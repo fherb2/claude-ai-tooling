@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Self-test for chat_crawl_store: unit checks plus an end-to-end CLI run.
 
-Run from the directory holding chat_crawl_store.py:
+Runnable from anywhere; the script under test is located relative to this
+file, not to the working directory:
 
-    python test_crawl_store.py
-    python -O test_crawl_store.py     # verifies the __debug__ guards compile out
+    python tests/test_crawl_store.py
+    python -O tests/test_crawl_store.py   # verifies the __debug__ guards compile out
 """
 
 import json
@@ -15,6 +16,20 @@ import shutil
 import subprocess
 import sys
 import tempfile
+
+# Locate the script under test: prefer the repo layout (../source next to a
+# tests/ directory), fall back to the directory of this file.  SCRIPT is then
+# derived from the *imported* module, so the unit tests and the CLI
+# subprocesses are guaranteed to exercise the same file.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_CANDIDATES = [os.path.join(os.path.dirname(_HERE), "source"), _HERE]
+for _candidate in _CANDIDATES:
+    if os.path.exists(os.path.join(_candidate, "chat_crawl_store.py")):
+        sys.path.insert(0, _candidate)
+        break
+else:
+    sys.exit("chat_crawl_store.py not found next to this test file "
+             f"or in {_CANDIDATES[0]}")
 
 import chat_crawl_store as ccs
 
@@ -532,12 +547,55 @@ check("v2 store upgraded to the current schema",
 
 
 # ---------------------------------------------------------------------------
+# Contradictory chat-start observations must be recorded, not swallowed
+# ---------------------------------------------------------------------------
+
+contra = ccs.new_store("uuid-contra", "u")
+ccs.merge_fragment(contra, CHAT[:200], "")
+result = ccs.merge_fragment(contra, CHAT[130:400], "", is_chat_start=True)
+check("chat-start fragment joining at a tail leaves a warning",
+      result["action"] == "extended"
+      and any("appended at the tail" in entry["message"]
+              for entry in contra["warnings"]),
+      str(contra["warnings"]))
+
+contra2 = ccs.new_store("uuid-contra2", "u")
+ccs.merge_fragment(contra2, CHAT[100:300], "", is_chat_start=True)
+result = ccs.merge_fragment(contra2, CHAT[:400], "")
+check("superseding text before a chat-start segment warns and drops the mark",
+      result["action"] == "superseded"
+      and not contra2["segments"][0]["chat_start"]
+      and any("mark was dropped" in entry["message"]
+              for entry in contra2["warnings"]),
+      str(contra2["warnings"]))
+
+contra3 = ccs.new_store("uuid-contra3", "u")
+ccs.merge_fragment(contra3, CHAT[100:400], "", is_chat_start=True)
+result = ccs.merge_fragment(contra3, CHAT[:200], "")
+check("prepending before a chat-start segment warns and drops the mark",
+      result["action"] == "extended"
+      and not contra3["segments"][0]["chat_start"]
+      and any("prepended before" in entry["message"]
+              for entry in contra3["warnings"]),
+      str(contra3["warnings"]))
+
+contra4 = ccs.new_store("uuid-contra4", "u")
+ccs.merge_fragment(contra4, CHAT[:400], "")
+result = ccs.merge_fragment(contra4, CHAT[100:300], "", is_chat_start=True)
+check("contained chat-start fragment away from the head warns",
+      result["action"] == "contained"
+      and not contra4["segments"][0]["chat_start"]
+      and any("not at its head" in entry["message"]
+              for entry in contra4["warnings"]),
+      str(contra4["warnings"]))
+
+
+# ---------------------------------------------------------------------------
 # End-to-end CLI
 # ---------------------------------------------------------------------------
 
 WORK = tempfile.mkdtemp(prefix="crawl-e2e-")
-SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                      "chat_crawl_store.py")
+SCRIPT = os.path.abspath(ccs.__file__)
 UUID = "e2e-uuid-1"
 STORE_DIR = os.path.join(WORK, "store")
 
@@ -623,6 +681,295 @@ empty = os.path.join(WORK, "empty.txt")
 open(empty, "w").close()
 check("CLI ingest on an empty dump exits 1",
       run("ingest", "--raw", empty).returncode == 1)
+
+# Foreign JSON files in the store directory are skipped, never mistaken for
+# chat stores: an export written there by accident and a leftover v3 index.
+foreign = os.path.join(STORE_DIR, "chat_foreign.json")
+shutil.copy(out_path, foreign)
+result = run("status")
+check("status skips an export file lying in the store directory",
+      result.returncode == 0 and "Skipping foreign JSON" in result.stderr
+      and UUID in result.stdout,
+      result.stdout + result.stderr)
+result = run("status", "--chat", "chat_foreign")
+check("status --chat on a foreign JSON file exits 1 with a clear message",
+      result.returncode == 1 and "Not a chat store" in result.stderr,
+      result.stderr)
+os.remove(foreign)
+
+# A legacy v3 index.json is folded into the crawl state on first contact.
+MIG_DIR = os.path.join(WORK, "mig-store")
+os.makedirs(MIG_DIR)
+with open(os.path.join(MIG_DIR, "index.json"), "w", encoding="utf-8") as handle:
+    json.dump({"chats": {"legacy-1": {
+        "url": "https://claude.ai/chat/legacy-1",
+        "title": "Alter Titel", "updated_at": "2026-01-01T00:00:00Z"}}}, handle)
+result = subprocess.run(
+    [sys.executable, SCRIPT, "--store-dir", MIG_DIR, "overview"],
+    capture_output=True, text=True)
+check("legacy index.json is migrated into the crawl state",
+      result.returncode == 0
+      and os.path.exists(os.path.join(MIG_DIR, "index.json.migrated"))
+      and not os.path.exists(os.path.join(MIG_DIR, "index.json"))
+      and os.path.exists(os.path.join(MIG_DIR, ccs.STATE_FILENAME)),
+      result.stdout + result.stderr)
+check("the migrated title is visible to the crawl",
+      "Alter Titel" in result.stdout, result.stdout)
+with open(os.path.join(MIG_DIR, ccs.STATE_FILENAME), encoding="utf-8") as handle:
+    migrated_state = json.load(handle)
+check("the migrated chat starts as untouched",
+      migrated_state["chats"]["legacy-1"]["status"] == "untouched",
+      str(migrated_state["chats"]))
+result = subprocess.run(
+    [sys.executable, SCRIPT, "--store-dir", MIG_DIR, "overview"],
+    capture_output=True, text=True)
+check("the migration runs only once",
+      result.returncode == 0 and "Migrated legacy" not in result.stderr,
+      result.stderr)
+
+# ---------------------------------------------------------------------------
+# Crawl state and chat status
+# ---------------------------------------------------------------------------
+
+STATE_DIR = os.path.join(WORK, "state-store")
+TARGET = "state-target"
+BYSTANDER = "state-bystander"
+
+
+def run_state(*args):
+    """Invoke the CLI against the status test store."""
+    return subprocess.run(
+        [sys.executable, SCRIPT, "--store-dir", STATE_DIR, *args],
+        capture_output=True, text=True)
+
+
+def read_state_of(store_dir):
+    """Read the crawl state file the CLI wrote into *store_dir*."""
+    with open(os.path.join(store_dir, ccs.STATE_FILENAME),
+              "r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def status_of_dir(store_dir, uuid):
+    """Return the recorded status of one chat, or None when unknown."""
+    return read_state_of(store_dir)["chats"].get(uuid, {}).get("status")
+
+
+def read_state():
+    """Read the crawl state of the status test store."""
+    return read_state_of(STATE_DIR)
+
+
+def status_of(uuid):
+    """Return the recorded status of one chat in the status test store."""
+    return status_of_dir(STATE_DIR, uuid)
+
+
+def write_blocks(name, blocks):
+    """Write several <chat> blocks, possibly of different chats, to one file."""
+    path = os.path.join(WORK, name)
+    with open(path, "w", encoding="utf-8") as handle:
+        for uuid, body in blocks:
+            handle.write(f"<chat url='https://claude.ai/chat/{uuid}' "
+                         f"updated_at='2026-08-02T10:00:00Z'>{body}</chat>\n")
+    return path
+
+
+# One dump carrying two chats: the one that was searched for and a bystander
+# that merely turned up in the same result.
+pair = write_blocks("pair.txt", [(TARGET, HEADER + CHAT[:260]),
+                                 (BYSTANDER, HEADER + CHAT[:260])])
+result = run_state("ingest", "--raw", pair, "--query", "cluster term")
+check("ingest creates the crawl state file",
+      result.returncode == 0
+      and os.path.exists(os.path.join(STATE_DIR, ccs.STATE_FILENAME)),
+      result.stderr)
+check("a newly seen chat starts as untouched",
+      status_of(TARGET) == "untouched" and status_of(BYSTANDER) == "untouched",
+      str(read_state()["chats"]))
+check("ingest records the title of a chat nobody searched for",
+      read_state()["chats"][BYSTANDER].get("title") == "E2E Chat",
+      str(read_state()["chats"][BYSTANDER]))
+check("the state file is not mistaken for a chat store",
+      run_state("status").returncode == 0)
+
+result = run_state("queries", "--chat", TARGET, "-n", "3")
+check("queries marks the chat as started",
+      result.returncode == 0 and status_of(TARGET) == "started",
+      result.stdout + result.stderr)
+check("querying one chat leaves the bystander untouched",
+      status_of(BYSTANDER) == "untouched")
+
+# Growing inside a dump fetched for someone else is not the same as being
+# worked on -- this is what keeps the ACTIVE_LIMIT cap meaningful.
+grow = write_blocks("grow.txt", [(BYSTANDER, HEADER + CHAT[180:520])])
+result = run_state("ingest", "--raw", grow, "--query", "cluster term")
+check("a chat that grows in another chat's dump stays untouched",
+      result.returncode == 0 and "extended" in result.stdout
+      and status_of(BYSTANDER) == "untouched",
+      result.stdout + result.stderr)
+
+# Exporting early is legitimate and must stay visible as unfinished.
+export_path = os.path.join(WORK, "state-export.json")
+result = run_state("export", "--chat", TARGET, "--out", export_path)
+check("export of an unfinished chat leaves the status alone",
+      result.returncode == 0 and status_of(TARGET) == "started",
+      result.stdout + result.stderr)
+check("export says so when the chat stayed unfinished",
+      "unfinished" in result.stdout, result.stdout)
+
+for segment in ccs.load_store(ccs.store_path(STATE_DIR, TARGET))["segments"]:
+    for side in ("head", "tail"):
+        run_state("close", "--chat", TARGET,
+                  "--segment", str(segment["id"]), "--side", side)
+result = run_state("export", "--chat", TARGET, "--out", export_path)
+check("export of an exhausted crawl sets done",
+      result.returncode == 0 and status_of(TARGET) == "done",
+      result.stdout + result.stderr)
+check("export names the transition to done", "done" in result.stdout,
+      result.stdout)
+
+# A finished chat whose edge was reopened by hand must not fall back to
+# 'started' just because it can be queried again.
+run_state("close", "--chat", TARGET, "--segment", "1", "--side", "tail",
+          "--reopen")
+result = run_state("queries", "--chat", TARGET, "-n", "3")
+check("queries does not drag a finished chat back into work",
+      status_of(TARGET) == "done", result.stdout + result.stderr)
+
+# ---------------------------------------------------------------------------
+# Overview: the report that has to state the next action on its own
+# ---------------------------------------------------------------------------
+
+OVER_DIR = os.path.join(WORK, "overview-store")
+
+
+def run_over(*args):
+    """Invoke the CLI against the overview test store."""
+    return subprocess.run(
+        [sys.executable, SCRIPT, "--store-dir", OVER_DIR, *args],
+        capture_output=True, text=True)
+
+
+result = run_over("overview")
+check("overview on an empty directory exits 0 instead of failing",
+      result.returncode == 0, result.stderr)
+check("overview without a state file asks the user to decide",
+      "NO CRAWL STATE" in result.stdout
+      and "fresh export" in result.stdout
+      and "continuing earlier work" in result.stdout, result.stdout)
+
+# Four chats, distinct timestamps, so the working order is observable.
+STAMPS = {"ov-1": "2026-01-01T00:00:00Z", "ov-2": "2026-02-01T00:00:00Z",
+          "ov-3": "2026-03-01T00:00:00Z", "ov-4": "2026-04-01T00:00:00Z"}
+ov_path = os.path.join(WORK, "ov.txt")
+with open(ov_path, "w", encoding="utf-8") as handle:
+    for uuid, stamp in STAMPS.items():
+        handle.write(f"<chat url='https://claude.ai/chat/{uuid}' "
+                     f"updated_at='{stamp}'>Title: Chat {uuid}\nChat {uuid}\n"
+                     f"{CHAT[:260]}</chat>\n")
+run_over("ingest", "--raw", ov_path, "--query", "cluster term")
+
+result = run_over("overview")
+check("overview reports an idle round without claiming which case it is",
+      "IDLE" in result.stdout and "only you know" in result.stdout,
+      result.stdout)
+check("overview counts the untouched chats", "4 untouched" in result.stdout,
+      result.stdout)
+check("overview offers all three slots when nothing is active",
+      "3 free slot(s)" in result.stdout, result.stdout)
+
+run_over("state", "--order", "oldest-first")
+oldest_first = run_over("overview").stdout
+run_over("state", "--order", "newest-first")
+newest_first = run_over("overview").stdout
+
+
+def section(report, name):
+    """Return one section of an overview report, header line excluded.
+
+    Anchored at the start of a line, because the section names also occur
+    inside the guidance text further up.
+    """
+    header = re.search(rf"^{name}.*$", report, re.M)
+    if header is None:
+        return ""
+    return report[header.end():].split("\n\n")[0]
+
+
+def first_nominee(report):
+    """Return the uuid named first under NEXT UP."""
+    return re.search(r"(ov-\d)", section(report, "NEXT UP")).group(1)
+
+
+check("oldest-first nominates the oldest chat first",
+      first_nominee(oldest_first) == "ov-1", first_nominee(oldest_first))
+check("newest-first nominates the newest chat first",
+      first_nominee(newest_first) == "ov-4", first_nominee(newest_first))
+
+run_over("state", "--order", "oldest-first")
+for uuid in ("ov-1", "ov-2", "ov-3"):
+    run_over("queries", "--chat", uuid, "-n", "2")
+result = run_over("overview")
+check("three started chats fill the round", "3 of at most 3" in result.stdout,
+      result.stdout)
+check("no fourth chat is nominated while the round is full",
+      "no free slot" in result.stdout
+      and "ov-4" not in section(result.stdout, "NEXT UP"), result.stdout)
+check("the handover names the state file and the three store files",
+      ccs.STATE_FILENAME in section(result.stdout, "HANDOVER")
+      and "4 file(s) in total" in result.stdout, result.stdout)
+check("the handover names by-catch stores that stay behind by design",
+      "BY DESIGN" in section(result.stdout, "HANDOVER"), result.stdout)
+
+# A chat that ran dry frees its slot again without being done yet.
+for segment in ccs.load_store(ccs.store_path(OVER_DIR, "ov-1"))["segments"]:
+    for side in ("head", "tail"):
+        run_over("close", "--chat", "ov-1", "--segment", str(segment["id"]),
+                 "--side", side)
+result = run_over("overview")
+check("a chat without open edges frees its slot",
+      "2 of at most 3" in result.stdout and "1 free" in result.stdout,
+      result.stdout)
+check("the drained chat is offered for export",
+      "ov-1" in section(result.stdout, "READY TO EXPORT"), result.stdout)
+check("the freed slot nominates the next chat in order",
+      first_nominee(result.stdout) == "ov-4", result.stdout)
+
+# order stays changeable after work has begun; it must not touch what is done
+run_over("export", "--chat", "ov-1", "--out", os.path.join(WORK, "ov1.json"))
+result = run_over("state", "--order", "newest-first")
+check("the working order can still be changed after work has begun",
+      result.returncode == 0, result.stderr)
+check("changing the order leaves a finished chat done",
+      status_of_dir(OVER_DIR, "ov-1") == "done")
+
+result = run_over("state")
+check("state without an argument explains itself and exits 1",
+      result.returncode == 1 and "--order" in result.stderr, result.stderr)
+result = run_over("state", "--status", "done")
+check("state --status without --chat exits 1", result.returncode == 1,
+      result.stderr)
+result = run_over("state", "--chat", "ov-2", "--status", "done")
+check("state --status corrects a status by hand",
+      result.returncode == 0 and status_of_dir(OVER_DIR, "ov-2") == "done",
+      result.stdout + result.stderr)
+
+# A started chat whose store file is gone must be asked for by name.
+os.remove(ccs.store_path(OVER_DIR, "ov-3"))
+result = run_over("overview")
+check("overview asks for the store file of a started chat that is absent",
+      "ov-3" in section(result.stdout, "MISSING STORE FILES"), result.stdout)
+
+# Without the state file everything has to be recovered from the stores.
+os.remove(os.path.join(OVER_DIR, ccs.STATE_FILENAME))
+result = run_over("overview")
+check("overview flags a missing state file as loss, not as a fresh start",
+      result.returncode == 0 and f"no {ccs.STATE_FILENAME}" in result.stdout
+      and "recovered" in result.stdout, result.stdout)
+check("the loss banner is precise about what survives and what is gone",
+      "titles and progress included" in result.stdout
+      and "'done' mark" in result.stdout, result.stdout)
 
 shutil.rmtree(WORK, ignore_errors=True)
 

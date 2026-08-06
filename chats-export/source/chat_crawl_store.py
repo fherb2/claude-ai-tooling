@@ -15,6 +15,87 @@ You cannot delegate the searching itself: the search tools live in your
 runtime, not in the container.  Every snippet must pass through your
 context.  The script's job is to remember everything so you do not have to.
 
+THE STORE DIRECTORY
+-------------------
+``--store-dir`` holds one file per chat plus one state file:
+
+*   ``<uuid>.json`` -- the reconstruction of one chat: its segments, which
+    edges are still worth querying, which queries were already spent.
+*   ``crawl-state.json`` -- every chat UUID ever seen in any dump, with its
+    title, timestamp and working status, plus the direction in which the
+    chats are being worked through.
+
+``crawl-state.json`` is only partly regenerable.  With every ``<uuid>.json``
+still in place, ``overview`` recovers those chats' titles and progress from
+the store files themselves.  What is gone for good without the state file:
+every ``done`` mark, the working order, and the titles of all chats that
+never got a store file -- exactly the seed vocabulary the bootstrap step
+paid searches for.  So treat it as precious anyway.
+
+Keep the directory clean: only store files and the state file belong there.
+In particular, never write an export (``--out``) into ``--store-dir`` --
+foreign JSON files are skipped with a warning, but they do not belong there.
+A directory from an older schema is upgraded automatically on first contact,
+including a legacy ``index.json``, which is folded into the state file and
+renamed to ``index.json.migrated``.
+
+SESSION START -- do this before anything else
+---------------------------------------------
+A big export does not fit into one conversation, so most sessions are a
+continuation of an earlier one.  Find out which case you are in first::
+
+    python chat_crawl_store.py --store-dir ./store overview
+
+The report names the case and the next action.  Three situations need a
+question put to the user, and you must not guess your way past them:
+
+*   **Nothing there at all.**  Ask: a fresh export, or continuing earlier
+    work?  On a fresh export also ask whether to work through the chats
+    oldest-first or newest-first, and record the answer with
+    ``state --order <choice>``.  On a continuation ask for the upload of
+    ``crawl-state.json`` plus the ``<uuid>.json`` of every started chat.
+*   **A state file is there.**  Continue; do not ask.  The one exception is
+    a store *you* built earlier in this same conversation and that was merely
+    interrupted -- then ask whether to continue or to start over empty,
+    because only you know that no upload happened.
+*   **Chats marked ``started`` whose ``<uuid>.json`` is absent.**  Ask for
+    exactly those files by name.  Their crawl progress is otherwise gone.
+
+UPLOAD PROBE -- once per continuation, before trusting anything uploaded
+    Whether files the user uploads into the conversation are readable by
+    this script in the container is *not* documented anywhere.  So check,
+    the same way the format probe checks the snippet format: list the
+    directory the user uploaded into and confirm the files are really there
+    and really parse.  Report the result.
+
+    Never point ``--store-dir`` at the upload directory and never work in
+    place: COPY the uploaded files into your working store directory
+    (e.g. ``./store``) first, then run ``overview`` there to confirm the
+    copies parse.  The upload location is reported to be read-only, so
+    working in it would fail at the first write -- in the best case
+    immediately, in the worst case mid-round.
+
+    Where that location is, is NOT documented by Anthropic.  Community
+    reverse-engineering reports ``/mnt/user-data/uploads`` on claude.ai, and
+    that is the first place worth looking, but treat it as a guess: if the
+    files are not there, search rather than conclude they were never
+    uploaded.  Copying instead of working in place is the right move either
+    way, whatever the path turns out to be.
+
+    They may well arrive under a different name -- ``.txt`` appended,
+    because a chat upload of a ``.json`` file is not always accepted.
+    Renaming while copying is fine; changing the content is not.
+    If the files are nowhere in the filesystem, stop and report it.  Do not
+    improvise: the documented alternative is to keep the store in the
+    project knowledge of a claude.ai project, at the price of the files
+    permanently occupying context.
+
+    One asymmetry decides how far you may go.  Writing ``crawl-state.json``
+    out again from what you can see in the conversation is acceptable: it is
+    small and machine-generated.  Doing that with a ``<uuid>.json`` is not --
+    those hold reconstructed chat text, and retyping snippets is exactly what
+    this script exists to prevent.  Rather stop and say so.
+
 WORKFLOW
 --------
 1.  Run the format probe below before the first real ingest.  Then list the
@@ -51,7 +132,7 @@ WORKFLOW
 
     Record every (uuid, title) pair you see this way, even from chats
     you are not ready to ingest yet -- title words are exactly the seed
-    vocabulary for a targeted query on that chat later (see step 2).
+    vocabulary for a targeted query on that chat later (see step 3).
     Ingest the dump immediately with ``--query`` set to the cluster term
     used, same as any other search result; do not discard the parts of
     the dump belonging to chats you were not looking for.
@@ -60,9 +141,29 @@ WORKFLOW
     net returns much you will not keep), so budget it deliberately: a
     handful of cluster queries to map the whole project's titles, not
     one per chat.  Prefer breadth here (many titles, shallow) and leave
-    depth (full reconstruction) to the targeted loop in step 2-3.
+    depth (full reconstruction) to the targeted loop in steps 3-4.
 
-2.  Ask what to search next:
+2.  Pick the chats to work on -- at most ``ACTIVE_LIMIT`` (three) at a time.
+    ``overview`` names them under ACTIVE and nominates the next candidates
+    under NEXT UP, neighbours first in the chosen order.  Read it at the
+    start of every round instead of remembering: the state on disk is the
+    truth, your recollection of it is not.
+
+    Three is an upper bound, not a quota.  With very long chats, start one
+    and see what it costs before opening a second.
+
+    Two reasons for the cap, and both matter:
+      * Context.  Every snippet of every chat passes through you.
+      * Handover.  Only started chats have to travel to the next
+        conversation, and a chat upload is documented to take at most 20
+        files.  Three active chats keep the handover at four files.
+
+    A dump fetched for one chat regularly contains others.  Ingest all of it
+    -- the script files each chat separately and keeps the titles.  But a
+    chat that merely grew that way is *not* one you started: it stays
+    ``untouched`` and does not occupy a slot.
+
+3.  For each active chat, ask what to search next:
 
         python chat_crawl_store.py --store-dir ./store queries \
             --chat <uuid> -n 5
@@ -71,18 +172,25 @@ WORKFLOW
     the result, ingest it with ``--query`` set to that exact suggestion.
     The exact string matters: it is how the script credits the right edge.
 
-3.  Repeat step 2.  Watch ``status``.  An edge marked ``~`` has produced
-    nothing new several times in a row; stop querying it.
+    ``queries`` is also what marks the chat ``started``.  Do not run it on a
+    chat you are not actually taking up.
 
-4.  Stop when ``status`` says CRAWL FINISHED, or when your context is
-    filling up.  Then export.
+4.  Repeat step 3.  Watch ``status``.  An edge marked ``~`` has produced
+    nothing new several times in a row; stop querying it.  When a chat has
+    no open edge left, ``overview`` moves it to READY TO EXPORT and the slot
+    is free.
 
-5.  Export:
+5.  Export every chat that is ready:
 
         python chat_crawl_store.py --store-dir ./store export \
             --chat <uuid> --out chat_<uuid>.json
 
-    Present the file to the user.  If the crawl is unfinished, say so.
+    The export is what turns a chat into ``done``, and only an exhausted
+    crawl earns that.  Exporting earlier is allowed -- then the chat keeps
+    its status and you say plainly that it is unfinished.
+
+6.  Round over.  Hand the files to the user, report the standing, and ask
+    whether to continue.  See ROUNDS AND HANDOVER below.
 
 ===========================================================================
 FORMAT PROBE -- do this once per environment, before trusting the parser.
@@ -114,11 +222,50 @@ If any answer contradicts the OBSERVED FORMATS section below, stop and tell
 the user before ingesting anything.  Naming the exact difference is far more
 useful than a half-correct export.
 
-RUNNING OUT OF CONTEXT
-----------------------
-The container filesystem is wiped between sessions.  Before you run out of
-room, present the whole ``store`` directory to the user and tell them to
-re-upload it next time.  Say plainly how far the crawl got.
+If the probes pass, do not throw their dumps away: they are valid search
+results.  Ingest them like any other dump (probe 1 with ``--query`` set to
+the term used, probe 2 with ``--query ""``) -- otherwise the two searches
+they cost are wasted.
+
+ROUNDS AND HANDOVER
+-------------------
+The container filesystem is wiped between sessions, so the store has to
+travel through the user by hand.  Work in *rounds* and hand over at the end
+of each one; a round is at most the three active chats.
+
+Do NOT wait for the context to run out.  You cannot see it run out.  On
+claude.ai a long conversation does not stop at the limit, it summarises its
+earlier parts and continues -- so the moment you would be waiting for may
+never arrive, and what degrades instead is your grip on these instructions.
+That is why the round, not a context signal, drives the handover.  It also
+makes the summarising harmless: everything that matters is on disk, so a
+fresh ``overview`` restores the full picture, and this file can simply be
+read again.
+
+At the start, tell the user they may interrupt at any time; otherwise you
+work on until the round ends or nothing is left to crawl.  If they do
+interrupt, run this handover procedure -- do not just stop.
+
+The handover itself:
+
+*   Export what is ready and offer every export file for download.  Name the
+    files that are ``done``: the user can move those out of the way for good.
+*   Hand back ``crawl-state.json`` **always**, together with the
+    ``<uuid>.json`` of every chat still ``started``.  ``overview`` lists
+    exactly these under HANDOVER.  Without the state file the titles, the
+    working order and every ``done`` mark are gone and the next session
+    starts from zero -- with all the ``<uuid>.json`` files still present.
+*   Say how many chats are done, how many are started, how many are still
+    untouched.  Mention that these are JSON files and ask whether the user
+    needs them with a ``.txt`` extension to get them back in next time.
+*   Store files of ``untouched`` chats stay behind **by design**, even when
+    they already carry text picked up as by-catch in other chats' dumps.
+    Only started chats travel; that is what keeps the handover at four
+    files.  The price is real and you should name it once at the handover
+    when it applies: whatever those chats accumulated is discarded with the
+    container, and taking one of them up later re-searches that text.  The
+    state file keeps their titles, so nothing but search effort is lost.
+*   Then ask whether to continue.
 
 HOW TO REPORT TO THE USER
 -------------------------
@@ -138,6 +285,15 @@ the user.  Read it, judge it, and tell the user only what matters:
     warnings one by one.  Warnings also travel into the export file, so the
     later import step can consider them again.
 
+Keep a running note of the work itself, separately from the warnings:
+
+*   Say at the outset that the user may interrupt whenever they like.
+*   One short line on every status change -- which chat you have just taken
+    up, which one is finished.  A line, not a paragraph, and no repetition
+    of the whole standing; that comes at the handover.
+*   Never report a chat as finished that you have not exported.  ``done``
+    means the file is written, not that the chat looked complete.
+
 WHAT NOT TO DO
 --------------
 *   Do not edit store files by hand.
@@ -145,6 +301,13 @@ WHAT NOT TO DO
 *   Do not claim a chat is complete.  The end of a chat cannot be detected
     from snippets; only its beginning can.  Segment order is unknown except
     for the segment carrying ``chat_start``.
+*   Do not take search tokens from more than three chats at a time, however
+    tempting the fourth title looks.
+*   Do not hand the store back without ``crawl-state.json``.  The
+    ``<uuid>.json`` files alone are not a resumable crawl.
+*   Do not report a chat as ``done`` that was never exported.
+*   Do not wait for a signal that the context is running out.  There is
+    none; work in rounds instead.
 
 ===========================================================================
 DESIGN NOTES -- for the developer maintaining this script.
@@ -213,8 +376,52 @@ across several blocks is accounted once.  An edge is *exhausted* at
 ``edges.head.closed``: closing an edge by hand means "stop querying here",
 which is not the same claim as "this is where the chat begins".
 
+STATUS MECHANICS
+----------------
+``crawl-state.json`` carries one status per chat: ``untouched``, ``started``
+or ``done``.
+
+``queries`` is what sets ``started``, never ``ingest``.  A dump fetched for
+one chat routinely grows two or three others, and those must stay
+``untouched``: asking for search tokens is the act of working on a chat,
+receiving text by accident is not.  Without that distinction the
+``ACTIVE_LIMIT`` cap would be gone after two searches.
+
+``export`` sets ``done`` only when ``crawl_finished`` holds.  Exporting an
+unfinished chat is legitimate -- context runs out -- and has to stay visible
+as unfinished, so the status remains ``started``.
+
+``done`` is a different claim from the ``CRAWL FINISHED`` line in ``status``.
+The latter means "no edge is worth querying any more"; ``done`` means
+"exported, and the file may leave the store directory".  That is why the
+status lives in the state file rather than in the per-chat store: a finished
+chat whose ``<uuid>.json`` has been filed away must not look untouched the
+next time around.
+
+``state --status`` is the manual override for what no script can judge: a
+chat the user calls good enough, a status that drifted, a file that came
+back under another name.  ``state --order`` may be changed at any time; it
+only steers which ``untouched`` chat is nominated next.
+
+``overview`` derives everything and changes no crawl decision.  Where it
+cannot know, it says so instead of guessing: an idle round looks exactly the
+same whether a round just ran dry or none has begun, and only the reader can
+tell the two apart.  A store file with no entry in the state file is reported
+as *recovered* and counted as ``started`` without being written out; the next
+command touching that chat persists the record anyway.
+
+The one thing ``overview`` does write is the one-off schema migration every
+command shares through ``load_state``: a legacy ``index.json`` is folded into
+the state file and renamed.  That is repair, not bookkeeping -- it is
+idempotent, it decides nothing, and running it from a read-only report is
+better than leaving the directory in a state where the next scan mistakes
+the legacy file for a chat store.
+
 Usage
 -----
+    python chat_crawl_store.py overview
+    python chat_crawl_store.py state   [--order oldest-first|newest-first] \
+                                       [--chat <uuid> --status STATUS]
     python chat_crawl_store.py ingest  --raw dump.txt [--query Q]
     python chat_crawl_store.py status  [--chat <uuid>]
     python chat_crawl_store.py queries --chat <uuid> [-n 5]
@@ -245,7 +452,9 @@ from typing import Any
 SCHEMA_VERSION       = 4
 DEFAULT_MIN_OVERLAP  = 60       # minimum overlap length in normalised chars
 EDGE_WINDOW          = 400      # chars inspected at a segment edge for tokens
-INDEX_FILENAME       = "index.json"
+STATE_FILENAME       = "crawl-state.json"
+STATE_SCHEMA_VERSION = 1
+ACTIVE_LIMIT         = 3        # chats queried at the same time (upper bound)
 BARREN_LIMIT         = 3        # fruitless queries before an edge is exhausted
 TITLE_MATCH_CHARS    = 15       # chars compared to detect a repeated title
 HEADER_SEARCH_LINES  = 6        # how far to look for the 'Title:' line
@@ -743,6 +952,35 @@ def load_store(path: str) -> dict[str, Any]:
         return upgrade_store(json.load(handle))
 
 
+def is_store_payload(payload: Any) -> bool:
+    """True when *payload* looks like a chat store of any schema version.
+
+    Export documents, the legacy ``index.json`` and other foreign JSON files
+    fail this test; directory scans use it so that a stray file never crashes
+    ``status`` or pollutes ``overview`` with a phantom chat.
+    """
+    return (isinstance(payload, dict)
+            and isinstance(payload.get("chat_uuid"), str)
+            and isinstance(payload.get("segments"), list))
+
+
+def try_load_store(path: str) -> dict[str, Any] | None:
+    """Load a store file, or return None when it is not a chat store.
+
+    Used by directory scans, where a foreign JSON file (an export written
+    into the store directory, a leftover ``index.json``) must be skipped
+    instead of crashing the command.
+    """
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not is_store_payload(payload):
+        return None
+    return upgrade_store(payload)
+
+
 def _write_json_atomic(payload: Any, path: str, prefix: str) -> None:
     """Write *payload* as JSON to *path* via a temp file and os.replace."""
     directory = os.path.dirname(os.path.abspath(path))
@@ -846,15 +1084,26 @@ def merge_fragment(store: dict[str, Any],
         if frag_norm in seg_norm:
             stats["contained_events"] += 1
             _record_query(segment, query)
-            if is_chat_start and seg_norm.startswith(frag_norm):
-                segment["chat_start"] = True
-                segment["edges"]["head"]["closed"] = True
+            if is_chat_start:
+                if seg_norm.startswith(frag_norm):
+                    segment["chat_start"] = True
+                    segment["edges"]["head"]["closed"] = True
+                else:
+                    add_warning(store, f"segment {segment['id']}",
+                                "a fragment flagged as chat start lies inside "
+                                "this segment but not at its head; the start "
+                                "detection or an earlier merge is wrong")
             return {"action": "contained", "segment_id": segment["id"],
                     "grew": False, "remap": {}}
 
         if seg_norm in frag_norm:
             head_kept = frag_norm.startswith(seg_norm)
             tail_kept = frag_norm.endswith(seg_norm)
+            if segment["chat_start"] and not head_kept:
+                add_warning(store, f"segment {segment['id']}",
+                            "text was found before a segment marked as chat "
+                            "start; the mark was dropped -- the start "
+                            "detection or this merge is wrong")
             segment["text"] = fragment
             if is_chat_start:
                 segment["chat_start"] = True
@@ -902,10 +1151,20 @@ def merge_fragment(store: dict[str, Any],
 
     if best_segment is not None:
         if best_direction == "append":
+            if is_chat_start:
+                add_warning(store, f"segment {best_segment['id']}",
+                            "a fragment flagged as chat start was appended at "
+                            "the tail of this segment; the flag was ignored -- "
+                            "the start detection or this merge is wrong")
             cut = _original_cut(fragment, best_len)
             best_segment["text"] = best_segment["text"] + fragment[cut:]
             best_segment["edges"]["tail"] = _new_edge()
         else:
+            if best_segment["chat_start"] and not is_chat_start:
+                add_warning(store, f"segment {best_segment['id']}",
+                            "text was prepended before a segment marked as "
+                            "chat start; the mark was dropped -- the start "
+                            "detection or this merge is wrong")
             cut = _original_cut(best_segment["text"], best_len)
             best_segment["text"] = fragment + best_segment["text"][cut:]
             best_segment["chat_start"] = is_chat_start
@@ -1397,29 +1656,413 @@ def warning_report(store: dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Index handling
+# Crawl state
 # ---------------------------------------------------------------------------
 
-def update_index(store_dir: str, entries: list[dict[str, Any]]) -> dict[str, Any]:
-    """Merge *entries* into the chat index file and return the index."""
-    path = os.path.join(store_dir, INDEX_FILENAME)
-    index: dict[str, Any] = {"chats": {}}
+CHAT_STATUSES = ("untouched", "started", "done")
+ORDER_VALUES  = ("oldest-first", "newest-first")
+
+
+def state_path(store_dir: str) -> str:
+    """Return the path of the crawl state file."""
+    return os.path.join(store_dir, STATE_FILENAME)
+
+
+def state_exists(store_dir: str) -> bool:
+    """True when a crawl state file is present."""
+    return os.path.exists(state_path(store_dir))
+
+
+def new_state() -> dict[str, Any]:
+    """Return an empty crawl state."""
+    return {"schema_version": STATE_SCHEMA_VERSION, "order": "", "chats": {}}
+
+
+LEGACY_INDEX_FILENAME = "index.json"
+
+
+def _migrate_legacy_index(store_dir: str) -> None:
+    """Fold a schema-v3 ``index.json`` into the crawl state, once.
+
+    v3 kept titles and timestamps in ``index.json``; v4 keeps them in the
+    state file.  The legacy file is merged (existing state entries win) and
+    renamed to ``index.json.migrated`` so that directory scans never mistake
+    it for a chat store again.  An unreadable legacy file is left in place
+    with a warning -- it is skipped by the scans either way.
+    """
+    legacy = os.path.join(store_dir, LEGACY_INDEX_FILENAME)
+    if not os.path.exists(legacy):
+        return
+    try:
+        with open(legacy, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        print(f"Warning: {legacy} exists but is unreadable; leaving it alone.",
+              file=sys.stderr)
+        return
+    chats = payload.get("chats", {}) if isinstance(payload, dict) else {}
+
+    path = state_path(store_dir)
+    state = new_state()
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as handle:
-            index = json.load(handle)
-    index.setdefault("chats", {})
+            state = json.load(handle)
+        state.setdefault("order", "")
+        state.setdefault("chats", {})
 
+    for uuid, legacy_record in chats.items():
+        if not isinstance(legacy_record, dict):
+            continue
+        record = state["chats"].setdefault(uuid, {"status": "untouched"})
+        record.setdefault("status", "untouched")
+        for key in ("url", "title", "updated_at"):
+            if legacy_record.get(key) and not record.get(key):
+                record[key] = legacy_record[key]
+
+    state["schema_version"] = STATE_SCHEMA_VERSION
+    _write_json_atomic(state, path, ".state-")
+    os.replace(legacy, legacy + ".migrated")
+    print(f"Migrated legacy {LEGACY_INDEX_FILENAME} into {STATE_FILENAME} "
+          f"({len(chats)} chat record(s)); the old file was renamed to "
+          f"{LEGACY_INDEX_FILENAME}.migrated.", file=sys.stderr)
+
+
+def load_state(store_dir: str) -> dict[str, Any]:
+    """Load the crawl state, or return an empty one when there is none.
+
+    A missing state file is never an error here.  It is the signal that the
+    user still has to decide between a fresh export and a continuation, and
+    only the caller knows how to ask that.  A legacy v3 ``index.json`` is
+    migrated into the state file on first contact.
+    """
+    _migrate_legacy_index(store_dir)
+    path = state_path(store_dir)
+    if not os.path.exists(path):
+        return new_state()
+    with open(path, "r", encoding="utf-8") as handle:
+        state = json.load(handle)
+    state.setdefault("schema_version", STATE_SCHEMA_VERSION)
+    state.setdefault("order", "")
+    state.setdefault("chats", {})
+    for record in state["chats"].values():
+        record.setdefault("status", "untouched")
+    return state
+
+
+def save_state(store_dir: str, state: dict[str, Any]) -> None:
+    """Write the crawl state atomically."""
+    state["schema_version"] = STATE_SCHEMA_VERSION
+    os.makedirs(store_dir, exist_ok=True)
+    _write_json_atomic(state, state_path(store_dir), ".state-")
+
+
+def update_state(store_dir: str, entries: list[dict[str, Any]]) -> dict[str, Any]:
+    """Merge *entries* into the crawl state and return it.
+
+    Every chat occurring in any dump is recorded, including chats nobody was
+    looking for: their titles are the seed vocabulary for a targeted query
+    later.  Such a chat starts as ``untouched`` -- growing by accident inside
+    someone else's dump is not the same as being worked on, and keeping the
+    two apart is what makes the ``ACTIVE_LIMIT`` cap hold.
+    """
+    state = load_state(store_dir)
     for entry in entries:
-        record = index["chats"].setdefault(entry["uuid"], {})
+        record = state["chats"].setdefault(entry["uuid"], {"status": "untouched"})
         record["url"] = entry["url"]
+        record.setdefault("status", "untouched")
         if entry["updated_at"]:
             record["updated_at"] = entry["updated_at"]
         if entry["title"]:
             record["title"] = entry["title"]
+    save_state(store_dir, state)
+    return state
 
-    os.makedirs(store_dir, exist_ok=True)
-    _write_json_atomic(index, path, ".index-")
-    return index
+
+def set_chat_status(store_dir: str, uuid: str, status: str,
+                    only_from: str = "") -> str | None:
+    """Set the status of one chat and return the status it had before.
+
+    With *only_from* the change happens only when the current status matches,
+    and ``None`` is returned when nothing changed.  That is what keeps
+    ``queries`` from dragging an already finished chat back into work.
+    """
+    state = load_state(store_dir)
+    record = state["chats"].setdefault(uuid, {"status": "untouched"})
+    previous = record.get("status", "untouched")
+    if only_from and previous != only_from:
+        return None
+    record["status"] = status
+    save_state(store_dir, state)
+    return previous
+
+
+def set_order(store_dir: str, order: str) -> None:
+    """Record the direction in which the chats are worked through.
+
+    Changing this later is harmless: it only steers which ``untouched`` chat
+    is nominated next and never touches what is already done.
+    """
+    state = load_state(store_dir)
+    state["order"] = order
+    save_state(store_dir, state)
+
+
+def sort_chats(records: list[dict[str, Any]], order: str) -> list[dict[str, Any]]:
+    """Order chat records by timestamp; entries without one always come last."""
+    stamped = [record for record in records if record.get("updated_at")]
+    unstamped = [record for record in records if not record.get("updated_at")]
+    stamped.sort(key=lambda record: record["updated_at"],
+                 reverse=(order == "newest-first"))
+    return stamped + unstamped
+
+
+def chat_overview(store_dir: str) -> dict[str, Any]:
+    """Derive the working picture from the crawl state and the store files.
+
+    This records no decision of its own.  A store file the state does not know
+    about is reported as *recovered* and counted as ``started`` without being
+    written out; the next command that touches that chat persists the record
+    anyway, so nothing is lost by leaving it alone here.
+
+    Not entirely free of side effects, though: ``load_state`` performs the
+    one-off legacy ``index.json`` migration, so a first call on an old store
+    directory does write the state file and rename that file.
+    """
+    state = load_state(store_dir)
+    order = state.get("order") or "oldest-first"
+
+    known = {uuid: dict(entry) for uuid, entry in state["chats"].items()}
+    stores: dict[str, dict[str, Any]] = {}
+    recovered: set[str] = set()
+    if os.path.isdir(store_dir):
+        for name in sorted(os.listdir(store_dir)):
+            if not name.endswith(".json") or name == STATE_FILENAME:
+                continue
+            path = os.path.join(store_dir, name)
+            store = try_load_store(path)
+            if store is None:
+                # Exports or other foreign JSON: not a chat, not an error.
+                continue
+            uuid = name[:-len(".json")]
+            stores[uuid] = store
+            if uuid not in known:
+                known[uuid] = {"status": "started"}
+                recovered.add(uuid)
+
+    records: list[dict[str, Any]] = []
+    for uuid, entry in known.items():
+        record = {
+            "uuid":       uuid,
+            "title":      entry.get("title", ""),
+            "updated_at": entry.get("updated_at", ""),
+            "status":     entry.get("status", "untouched"),
+            "has_store":  uuid in stores,
+            "recovered":  uuid in recovered,
+            "open_edges": 0,
+            "segments":   0,
+            "chars":      0,
+        }
+        if record["has_store"]:
+            store = stores[uuid]
+            record["title"] = record["title"] or store.get("title", "")
+            record["updated_at"] = (record["updated_at"]
+                                    or store.get("updated_at", ""))
+            record["open_edges"] = len(open_edges(store))
+            record["segments"] = len(store["segments"])
+            record["chars"] = sum(len(seg["text"]) for seg in store["segments"])
+        records.append(record)
+
+    records = sort_chats(records, order)
+
+    active = [r for r in records if r["status"] == "started"
+              and r["has_store"] and r["open_edges"]]
+    # Anything worth exporting: a started chat that ran dry, but also a chat
+    # that was completed by accident inside other chats' dumps.
+    ready = [r for r in records if r["status"] != "done"
+             and r["has_store"] and r["segments"] and not r["open_edges"]]
+    # 'done' without a store file is normal -- the user filed it away.
+    missing = [r for r in records if r["status"] == "started"
+               and not r["has_store"]]
+    done = [r for r in records if r["status"] == "done"]
+    untouched = [r for r in records if r["status"] == "untouched"]
+    candidates = [r for r in untouched if r not in ready]
+    free_slots = max(0, ACTIVE_LIMIT - len(active))
+
+    # Whether a round just ran or has not begun yet is indistinguishable from
+    # the state alone -- only the reader knows.  So the script reports the
+    # fact ("nothing is active") and never claims which of the two it is.
+    if active:
+        round_state = "in progress"
+    elif candidates or ready or missing:
+        round_state = "idle"
+    else:
+        round_state = "all done"
+
+    return {
+        "store_dir":   store_dir,
+        "state_file":  state_exists(store_dir),
+        "order":       order,
+        "order_set":   bool(state.get("order")),
+        "records":     records,
+        "active":      active,
+        "ready":       ready,
+        "missing":     missing,
+        "done":        done,
+        "untouched":   untouched,
+        "candidates":  candidates,
+        "free_slots":  free_slots,
+        "next_up":     candidates[:free_slots],
+        "round_state": round_state,
+    }
+
+
+def _overview_chat_line(record: dict[str, Any], hint: str = "") -> list[str]:
+    """Render one chat as one or two lines of the overview."""
+    lines = [f"  {record['uuid']}  {record['title'] or '(title unknown)'}"]
+    facts = []
+    if record["segments"]:
+        facts.append(f"{record['segments']} segment(s)")
+        facts.append(f"{record['chars']} chars")
+    if record["open_edges"]:
+        facts.append(f"{record['open_edges']} open edge(s)")
+    if not record["has_store"]:
+        facts.append("no store file here")
+    if record["recovered"]:
+        facts.append("recovered from the store file")
+    detail = ", ".join(facts)
+    if detail or hint:
+        lines.append(f"      {detail}{'  -> ' + hint if hint else ''}")
+    return lines
+
+
+def _no_state_report(store_dir: str) -> list[str]:
+    """Render the start-up decision when there is nothing to continue from."""
+    return [
+        f"NO CRAWL STATE in {store_dir}",
+        "-" * 66,
+        "Neither a crawl state file nor a single chat store is here.",
+        "Ask the user which case applies; do not guess:",
+        "  * a fresh export -- ask whether to work through the chats",
+        "    oldest-first or newest-first, then run 'state --order <choice>'.",
+        f"  * continuing earlier work -- ask them to upload {STATE_FILENAME}",
+        "    plus the <uuid>.json of every chat marked 'started', then run the",
+        "    upload probe from the operating instructions.",
+        "If you created or emptied this directory yourself earlier in this same",
+        "conversation, neither case applies: carry on where you left off.",
+    ]
+
+
+def overview_report(picture: dict[str, Any]) -> str:
+    """Render the working picture as text that states the next action."""
+    if not picture["state_file"] and not picture["records"]:
+        return "\n".join(_no_state_report(picture["store_dir"]))
+
+    started = [r for r in picture["records"] if r["status"] == "started"]
+    lines = [f"CRAWL STATE  {picture['store_dir']}"]
+
+    if not picture["state_file"]:
+        lines += [
+            f"  !! no {STATE_FILENAME} here -- the chats below were recovered",
+            "     from their store files, titles and progress included.  What",
+            "     is lost with the state file: every 'done' mark, the working",
+            "     order, and the titles of chats that had no store file.  Ask",
+            "     the user whether the state file can still be uploaded before",
+            "     you crawl anything again.",
+        ]
+
+    lines.append(f"Order : {picture['order']}"
+                 + ("" if picture["order_set"] else "   (default, never set)"))
+    lines.append(f"Chats : {len(picture['records'])} known -- "
+                 f"{len(picture['untouched'])} untouched, "
+                 f"{len(started)} started, {len(picture['done'])} done")
+
+    if picture["round_state"] == "in progress":
+        lines.append(f"Round : IN PROGRESS -- {len(picture['active'])} of at most "
+                     f"{ACTIVE_LIMIT} slot(s) in use, {picture['free_slots']} free")
+    elif picture["round_state"] == "idle":
+        lines.append("Round : IDLE -- no chat is active.  Which of the two this is,")
+        lines.append("        only you know:")
+        lines.append("        * you just finished a round -> export what is ready,")
+        lines.append("          hand the files over, ask whether to continue.")
+        lines.append("        * you are starting out -> begin up to "
+                     f"{ACTIVE_LIMIT} chats from NEXT UP.")
+    else:
+        lines.append("Round : ALL DONE -- nothing left to crawl. Hand over and "
+                     "say so.")
+
+    if picture["active"]:
+        lines.append("")
+        lines.append("ACTIVE -- take search tokens from these and from no others")
+        for record in picture["active"]:
+            lines += _overview_chat_line(
+                record, f"queries --chat {record['uuid']}")
+
+    if picture["ready"]:
+        lines.append("")
+        lines.append("READY TO EXPORT -- no edge worth querying; the export is "
+                     "what sets 'done'")
+        for record in picture["ready"]:
+            lines += _overview_chat_line(
+                record, f"export --chat {record['uuid']} "
+                        f"--out chat_{record['uuid']}.json")
+
+    if picture["missing"]:
+        lines.append("")
+        lines.append("MISSING STORE FILES -- marked started, but no <uuid>.json "
+                     "is here")
+        for record in picture["missing"]:
+            lines += _overview_chat_line(record)
+        lines.append("  Ask the user to upload exactly these.  Without them the "
+                     "crawl progress")
+        lines.append("  of those chats is lost and would have to start over.")
+
+    lines.append("")
+    if picture["free_slots"] and picture["next_up"]:
+        lines.append(f"NEXT UP -- {picture['free_slots']} free slot(s), "
+                     f"{picture['order']}")
+        for record in picture["next_up"]:
+            hint = (f"queries --chat {record['uuid']}" if record["has_store"]
+                    else "search its title words first, then ingest the dump")
+            lines += _overview_chat_line(record, hint)
+    elif not picture["free_slots"]:
+        lines.append(f"NEXT UP -- no free slot ({ACTIVE_LIMIT} in use). Finish or "
+                     f"export an active")
+        lines.append("          chat first.  Fewer than three at a time is fine "
+                     "when the chats")
+        lines.append("          turn out to be long.")
+    else:
+        lines.append("NEXT UP -- nothing untouched left.")
+
+    if picture["done"]:
+        lines.append("")
+        lines.append(f"DONE ({len(picture['done'])}) -- name these when you hand "
+                     f"over; the user may file them away")
+        for record in picture["done"]:
+            lines.append(f"  {record['uuid']}  "
+                         f"{record['title'] or '(title unknown)'}")
+
+    travellers = [r for r in started if r["has_store"]]
+    leftovers = [r for r in picture["records"]
+                 if r["status"] == "untouched" and r["has_store"]
+                 and r["segments"]]
+    lines.append("")
+    lines.append("HANDOVER -- what has to reach the next conversation")
+    lines.append(f"  {STATE_FILENAME}  -- always, no exception")
+    if travellers:
+        lines.append(f"  plus {len(travellers)} store file(s) of started chats:")
+        for record in travellers:
+            lines.append(f"    {record['uuid']}.json")
+    lines.append(f"  {1 + len(travellers)} file(s) in total.")
+    lines.append(f"  Without {STATE_FILENAME} every 'done' mark, the working "
+                 "order and the")
+    lines.append("  titles of chats without a store file are gone.")
+    if leftovers:
+        lines.append(f"  {len(leftovers)} store file(s) of untouched chats stay "
+                     "behind BY DESIGN (by-catch")
+        lines.append("  text; re-searched if those chats are taken up later).  "
+                     "Name this to the")
+        lines.append("  user once when handing over.")
+    return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -1466,7 +2109,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         print("No <chat ...> blocks found in the raw dump.", file=sys.stderr)
         return 1
 
-    update_index(args.store_dir, entries)
+    update_state(args.store_dir, entries)
 
     for record in group_entries_by_uuid(entries).values():
         path = store_path(args.store_dir, record["uuid"])
@@ -1507,23 +2150,66 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_overview(args: argparse.Namespace) -> int:
+    """Print the working picture: where the crawl stands and what comes next.
+
+    A missing store directory or state file is not an error here.  It is the
+    documented start-up case, and the report says how to resolve it.
+    """
+    print(overview_report(chat_overview(args.store_dir)))
+    return 0
+
+
+def cmd_state(args: argparse.Namespace) -> int:
+    """Set the working order, or correct the status of one chat by hand."""
+    if not args.order and not args.status:
+        print("Nothing to change: pass --order or --chat with --status.",
+              file=sys.stderr)
+        return 1
+
+    if args.order:
+        set_order(args.store_dir, args.order)
+        print(f"Working order is now {args.order}.")
+
+    if args.status:
+        if not args.chat:
+            print("--status needs --chat.", file=sys.stderr)
+            return 1
+        previous = set_chat_status(args.store_dir, args.chat, args.status)
+        print(f"chat {args.chat[:8]}: {previous} -> {args.status}")
+    return 0
+
+
 def _resolve_paths(args: argparse.Namespace) -> list[str] | None:
-    """Return the store paths selected by --chat, or None on error."""
+    """Return the store paths selected by --chat, or None on error.
+
+    Foreign JSON files in the store directory (exports, a leftover legacy
+    ``index.json``) are skipped with a warning instead of being mistaken for
+    chat stores.
+    """
     if getattr(args, "chat", ""):
         path = store_path(args.store_dir, args.chat)
         if not os.path.exists(path):
             print(f"Missing store: {path}", file=sys.stderr)
+            return None
+        if try_load_store(path) is None:
+            print(f"Not a chat store: {path}", file=sys.stderr)
             return None
         return [path]
 
     if not os.path.isdir(args.store_dir):
         print(f"Store directory does not exist: {args.store_dir}", file=sys.stderr)
         return None
-    paths = sorted(
-        os.path.join(args.store_dir, name)
-        for name in os.listdir(args.store_dir)
-        if name.endswith(".json") and name != INDEX_FILENAME
-    )
+    paths = []
+    for name in sorted(os.listdir(args.store_dir)):
+        if not name.endswith(".json") or name == STATE_FILENAME:
+            continue
+        path = os.path.join(args.store_dir, name)
+        if try_load_store(path) is None:
+            print(f"Skipping foreign JSON file (not a chat store): {name}",
+                  file=sys.stderr)
+            continue
+        paths.append(path)
     if not paths:
         print("No stores found.", file=sys.stderr)
         return None
@@ -1568,6 +2254,13 @@ def cmd_queries(args: argparse.Namespace) -> int:
 
     remember_suggestions(store, suggestions)
     save_store(store, path)
+
+    # Asking for search tokens IS the act of starting a chat -- see the
+    # status mechanics in the design notes.
+    if set_chat_status(args.store_dir, args.chat, "started",
+                       only_from="untouched") is not None:
+        print(f"chat {args.chat[:8]} is now started.", file=sys.stderr)
+
     for item in suggestions:
         print(f"[seg {item['segment_id']} {item['side']:<4} score {item['score']:>2}]  "
               f"{item['query']}")
@@ -1625,6 +2318,17 @@ def cmd_export(args: argparse.Namespace) -> int:
     else:
         json.dump(document, sys.stdout, ensure_ascii=False, indent=2)
         sys.stdout.write("\n")
+
+    # Only an exhausted crawl earns 'done'.  Exporting early is allowed and
+    # must stay visible as unfinished, so the chat keeps its status.
+    channel = sys.stdout if args.out else sys.stderr
+    if crawl_finished(store):
+        set_chat_status(args.store_dir, args.chat, "done")
+        print(f"chat {args.chat[:8]} is now done -- the user may file it away.",
+              file=channel)
+    else:
+        print(f"chat {args.chat[:8]} stays unfinished; status unchanged. "
+              f"Say so when presenting the file.", file=channel)
     return 0
 
 
@@ -1643,6 +2347,18 @@ def build_parser() -> argparse.ArgumentParser:
     p_ingest.add_argument("--min-overlap", type=int, default=DEFAULT_MIN_OVERLAP,
                           help="minimum normalised overlap length")
     p_ingest.set_defaults(func=cmd_ingest)
+
+    p_overview = sub.add_parser("overview",
+                                help="where the crawl stands and what comes next")
+    p_overview.set_defaults(func=cmd_overview)
+
+    p_state = sub.add_parser("state", help="set the working order or a chat status")
+    p_state.add_argument("--order", default="", choices=("", *ORDER_VALUES),
+                         help="direction in which the chats are worked through")
+    p_state.add_argument("--chat", default="", help="chat UUID for --status")
+    p_state.add_argument("--status", default="", choices=("", *CHAT_STATUSES),
+                         help="set the status of one chat by hand")
+    p_state.set_defaults(func=cmd_state)
 
     p_status = sub.add_parser("status", help="report coverage and open edges")
     p_status.add_argument("--chat", default="", help="restrict to one chat UUID")
