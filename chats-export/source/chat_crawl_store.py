@@ -99,9 +99,8 @@ UPLOAD PROBE -- once per continuation, before trusting anything uploaded
 WORKFLOW
 --------
 1.  Run the format probe below before the first real ingest.  Then list the
-    chats: call ``recent_chats``.  Write the raw tool output verbatim into a
-    file and run ``ingest``.  Never retype or reformat a snippet -- copy it
-    exactly, otherwise the reconstruction silently degrades.  Use a quoted
+    chats: call ``recent_chats`` (with a bounded ``n`` -- see step 1a).  Write
+    the raw tool output verbatim into a file and run ``ingest``.  Use a quoted
     heredoc so nothing is expanded:
 
         cat > dump.txt <<'RAWEOF'
@@ -112,6 +111,49 @@ WORKFLOW
             --raw dump.txt --query "the query you used"
 
     For ``recent_chats`` output pass ``--query ""``.
+
+    TRANSCRIBING IS THE ONE PLACE YOU MUST NOT ECONOMISE.  There is no pipe
+    from the search tool into the container: the text reaches the file only
+    by you writing it out.  That makes shortening tempting, and shortening is
+    the one thing that ruins the result.
+
+    Leaving text out and rewriting text are not two degrees of the same
+    problem, they are opposites:
+
+    *   **Leaving out** is safe.  A fragment simply ends; its edge stays open,
+        ``queries`` aims at exactly that spot, and a later search fills it in.
+        The gap is visible in ``status`` the whole time.
+    *   **Rewriting, summarising or paraphrasing** is not recoverable.  Your
+        wording merges by overlap like any other text and ends up in the
+        export indistinguishable from the real transcript.  That is no longer
+        a damaged record, it is an invented one.
+
+    So when a tool result is too large to write out in one go, do one of
+    these -- never a summary:
+
+    *   Split it across several ``ingest`` calls.  Any number is fine and the
+        store merges them; one file per ``<chat>`` block is perfectly normal.
+    *   For a single oversized block, copy a *prefix* and stop, preferably at
+        a speaker-label boundary.  Do not announce the cut in the text; just
+        end.  Keep the piece well above ``--min-overlap`` (60 normalised
+        characters by default), or it can never be joined by overlap.
+    *   For many chats at once, transcribe headers only -- see step 1a.
+
+    Never write an ellipsis of your own to mark an omission.  Gap markers are
+    something the *search backend* produces; a self-written one is a trap.
+    Measured against this parser: ``abc...def`` splits correctly, but
+    ``abc ... def`` and a lone ``...`` line are silently absorbed into the
+    transcript with no split and no warning, and ``[...]`` splits while
+    leaving the brackets behind as text.
+
+    IF YOU HAVE ALREADY SHORTENED SOMETHING, say which chat and repair it;
+    do not weigh options and do not ask for permission to redo it:
+
+    *   Not ingested yet: delete that file and write it again properly.
+    *   Already ingested: the store of that chat can no longer be trusted,
+        and nothing in it can detect the damage.  Delete its ``<uuid>.json``,
+        run ``state --chat <uuid> --status untouched``, and crawl it again.
+        Other chats in the same dump are unaffected.
 
 1a. BOOTSTRAP DISCOVERY -- finding titles/UUIDs you have no search terms for yet.
 
@@ -143,6 +185,34 @@ WORKFLOW
     one per chat.  Prefer breadth here (many titles, shallow) and leave
     depth (full reconstruction) to the targeted loop in steps 3-4.
 
+    HEADERS ONLY -- the normal way to do this in a project with many chats.
+    A listing of twenty chats is a *map*, not a work item, and writing out
+    twenty full bodies verbatim is where a run typically goes wrong.  What
+    the map needs is the UUID, the timestamp and the title, and those all
+    sit in the block header.  So transcribe the header lines and close the
+    block right after them:
+
+        cat > titles.txt <<'RAWEOF'
+        <chat url='https://claude.ai/chat/<uuid>' updated_at='...'>Title: ...
+        </chat>
+        <chat url='https://claude.ai/chat/<uuid>' updated_at='...'>Title: ...
+        </chat>
+        RAWEOF
+        python chat_crawl_store.py --store-dir ./store ingest \
+            --raw titles.txt --query ""
+
+    ``ingest`` reports ``0 fragment(s)`` for each, which is correct and not
+    an error: the chat is recorded in ``crawl-state.json`` with its title and
+    timestamp and shows up in ``overview`` under NEXT UP as a chat with no
+    text yet.  ``queries`` cannot work on it until a real snippet arrives, and
+    ``overview`` says so instead of suggesting it.
+
+    Bodies you drop here are re-searched later, so this trades search effort
+    for a cheap map -- worth it above a handful of chats, wasteful below.  It
+    is *not* a licence to reword anything: a dropped body is text not yet
+    collected, which is the safe side of the asymmetry in step 1.  Where a
+    body is short enough to copy exactly, take it.
+
 2.  Pick the chats to work on -- at most ``ACTIVE_LIMIT`` (three) at a time.
     ``overview`` names them under ACTIVE and nominates the next candidates
     under NEXT UP, neighbours first in the chosen order.  Read it at the
@@ -172,13 +242,87 @@ WORKFLOW
     the result, ingest it with ``--query`` set to that exact suggestion.
     The exact string matters: it is how the script credits the right edge.
 
+    USE THE SUGGESTIONS.  DO NOT INVENT SEARCH TERMS.  This is the mistake
+    that quietly ruins a crawl, and it feels productive while it happens.
+    A suggestion is lifted from the text at an open edge -- a rare code
+    identifier, an odd turn of phrase -- so a hit on it *must* adjoin what you
+    already have, and the fragment extends a segment.  A term you thought of
+    yourself (the chat title, a topic word, something from the project) is
+    broad by nature: it matches somewhere in the middle of the chat, the
+    fragment has no overlap with anything stored, and it becomes a new island
+    that must later be closed from *both* sides.  Every such query buys one
+    island and two new edges.
+
+    A real measurement from one run, three chats: 26 fragments produced 14 new
+    islands and 7 joins; another chat took in five fragments and produced five
+    islands and not one join.  In both, ``queries`` had been run and its
+    suggestions -- ``'face_or_plane TopoDS_Face DatumPlane'``,
+    ``'App.Console.PrintWarning Snapshot fehlgeschlagen'`` -- were sitting
+    unused while the searches went out with the chat title instead.  Across 24
+    open edges, exactly two had ever been aimed at.
+
+    Honest caveat, from the round after that one: switching to verbatim
+    suggestions raised the yield per query markedly (+9,400 characters in a
+    handful of calls) but did *not* reduce the island count -- segments went
+    12 -> 15, open edges 24 -> 30.  So take the instruction above as the best
+    available theory, not as a promise.  Whether edge tokens really land at
+    their edge is exactly what probe 3 settles, and until it has been run on
+    your environment, nobody knows.
+
+    When you ingest with a query that was not a suggestion, and suggestions
+    were available, ``ingest`` says so in its output.  Take that seriously.
+    During bootstrap discovery (step 1a) the note also appears, and there it
+    is expected -- broad terms are the point of that step.
+
+    INGEST EVERY RESULT, INCLUDING THE ONES THAT LOOK REDUNDANT.  A hit that
+    turns out to be text you already have is not wasted effort and not noise
+    to be tidied away -- it is the only thing that can close an edge.  The
+    mechanism: a fragment already contained in a segment is reported as
+    ``contained``, ``account_query`` then raises that edge's ``barren``
+    counter, and at ``BARREN_LIMIT`` the edge counts as exhausted.
+    ``crawl_finished`` requires *every* edge to be exhausted.  Skip the
+    redundant hits and no edge ever dies, so the chat can never reach
+    ``done`` and the open-edge count only grows.  If you catch yourself
+    deciding not to ingest something because it "overlaps too much with
+    dump 6", you are removing the crawl's only stopping condition.
+
     ``queries`` is also what marks the chat ``started``.  Do not run it on a
     chat you are not actually taking up.
 
-4.  Repeat step 3.  Watch ``status``.  An edge marked ``~`` has produced
-    nothing new several times in a row; stop querying it.  When a chat has
-    no open edge left, ``overview`` moves it to READY TO EXPORT and the slot
-    is free.
+    A high ``max_results`` (10 rather than 5) is worth using: more overlapping
+    chunks per call, more coverage per token spent.  But be clear about what
+    it does not do -- it multiplies text, not adjacency.  Ten broad hits give
+    ten islands just as five did.
+
+4.  Repeat step 3.  Watch ``status`` and ``overview``.
+
+    MEASURE THE RIGHT THING -- and know which phase you are in.  A crawl of a
+    long chat has two, and they look like opposites:
+
+    *   *Discovery.*  Characters and segments both climb, and so does the open
+        edge count: every find brings two fresh edges with it.  That is normal
+        and not a fault.  Progress here is characters gained per query.
+    *   *Consolidation.*  Characters level off, islands start joining, the
+        segment count falls and edges exhaust one after another.  This is the
+        only phase in which ``done`` comes into reach.
+
+    You cannot read the phase off a single ``status``; read it off the *kind*
+    of outcome new fragments produce.  Mostly ``new`` means discovery, mostly
+    ``contained`` and ``extended`` means consolidation.  So do not panic at a
+    rising segment count early on, and do not mistake a rising character count
+    for reconstruction late on.
+
+    Two things do indicate a real problem: islands dominating while the edges
+    have barely been probed at all (that is the discipline failure from step
+    3 -- ``overview`` shows the probe count per chat), and islands dominating
+    while the edges have been probed a great deal (that points at probe 3:
+    the search may not be returning what you aim at).  ``status`` prints a
+    hint once islands outnumber joins and names which of the two it looks
+    like.
+
+    An edge marked ``~`` has produced nothing new several times in a row;
+    stop querying it.  When a chat has no open edge left, ``overview`` moves
+    it to READY TO EXPORT and the slot is free.
 
 5.  Export every chat that is ready:
 
@@ -193,14 +337,15 @@ WORKFLOW
     whether to continue.  See ROUNDS AND HANDOVER below.
 
 ===========================================================================
-FORMAT PROBE -- do this once per environment, before trusting the parser.
+PROBES -- do these once per environment, before trusting anything below.
 ===========================================================================
 
-Everything this script knows about snippet packaging was observed in one
-environment at one point in time.  Anthropic changes these details, and
-claude.ai, Claude Desktop and Claude Code do not have to agree.  A wrong
-assumption here does not crash anything -- it silently produces a damaged
-transcript, which is far worse.  So spend two searches on checking.
+Everything this script knows about snippet packaging *and* about how the
+search behaves was observed in one environment at one point in time.
+Anthropic changes these details, and claude.ai, Claude Desktop and Claude
+Code do not have to agree.  A wrong assumption here does not crash anything
+-- it silently produces a damaged transcript, or a crawl that never
+converges, which is far worse.  So spend three searches on checking.
 
 Probe 1 -- a snippet from the MIDDLE of a chat:
     Call ``conversation_search`` with any topic term.  Look at the raw
@@ -218,13 +363,38 @@ Probe 2 -- a snippet from the START of a chat:
     from probe 1.  Confirm that the first turn carries a speaker label and
     that nothing precedes it.
 
+Probe 3 -- IS THE SEARCH LITERAL?  This one tests the premise of the whole
+    working loop, not the format, and it is the most important of the three.
+
+    Everything ``queries`` does rests on one unverified assumption: that
+    searching for a rare phrase returns *the passage containing that phrase*.
+    If instead the backend searches semantically and hands back whatever
+    excerpt of the chat it considers most relevant, then no wording can steer
+    you to a particular spot in a chat -- you get text, but never *that* text,
+    and the edge-token strategy has no foundation.
+
+    To check: ingest one snippet of some chat, run ``queries --chat <uuid>``,
+    take a suggestion, search it, and answer one question -- **does the
+    returned excerpt contain the phrase you searched for, verbatim?**
+
+      * Yes -> retrieval is literal enough; the loop in steps 3-4 works as
+        designed.
+      * No, and you got a different part of the same chat -> the search is
+        relevance-based.  Edge tokens then buy nothing over any other term,
+        the crawl grows by luck rather than by aim, and closing a specific
+        gap may be impossible.  Say so and stop; this is a finding about the
+        tool, not a problem to work around with more searches.
+
+    Report the answer either way, and quote the phrase and the beginning of
+    what came back so the user can judge for themselves.
+
 If any answer contradicts the OBSERVED FORMATS section below, stop and tell
 the user before ingesting anything.  Naming the exact difference is far more
 useful than a half-correct export.
 
 If the probes pass, do not throw their dumps away: they are valid search
-results.  Ingest them like any other dump (probe 1 with ``--query`` set to
-the term used, probe 2 with ``--query ""``) -- otherwise the two searches
+results.  Ingest them like any other dump (probes 1 and 3 with ``--query``
+set to the term used, probe 2 with ``--query ""``) -- otherwise the searches
 they cost are wasted.
 
 ROUNDS AND HANDOVER
@@ -245,6 +415,14 @@ read again.
 At the start, tell the user they may interrupt at any time; otherwise you
 work on until the round ends or nothing is left to crawl.  If they do
 interrupt, run this handover procedure -- do not just stop.
+
+Once the start decision is settled, do not ask for authorisation again.  A
+round is the unit of work and asking per chat, per search or per dump turns
+the export into a conversation about the export.  In particular do not
+present the multi-session nature as an obstacle or offer a "test run" as if
+it were a lesser mode: spanning several conversations *is* the design, and
+taking up a single chat is a normal round, not a concession.  Report what you
+did in one line per status change and ask at the end of the round.
 
 The handover itself:
 
@@ -298,6 +476,13 @@ WHAT NOT TO DO
 --------------
 *   Do not edit store files by hand.
 *   Do not "clean up" snippets before ingesting them.
+*   Do not summarise, shorten by rewording, or "make handleable" a tool
+    result on its way into a file.  Copy less of it rather than a version of
+    it, and never write a gap marker of your own.  See step 1.
+*   Do not ask the user how to proceed once the start decision is made.  Work
+    the round.
+*   Do not invent search terms while ``queries`` has suggestions pending, and
+    do not report a rising character count as progress.  See step 3 and 4.
 *   Do not claim a chat is complete.  The end of a chat cannot be detected
     from snippets; only its beginning can.  Segment order is unknown except
     for the segment carrying ``chat_start``.
@@ -338,6 +523,15 @@ than relying on the observation.
     could not be determined from the rendering, so both three-or-more ASCII
     dots and U+2026 are treated as markers.  Each passage becomes its own
     fragment; the marker itself is discarded and the split is logged.
+
+    A marker counts only when it is glued between two non-space characters,
+    which is how the backend was seen to emit it.  The consequences, measured
+    against ``split_gap_markers``, are why nobody may write one by hand:
+    ``abc...def`` splits; ``abc ... def`` and a lone ``...`` line match
+    neither the gap nor the near-miss pattern and are absorbed into the
+    transcript without any warning; ``[...]`` splits but leaves ``[`` and
+    ``]`` behind in the text.  Detecting an invented marker is impossible in
+    the general case, so the instructions forbid the practice instead.
 *   Only a block whose content begins directly with a user label starts at
     the beginning of the chat.
 
@@ -1296,6 +1490,13 @@ def account_query(store: dict[str, Any], query: str,
             entry = candidate
             break
     if entry is None:
+        # Say so only when suggestions were actually available: then the query
+        # was invented instead of taken from an edge, which is the single most
+        # common reason a crawl collects islands instead of joining them.  On
+        # first contact with a chat there is nothing to reproach.
+        if store["pending_queries"]:
+            return ("query was not one of the suggestions -- no edge credited; "
+                    "text like this lands wherever it matches")
         return ""
 
     store["pending_queries"].remove(entry)
@@ -1587,15 +1788,36 @@ def _edge_mark(edge: dict[str, Any], side: str) -> str:
     return "<" if side == "head" else ">"
 
 
-def _health_hint(stats: dict[str, int]) -> str:
-    """Derive a consistency hint from the merge statistics."""
+def _health_hint(store: dict[str, Any]) -> str:
+    """Derive a consistency hint from the merge statistics and the edges.
+
+    Islands outnumbering joins means different things at different times, and
+    what separates them is how many of the queries spent on this chat were
+    aimed at an edge at all.  An edge only records an attempt for a query that
+    came from ``queries``, so comparing attempts against the queries used
+    measures the discipline directly rather than guessing at it.  Few aimed
+    queries means they were invented; many means the search may not return
+    what it is aimed at, which is what probe 3 settles.  Neither reading is
+    asserted as the truth -- both are named.
+    """
+    stats = store["stats"]
     productive = stats["merge_events"] + stats["segment_joins"]
     isolated = stats["new_segment_events"]
     if stats["fragments_seen"] < 5:
         return ""
     if isolated > 0 and productive < isolated:
-        return ("mostly isolated fragments - either the crawl is still early or "
-                "the incoming data does not fit the store")
+        probes = sum(edge["attempts"] for segment in store["segments"]
+                     for edge in segment["edges"].values())
+        spent = len(store["queries_used"])
+        if probes * 2 < spent:
+            return (f"islands ({isolated}) outnumber joins ({productive}), and "
+                    f"only {probes} of {spent} queries were aimed at an edge - "
+                    "use the suggestions from 'queries' verbatim before reading "
+                    "anything else into this")
+        return (f"islands ({isolated}) outnumber joins ({productive}) although "
+                f"{probes} of {spent} queries were aimed at an edge - either "
+                "this chat is still being discovered, or the search is not "
+                "returning what it is aimed at; probe 3 settles which")
     if stats["ambiguous_rejections"] > productive:
         return "many ambiguous overlaps - consider raising --min-overlap"
     return ""
@@ -1623,7 +1845,7 @@ def status_report(store: dict[str, Any]) -> str:
                  f"empty={stats['empty_fragments']}")
     lines.append(f"Warn  : {len(store['warnings'])} warning(s) -- see 'report'")
 
-    hint = _health_hint(stats)
+    hint = _health_hint(store)
     if hint:
         lines.append(f"Hint  : {hint}")
 
@@ -1861,6 +2083,7 @@ def chat_overview(store_dir: str) -> dict[str, Any]:
             "open_edges": 0,
             "segments":   0,
             "chars":      0,
+            "edge_probes": 0,
         }
         if record["has_store"]:
             store = stores[uuid]
@@ -1870,6 +2093,9 @@ def chat_overview(store_dir: str) -> dict[str, Any]:
             record["open_edges"] = len(open_edges(store))
             record["segments"] = len(store["segments"])
             record["chars"] = sum(len(seg["text"]) for seg in store["segments"])
+            record["edge_probes"] = sum(
+                edge["attempts"] for seg in store["segments"]
+                for edge in seg["edges"].values())
         records.append(record)
 
     records = sort_chats(records, order)
@@ -1924,7 +2150,11 @@ def _overview_chat_line(record: dict[str, Any], hint: str = "") -> list[str]:
         facts.append(f"{record['segments']} segment(s)")
         facts.append(f"{record['chars']} chars")
     if record["open_edges"]:
+        # Probes against edges, not queries in total: an edge nobody ever
+        # aimed at cannot close, and a low count next to many open edges is
+        # the signature of queries invented instead of taken from 'queries'.
         facts.append(f"{record['open_edges']} open edge(s)")
+        facts.append(f"{record['edge_probes']} edge probe(s) so far")
     if not record["has_store"]:
         facts.append("no store file here")
     if record["recovered"]:
@@ -2021,8 +2251,12 @@ def overview_report(picture: dict[str, Any]) -> str:
         lines.append(f"NEXT UP -- {picture['free_slots']} free slot(s), "
                      f"{picture['order']}")
         for record in picture["next_up"]:
-            hint = (f"queries --chat {record['uuid']}" if record["has_store"]
-                    else "search its title words first, then ingest the dump")
+            # Keyed on stored text, not on a store file: the bootstrap step
+            # deliberately produces empty stores from header-only dumps, and
+            # 'queries' has nothing to work with in those.
+            hint = (f"queries --chat {record['uuid']}" if record["segments"]
+                    else "no text yet -- search its title words first, then "
+                         "ingest the dump")
             lines += _overview_chat_line(record, hint)
     elif not picture["free_slots"]:
         lines.append(f"NEXT UP -- no free slot ({ACTIVE_LIMIT} in use). Finish or "

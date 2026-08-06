@@ -420,8 +420,17 @@ ccs.account_query(store7, tracked["query"], {segment["id"]})
 check("growth in the owning segment resets barren",
       edge["barren"] == 0 and edge["attempts"] == 4)
 
-check("unknown query is accounted to nothing",
-      ccs.account_query(store7, "never suggested", {1}) == "")
+before = [(seg["id"], side, dict(edge))
+          for seg in store7["segments"]
+          for side, edge in seg["edges"].items()]
+unknown_note = ccs.account_query(store7, "never suggested", {1})
+after = [(seg["id"], side, dict(edge))
+         for seg in store7["segments"]
+         for side, edge in seg["edges"].items()]
+check("unknown query changes no edge counter", before == after)
+check("unknown query is called out exactly when suggestions were pending",
+      ("not one of the suggestions" in unknown_note)
+      == bool(store7["pending_queries"]), unknown_note)
 
 flood = ccs.new_store("uuid-flood", "u")
 ccs.merge_fragment(flood, CHAT[:300], "")
@@ -970,6 +979,109 @@ check("overview flags a missing state file as loss, not as a fresh start",
 check("the loss banner is precise about what survives and what is gone",
       "titles and progress included" in result.stdout
       and "'done' mark" in result.stdout, result.stdout)
+
+# ---------------------------------------------------------------------------
+# Header-only bootstrap: building the title map without transcribing bodies
+# ---------------------------------------------------------------------------
+
+HDR_DIR = os.path.join(WORK, "header-store")
+
+
+def run_hdr(*args):
+    """Invoke the CLI against the header-bootstrap test store."""
+    return subprocess.run(
+        [sys.executable, SCRIPT, "--store-dir", HDR_DIR, *args],
+        capture_output=True, text=True)
+
+
+hdr_path = os.path.join(WORK, "titles.txt")
+with open(hdr_path, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/hdr-1' "
+                 "updated_at='2026-03-01T10:00:00Z'>Title: Nur ein Titel\n"
+                 "</chat>\n")
+
+result = run_hdr("ingest", "--raw", hdr_path, "--query", "")
+check("a header-only dump ingests without error",
+      result.returncode == 0 and "0 fragment(s)" in result.stdout,
+      result.stdout + result.stderr)
+check("a header-only dump still records uuid, title and timestamp",
+      read_state_of(HDR_DIR)["chats"]["hdr-1"].get("title") == "Nur ein Titel"
+      and read_state_of(HDR_DIR)["chats"]["hdr-1"].get("updated_at")
+      == "2026-03-01T10:00:00Z",
+      str(read_state_of(HDR_DIR)["chats"].get("hdr-1")))
+
+result = run_hdr("overview")
+check("overview does not suggest 'queries' for a chat that has no text yet",
+      "hdr-1" in section(result.stdout, "NEXT UP")
+      and "no text yet" in section(result.stdout, "NEXT UP")
+      and "queries --chat hdr-1" not in section(result.stdout, "NEXT UP"),
+      section(result.stdout, "NEXT UP"))
+check("a chat without text is not offered for export",
+      "hdr-1" not in section(result.stdout, "READY TO EXPORT"), result.stdout)
+
+# The measured ellipsis behaviour the instructions rely on.
+check("a glued ellipsis splits a body into two fragments",
+      len(ccs.split_gap_markers("H: abc...def weiter")[0]) == 2)
+check("an ellipsis with blanks on both sides is absorbed without warning",
+      ccs.split_gap_markers("H: abc ... def weiter") == (
+          ["H: abc ... def weiter"], []))
+
+# ---------------------------------------------------------------------------
+# Query discipline: invented terms must be called out, not silently accepted
+# ---------------------------------------------------------------------------
+
+disc = ccs.new_store("disc-1", "https://claude.ai/chat/disc-1", "Disc")
+ccs.merge_fragment(disc, CHAT[:300], "erste query", ccs.DEFAULT_MIN_OVERLAP)
+
+check("an off-suggestion query is silent while nothing was suggested",
+      ccs.account_query(disc, "selbst erfunden", set()) == "")
+
+ccs.remember_suggestions(disc, ccs.suggest_queries(disc, 3))
+check("suggestions were produced for the open edges",
+      len(disc["pending_queries"]) > 0)
+note = ccs.account_query(disc, "selbst erfunden", set())
+check("an off-suggestion query is called out once suggestions are pending",
+      "not one of the suggestions" in note, note)
+check("calling it out consumes no suggestion",
+      len(disc["pending_queries"]) > 0)
+
+suggested_query = disc["pending_queries"][0]["query"]
+note = ccs.account_query(disc, suggested_query, {1})
+check("a suggested query still credits its edge",
+      "advanced" in note, note)
+
+ISLAND_STATS = {"fragments_seen": 26, "merge_events": 5, "segment_joins": 2,
+                "new_segment_events": 14, "contained_events": 7,
+                "ambiguous_rejections": 0, "empty_fragments": 0}
+
+
+def island_store(probes, spent):
+    """Build an island-heavy store: *probes* aimed queries out of *spent*."""
+    store = ccs.new_store("hint-1", "u")
+    ccs.merge_fragment(store, CHAT[:300], "")
+    store["stats"] = dict(ISLAND_STATS)
+    store["segments"][0]["edges"]["tail"]["attempts"] = probes
+    store["queries_used"] = [f"q{index}" for index in range(spent)]
+    return store
+
+
+# The real case observed in the field: 2 of 5 queries aimed at an edge.
+check("the hint points at query discipline when few queries were aimed",
+      "verbatim" in ccs._health_hint(island_store(2, 5)),
+      ccs._health_hint(island_store(2, 5)))
+# Disciplined run: one broad bootstrap query, the rest from suggestions.
+check("the hint points at probe 3 when the queries were aimed",
+      "probe 3" in ccs._health_hint(island_store(4, 5)),
+      ccs._health_hint(island_store(4, 5)))
+check("both readings name the counts they are based on",
+      "islands (14)" in ccs._health_hint(island_store(2, 5))
+      and "joins (7)" in ccs._health_hint(island_store(2, 5)))
+check("no hint while too few fragments have been seen",
+      ccs._health_hint(ccs.new_store("hint-2", "u")) == "")
+
+result = run_over("overview")
+check("overview reports how often the edges were aimed at",
+      "edge probe(s) so far" in result.stdout, result.stdout)
 
 shutil.rmtree(WORK, ignore_errors=True)
 
