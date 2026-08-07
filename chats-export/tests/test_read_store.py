@@ -310,8 +310,8 @@ check("CLI map exits 0", result.returncode == 0, result.stderr)
 check("CLI map records both chats", len(read_state()["chats"]) == 2)
 check("CLI map says how many lack a title", "without a title" in result.stdout,
       result.stdout)
-check("mapped chats start as untouched",
-      all(entry["status"] == "untouched"
+check("mapped chats start as listed",
+      all(entry["status"] == "listed"
           for entry in read_state()["chats"].values()))
 
 result = run("ingest", "--raw", write("p1.txt", page(first=0, last=1)))
@@ -400,8 +400,8 @@ check("the export carries every turn in order",
       str([message["n"] for message in exported["messages"]]))
 check("the export states completeness with its evidence",
       exported["metadata"]["complete"] is True
-      and exported["metadata"]["turns_held"] == 6
-      and exported["metadata"]["turns_total"] == 6
+      and exported["metadata"]["turns"] == 6
+      and exported["metadata"]["total_turns"] == 6
       and exported["metadata"]["turns_missing"] == [],
       str(exported["metadata"]))
 check("the export names the source tool",
@@ -409,11 +409,16 @@ check("the export names the source tool",
 check("roles survive into the export",
       exported["messages"][0]["role"] == "user"
       and exported["messages"][1]["role"] == "assistant")
-check("exporting a complete chat sets done",
-      read_state()["chats"][UUID]["status"] == "done",
+check("exporting a complete chat sets exported",
+      read_state()["chats"][UUID]["status"] == "exported",
       str(read_state()["chats"][UUID]))
 check("export says the chat is complete", "is complete" in result.stdout,
       result.stdout)
+check("the protocol records the written file and the source state",
+      read_state()["chats"][UUID]["file"] == "export.json"
+      and read_state()["chats"][UUID]["exported_updated_at"] != ""
+      and read_state()["chats"][UUID]["total_turns"] == 6,
+      str(read_state()["chats"][UUID]))
 
 # A partial chat must export as partial and keep its status.
 PARTIAL = "partial-uuid"
@@ -462,7 +467,7 @@ check("overview without a state file asks the user to decide",
 
 result = run("overview")
 check("overview counts the statuses",
-      "1 started, 1 done" in result.stdout, result.stdout)
+      "1 started, 1 exported" in result.stdout, result.stdout)
 check("overview lists the partial chat as in progress",
       PARTIAL in section(result.stdout, "IN PROGRESS"), result.stdout)
 check("overview names the token to continue with",
@@ -471,8 +476,8 @@ check("overview reports turns held against the total",
       "2/10 turns" in result.stdout, result.stdout)
 check("overview names the missing turns",
       "missing 2-9" in result.stdout, result.stdout)
-check("overview lists the done chat for filing away",
-      UUID in section(result.stdout, r"DONE \(1\)"), result.stdout)
+check("overview lists the exported chat for filing away",
+      UUID in section(result.stdout, r"EXPORTED \(1\)"), result.stdout)
 check("the handover names the state file and the started store",
       crs.STATE_FILENAME in section(result.stdout, "HANDOVER")
       and f"{PARTIAL}.json" in section(result.stdout, "HANDOVER")
@@ -496,12 +501,72 @@ result = run("overview")
 check("the order is reported once set",
       "Order : newest-first" in result.stdout and "never set" not in result.stdout,
       result.stdout)
-result = run("state", "--chat", "fresh-1", "--status", "done")
+result = run("state", "--chat", "fresh-1", "--status", "exported")
 check("state --status corrects a status by hand",
-      result.returncode == 0 and read_state()["chats"]["fresh-1"]["status"] == "done")
+      result.returncode == 0
+      and read_state()["chats"]["fresh-1"]["status"] == "exported")
 result = run("state")
 check("state without an argument explains itself and exits 1",
       result.returncode == 1 and "--order" in result.stderr, result.stderr)
+
+# ---------------------------------------------------------------------------
+# Protocol convergence: stale detection and the shared schema
+# ---------------------------------------------------------------------------
+
+check("the state file is the shared protokoll.json",
+      crs.STATE_FILENAME == "protokoll.json", crs.STATE_FILENAME)
+check("the protocol carries the shared top-level fields",
+      set(read_state()) >= {"protocol_version", "project", "order", "chats"},
+      str(sorted(read_state())))
+check("an entry carries every field of Vorgabe 2.4",
+      set(read_state()["chats"][UUID]) == set(crs.blank_entry()),
+      str(sorted(read_state()["chats"][UUID])))
+
+# A newer timestamp in a fresh chat list marks an exported chat stale.
+NEWER = ("<chat url='https://claude.ai/chat/" + UUID + "' "
+         "updated_at='2026-09-01T00:00:00.000000Z'>Content:\n"
+         "Title: Flattening angled parts\n</chat>\n")
+newer_map = os.path.join(WORK, "neuere-liste.txt")
+with open(newer_map, "w", encoding="utf-8") as handle:
+    handle.write(NEWER)
+run("map", "--raw", newer_map)
+check("a newer listing marks the exported chat stale",
+      read_state()["chats"][UUID]["status"] == "stale",
+      read_state()["chats"][UUID]["status"])
+
+# An older or equal listing must not un-stale or otherwise disturb it.
+run("map", "--raw", newer_map)
+check("mapping the same listing again keeps it stale",
+      read_state()["chats"][UUID]["status"] == "stale")
+
+# Reading a page of a stale chat takes it back into work.
+run("ingest", "--raw", write("p1-again.txt", page(first=0, last=1)))
+check("ingest takes a stale chat back to started",
+      read_state()["chats"][UUID]["status"] == "started",
+      read_state()["chats"][UUID]["status"])
+
+# Export without --out names the file per Vorgabe 2.3 -- date unknown here.
+run("ingest", "--raw", write("p2-again.txt", page(first=2, last=3,
+                                                  next_token="t4")))
+run("ingest", "--raw", write("p3-again.txt", page(first=4, last=5,
+                                                  next_token="")))
+AUTO_DIR = os.path.join(WORK, "autoname")
+os.makedirs(AUTO_DIR, exist_ok=True)
+result = subprocess.run(
+    [sys.executable, SCRIPT, "--store-dir", STORE_DIR, "export",
+     "--chat", UUID, "--now", "2026-09-02T00:00:00+00:00"],
+    capture_output=True, text=True, cwd=AUTO_DIR)
+check("export without --out writes the 2.3 name with 'ohne-datum'",
+      os.path.exists(os.path.join(
+          AUTO_DIR, f"ohne-datum_flattening-angled-parts_{UUID[:8]}.json")),
+      str(os.listdir(AUTO_DIR)) + result.stderr)
+check("the protocol notes the auto name",
+      read_state()["chats"][UUID]["file"]
+      == f"ohne-datum_flattening-angled-parts_{UUID[:8]}.json",
+      read_state()["chats"][UUID]["file"])
+check("the export records the fresh source state, clearing the stale verdict",
+      read_state()["chats"][UUID]["status"] == "exported")
+
 
 # A missing store file for a started chat must be asked for by name.
 os.remove(crs.store_path(STORE_DIR, PARTIAL))

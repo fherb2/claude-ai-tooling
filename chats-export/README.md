@@ -21,9 +21,9 @@ Rechnung statt einer Vermutung**: gehaltene Turns gegen `total_turns`,
 fehlende werden namentlich benannt. Kein Zusammennähen, keine Suchbegriffe,
 keine Unklarheit über die Reihenfolge.
 
-Kern ist `read-state.json`: Sie führt alle Chats des Bereichs mit Titel,
-Zeitstempel, Bearbeitungsrichtung und Status (`untouched` / `started` /
-`done`) und wandert zwischen zwei Sitzungen durch den Nutzer. `overview`
+Kern ist `protokoll.json` — dieselbe Protokolldatei, die auch der ZIP-Weg führt: Sie führt alle Chats des Bereichs mit Titel,
+Zeitstempel, Bearbeitungsrichtung und Status (`listed` / `started` /
+`exported` / `stale` / `deleted`) und wandert zwischen zwei Sitzungen durch den Nutzer. `overview`
 leitet daraus die Arbeitslage ab und formuliert sie als Handlungsanweisung;
 `state` korrigiert von Hand, was kein Skript beurteilen kann.
 

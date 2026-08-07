@@ -1,5 +1,6 @@
 {
   "hauptpfad": "master",
   "werkbank": "claude-workbench",
-  "notiz": "Hauptpfad vom Nutzer am 2026-08-06 bestaetigt. origin derzeit nicht erreichbar (Rechte am Remote fehlen noch)."
+  "notiz": "Hauptpfad vom Nutzer am 2026-08-06 bestaetigt. origin seit 2026-08-07 erreichbar und synchron; gepusht wird nur nach ausdruecklicher Zustimmung (§1.6).",
+  "commit_umfang": "Adds und Commits immer fuer das Gesamtprojekt, nicht nur fuer den bearbeiteten Ordner. Vom Nutzer am 2026-08-07 so festgelegt; er bearbeitet home-.claude-sharing von Hand und nimmt in Kauf, dass dessen Inhalt mitwandert."
 }
