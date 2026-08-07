@@ -2,6 +2,8 @@
 
 **Hält den Arbeitszustand von Claude Desktop und Claude Code — Konfiguration, Sitzungsprotokolle, Projektgedächtnis — automatisch zwischen mehreren Rechnern synchron, damit derselbe Kontext überall zur Verfügung steht.**
 
+# Stand: Noch in Überarbeitung. Nicht benutzen!
+
 Status: **In Codierung.** Das Konzept steht vollständig (`implementierungs_doku.md`); das Hauptskript wird gerade danach neu geschrieben (siehe `fahrplan.md`), bisher auf keinem Rechner automatisiert im Einsatz.
 
 ## Ziel
