@@ -58,12 +58,14 @@ THE STORE DIRECTORY
 
 *   ``<uuid>.json`` -- one chat: its turns by index, its ``total_turns``, and
     which pages have been fetched.
-*   ``read-state.json`` -- every chat UUID known in this scope, with title,
-    timestamp and working status, plus the direction of work.
+*   ``protokoll.json`` -- every chat UUID known in this scope, with title,
+    timestamps and working status, plus the direction of work.  It is the
+    **same protocol file** the local zip converter writes, so both routes
+    keep one shared ledger per source project.
 
-``read-state.json`` is what makes a run resumable across conversations.  It
-must always travel with the store files; the titles and every ``done`` mark
-live there and nowhere else.
+``protokoll.json`` is what makes a run resumable across conversations.  It
+must always travel with the store files; the titles and every ``exported``
+mark live there and nowhere else.
 
 A ``crawl-state.json`` in the directory means it belongs to the older
 ``chat_crawl_store.py``.  Do not mix the two: the data models are unrelated.
@@ -82,7 +84,7 @@ and you must not guess your way past them:
     work?  On a fresh export also ask whether to work through the chats
     oldest-first or newest-first, record it with ``state --order <choice>``,
     and then map the scope.  On a continuation ask for the upload of
-    ``read-state.json`` plus the ``<uuid>.json`` of every started chat.
+    ``protokoll.json`` plus the ``<uuid>.json`` of every started chat.
 *   **A state file is there.**  Continue; do not ask.  The one exception is a
     store *you* built earlier in this same conversation that was merely
     interrupted -- then ask whether to continue or start over empty, because
@@ -111,7 +113,7 @@ UPLOAD PROBE -- once per continuation, before trusting anything uploaded
     copying is fine; changing the content is not.
 
     One asymmetry decides how far you may go if the files are unreachable.
-    Writing ``read-state.json`` out again from what you can see in the
+    Writing ``protokoll.json`` out again from what you can see in the
     conversation is acceptable: it is small and machine-generated.  Doing that
     with a ``<uuid>.json`` is not -- those hold chat text, and retyping it is
     exactly what must not happen.  Rather stop and say so.
@@ -173,7 +175,7 @@ WORKFLOW
         python chat_read_store.py --store-dir ./store export \
             --chat <uuid> --out chat_<uuid>.json
 
-    The export sets ``done``, but only for a chat whose turns are all held.
+    The export sets ``exported``, but only for a chat whose turns are all held.
     Exporting a partial chat is allowed -- then the document carries
     ``complete: false`` and the missing indices, and you say so plainly.
 
@@ -205,10 +207,11 @@ design; taking up a single chat is a normal round, not a concession.
 The handover itself:
 
 *   Export what is complete and offer every export file for download.  Name
-    the chats that are ``done``: the user can file those away for good.
-*   Hand back ``read-state.json`` **always**, with the ``<uuid>.json`` of
+    the chats that are ``exported``: the user can file those away for good.
+*   Hand back ``protokoll.json`` **always**, with the ``<uuid>.json`` of
     every chat still ``started``.  ``overview`` lists exactly these.
-*   Say how many chats are done, how many started, how many untouched.
+*   Say how many chats are exported, how many started, how many still
+    listed or stale.
     Mention that these are JSON files and ask whether the user needs them
     with a ``.txt`` extension to get them back in next time.
 *   Then ask whether to continue.
@@ -238,7 +241,7 @@ WHAT NOT TO DO
 *   Do not skip a page because it looks like text you already have.
     Re-ingesting is free and provably harmless; guessing is not.
 *   Do not take up more than three chats at a time.
-*   Do not hand the store back without ``read-state.json``.
+*   Do not hand the store back without ``protokoll.json``.
 *   Do not wait for a signal that the context is running out.  There is none.
 *   Do not mix this store with a ``chat_crawl_store.py`` store.
 *   Do not leave ``max_turns`` at its default.  Ask for 50 every time.
@@ -295,7 +298,7 @@ condense, and never invent an ellipsis to mark an omission.
 If you have already shortened something, say which chat and repair it rather
 than discussing it: delete the affected turns from the store by fetching that
 page again -- a re-ingested turn overwrites itself -- or, if in doubt about a
-whole chat, delete its ``<uuid>.json``, set its status back to ``untouched``
+whole chat, delete its ``<uuid>.json``, set its status back to ``listed``
 and read it again from the start.  Nothing in the store can detect a
 paraphrase, so the doubt itself is reason enough.
 
@@ -349,27 +352,34 @@ or the other.
 
 STATUS MECHANICS
 ----------------
-``read-state.json`` carries one status per chat: ``untouched``, ``started``
-or ``done``.
+``protokoll.json`` carries one status per chat, shared with the zip route:
+``listed`` (known from the chat list), ``started`` (partially read -- only
+this route ever sets it), ``exported``, ``stale`` (the source moved on) and
+``deleted`` (only ever set by hand here, because this route cannot tell a
+deleted chat from an inaccessible one).
 
 ``ingest`` is what sets ``started``: reading a page *is* taking up a chat.
 There is no equivalent of the predecessor's problem where a chat grew by
 accident inside another chat's dump -- ``read_conversation`` returns one chat
 per call, so intent and effect coincide.
 
-``export`` sets ``done`` only when every turn up to ``total_turns`` is held.
-This is a proof, not a judgement, which is the sharpest difference from
-``chat_crawl_store.py``.
+``map`` is what sets ``stale``: a chat list whose ``updated_at`` is newer
+than the export's means the source moved on.  A stale chat is read again
+from the start and replaced whole.
 
-``done`` means "exported, and the file may leave the store directory".  That
-is why the status lives in the state file and not in the per-chat store: a
-finished chat whose ``<uuid>.json`` has been filed away must not look
-untouched next time.
+``export`` sets ``exported`` only when every turn up to ``total_turns`` is
+held, and records the written file in the protocol.  This is a proof, not a
+judgement, which is the sharpest difference from ``chat_crawl_store.py``.
+
+``exported`` means "written out, and the file may leave the store
+directory".  That is why the status lives in the protocol and not in the
+per-chat store: a finished chat whose ``<uuid>.json`` has been filed away
+must not look untouched next time.
 
 ``state --status`` is the manual override for what no script can judge -- a
 chat the user calls good enough, a status that drifted, a file that came back
 under another name.  ``state --order`` may be changed at any time; it only
-steers which ``untouched`` chat is nominated next.
+steers which ``listed`` or ``stale`` chat is nominated next.
 
 ``overview`` derives everything and decides nothing.  Where it cannot know,
 it says so instead of guessing: an idle round looks the same whether a round
@@ -390,6 +400,7 @@ Usage
 from __future__ import annotations
 
 import argparse
+import datetime
 import html
 import json
 import os
@@ -404,12 +415,16 @@ from typing import Any
 # ---------------------------------------------------------------------------
 
 SCHEMA_VERSION       = 1
-STATE_FILENAME       = "read-state.json"
-STATE_SCHEMA_VERSION = 1
+STATE_FILENAME       = "protokoll.json"
+PROTOCOL_VERSION     = 1
 FOREIGN_STATE        = "crawl-state.json"   # belongs to chat_crawl_store.py
 ACTIVE_LIMIT         = 3        # chats worked on at once (upper bound)
 
-CHAT_STATUSES = ("untouched", "started", "done")
+# The shared vocabulary of Vorgabe 2.4. 'started' is this route's own --
+# partially read; the zip route always writes a chat whole. 'stale' is set by
+# 'map' when the source moved on; 'deleted' only ever by hand, because this
+# route cannot tell a deleted chat from an inaccessible one.
+CHAT_STATUSES = ("listed", "started", "exported", "stale", "deleted")
 ORDER_VALUES  = ("oldest-first", "newest-first")
 
 # Opening tag of a page; attributes are parsed order-independently so that an
@@ -437,6 +452,34 @@ ZERO_WIDTH = dict.fromkeys(map(ord, "​‌‍﻿"))
 # ---------------------------------------------------------------------------
 # Small helpers
 # ---------------------------------------------------------------------------
+
+UMLAUTS = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "Ä": "ae",
+                         "Ö": "oe", "Ü": "ue", "ß": "ss"})
+SLUG_STRIP = re.compile(r"[^a-z0-9]+")
+SLUG_MAX = 50
+
+
+def slug(title: str) -> str:
+    """Turn a chat title into a filename part (doku 2.3).
+
+    Deliberately duplicated from chat_export_convert.py: this script has to
+    stay uploadable as a single file (doku 2.9), and the equality of the two
+    implementations is guarded by tests/test_wegegleichheit.py.
+    """
+    lowered = title.translate(UMLAUTS).lower()
+    cleaned = SLUG_STRIP.sub("-", lowered).strip("-")
+    return cleaned[:SLUG_MAX].strip("-") or "ohne-titel"
+
+
+def file_stem(store: dict[str, Any]) -> str:
+    """Return the file stem per doku 2.3.
+
+    This route never knows a chat's creation date -- read_conversation does
+    not supply one -- so the date segment is honestly 'ohne-datum' rather
+    than a guess from updated_at, which moves with every later message.
+    """
+    return f"ohne-datum_{slug(store.get('title') or '')}_{store['chat_uuid'][:8]}"
+
 
 def uuid_from_url(url: str) -> str:
     """Return the trailing path segment of a chat URL."""
@@ -832,8 +875,17 @@ def foreign_state_present(store_dir: str) -> bool:
 
 
 def new_state() -> dict[str, Any]:
-    """Return an empty state."""
-    return {"schema_version": STATE_SCHEMA_VERSION, "order": "", "chats": {}}
+    """Return an empty protocol, shaped exactly as chat_export_convert writes it."""
+    return {"protocol_version": PROTOCOL_VERSION, "project": "", "order": "",
+            "chats": {}}
+
+
+def blank_entry() -> dict[str, Any]:
+    """Return a fresh protocol entry with every field of Vorgabe 2.4."""
+    return {"title": "", "created_at": "", "listed_updated_at": "",
+            "exported_updated_at": "", "turns": 0, "total_turns": None,
+            "end_token": "", "file": "", "side_files": [],
+            "status": "listed", "exported_at": ""}
 
 
 def load_state(store_dir: str) -> dict[str, Any]:
@@ -848,17 +900,21 @@ def load_state(store_dir: str) -> dict[str, Any]:
         return new_state()
     with open(path, "r", encoding="utf-8") as handle:
         state = json.load(handle)
-    state.setdefault("schema_version", STATE_SCHEMA_VERSION)
+    state.setdefault("protocol_version", PROTOCOL_VERSION)
+    state.setdefault("project", "")
     state.setdefault("order", "")
     state.setdefault("chats", {})
+    # A protocol written by chat_export_convert is read as-is; whichever
+    # fields a route never touched are filled with their blanks.
     for record in state["chats"].values():
-        record.setdefault("status", "untouched")
+        for key, value in blank_entry().items():
+            record.setdefault(key, value)
     return state
 
 
 def save_state(store_dir: str, state: dict[str, Any]) -> None:
-    """Write the state atomically."""
-    state["schema_version"] = STATE_SCHEMA_VERSION
+    """Write the protocol atomically."""
+    state["protocol_version"] = PROTOCOL_VERSION
     os.makedirs(store_dir, exist_ok=True)
     _write_json_atomic(state, state_path(store_dir), ".state-")
 
@@ -866,36 +922,41 @@ def save_state(store_dir: str, state: dict[str, Any]) -> None:
 def update_state(store_dir: str, records: list[dict[str, str]]) -> dict[str, Any]:
     """Merge identity records into the state and return it.
 
-    A newly seen chat starts as ``untouched``.  An existing title is only
-    replaced by a non-empty one, so a listing without a title cannot erase a
-    title that a read page already supplied.
+    A newly seen chat starts as ``listed``.  An exported chat whose source
+    moved on -- the list carries a newer ``updated_at`` than the export rests
+    on -- becomes ``stale``; that comparison is the whole growth detection
+    (Vorgabe 2.4).  An existing title is only replaced by a non-empty one, so
+    a listing without a title cannot erase one a read page already supplied.
     """
     state = load_state(store_dir)
     for record in records:
-        entry = state["chats"].setdefault(record["uuid"], {"status": "untouched"})
-        entry.setdefault("status", "untouched")
-        if record.get("url"):
-            entry["url"] = record["url"]
+        entry = state["chats"].setdefault(record["uuid"], blank_entry())
+        for key, value in blank_entry().items():
+            entry.setdefault(key, value)
         if record.get("updated_at"):
-            entry["updated_at"] = record["updated_at"]
+            entry["listed_updated_at"] = record["updated_at"]
         if record.get("title"):
             entry["title"] = record["title"]
+        if (entry["status"] == "exported" and entry["listed_updated_at"]
+                and entry["listed_updated_at"] > (entry["exported_updated_at"] or "")):
+            entry["status"] = "stale"
     save_state(store_dir, state)
     return state
 
 
 def set_chat_status(store_dir: str, uuid: str, status: str,
-                    only_from: str = "") -> str | None:
+                    only_from: tuple[str, ...] = ()) -> str | None:
     """Set one chat's status and return the previous value.
 
-    With *only_from* the change happens only when the current status matches,
-    and ``None`` is returned when nothing changed.  That keeps an automatic
-    transition from pulling a finished chat back into work.
+    With *only_from* the change happens only when the current status is one
+    of the named ones, and ``None`` is returned when nothing changed.  That
+    keeps an automatic transition from pulling an exported chat back into
+    work.
     """
     state = load_state(store_dir)
-    entry = state["chats"].setdefault(uuid, {"status": "untouched"})
-    previous = entry.get("status", "untouched")
-    if only_from and previous != only_from:
+    entry = state["chats"].setdefault(uuid, blank_entry())
+    previous = entry.get("status", "listed")
+    if only_from and previous not in only_from:
         return None
     entry["status"] = status
     save_state(store_dir, state)
@@ -905,8 +966,8 @@ def set_chat_status(store_dir: str, uuid: str, status: str,
 def set_order(store_dir: str, order: str) -> None:
     """Record the direction in which the chats are worked through.
 
-    Changing this later is harmless: it only steers which ``untouched`` chat
-    is nominated next and never touches what is already done.
+    Changing this later is harmless: it only steers which ``listed`` or
+    ``stale`` chat is nominated next and never touches what is exported.
     """
     state = load_state(store_dir)
     state["order"] = order
@@ -955,7 +1016,7 @@ def chat_overview(store_dir: str) -> dict[str, Any]:
             "uuid":       uuid,
             "title":      entry.get("title", ""),
             "updated_at": entry.get("updated_at", ""),
-            "status":     entry.get("status", "untouched"),
+            "status":     entry.get("status", "listed"),
             "has_store":  uuid in stores,
             "recovered":  uuid in recovered,
             "held":       0,
@@ -983,12 +1044,14 @@ def chat_overview(store_dir: str) -> dict[str, Any]:
 
     active = [r for r in records if r["status"] == "started"
               and r["has_store"] and not r["complete"]]
-    ready = [r for r in records if r["status"] != "done" and r["complete"]]
+    ready = [r for r in records if r["status"] != "exported" and r["complete"]]
     missing_files = [r for r in records if r["status"] == "started"
                      and not r["has_store"]]
-    done = [r for r in records if r["status"] == "done"]
-    untouched = [r for r in records if r["status"] == "untouched"]
-    candidates = [r for r in untouched if not r["complete"]]
+    done = [r for r in records if r["status"] == "exported"]
+    # 'stale' chats queue up again next to the never-started ones: the source
+    # moved on, so there is fresh reading to do either way.
+    queued = [r for r in records if r["status"] in ("listed", "stale")]
+    candidates = [r for r in queued if not r["complete"]]
     free_slots = max(0, ACTIVE_LIMIT - len(active))
 
     if active:
@@ -1009,7 +1072,7 @@ def chat_overview(store_dir: str) -> dict[str, Any]:
         "ready":       ready,
         "missing":     missing_files,
         "done":        done,
-        "untouched":   untouched,
+        "queued":      queued,
         "candidates":  candidates,
         "free_slots":  free_slots,
         "next_up":     candidates[:free_slots],
@@ -1076,15 +1139,19 @@ def overview_report(picture: dict[str, Any]) -> str:
         lines += [
             f"  !! no {STATE_FILENAME} here -- everything below was recovered",
             "     from the store files alone.  The titles of chats without a",
-            "     store file, the working order and every 'done' mark are lost.",
+            "     store file, the working order and every 'exported' mark are lost.",
             "     Ask whether the state file can still be uploaded.",
         ]
 
     lines.append(f"Order : {picture['order']}"
                  + ("" if picture["order_set"] else "   (default, never set)"))
+    stale_count = sum(1 for r in picture["records"] if r["status"] == "stale")
+    deleted_count = sum(1 for r in picture["records"] if r["status"] == "deleted")
     lines.append(f"Chats : {len(picture['records'])} known -- "
-                 f"{len(picture['untouched'])} untouched, "
-                 f"{len(started)} started, {len(picture['done'])} done")
+                 f"{len(picture['queued']) - stale_count} listed, "
+                 f"{len(started)} started, {len(picture['done'])} exported"
+                 + (f", {stale_count} stale" if stale_count else "")
+                 + (f", {deleted_count} deleted" if deleted_count else ""))
 
     if picture["round_state"] == "in progress":
         lines.append(f"Round : IN PROGRESS -- {len(picture['active'])} of at most "
@@ -1144,11 +1211,11 @@ def overview_report(picture: dict[str, Any]) -> str:
                      "chats it is")
         lines.append("          the better choice.")
     else:
-        lines.append("NEXT UP -- nothing untouched left.")
+        lines.append("NEXT UP -- nothing listed or stale left.")
 
     if picture["done"]:
         lines.append("")
-        lines.append(f"DONE ({len(picture['done'])}) -- name these when you hand "
+        lines.append(f"EXPORTED ({len(picture['done'])}) -- name these when you hand "
                      f"over; the user may file them away")
         for record in picture["done"]:
             lines.append(f"  {record['uuid']}  "
@@ -1163,7 +1230,7 @@ def overview_report(picture: dict[str, Any]) -> str:
         for record in travellers:
             lines.append(f"    {record['uuid']}.json")
     lines.append(f"  {1 + len(travellers)} file(s) in total.")
-    lines.append(f"  Without {STATE_FILENAME} the working order, every 'done' "
+    lines.append(f"  Without {STATE_FILENAME} the working order, every 'exported' "
                  "mark and the")
     lines.append("  titles of chats without a store file are gone.")
     return "\n".join(lines)
@@ -1219,7 +1286,8 @@ def status_report(store: dict[str, Any]) -> str:
 
 
 def build_export(store: dict[str, Any], predecessor: str | None = None,
-                 successor: str | None = None) -> dict[str, Any]:
+                 successor: str | None = None,
+                 now: str = "") -> dict[str, Any]:
     """Build the export document for one chat.
 
     Turns go out in index order as a flat list of messages -- there is nothing
@@ -1227,6 +1295,13 @@ def build_export(store: dict[str, Any], predecessor: str | None = None,
     with the evidence beside it: the held count, the total from the envelope
     and the missing indices, so a reader of the file alone can tell whether it
     is a whole chat or a partial one.
+
+    The shape is the one ``chat_export_convert.py`` writes as well, field for
+    field and in the same order, so that a chat fetched either way ends up in
+    the same file.  Where a path cannot know something, the value is ``None``
+    rather than a guess: this path has no ``created_at`` because
+    ``read_conversation`` does not supply one, and it can never report dropped
+    blocks because it never sees any.
     """
     missing = missing_turns(store)
     messages = [{"n": index,
@@ -1235,17 +1310,27 @@ def build_export(store: dict[str, Any], predecessor: str | None = None,
                 for index in held_turns(store)]
     return {
         "metadata": {
-            "chat_uuid":     store["chat_uuid"],
-            "url":           store["url"],
-            "title":         store["title"],
-            "chat_date":     store["updated_at"] or "unknown",
+            "chat_date":     "unknown",
+            "imported_at":   now,
             "predecessor":   predecessor,
             "successor":     successor,
+            "chat_uuid":     store["chat_uuid"],
+            "url":           store["url"] or
+                             f"https://claude.ai/chat/{store['chat_uuid']}",
+            "title":         store["title"],
             "source":        "read_conversation",
+            "source_updated_at": store["updated_at"],
+            "turns":         len(messages),
+            "total_turns":   store["total_turns"] or None,
             "complete":      is_complete(store),
-            "turns_held":    len(messages),
-            "turns_total":   store["total_turns"] or None,
             "turns_missing": missing,
+            "deleted":       False,
+            "dropped_duplicates": 0,
+            "dropped_blocks":     {},
+            "dropped_thinking":   0,
+            "attachments_with_content":    0,
+            "creations":    0,
+            "attachments_without_content": [],
         },
         "messages": messages,
         "warnings": list(store["warnings"]),
@@ -1295,28 +1380,41 @@ def cmd_export(args: argparse.Namespace) -> int:
         print("Store holds no turns yet.", file=sys.stderr)
         return 1
 
+    now = args.now or datetime.datetime.now(datetime.timezone.utc).isoformat()
     document = build_export(store, args.predecessor or None,
-                            args.successor or None)
-    if args.out:
-        _write_json_atomic(document, args.out, ".export-")
-        print(f"Wrote {len(document['messages'])} turn(s) and "
-              f"{len(document['warnings'])} warning(s) to {args.out}")
-    else:
-        json.dump(document, sys.stdout, ensure_ascii=False, indent=2)
-        sys.stdout.write("\n")
+                            args.successor or None, now=now)
+    # Without --out the name follows doku 2.3, so the protocol can carry it.
+    out_path = args.out or f"{file_stem(store)}.json"
+    _write_json_atomic(document, out_path, ".export-")
+    print(f"Wrote {len(document['messages'])} turn(s) and "
+          f"{len(document['warnings'])} warning(s) to {out_path}")
 
-    # Only a provably complete chat earns 'done'.  Exporting a partial chat is
-    # allowed and has to stay visible as partial.
-    channel = sys.stdout if args.out else sys.stderr
+    # Only a provably complete chat earns 'exported'.  Exporting a partial
+    # chat is allowed and has to stay visible as partial.
     if is_complete(store):
-        set_chat_status(args.store_dir, args.chat, "done")
+        state = load_state(args.store_dir)
+        entry = state["chats"].setdefault(args.chat, blank_entry())
+        for key, value in blank_entry().items():
+            entry.setdefault(key, value)
+        entry.update({
+            "title":       store["title"] or entry.get("title", ""),
+            "exported_updated_at": store["updated_at"],
+            "turns":       len(store["turns"]),
+            "total_turns": store["total_turns"] or None,
+            "end_token":   next_token(store),
+            "file":        os.path.basename(out_path),
+            "side_files":  [],
+            "status":      "exported",
+            "exported_at": now,
+        })
+        save_state(args.store_dir, state)
         print(f"chat {args.chat[:8]} is complete ({store['total_turns']} turns) "
-              "and now done -- the user may file it away.", file=channel)
+              "and now exported -- the user may file it away.")
     else:
         held, total = len(store["turns"]), store["total_turns"]
         print(f"chat {args.chat[:8]} is PARTIAL: {held} of {total or '?'} turns, "
               f"missing {format_ranges(missing_turns(store)) or 'unknown'}. "
-              "Status unchanged; say so when presenting the file.", file=channel)
+              "Status unchanged; say so when presenting the file.")
     return 0
 
 
@@ -1381,7 +1479,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     # Reading a page IS taking up a chat, so ingest is what marks it started.
     for uuid in sorted(started):
         if set_chat_status(args.store_dir, uuid, "started",
-                           only_from="untouched") is not None:
+                           only_from=("listed", "stale")) is not None:
             print(f"chat {uuid[:8]} is now started.", file=sys.stderr)
     return 0
 
@@ -1469,6 +1567,8 @@ def build_parser() -> argparse.ArgumentParser:
                           help="chat UUID of the preceding chat")
     p_export.add_argument("--successor", default="",
                           help="chat UUID of the following chat")
+    p_export.add_argument("--now", default="",
+                          help="timestamp to record instead of the clock")
     p_export.set_defaults(func=cmd_export)
 
     return parser

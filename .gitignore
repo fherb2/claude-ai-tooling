@@ -8,6 +8,8 @@ __pycache__/
 # tief verschachtelt.
 **/test_results/*
 !**/test_results/.gitkeep
+**/test_data/*
+!**/test_data/.gitkeep
 
 # rein persönliche Daten, die nie den Rechner verlassen
 Fossil-Synology-Konfigurationsanleitung-Herbrand.md
