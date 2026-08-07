@@ -2,6 +2,28 @@
 """Incremental store for reconstructing chat transcripts from search snippets.
 
 ===========================================================================
+SUPERSEDED WHERE ``read_conversation`` EXISTS -- check that first.
+===========================================================================
+
+This script exists because of one assumption: that a chat can only be reached
+through ``conversation_search`` / ``recent_chats``, which return overlapping
+*snippets* and never a whole transcript.  On claude.ai in August 2026 that
+assumption turned out to be wrong.  There is ``read_conversation(
+conversation_id, page_token, max_turns)``, which returns the full text of
+every turn, numbered, with the total turn count in the envelope.
+
+Where that tool is available, use ``chat_read_store.py`` instead.  It is
+shorter, it needs no search terms, and it can *prove* a chat is complete --
+something this script's instructions have to forbid claiming.  Measured
+against real data, the crawl here collected text without assembling it: the
+snippets returned are fixed, non-overlapping chunks, so the overlap machinery
+that is the heart of this file has almost nothing to join.
+
+Keep using this script only when ``read_conversation`` is missing from your
+runtime, or for a chat it refuses (Cowork conversations, whose ids are not
+UUIDs, are unreachable for both).
+
+===========================================================================
 @Claude: OPERATING INSTRUCTIONS -- read this part, then start working.
 ===========================================================================
 

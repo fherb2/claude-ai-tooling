@@ -1,3 +1,10 @@
 # Python bytecode caches, created by every test run
 __pycache__/
 *.py[cod]
+
+# Ablage fuer Untersuchungsmaterial (echte Chatinhalte, Exportdumps): die
+# Inhalte werden nie versioniert, der Ordner selbst schon -- er ist der
+# verabredete Platz dafuer. Gilt fuer jeden so benannten Ordner, egal wie
+# tief verschachtelt.
+**/test_results/*
+!**/test_results/.gitkeep
