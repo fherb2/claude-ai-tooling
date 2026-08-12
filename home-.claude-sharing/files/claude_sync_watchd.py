@@ -139,7 +139,7 @@ NOTICE_INTERVAL = datetime.timedelta(hours=1)
 
 # How long the hourly notice stays on screen. Good news may be brief -- it is
 # a sign of life, and "everything fine" is read at a glance. Anything asking
-# for attention must stay long enough to be read (doku 1.7). Both are wishes:
+# for attention must stay long enough to be read (doku 1.8). Both are wishes:
 # whether `notify-send -t` is honoured is up to the notification daemon (Plasma
 # does, GNOME Shell ignores it).
 NOTICE_SECONDS_QUIET = 5
@@ -192,10 +192,10 @@ def _require_linux(what: str) -> None:
 
 def notify(summary: str, body: str,
            seconds: int = NOTICE_SECONDS_QUIET) -> None:
-    """Show a passive desktop notification. Never raises (doku 1.7).
+    """Show a passive desktop notification. Never raises (doku 1.8).
 
     *seconds* is a request, not a guarantee: honouring `-t` is the
-    notification daemon's decision (doku 1.7).
+    notification daemon's decision (doku 1.8).
     """
     if DRY_RUN:
         print(f"[dry-run] notify ({seconds}s): {summary} -- {body}")
@@ -386,7 +386,7 @@ class WatchState:
     # True when the last attempt could not be shown at all (doku 3.3).
     dialog_failed: bool = False
     # Last time at least one device was connected -- the reference point for
-    # "no connection since ..." in the notice (doku 1.7). Absent in state
+    # "no connection since ..." in the notice (doku 1.8). Absent in state
     # files written by older versions, which stay readable.
     last_connected: Optional[str] = None
 
@@ -774,7 +774,7 @@ def build_notice(state: WatchState, open_conflicts: int,
 
     Three cases ask for attention and get the long display time: open
     conflicts, no connection at all, and a backlog. Everything else is the
-    sign of life and may be brief (doku 1.7).
+    sign of life and may be brief (doku 1.8).
     """
     api_key = read_api_key()
     figures = _sync_figures(state, api_key, watch_dir) if api_key else None
@@ -789,7 +789,7 @@ def build_notice(state: WatchState, open_conflicts: int,
             since = f" seit {hours} Stunde(n)"
         # Both a pause and a backlog change what the user has to do, so both
         # are named alongside the conflict instead of waiting for a quiet hour
-        # that may not come while conflicts are open (doku 1.7).
+        # that may not come while conflicts are open (doku 1.8).
         extra = ""
         if figures and figures["paused"]:
             extra += "; Abgleich angehalten"
@@ -837,7 +837,7 @@ def _human_bytes(count: float) -> str:
     """Byte count in a form a notice can show.
 
     Switches one tenth into the next unit instead of at its full value
-    (doku 1.7): more than 0.1 kB reads as kB, more than 0.1 MB as MB. The
+    (doku 1.8): more than 0.1 kB reads as kB, more than 0.1 MB as MB. The
     deliberate consequence is that 500 kB shows as "0.5 MB" -- the point is a
     short number at a glance, not an exact magnitude.
     """
@@ -856,7 +856,7 @@ def folder_config_for(watch_dir: Path,
     """Syncthing's configuration entry for the watched directory, or None.
 
     Returns the whole entry, not just the id: the backlog needs the id, and
-    the notice needs `paused` from the same answer (doku 1.7). Compares
+    the notice needs `paused` from the same answer (doku 1.8). Compares
     resolved paths, since the configuration may hold "~/.claude" rather than
     an absolute path.
     """
@@ -918,7 +918,7 @@ def _sync_figures(state: WatchState, api_key: str,
     folder = folder_config_for(watch_dir, api_key)
     if folder:
         # A pause the user set by hand stops the sync without anything looking
-        # broken -- exactly the case the notice exists for (doku 1.7). Read,
+        # broken -- exactly the case the notice exists for (doku 1.8). Read,
         # never written: the watcher does not steer Syncthing (2.1).
         paused = bool(folder.get("paused"))
         status = rest_get(f"/rest/db/status?folder={folder.get('id')}", api_key)

@@ -12,17 +12,13 @@ Arbeitsregeln der Entwicklung: Geschrieben wird ausschließlich im Arbeitsordner
 
 @Claude: Dieses große Kapitel 1 ist inhaltlich vom Entwickler geprüft und redigiert. Hier bitte Änderung nur in intensiver Absprache mit dem Entwickler vornehmen. Idealerweise dem Entwickler die EInarbeitung von Änderungen vorgeben.
 
-@Claude: In diesem Kapitel gibt es noch ein Update der Kapitelnummerierung durchzuführen. Das schließt auch eine Überarbeitung der Kapitelnummern in Verweisen ein. Diese Überarbeitung darf automatisch erfolgen, nachdem der Entwickler dem Anpassungsvorschlag von Dir explizit zugestimmt hat. Dabei sind keine Änderungen an Worten vorzunehmen. Nur die Kapitelnummern sind anzupassen. Die Verweise auf die Kapitel 1.x sind dabei auch in allen anderen Teilen des Dokuments zu korrigieren, wo auf das Segment 1 verwiesden wird. Nach der vollständigen Aktualisierung der Kapitelnummern ist dieser Absatz zu entfernen.
-
-@Claude: In diesem Kapitel gibt es HTML-Kommentare zur Klärung ob die Details in einigen Absätzen noch identisch zum Code sind. Diese einzelnen Stellen sind mit dem Entwickler und einem Code-Review zu klären. Wenn die jeweiligen Absätze geklärt wurden, ist der jeweils zugehörige HTML-Kommentar zu entfernen. Nachdem alle Stellen überarbeitet wurden, wird dieser Absatz entfernt.
-
 ## 1.1 Ziel und Nutzen
 
 Claude Code, Claude Desktop und die VSCode Extension Claude Code (anthropic.claude-code) halten ihren gesamten Arbeitszustand — Konfiguration teilweise, Sitzungsprotokolle, vor allem aber das Projektgedächtnis — im Verzeichnis `~/.claude` des jeweiligen Rechners. Wer an mehreren Rechnern arbeitet, hat dadurch mehrere voneinander unabhängige Gedächtnisse. Dieses Vorhaben hält `~/.claude` über Syncthing und einen dauerhaft laufenden Vermittlungsknoten, z.B. auf einem Synology NAS, zwischen den beteiligten Rechnern synchron, sodass derselbe Kontext überall zur Verfügung steht.
 
 Die Synchronisation selbst leistet Syncthing vollständig und ereignisgesteuert im Hintergrund. Dafür wird nichts implementiert / bereitgestellt, abgesehen von einem passend zu ~/.claude erstellten und getesteten Ignore-File für die Sysnchronisation (.stignore) und einer beispielhaften Installations- und Konfigurationsanleitung für Syncthing.
 
-**Die Eigenleistung dieses Vorhabens liegt vor allem in einer umfassende *Konfliktbehandlung*, wenn ein einfaches Synchronisieren in Ausnahmefällen versagt: Syncthing führt beidseitig geänderte Dateien absichtlich nie inhaltlich zusammen, sondern legt die unterlegene Fassung als Konfliktkopie neben das Original (1.5). Ein selbst gebauter *Konflikt-Wächter*, installiert als Hintergrunddienst, (3.1) entdeckt solche Kopien, meldet sie dem Nutzer und bietet den Einstieg in eine geführte Lösung mit Claude (1.7, 1.8).**
+**Die Eigenleistung dieses Vorhabens liegt vor allem in einer umfassende *Konfliktbehandlung*, wenn ein einfaches Synchronisieren in Ausnahmefällen versagt: Syncthing führt beidseitig geänderte Dateien absichtlich nie inhaltlich zusammen, sondern legt die unterlegene Fassung als Konfliktkopie neben das Original (1.5). Ein selbst gebauter *Konflikt-Wächter*, installiert als Hintergrunddienst, (3.1) entdeckt solche Kopien, meldet sie dem Nutzer und bietet den Einstieg in eine geführte Lösung mit Claude (1.8, 1.9).**
 
 ## 1.2 Die Landschaft: Geräte, Knoten, Ist-Stand
 
@@ -30,7 +26,7 @@ Drei Geräte in Sterntopologie: Die **Synology** als beispielhafter Sync-Server,
 
 Ist-Stand der Beispielanwendung: Synology und Rechner A und B sind eingerichtet und synchronisieren `~/.claude` bereits produktiv. Der Watcher ist als Dienst (user-Basis) installiert und läuft erfolgreich. Konfliktsituationen wurden per Hand herbeigeschaffen, um zu testen. Im Betrieb selbst gab es bisher keine Konfliktsituationen.
 
-Eine Implementation des Überwachungsdienstes für Windows (1.11) wurde noch nicht erstellt.
+Eine Implementation des Überwachungsdienstes für Windows (1.12) wurde noch nicht erstellt.
 
 Einrichtung, Ports, Rechte und Betriebsdetails des Knotens: siehe `Syncthing-Synology-Konfigurationsanleitung-allgemein.md`. Dieses Dokument setzt eine danach eingerichtete Umgebung voraus.
 
@@ -94,7 +90,7 @@ Für den Alltag folgen daraus zwei Verhaltensregeln (normativ in 2.2): **Syncthi
 
 ## 1.5 Konflikte: Entstehung und Gestalt
 
-Ein Konflikt entsteht, wenn dieselbe Datei auf zwei Geräten geändert wurde, bevor der Abgleich die jeweils andere Änderung zustellen konnte. Syncthing erkennt das über Versionsvektoren und entscheidet **nie inhaltlich**: Die Fassung mit dem jüngeren Änderungszeitpunkt bleibt unter dem Originalnamen, die andere wird umbenannt zu `<name>.sync-conflict-<datum>-<zeit>-<gerätekennung>.<endung>` und als gewöhnliche Datei **auf alle Geräte verteilt**. Beide Fassungen liegen damit überall nebeneinander; nichts geht verloren, aber zusammengeführt hat auch niemand — genau das ist die gewollte Arbeitsteilung (Kern-Invariante in 2.1): Das Werkzeug transportiert, die inhaltliche Entscheidung treffen Nutzer und in diesem Projekt der Nutzer mit Unterstützung von Claude (1.8).
+Ein Konflikt entsteht, wenn dieselbe Datei auf zwei Geräten geändert wurde, bevor der Abgleich die jeweils andere Änderung zustellen konnte. Syncthing erkennt das über Versionsvektoren und entscheidet **nie inhaltlich**: Die Fassung mit dem jüngeren Änderungszeitpunkt bleibt unter dem Originalnamen, die andere wird umbenannt zu `<name>.sync-conflict-<datum>-<zeit>-<gerätekennung>.<endung>` und als gewöhnliche Datei **auf alle Geräte verteilt**. Beide Fassungen liegen damit überall nebeneinander; nichts geht verloren, aber zusammengeführt hat auch niemand — genau das ist die gewollte Arbeitsteilung (Kern-Invariante in 2.1): Das Werkzeug transportiert, die inhaltliche Entscheidung treffen Nutzer und in diesem Projekt der Nutzer mit Unterstützung von Claude (1.9).
 
 Wie oft das praktisch vorkommt, hängt am Dateimix: Die Sitzungsprotokolle unter `projects/` tragen je Sitzung eindeutige Namen und kollidieren zwischen zwei Rechnern praktisch nie, sofern man auf beiden Rechnern **nicht gleichzeitig im selben Chat** arbeitet. Kandidaten sind die wenigen wirklich geteilten, beidseitig veränderten Dateien — `settings.json`, `CLAUDE.md` und ähnliche. In den ersten Betriebswochen zeigt sich, dass beim Synchronisieren von ~/.claude keine Konflikte zustande kommen. Eine Überwachung mit Hilfe des Dienstes in diesem Projekt ist trotzdem nicht verkehrt: Wenn Anthropic weiter entwickelt können zukünftig vielleicht doch Konflikte dazu kommen, die aktuell (08/2026) noch nicht aufgetreten sind.
 
@@ -131,13 +127,13 @@ Anhalten bleibt trotzdem möglich — es ist in Syncthings Oberfläche einen Kli
 
 **Zwei Wächter, ein Konflikt.** Läuft der Wächter auf beiden Rechnern, meldet ihn jeder für sich — die Kopie liegt ja auf beiden. Gelöst wird an **einem** Rechner (verbindlich in 2.1, Begründung oben); die Auflösung wandert dann als gewöhnlicher Datei- und Löschvorgang zum anderen. Dort verschwindet der Anlass damit von selbst, aber **nicht** der schon offene Dialog: Ein Fenster, das auf Eingabe wartet, weiß nichts davon. Es schließt sich nach fünfzehn Minuten selbst (3.3), und der nächste Durchgang findet nichts mehr und schweigt. Wer den veralteten Dialog vorher noch anklickt, bekommt eine Sitzung, die leer ausgeht und genau das sagt (3.4, Schritt 1) — unnötig, aber harmlos. Was dagegen **nicht** passieren passieren sollte, ist paralleles Lösen an beiden Rechnern durch den Nutzer: Fallen die Entscheidungen unterschiedlich aus, entsteht ein neuer Konflikt.
 
-## 1.6a Mehr als 2 Rechner
+## 1.7 Mehr als 2 Rechner
 
-<!-- Dieses Kapitel 1.6a ist noch zu 1.7 umzubenennen, alle folgenden Kapitelnummern um 0.1 hoch zu zählen und gleichzeitig alle Verweise in diesem Dokument, die damit auf ein falsches Kapitel weisen würden, zu überarbeiten. -->
+<!-- Dieses Kapitel 1.7 ist noch zu 1.8 umzubenennen, alle folgenden Kapitelnummern um 0.1 hoch zu zählen und gleichzeitig alle Verweise in diesem Dokument, die damit auf ein falsches Kapitel weisen würden, zu überarbeiten. -->
 
 Das Verfahren wird hier explizit immer an 2 Rechnern demonstriert. Da jeder Rechner allein für sich arbeitet und nur Syncthing die Daten und damit auch die Konflikte und Konfliktlösungen verteilt, ist es möglich, beliebig viele Rechner auf die gleiche Art untereinander zu synchronisieren, wie hier an zwei Rechnern beschrieben. Dazu ist keinerlei Änderung der Projektdaten hier oder des Wächterdienstes notwendig.
 
-## 1.7 Meldung und Einstieg
+## 1.8 Meldung und Einstieg
 
 Findet der Wächter Konfliktkopien, erscheint ein Zenity-Frage-Dialog: Er nennt die betroffenen Dateien und erklärt vorab, dass sich zur Bearbeitung eine Claude-Code-Sitzung in einem Terminal öffnet und dafür gegebenenfalls ein Terminal-Programm auszuwählen ist. Antworten: „Jetzt lösen" / „Später". Bricht der Nutzer die anschließende Terminal-Auswahl ab, wird nicht stillschweigend ein Terminal gewählt, sondern erneut gefragt — Wiederholung oder Abbruch; bei Abbruch meldet sich die Episode regulär wieder. Diese gesamte Dialogstrecke samt Terminal-Erkennung ist in Vorversuchen erprobt und abgenommen (Belege in 3.8, Einzelheiten in 3.3).
 
@@ -159,15 +155,13 @@ Die Bytes wechseln die Einheit schon bei einem Zehntel der nächsten: über 0,1 
 
 **Die Anzeigedauer richtet sich nach dem Inhalt**, und das ist die eigentliche Festlegung: Eine gute Nachricht darf kurz sein — wenige Sekunden, denn „alles in Ordnung" ist mit einem Blick erfasst, und genau darin liegt ihr Wert als Lebenszeichen. Alles, was Aufmerksamkeit verlangt, bleibt zwölf Sekunden stehen: offene Konflikte, ein Rückstand, eine von Hand angehaltene Freigabe, oder gar keine Verbindung zum Abgleich. **Vorbehalt:** Ob die gewünschte Dauer eingehalten wird, entscheidet der Benachrichtigungsdienst des Desktops — Plasma befolgt sie, GNOME Shell übergeht sie.
 
-<!-- Auch in den folgenden zwei Absätzen mit dem Code prüfen. Es gilt, was der Code sagt. -->
+**Keine Verbindung** erhält keinen eigenen Meldungsweg: Es erscheint dieselbe stündliche Benachrichtigung, aber an die Stelle der Zahlen tritt der Satz „keine Verbindung zum Abgleich seit …" — ohne Bytes, denn ohne Verbindung sind deren Zuwächse null und damit ohne Aussage. Ist noch kein Bezugspunkt bekannt, entfällt die Zeitangabe und es bleibt bei „keine Verbindung zum Abgleich". Ein zweiter Kanal wäre ein zweiter Ort, an dem etwas veralten kann.
 
-**Keine Verbindung** erhält keinen eigenen Meldungsweg, sondern dieselbe Meldung mit klarem Vorspann („keine Verbindung zum Abgleich seit …"). Ein zweiter Kanal wäre ein zweiter Ort, an dem etwas veralten kann.
-
-**Und eine Frist wird nur genannt, wenn sie stimmt.** Fehlt der Bezugspunkt, steht „Zählung neu begonnen" statt einer Stundenzahl. Dieser Satz deckt zwei Lagen gleichzeitig: eine verlorene Zustandsdatei (3.2) und eine frische Installation, die noch nie einen Konflikt gesehen hat. Von außen sind beide nicht unterscheidbar, und für beide ist er wahr — eine erfundene Null wäre für beide falsch.
+**Und eine Frist wird nur genannt, wenn sie stimmt.** Fehlt der Bezugspunkt, steht in der Ruheform „Zählung neu begonnen" statt einer Stundenzahl; in den übrigen Formen entfällt die Zeitangabe schlicht. Der Ersatzsatz deckt zwei Lagen gleichzeitig: eine verlorene Zustandsdatei (3.2) und eine frische Installation, die noch nie einen Konflikt gesehen hat. Von außen sind beide nicht unterscheidbar, und für beide ist er wahr — eine erfundene Null wäre für beide falsch.
 
 Stündlich bleibt es. Geht alles gut, ist die Meldung nur kurz zu sehen und sagt sinngemäß genau eines: Der Wächter lebt.
 
-## 1.8 Die Konfliktsitzung
+## 1.9 Die Konfliktsitzung
 
 **Die Konfliktlösung mit Claude statt einem Diff-Tool** durchzuführen, soll die Konfliktlösung transparenter machen, da der Nutzer unmittelbar mit dem Wissen von Claude und dessen Tools, insbesondere der Internetrecherche, eine für ihn unklare Konfliktsituation leichter erforschen kann.
 
@@ -187,7 +181,7 @@ Ergibt die Lösung, dass eine Datei künftig gar nicht mehr abgeglichen werden s
 
 Zwei Regeln binden die Sitzung unbedingt (2.2): Keine Datei wird überschrieben und keine Konfliktkopie gelöscht ohne ausdrückliche Zustimmung des Nutzers zur konkreten Entscheidung; und am Ende berichtet die Sitzung, welche Paare es gab, wie je Paar entschieden wurde und was geschrieben oder gelöscht wurde.
 
-## 1.9 Betriebsrahmen, Versionierung und Notfall-Rückgriff
+## 1.10 Betriebsrahmen, Versionierung und Notfall-Rückgriff
 
 Auf den Rechnern läuft Syncthing als systemd-**Benutzerdienst** (im Falle von Linux), der Wächter ebenfalls als Benutzerdienst, dauerhaft und ereignisgesteuert (3.5). Der Wächter braucht die grafische Sitzung, weil er Dialoge zeigt. Auf der Synology läuft das Paket als Dienst des DSM.
 
@@ -216,7 +210,7 @@ Die **Dateiversionierung** ist eingeschaltet und dient in diesem Vorhaben genau 
 
 Warum die Schritte 1 bis 3 vor allem anderen stehen: Eine laufende Claude-Instanz hält ihren Stand im Speicher und schreibt beim Beenden Dateien zurück. War während einer Auflösung eine Sitzung offen, kann sie die Lösung unbemerkt überschrieben haben — dann ist nicht der Bestand kaputt, sondern nur überschrieben, und ein Rückgriff aus `.stversions` würde bei laufender Sitzung gleich wieder zunichte gemacht. Erst die Sitzungen beenden, dann urteilen. Die Sicherung steht vor dem Pausieren, weil Pausieren nur die Weiterverbreitung aufhält: Wer beim Zurückholen daneben greift, hat ohne Sicherung auch den kaputten Stand verloren — und der ist die einzige Quelle, um zu verstehen, was geschah.
 
-## 1.10 Rechner B erstmalig anschließen
+## 1.11 Rechner B erstmalig anschließen
 
 Rechner B trägt ein eigenständig gewachsenes `~/.claude`, das nicht überschrieben werden darf. In ihm sind alle Chats aufbewahrt, die zu den lokalen Projekten odere Claude Desktop geführt wurden.
 
@@ -230,9 +224,9 @@ Die Anbindung eines 2. Rechners während der Erstellung dieses Projekts geschieh
 
 **Phase 1 — Hilfsordner:** B wird mit der Synology gekoppelt und synchronisiert zunächst ausschließlich einen eigenen Testordner. Daran läuft der komplette Testplan (3.8): einseitige Änderungen, Vermittlung bei abwechselndem Betrieb, absichtliche Konflikte, Ausschlussmuster, Zeitverhalten, Erstverbindung nicht-leerer Ordner. `~/.claude` auf B bleibt so lange unangetastet.
 
-**Phase 2 — echter Bestand:** Erst wenn Phase 1 bestanden ist und der Watcher-Dienst läuft: 1) Sicherung des B-Standes, 2) `.stignore` auf B anlegen (vor der Verbindung!), 3) dann den Ordner mit Syncthing auf dem Server (hier eine Synology) teilen. **Beim Erstabgleich zweier nicht-leerer Bestände vereinigt Syncthing auf Dateiebene: Was nur auf einer Seite existiert, wird verteilt; was auf beiden Seiten existiert und sich unterscheidet, erzeugt Konfliktkopien**. Die anschließende, vermutlich umfangreiche Konfliktlösung ist keine Störung, sondern der geplante Zusammenführungsschritt — geführt durch dieselbe Sitzung wie im Regelbetrieb (1.8).
+**Phase 2 — echter Bestand:** Erst wenn Phase 1 bestanden ist und der Watcher-Dienst läuft: 1) Sicherung des B-Standes, 2) `.stignore` auf B anlegen (vor der Verbindung!), 3) dann den Ordner mit Syncthing auf dem Server (hier eine Synology) teilen. **Beim Erstabgleich zweier nicht-leerer Bestände vereinigt Syncthing auf Dateiebene: Was nur auf einer Seite existiert, wird verteilt; was auf beiden Seiten existiert und sich unterscheidet, erzeugt Konfliktkopien**. Die anschließende, vermutlich umfangreiche Konfliktlösung ist keine Störung, sondern der geplante Zusammenführungsschritt — geführt durch dieselbe Sitzung wie im Regelbetrieb (1.9).
 
-## 1.11 Windows-Ausblick
+## 1.12 Windows-Ausblick
 
 Zurückgestellt, bis der Betrieb auf Linux-Rechnern eindeutig stabil und Konfliktfrei oder -arm läuft. Die Grundlage ist günstig: Syncthing läuft nativ unter Windows, Claude Code legt seinen Zustand strukturell identisch unter `%USERPROFILE%\.claude` ab, und die Zugangsdaten liegen dort ebenso als Klartextdatei — der Ausschluss aus 2.3 gilt unverändert. Anzupassen sind allein die gekapselten Bausteine des Wächters: Dialoge (statt Zenity), Terminalstart (statt X11-Terminal-Erkennung), Zeitsteuerung (Aufgabenplanung statt systemd). Einzelheiten in 3.7.
 
@@ -270,7 +264,7 @@ Jedes Skript trägt einen Kopfkommentar, der seine Nutzung beschreibt. Skripte u
 
 Der Wächter berichtet im Dienstbetrieb knapp: **eine** Zeile je Durchgang, der etwas gefunden hat (Anlass, Anzahl, Ordner). Ein leerer Befund schweigt, sonst füllt der Sicherheits-Suchlauf das Journal mit „nichts" (3.5). Befunde führen zu Dialogen nach 2.9, nicht zu Konsolenzeilen. Fehler und Ausnahmen werden **immer** ausgegeben, damit sie im systemd-Journal sichtbar bleiben — auch die Meldung eines Dialogs, der nicht gezeigt werden konnte (3.3). Verletzt durch Gesprächigkeit bei leerem Befund und durch verschluckte Fehler.
 
-Sichtbar wird der Wächter gegenüber dem Nutzer damit an genau zwei Stellen: dem Konfliktdialog und der stündlichen Betriebsmeldung (1.7). Beides sind bewusst gesetzte Meldungen, keine Nebenwirkungen — jede weitere Sichtbarkeit ist zu begründen oder zu unterlassen.
+Sichtbar wird der Wächter gegenüber dem Nutzer damit an genau zwei Stellen: dem Konfliktdialog und der stündlichen Betriebsmeldung (1.8). Beides sind bewusst gesetzte Meldungen, keine Nebenwirkungen — jede weitere Sichtbarkeit ist zu begründen oder zu unterlassen.
 
 ## 2.7 Ablageorte
 
@@ -308,7 +302,7 @@ Erzwingen lässt sich das nicht, prüfen schon: `install_service.sh` vergleicht 
 
 ## 2.9 Regeln für die grafische Interaktion
 
-**Für alles, was eine Entscheidung des Nutzers verlangt, werden Zenity-Dialoge verwendet, niemals Desktop-Benachrichtigungen** — deren Anklickbarkeit hängt vom Benachrichtigungsdienst ab und ist nicht zugesichert; eine übersehene oder nicht anklickbare Konfliktmeldung wäre ein stiller Ausfall der Eskalation. **Für reine Betriebsanzeigen ohne Handlungsbedarf gilt das Umgekehrte:** Dort ist `notify-send` das Mittel der Wahl (stündliche Betriebsmeldung, 1.7), weil ein modaler Dialog für eine Belanglosigkeit unangemessen aufdringlich wäre. Trennlinie ist also nicht das Werkzeug, sondern die Frage, ob eine Reaktion nötig ist.
+**Für alles, was eine Entscheidung des Nutzers verlangt, werden Zenity-Dialoge verwendet, niemals Desktop-Benachrichtigungen** — deren Anklickbarkeit hängt vom Benachrichtigungsdienst ab und ist nicht zugesichert; eine übersehene oder nicht anklickbare Konfliktmeldung wäre ein stiller Ausfall der Eskalation. **Für reine Betriebsanzeigen ohne Handlungsbedarf gilt das Umgekehrte:** Dort ist `notify-send` das Mittel der Wahl (stündliche Betriebsmeldung, 1.8), weil ein modaler Dialog für eine Belanglosigkeit unangemessen aufdringlich wäre. Trennlinie ist also nicht das Werkzeug, sondern die Frage, ob eine Reaktion nötig ist.
 
 Der Konflikt-Dialog erscheint einmal je Konflikt-Episode und nach Vertagung frühestens nach dreißig Minuten erneut; das Verschwinden aller Konfliktkopien beendet die Episode. Ein Dialog-Abbruch führt nie zu einer stillschweigenden Ersatzentscheidung — insbesondere wählt ein abgebrochener Auswahldialog niemals heimlich den ersten Kandidaten, sondern führt zur Rückfrage (3.3). Zenity-Meldungen auf dem Fehlerkanal über das Erscheinungsbild (GTK-Warnungen) sind kosmetisch und dürfen nicht als Fehlerkennzeichen ausgewertet werden. Verletzt durch `notify-send`, Dialoge außerhalb der Episodenregel, stille Ersatzwahlen und Fehlerauswertung anhand des GTK-Rauschens.
 
@@ -341,10 +335,10 @@ Ausgelöst wird ein Durchgang durch ein Dateiereignis, durch den Sicherheits-Suc
 1. **Suchen.** Den abgeglichenen Ordner rekursiv nach Dateien mit dem Namensbestandteil `.sync-conflict-` durchsuchen. Ausgelassen werden `.stversions/` (archivierte Altfassungen) und `.stfolder/`. Das Suchmuster stützt sich bewusst nur auf den dokumentierten, festen Literalteil — das genaue Format von Datum, Zeit und Gerätekennung im Namen ist nicht zugesichert.
 2. **Zuordnen.** Jede gefundene Kopie ihrem Original zuordnen (Namensableitung). Ein Original kann mehrere Kopien haben (`maxConflicts`-Vorgabe: 10 je Datei — bleibt unverändert, keinesfalls 0, siehe 2.1). Der Namensbestandteil `<modifiedBy>` wird mitgeführt und in Dialog und Übergabe als **Gerätekennung** genannt, ohne Richtungsaussage: Er gehört einem der beiden beteiligten Geräte, seine Rolle ist nicht verlässlich ableitbar. Zwei Gründe, jeder allein hinreichend. Erstens entscheidet Syncthing anhand der Änderungszeit, welche Fassung Original bleibt (bei Gleichstand anhand der größeren Gerätekennung) — der Ausgang ist beliebig und beim nächsten Mal womöglich umgekehrt. Zweitens wird der Name genau **einmal** gebildet, dort wo der Konflikt auffiel, und die Kopie wandert danach als gewöhnliche Datei auf alle Geräte (1.6): Auf dem einen Rechner steht darin die fremde Kennung, auf dem anderen die eigene, bei bitgleichem Inhalt beider Dateien. Eine Prüfung „ist das meine Kennung?" wäre deshalb auf einem der beiden Rechner regelmäßig falsch. Die Zuordnung, welche Fassung von welchem Rechner stammt, kommt daher nicht aus dem Namen, sondern aus Inhalt und Änderungszeit — oder aus einer Frage an den Nutzer (3.4).
 
-   Anzumerken ist ein Widerspruch (§1.10): Syncthings eigene Dokumentation nennt `<modifiedBy>` „the device ID of the device that modified the file being renamed", also den Verlierer. Die Messung am echten Konflikt widerlegt das (3.8), und der Quellcode stützt die Messung — `moveForConflict(name, file.ModifiedBy.String(), …)` wird mit der **eingehenden**, siegreichen Fassung aufgerufen, umbenannt wird die lokale (`lib/model/folder_sendrecv.go`). Aufgelöst wird der Widerspruch hier nicht, sondern umgangen: Die Umsetzung verlässt sich auf keine der beiden Lesarten.
+   Anzumerken ist ein Widerspruch (§1.11): Syncthings eigene Dokumentation nennt `<modifiedBy>` „the device ID of the device that modified the file being renamed", also den Verlierer. Die Messung am echten Konflikt widerlegt das (3.8), und der Quellcode stützt die Messung — `moveForConflict(name, file.ModifiedBy.String(), …)` wird mit der **eingehenden**, siegreichen Fassung aufgerufen, umbenannt wird die lokale (`lib/model/folder_sendrecv.go`). Aufgelöst wird der Widerspruch hier nicht, sondern umgangen: Die Umsetzung verlässt sich auf keine der beiden Lesarten.
 3. **Laufende Sitzung erkennen.** Steht in der Zustandsdatei die PID einer gestarteten Sitzung und existiert dieser Prozess noch, wird **kein** Dialog gezeigt — der Nutzer arbeitet gerade. Erprobt: `konsole` hält den gestarteten Prozess offen, die PID taugt damit als Signal. Manche Emulatoren (`gnome-terminal`) reichen den Auftrag jedoch an einen Server weiter und beenden sich sofort; dort ist die PID sofort tot. Deshalb gilt zusätzlich eine Zeitspanne von dreißig Minuten ab Start als Ruhezeit. Wo die PID trägt, ist die Erkennung exakt; wo nicht, verhält sich der Wächter wie ohne sie — ein Dialog kann dann früher wiederkehren, aber die Eskalation geht nie verloren.
 4. **Episode führen und eskalieren.** Kein Fund: Episode beenden (3.2). Fund und Dialog nach der Episodenregel aus 2.9 fällig: Dialogstrecke aus 3.3 anstoßen; bei „Jetzt lösen" die Konfliktsitzung starten, ihr **alle** derzeit anstehenden Paare übergeben und die PID des gestarteten Prozesses vermerken.
-5. **Betriebsmeldung.** Ist sie fällig, zusammenstellen und zeigen — bei offenen Konflikten als Hinweis darauf statt als Statistik (1.7).
+5. **Betriebsmeldung.** Ist sie fällig, zusammenstellen und zeigen — bei offenen Konflikten als Hinweis darauf statt als Statistik (1.8).
 
 Der Wächter greift dabei zu keinem Zeitpunkt steuernd ein (2.1): Er hält den Abgleich nicht an und nimmt eine vom Nutzer gesetzte Pause nicht zurück. Verschwinden die Konfliktkopien — weil sie hier gelöst wurden oder weil die andernorts hergestellte Lösung eingetroffen ist —, endet die Episode von selbst; die zweite Möglichkeit ist der Regelfall, wenn an einem anderen Rechner gelöst wurde (1.6).
 
@@ -363,7 +357,7 @@ Der Wächter verändert nie Ordnerinhalt und trifft nie inhaltliche Entscheidung
 
 ### Stündliche Betriebsmeldung
 
-Zusätzlich zur Konfliktsuche stellt der Wächter einmal je Stunde die Betriebsmeldung aus 1.7 zusammen und zeigt sie per `notify-send`. Fällig ist sie, wenn seit der letzten Meldung eine Stunde vergangen ist (Zeitstempel in der Zustandsdatei); sie hängt damit am selben Durchgang wie die Konfliktsuche und braucht keinen eigenen Takt.
+Zusätzlich zur Konfliktsuche stellt der Wächter einmal je Stunde die Betriebsmeldung aus 1.8 zusammen und zeigt sie per `notify-send`. Fällig ist sie, wenn seit der letzten Meldung eine Stunde vergangen ist (Zeitstempel in der Zustandsdatei); sie hängt damit am selben Durchgang wie die Konfliktsuche und braucht keinen eigenen Takt.
 
 **Datenquellen** — Syncthings lokale REST-Schnittstelle auf `127.0.0.1:8384`, geprüft und lieferfähig:
 
@@ -379,8 +373,8 @@ Zusätzlich zur Konfliktsuche stellt der Wächter einmal je Stunde die Betriebsm
 1. **Die Byte-Zähler sind kumulativ seit Verbindungsaufbau und springen bei jedem Neuverbinden auf null.** Für eine Stundenangabe muss der Wächter Vorwert **und** `startedAt` in der Zustandsdatei mitführen und die Differenz nur bilden, wenn `startedAt` unverändert ist; andernfalls beginnt die Zählung neu. Ohne diese Prüfung meldet der Wächter nach jedem Verbindungsabriss negative oder unsinnige Werte.
 2. **Zugriff braucht den API-Schlüssel** aus `configuration/gui/apikey` der Syncthing-Konfiguration. Der Schlüssel gewährt vollen Zugriff auf die Syncthing-Steuerung: Er wird zur Laufzeit gelesen, nie protokolliert, nie in eine Meldung geschrieben und liegt außerhalb des abgeglichenen Ordners (2.7).
 3. **Die Meldung ist Beiwerk.** Ist die Schnittstelle nicht erreichbar, der Schlüssel nicht auffindbar oder eine Antwort unerwartet geformt, entfällt die Meldung stillschweigend — die Konfliktsuche, die eigentliche Aufgabe, läuft davon unberührt weiter und darf daran nie scheitern.
-4. **Der Rückstand ist Bestandteil der Meldung** (Entscheidung zu F10, Wortlaut und Dauer in 1.7). `needFiles` wird je Freigabe abgefragt, wofür der Wächter den überwachten Ordner erst auf Syncthings Freigabe-Kennung abbilden muss — über die Konfiguration, per Pfadvergleich, weil dort auch „~/.claude" statt eines absoluten Pfades stehen kann. Findet er keine Freigabe, entfällt allein die Rückstandszahl und die Meldung erscheint trotzdem. Aus derselben Antwort kommt das Feld `paused`: Eine vom Nutzer von Hand gesetzte Pause der Freigabe wird gemeldet (Wortlaut in 1.7) — gelesen, nie geschrieben (2.1). **Pause und Rückstand werden neben offenen Konflikten mitgenannt, nicht statt ihrer:** Beides ändert, was der Nutzer tun sollte, und die Ruheform, in der sie sonst erschienen, kommt bei offenen Konflikten gar nicht vor. Der Wortlaut des Rückstands liegt dafür an **einer** Stelle im Code, weil er in zwei Meldungen auftritt (2.4). Ein angehaltenes **Gerät** braucht dafür keine eigene Behandlung: Es erscheint als fehlende Verbindung, weil Syncthing die Verbindung dabei trennt. Am echten Bestand geprüft: `paused` steht sowohl auf der Freigabe als auch je Gerät und je Verbindung.
-5. **Die Anzeigedauer hängt vom Inhalt ab** (5 s im Normalfall, 12 s bei offenen Konflikten, Rückstand oder fehlender Verbindung; Begründung in 1.7). Übergeben wird sie als `notify-send -t` in **Millisekunden**; ob sie befolgt wird, entscheidet der Benachrichtigungsdienst. Der Zustand führt dafür zusätzlich mit, wann zuletzt überhaupt eine Verbindung bestand — ohne diesen Bezugspunkt ließe sich „seit …" nicht sagen (3.2). Dieser Merker wird **nur beim Zusammenstellen der Meldung** aktualisiert, also höchstens einmal je Stunde. Die Angabe „seit …" ist damit auf Stunden genau und nicht genauer — passend zum Takt der Meldung, aber es heißt auch: Nach einer frischen Installation steht bis zur ersten Meldung noch kein Bezugspunkt in der Zustandsdatei, und ein sofortiger Verbindungsverlust wäre dann ohne Zeitangabe zu melden. Beabsichtigt: Ein zusätzlicher REST-Aufruf je Durchgang wäre Aufwand für eine Genauigkeit, die niemand braucht.
+4. **Der Rückstand ist Bestandteil der Meldung** (Entscheidung zu F10, Wortlaut und Dauer in 1.8). `needFiles` wird je Freigabe abgefragt, wofür der Wächter den überwachten Ordner erst auf Syncthings Freigabe-Kennung abbilden muss — über die Konfiguration, per Pfadvergleich, weil dort auch „~/.claude" statt eines absoluten Pfades stehen kann. Findet er keine Freigabe, entfällt allein die Rückstandszahl und die Meldung erscheint trotzdem. Aus derselben Antwort kommt das Feld `paused`: Eine vom Nutzer von Hand gesetzte Pause der Freigabe wird gemeldet (Wortlaut in 1.8) — gelesen, nie geschrieben (2.1). **Pause und Rückstand werden neben offenen Konflikten mitgenannt, nicht statt ihrer:** Beides ändert, was der Nutzer tun sollte, und die Ruheform, in der sie sonst erschienen, kommt bei offenen Konflikten gar nicht vor. Der Wortlaut des Rückstands liegt dafür an **einer** Stelle im Code, weil er in zwei Meldungen auftritt (2.4). Ein angehaltenes **Gerät** braucht dafür keine eigene Behandlung: Es erscheint als fehlende Verbindung, weil Syncthing die Verbindung dabei trennt. Am echten Bestand geprüft: `paused` steht sowohl auf der Freigabe als auch je Gerät und je Verbindung.
+5. **Die Anzeigedauer hängt vom Inhalt ab** (5 s im Normalfall, 12 s bei offenen Konflikten, Rückstand oder fehlender Verbindung; Begründung in 1.8). Übergeben wird sie als `notify-send -t` in **Millisekunden**; ob sie befolgt wird, entscheidet der Benachrichtigungsdienst. Der Zustand führt dafür zusätzlich mit, wann zuletzt überhaupt eine Verbindung bestand — ohne diesen Bezugspunkt ließe sich „seit …" nicht sagen (3.2). Dieser Merker wird **nur beim Zusammenstellen der Meldung** aktualisiert, also höchstens einmal je Stunde. Die Angabe „seit …" ist damit auf Stunden genau und nicht genauer — passend zum Takt der Meldung, aber es heißt auch: Nach einer frischen Installation steht bis zur ersten Meldung noch kein Bezugspunkt in der Zustandsdatei, und ein sofortiger Verbindungsverlust wäre dann ohne Zeitangabe zu melden. Beabsichtigt: Ein zusätzlicher REST-Aufruf je Durchgang wäre Aufwand für eine Genauigkeit, die niemand braucht.
 
 **Bezug zu F4:** Wird die REST-Schnittstelle für die Betriebsmeldung ohnehin angebunden, verliert das Gegenargument gegen einen ereignisgesteuerten Auslöser („Kopplung an die lokale API samt Schlüssel") seine Kraft — beide Fragen sind deshalb zusammen zu entscheiden.
 
@@ -394,7 +388,7 @@ Eine kleine JSON-Datei `~/.claude-sync-watch/zustand.json` mit diesen Angaben:
 - wann der Konflikt-Dialog zuletzt gezeigt wurde (Dreißig-Minuten-Regel),
 - der zwischengespeicherte Terminal-Befehl (3.3),
 - wann die letzte Betriebsmeldung erschien, sowie die Vergleichswerte dafür: die Byte-Zähler je Gerät samt zugehörigem `startedAt` (siehe 3.1),
-- wann zuletzt überhaupt eine Verbindung zu einem Gerät bestand — der Bezugspunkt für „keine Verbindung seit …" in der Meldung (1.7). Fehlt das Feld, weil die Datei von einer älteren Fassung stammt, bleibt sie lesbar und die Angabe entfällt,
+- wann zuletzt überhaupt eine Verbindung zu einem Gerät bestand — der Bezugspunkt für „keine Verbindung seit …" in der Meldung (1.8). Fehlt das Feld, weil die Datei von einer älteren Fassung stammt, bleibt sie lesbar und die Angabe entfällt,
 - wann zuletzt eine Konfliktkopie gefunden wurde — Grundlage für die Angabe „kein Konflikt seit … Stunden",
 - PID und Startzeitpunkt einer gestarteten Konfliktsitzung — Grundlage für die Ruhezeit aus 3.1 Schritt 3.
 
@@ -466,12 +460,12 @@ Das Verfahren:
 
    Geschrieben wird **nur**, was der Konflikt erfordert — kein Ausbessern von Leerraum, Einrückung, Zeilenenden, Reihenfolge oder Schreibfehlern, auch wenn es eine Verbesserung wäre. Begründung: Jede unnötige Byte-Änderung wandert auf alle Geräte (1.6) und kann dort zum nächsten Konflikt werden, und in manchen Dateien trägt der Leerraum Bedeutung. Ist eine solche Entscheidung beim Zusammenfügen unvermeidlich, wird sie vor der Zustimmung benannt. Anlass ist eine Beobachtung aus dem Vollzug (3.8): Die Sitzung hatte Leerzeilen normalisiert — offengelegt und abgesegnet, aber ungeregelt.
 4. **Endkontrolle.** Erneut suchen; erst ein leerer Befund beendet die Bearbeitung. Sind während der Arbeit neue Kopien hinzugekommen, gehören sie in dieselbe Runde. Ergibt eine Entscheidung, dass eine Datei oder ein Ordner künftig gar nicht mehr abgeglichen werden soll, ist die Ausschlussliste jetzt anzupassen — und zwar auf **jedem** Gerät, da sie nicht mitwandert (2.3).
-5. **Aufräumen.** Wurde auf Empfehlung aus Schritt 1 von Hand angehalten, den Nutzer daran erinnern, den Abgleich wieder einzuschalten. Bestehen Zweifel, ob die Lösung trägt, ist Angehaltenlassen die richtige Wahl — dann greift der Notfall-Rückgriff aus 1.9.
+5. **Aufräumen.** Wurde auf Empfehlung aus Schritt 1 von Hand angehalten, den Nutzer daran erinnern, den Abgleich wieder einzuschalten. Bestehen Zweifel, ob die Lösung trägt, ist Angehaltenlassen die richtige Wahl — dann greift der Notfall-Rückgriff aus 1.10.
 6. **Berichten.** Betroffene Paare, Entscheidung je Paar, was geschrieben und gelöscht wurde, ob Ausschlüsse geändert wurden. **Offen** (Anhang F6): Form des Berichts und ob eine Erfolgsmeldung folgt.
 
 **Zum Zusammenspiel mehrerer Rechner:** Löschung der Kopie und Aktualisierung des Originals wandern als gewöhnliche Dateivorgänge mit. Wer hier löst, räumt damit überall auf — auf einem eingeschalteten zweiten Rechner verschwinden die Kopien von selbst und seine Episode endet, ein ausgeschalteter erfährt von dem Konflikt nie etwas. **Deshalb wird immer nur an einem Rechner gelöst**, sinnvollerweise dem, an dem gerade gearbeitet wird.
 
-Zur Einordnung von Schritt 2: Es stehen **zwei** Fassungen zur Verfügung, kein gemeinsamer Vorfahre. Für die typischen Kandidaten (Konfigurationsdateien, Markdown) genügt der direkte Vergleich; die Versionierung ist ausdrücklich **kein** Werkzeug der Konfliktlösung, sondern nur der Notfall-Rückgriff aus 1.9.
+Zur Einordnung von Schritt 2: Es stehen **zwei** Fassungen zur Verfügung, kein gemeinsamer Vorfahre. Für die typischen Kandidaten (Konfigurationsdateien, Markdown) genügt der direkte Vergleich; die Versionierung ist ausdrücklich **kein** Werkzeug der Konfliktlösung, sondern nur der Notfall-Rückgriff aus 1.10.
 
 **Offen** (Anhang F3): Verhalten bei Dateien, die die laufende Claude-Instanz selbst benutzt.
 
@@ -518,7 +512,7 @@ Beide Skripte tragen einen Kopfkommentar nach 2.5; einen `@Claude:`-Abschnitt br
 
 ## 3.6 Anbindung eines weiteren Rechners
 
-Einmaliger Vorgang je Rechner, zweiphasig (Begründung in 1.10). **Stand:** Für FWFE41 sind beide Phasen durchlaufen — Testordner erprobt, `~/.claude` angebunden; es fehlt dort nur noch der Wächter. Das Verfahren bleibt hier stehen, weil es für jeden weiteren Rechner erneut gilt; was davon belegt ist, steht in 3.8.
+Einmaliger Vorgang je Rechner, zweiphasig (Begründung in 1.11). **Stand:** Für FWFE41 sind beide Phasen durchlaufen — Testordner erprobt, `~/.claude` angebunden; es fehlt dort nur noch der Wächter. Das Verfahren bleibt hier stehen, weil es für jeden weiteren Rechner erneut gilt; was davon belegt ist, steht in 3.8.
 
 **Phase 1 — Hilfsordner:** Gerät mit der Synology koppeln (Introducer aus). Einen eigenen Testordner (z. B. `~/syncthing-test`) mit eigener Folder-ID teilen. Den Testplan aus 3.8 vollständig durchlaufen. `~/.claude` bleibt unberührt.
 
@@ -583,7 +577,7 @@ Nachgezogen wurde später die **dritte** Ereignisart: Der Wächter behandelte An
 
 **Pause-Meldung — kalt geprüft, im Vollzug offen.** Dass eine von Hand gesetzte Pause gemeldet wird, ist die Umsetzung einer Zusage, die Kapitel 1 schon enthielt, während der Code das Feld gar nicht las (aufgefallen im Kapitel-1-Review des Entwicklers, nicht in einem Test). Geprüft ist sie bisher **ohne Eingriff in den laufenden Betrieb**, in zwei Stufen: fünf Fälle im Prüfskript mit vorgetäuschter REST-Antwort — Pause allein, Pause neben offenen Konflikten, ohne Pause kein Zusatz, angehaltenes Gerät als fehlende Verbindung —, und der echte Lesepfad gegen die laufende Syncthing-Instanz, rein lesend: Freigabe gefunden, `paused` gelesen, Kennzahlen vollständig. Am echten Bestand bestätigt ist außerdem, dass `paused` auf Freigabe, Gerät und Verbindung steht.
 
-**Damit bleibt ein eigenständiger Handtest offen** — er lässt sich nicht kalt führen, weil er einen echten Eingriff verlangt: Freigabe `~/.claude` in Syncthings Oberfläche **anhalten**, die nächste fällige Betriebsmeldung abwarten (bis zu eine Stunde, siehe 1.7) und prüfen, dass sie „Abgleich für diesen Ordner angehalten …" zeigt und zwölf Sekunden stehen bleibt; danach fortsetzen und prüfen, dass die nächste Meldung wieder die Ruheform hat. Wer dabei zusätzlich einen Konflikt offen hat, sieht die zweite Form, in der die Pause **neben** der Konfliktzahl steht. Solange dieser Test nicht gelaufen ist, gilt: Der Weg ist geprüft, die Wirkung am Bildschirm nicht. Ebenso ungeprüft bleibt, ob der Dienst mit dieser Fassung überhaupt läuft — die Änderung ist bewusst **nicht** in die laufende Installation kopiert worden (Stand vom 12. August 2026).
+**Damit bleibt ein eigenständiger Handtest offen** — er lässt sich nicht kalt führen, weil er einen echten Eingriff verlangt: Freigabe `~/.claude` in Syncthings Oberfläche **anhalten**, die nächste fällige Betriebsmeldung abwarten (bis zu eine Stunde, siehe 1.8) und prüfen, dass sie „Abgleich für diesen Ordner angehalten …" zeigt und zwölf Sekunden stehen bleibt; danach fortsetzen und prüfen, dass die nächste Meldung wieder die Ruheform hat. Wer dabei zusätzlich einen Konflikt offen hat, sieht die zweite Form, in der die Pause **neben** der Konfliktzahl steht. Solange dieser Test nicht gelaufen ist, gilt: Der Weg ist geprüft, die Wirkung am Bildschirm nicht. Ebenso ungeprüft bleibt, ob der Dienst mit dieser Fassung überhaupt läuft — die Änderung ist bewusst **nicht** in die laufende Installation kopiert worden (Stand vom 12. August 2026).
 
 **Offen bleibt** in diesem Bereich nur noch Kleinkram, jeweils mit dem Grund, warum es offen ist: der Sicherheits-Suchlauf alle fünfzehn Minuten (beobachtbar nur durch fünfzehn Minuten Warten; die Schleife selbst ist trivial), `Restart=on-failure` (verlangt ein herbeigeführtes Absterben), und die **eigentliche** Installation nach `~/.config/systemd/user/` samt `~/.claude-sync-watch` — die liegt beim Nutzer, weil 1.2 Änderungen außerhalb der Projektwurzel verbietet und `install_service.sh` bewusst nichts an seiner Stelle einrichtet (3.5).
 
@@ -637,7 +631,7 @@ Nebenbefund für F7: `history.jsonl` wird abgeglichen und ändert sich fortlaufe
 
 Vor Implementierungsbeginn zu klären (Fahrplan-Punkt 1). Je Frage: Entscheidung treffen, Ergebnis in das zuständige Kapitel einpflegen, Frage hier streichen.
 
-*(F1 und F2 sind entschieden und in 1.6, 1.7, 1.8, 2.1, 3.1, 3.2 und 3.4 eingearbeitet: kein selbsttätiges Anhalten des Abgleichs — Begründung samt verworfener Gegenposition in 1.6 —, Übergabe aller Konflikte auf einmal, Lösung immer nur an einem Rechner, Anhalten als Empfehlung der Sitzung im Ausnahmefall, Sitzungserkennung über die PID. Die Nummerierung der übrigen Fragen bleibt unverändert.)*
+*(F1 und F2 sind entschieden und in 1.6, 1.8, 1.9, 2.1, 3.1, 3.2 und 3.4 eingearbeitet: kein selbsttätiges Anhalten des Abgleichs — Begründung samt verworfener Gegenposition in 1.6 —, Übergabe aller Konflikte auf einmal, Lösung immer nur an einem Rechner, Anhalten als Empfehlung der Sitzung im Ausnahmefall, Sitzungserkennung über die PID. Die Nummerierung der übrigen Fragen bleibt unverändert.)*
 
 **F3 — Dateien in Benutzung durch die laufende Instanz.** *Zurückgestellt: nicht gelöst, Verhalten bei der Nutzung zu beobachten, möglicherweise gar nicht einschlägig.*
 
@@ -664,6 +658,6 @@ Erste Befunde aus dem Betrieb, bevor die Wochen gezählt sind: Bei der Erstverbi
 
 *(F8 ist entschieden und in 2.8 sowie 3.5 eingearbeitet: maßgebliche Fassung im Werkzeugordner, versioniert im Repo, Vergleich mit Warnung bei der Installation, keine laufende Überwachung.)*
 
-*(F9 ist entschieden und in 1.9 eingearbeitet: Erkennungsmerkmale, achtstufiger Ablauf, Sitzungen zuerst beenden und erst dann urteilen, Sicherung vor dem Pausieren, einzelne Dateien statt ganzer Ordner, Prüfung auf beiden Rechnern vor dem Wiedereinschalten.)*
+*(F9 ist entschieden und in 1.10 eingearbeitet: Erkennungsmerkmale, achtstufiger Ablauf, Sitzungen zuerst beenden und erst dann urteilen, Sicherung vor dem Pausieren, einzelne Dateien statt ganzer Ordner, Prüfung auf beiden Rechnern vor dem Wiedereinschalten.)*
 
-*(F10 ist entschieden und in 1.7, 3.1 und 3.2 eingearbeitet: Bytes je Richtung und Rückstand, Einheitenwechsel bei einem Zehntel, Anzeigedauer nach Inhalt (5 s bzw. 12 s), fehlende Verbindung im selben Meldungsweg mit Vorspann, keine Frist ohne Bezugspunkt, stündlich unverändert.)*
+*(F10 ist entschieden und in 1.8, 3.1 und 3.2 eingearbeitet: Bytes je Richtung und Rückstand, Einheitenwechsel bei einem Zehntel, Anzeigedauer nach Inhalt (5 s bzw. 12 s), fehlende Verbindung im selben Meldungsweg mit Vorspann, keine Frist ohne Bezugspunkt, stündlich unverändert.)*
