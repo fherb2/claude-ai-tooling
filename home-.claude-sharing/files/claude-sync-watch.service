@@ -1,0 +1,36 @@
+# Conflict watcher for the Syncthing-synchronised ~/.claude directory.
+#
+# Usage: this file is not edited. install_service.sh copies it verbatim to
+# ~/.config/systemd/user/ and enables it. All paths use the %h specifier,
+# which systemd resolves to the invoking user's home -- that is why no path
+# substitution is needed at install time and why this can ship as a static
+# file (implementierungs_doku.md, 3.5).
+#
+# Diagnose with:  journalctl --user -u claude-sync-watch.service -f
+
+[Unit]
+Description=Claude sync conflict watcher
+Documentation=https://codebase.helmholtz.cloud/FWF/tools/claude-ai-tooling.git
+
+# The escalation shows graphical dialogs, so the service is bound to the
+# graphical session and stops with it. Without one there is no watcher;
+# conflicts then wait for the next login, the sync itself carries on
+# regardless, and the startup scan picks up whatever was missed (doku 3.5).
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+# Absolute interpreter for the same reason /usr/bin/claude is absolute: a
+# service starts with a foreign PATH. On a machine whose interactive shell
+# has a virtualenv first in PATH, "env python3" would resolve to a different
+# interpreter than the installer checked -- and only one of the two has
+# watchdog (implementierungs_doku.md, 3.5 and 3.8).
+ExecStart=/usr/bin/python3 %h/.claude-sync-watch/claude_sync_watchd.py
+
+# A long-running service must not die unnoticed.
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=graphical-session.target

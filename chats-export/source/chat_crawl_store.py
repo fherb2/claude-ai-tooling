@@ -643,6 +643,8 @@ Usage
     python chat_crawl_store.py queries --chat <uuid> [-n 5]
     python chat_crawl_store.py close   --chat <uuid> --segment <id> \
                                        --side tail [--reopen]
+
+Any command accepts ``--debug`` for diagnostic output on stderr.
     python chat_crawl_store.py report  [--chat <uuid>]
     python chat_crawl_store.py export  --chat <uuid> [--out file] \
                                        [--predecessor UUID] [--successor UUID]

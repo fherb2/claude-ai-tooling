@@ -85,6 +85,25 @@ and you must not guess your way past them:
     oldest-first or newest-first, record it with ``state --order <choice>``,
     and then map the scope.  On a continuation ask for the upload of
     ``protokoll.json`` plus the ``<uuid>.json`` of every started chat.
+
+2a. ASK WHAT IS NEW, BEFORE READING ANYTHING
+
+    When a ``protokoll.json`` was uploaded, the first thing to run is
+    ``plan``: fetch a fresh chat list, hand it to ``plan --raw``, and show the
+    user what it says.  It writes nothing and decides nothing -- it reports how
+    many chats are new, grown, or still pending, and then names two ways
+    forward: request an account export from a given date (everything, thinking
+    and attachments included), or read the chats here and now (immediate, but
+    permanently without thinking and attachments).
+
+    Do not choose for the user.  The date ``plan`` names is the whole point of
+    the exercise: it is computed from the best bound available for each chat,
+    and a window that is too short loses content silently.  If ``plan`` says
+    the window cannot be computed, ask the user for the project's start date
+    (they read it off a probe export) and pass it to ``map --project-created``.
+
+    Only when the user chooses to read here does the rest of this docstring
+    apply.
 *   **A state file is there.**  Continue; do not ask.  The one exception is a
     store *you* built earlier in this same conversation that was merely
     interrupted -- then ask whether to continue or start over empty, because
@@ -308,16 +327,20 @@ DESIGN NOTES -- for the developer maintaining this script.
 
 OBSERVED FORMAT
 ---------------
-One page, as seen in August 2026::
+One page, as seen in August 2026.  Titles and turn texts below are invented;
+every structural detail is reproduced exactly as observed -- the attribute
+spelling, the ``><title>`` glued to the closing bracket, the blank lines and
+the two spaces after ``Assistant:``.  Real chat text is kept out of this
+script on purpose: it travels wherever the script is uploaded::
 
     <chat url="https://claude.ai/chat/<uuid>"
-          updated_at="2025-11-13T22:07:44.559082+00:00"
+          updated_at="2026-08-01T12:00:00.000000+00:00"
           total_turns="58" turns="0-7" next_page_token="t8"
-      ><title>Flattening angled parts in TechDraw projections</title>
+      ><title>Pruefstueck Lesepfad</title>
 
-    <turn n="0">Human: Es geht darum, ...</turn>
+    <turn n="0">Human: Wie schneiden wir die Rollen ...</turn>
 
-    <turn n="1">Assistant:  Um in TechDraw ...</turn>
+    <turn n="1">Assistant:  Der GUI-Prozess besitzt ...</turn>
 
 Attributes are read order-independently and unknown ones are ignored, so an
 added attribute does not break parsing.  ``prev_page_token`` was documented
@@ -352,6 +375,10 @@ or the other.
 
 STATUS MECHANICS
 ----------------
+``plan`` is read-only and exists to be run first: it answers "what is new?"
+against a fresh chat list without touching a thing, so the user can decide
+between the export route and this one while knowing the cost of each.
+
 ``protokoll.json`` carries one status per chat, shared with the zip route:
 ``listed`` (known from the chat list), ``started`` (partially read -- only
 this route ever sets it), ``exported``, ``stale`` (the source moved on) and
@@ -376,6 +403,34 @@ directory".  That is why the status lives in the protocol and not in the
 per-chat store: a finished chat whose ``<uuid>.json`` has been filed away
 must not look untouched next time.
 
+Three more fields ride alongside the status, all of them about *when*, none of
+them written by hand:
+
+``listed_at`` (top level) is the timestamp of the last ``map``.  ``plan`` and
+``map`` both stamp it, and it is the reference point the next new chat gets
+bounded against -- see ``created_after`` below.
+
+``created_after`` (per chat) is set exactly once, the first time a chat is
+seen, to whatever ``listed_at`` held *before* that.  The reasoning: the project
+was listed then and this chat was not in it, so it was created afterwards.
+This route never learns a chat's real ``created_at`` -- ``read_conversation``
+does not supply one -- so this is the only lower bound it can ever offer.  It
+is never overwritten once set; overwriting it on a later ``map`` would
+quietly weaken a bound that was already as tight as it gets.
+
+``project_created_at`` (top level) is the one field nothing here can derive:
+the source project's own creation date, typed in by hand via
+``map --project-created`` after reading it off a probe export
+(``inspect_export.py``).  It bounds every chat that has neither of the two
+fields above, because no chat of a project can predate the project itself.
+
+All three feed ``window_start()``, which picks the best bound available per
+chat and reports the earliest date an account export would have to reach to
+cover everything pending -- see ``plan`` and doku Vorgabe 2.4.
+
+Every command that stamps a timestamp accepts ``--now`` to record a fixed one
+instead of the clock -- for reproducible test runs, not for daily use.
+
 ``state --status`` is the manual override for what no script can judge -- a
 chat the user calls good enough, a status that drifted, a file that came back
 under another name.  ``state --order`` may be changed at any time; it only
@@ -393,8 +448,7 @@ Usage
     python chat_read_store.py map      --raw recent.txt
     python chat_read_store.py ingest   --raw page.txt
     python chat_read_store.py status   [--chat <uuid>]
-    python chat_read_store.py export   --chat <uuid> [--out file] \
-                                       [--predecessor UUID] [--successor UUID]
+    python chat_read_store.py export   --chat <uuid> [--out file]
 """
 
 from __future__ import annotations
@@ -876,13 +930,15 @@ def foreign_state_present(store_dir: str) -> bool:
 
 def new_state() -> dict[str, Any]:
     """Return an empty protocol, shaped exactly as chat_export_convert writes it."""
-    return {"protocol_version": PROTOCOL_VERSION, "project": "", "order": "",
+    return {"protocol_version": PROTOCOL_VERSION, "project": "",
+            "project_created_at": "", "order": "", "listed_at": "",
             "chats": {}}
 
 
 def blank_entry() -> dict[str, Any]:
     """Return a fresh protocol entry with every field of Vorgabe 2.4."""
-    return {"title": "", "created_at": "", "listed_updated_at": "",
+    return {"title": "", "created_at": "", "created_after": "",
+            "listed_updated_at": "",
             "exported_updated_at": "", "turns": 0, "total_turns": None,
             "end_token": "", "file": "", "side_files": [],
             "status": "listed", "exported_at": ""}
@@ -902,6 +958,11 @@ def load_state(store_dir: str) -> dict[str, Any]:
         state = json.load(handle)
     state.setdefault("protocol_version", PROTOCOL_VERSION)
     state.setdefault("project", "")
+    # When this project was last listed -- the reference point for the
+    # created_after bound in update_state.
+    state.setdefault("listed_at", "")
+    # The project's own start date, read off a probe export by hand (doku 1.5).
+    state.setdefault("project_created_at", "")
     state.setdefault("order", "")
     state.setdefault("chats", {})
     # A protocol written by chat_export_convert is read as-is; whichever
@@ -919,7 +980,8 @@ def save_state(store_dir: str, state: dict[str, Any]) -> None:
     _write_json_atomic(state, state_path(store_dir), ".state-")
 
 
-def update_state(store_dir: str, records: list[dict[str, str]]) -> dict[str, Any]:
+def update_state(store_dir: str, records: list[dict[str, str]],
+                 now: str = "") -> dict[str, Any]:
     """Merge identity records into the state and return it.
 
     A newly seen chat starts as ``listed``.  An exported chat whose source
@@ -927,12 +989,22 @@ def update_state(store_dir: str, records: list[dict[str, str]]) -> dict[str, Any
     on -- becomes ``stale``; that comparison is the whole growth detection
     (Vorgabe 2.4).  An existing title is only replaced by a non-empty one, so
     a listing without a title cannot erase one a read page already supplied.
+
+    *now* stamps the reconciliation.  A chat seen here for the first time gets
+    the **previous** reconciliation as ``created_after``: the project was
+    listed then and did not contain this chat, so it was created later.  This
+    route never learns a real ``created_at`` -- ``read_conversation`` does not
+    supply one -- so that bound is all it can offer (Vorgabe 2.4).
     """
     state = load_state(store_dir)
+    previous_listed = state.get("listed_at", "")
     for record in records:
+        fresh = record["uuid"] not in state["chats"]
         entry = state["chats"].setdefault(record["uuid"], blank_entry())
         for key, value in blank_entry().items():
             entry.setdefault(key, value)
+        if fresh:
+            entry["created_after"] = previous_listed
         if record.get("updated_at"):
             entry["listed_updated_at"] = record["updated_at"]
         if record.get("title"):
@@ -940,8 +1012,243 @@ def update_state(store_dir: str, records: list[dict[str, str]]) -> dict[str, Any
         if (entry["status"] == "exported" and entry["listed_updated_at"]
                 and entry["listed_updated_at"] > (entry["exported_updated_at"] or "")):
             entry["status"] = "stale"
+    if now:
+        state["listed_at"] = now
     save_state(store_dir, state)
     return state
+
+
+def plan_report(state: dict[str, Any], records: list[dict[str, str]],
+                now: str) -> dict[str, Any]:
+    """Compare a fresh chat list against the protocol, without changing either.
+
+    This is the "what is new?" question, answered as a pure computation so it
+    can run before the user has decided anything -- the whole point is to hand
+    them the choice, not to take it.  Nothing here writes; the caller may not
+    save the state it was given.
+
+    Four groups come out of the comparison.  *new* and *grown* are work to do;
+    *pending* is work an earlier run left behind (listed, never fetched);
+    *vanished* is a chat the protocol knows and the list no longer offers,
+    which means deleted at the source or moved out of the project -- and,
+    less alarmingly, a chat list that was not paged to the end.
+    """
+    listed = {record["uuid"]: record for record in records}
+    known = state["chats"]
+    groups: dict[str, list[str]] = {"new": [], "grown": [], "pending": [],
+                                    "started": [], "unchanged": [],
+                                    "deleted": [], "vanished": []}
+    for uuid, record in listed.items():
+        entry = known.get(uuid)
+        if entry is None:
+            groups["new"].append(uuid)
+            continue
+        status = entry.get("status", "listed")
+        fresh = record.get("updated_at", "")
+        if status == "deleted":
+            groups["deleted"].append(uuid)
+        elif status == "started":
+            groups["started"].append(uuid)
+        elif status in ("listed", "stale"):
+            groups["pending"].append(uuid)
+        elif fresh and fresh > (entry.get("exported_updated_at") or ""):
+            groups["grown"].append(uuid)
+        else:
+            groups["unchanged"].append(uuid)
+    groups["vanished"] = [uuid for uuid in known if uuid not in listed]
+
+    # The window is computed on what the protocol WOULD look like after this
+    # list is folded in -- new chats bounded by the previous reconciliation,
+    # grown ones by their own created_at. Nothing is saved.
+    hypothetical = {"project_created_at": state.get("project_created_at", ""),
+                    "chats": {}}
+    previous_listed = state.get("listed_at", "")
+    for uuid in groups["new"]:
+        hypothetical["chats"][uuid] = {"status": "listed", "created_at": "",
+                                       "created_after": previous_listed}
+    for uuid in groups["grown"] + groups["pending"] + groups["started"]:
+        entry = known[uuid]
+        hypothetical["chats"][uuid] = {
+            "status": "stale",
+            "created_at": entry.get("created_at", ""),
+            "created_after": entry.get("created_after", "")}
+    window = window_start(hypothetical)
+
+    # What the reading route would cost instead: turns are known only for
+    # chats an archive has already described. Guessing for the rest would be
+    # invention, so they are counted, not estimated.
+    known_turns = 0
+    unknown_extent = len(groups["new"])
+    for uuid in groups["grown"] + groups["pending"] + groups["started"]:
+        extent = known[uuid].get("total_turns") or known[uuid].get("turns") or 0
+        if extent:
+            known_turns += extent
+        else:
+            # Listed but never fetched: the protocol knows of it and nothing
+            # about its size. Counting it as zero turns would understate the
+            # cost of option B for every chat an earlier run left behind.
+            unknown_extent += 1
+    titles = {uuid: record.get("title", "") for uuid, record in listed.items()}
+    return {"groups": groups, "window": window, "known_turns": known_turns,
+            "unknown_extent": unknown_extent, "titles": titles,
+            "previous_listed": previous_listed, "now": now}
+
+
+def format_plan(report: dict[str, Any], state: dict[str, Any]) -> list[str]:
+    """Render the plan for a human to decide on."""
+    groups, window = report["groups"], report["window"]
+    lines = ["WHAT IS NEW"]
+    if state.get("project"):
+        lines.append(f"  project        : {state['project']}")
+    lines.append(f"  last reconciled: {report['previous_listed'][:19] or 'never'}")
+    for key, label in (("new", "new, never seen"),
+                       ("grown", "grown since the export"),
+                       ("pending", "pending from an earlier run"),
+                       ("started", "partially read"),
+                       ("unchanged", "unchanged"),
+                       ("deleted", "deleted at the source"),
+                       ("vanished", "gone from the list")):
+        if groups[key]:
+            lines.append(f"  {label:<27}: {len(groups[key])}")
+    todo = len(groups["new"]) + len(groups["grown"]) + len(groups["pending"]) \
+        + len(groups["started"])
+    def vanished_note() -> list[str]:
+        """The chats the protocol knows and the list no longer offers.
+
+        Reported on both paths: with nothing left to fetch it is the *only*
+        finding, and the most likely one to matter -- everything exported and
+        some chats gone means they were deleted at the source.
+        """
+        if not groups["vanished"]:
+            return []
+        return ["", f"NOTE: {len(groups['vanished'])} chat(s) in the protocol "
+                    "are not in this list.",
+                "  Deleted at the source, moved out of the project -- or the "
+                "list was not paged", "  to the end. Check before concluding "
+                "anything; nothing is removed automatically."]
+
+    if not todo:
+        lines += ["", "Nothing to fetch -- every listed chat is exported and "
+                      "none has moved on."]
+        lines += vanished_note()
+        return lines
+
+    lines += ["", f"TO FETCH: {todo} chat(s)"]
+    for key, mark in (("new", "new"), ("grown", "grown"),
+                      ("pending", "pending"), ("started", "partial")):
+        for uuid in groups[key]:
+            # A chat seen for the first time has no protocol entry yet, so its
+            # title exists only in the fresh list.
+            title = (report.get("titles", {}).get(uuid)
+                     or (state["chats"].get(uuid) or {}).get("title", ""))
+            lines.append(f"  {mark:<8} {uuid[:8]}  {title[:44]!r}")
+
+    lines += ["", "OPTION A -- the account export: everything, thinking and "
+                  "attachments included"]
+    if window["source"] == "unbounded":
+        lines += [f"  {len(window['unbounded'])} of them have no date bound at "
+                  "all, so the window cannot be computed.",
+                  "  Give the project's start date once (read it off a probe "
+                  "export with", "  inspect_export.py, then 'map "
+                  "--project-created <date>'), or export everything."]
+    else:
+        reason = {"created_at": "the creation date of the oldest chat to fetch",
+                  "created_after": "the reconciliation before the oldest new "
+                                   "chat appeared",
+                  "project": "the project's own start date -- no chat can be "
+                             "older"}[window["source"]]
+        lines += [f"  Request an export from {window['start'][:10]} onwards.",
+                  f"  That date is {reason}.",
+                  "  A wider window costs only download size; a narrower one "
+                  "loses content."]
+    lines += ["  Then run chat_export_convert.py locally: list, convert.",
+              "",
+              "OPTION B -- read them here, now: no waiting, but permanently "
+              "poorer"]
+    if report["known_turns"]:
+        pages = -(-report["known_turns"] // 8)
+        lines.append(f"  {report['known_turns']} turn(s) of known extent, "
+                     f"roughly {pages} page(s) of reading at ~8 turns a page.")
+    if report["unknown_extent"]:
+        lines.append(f"  {report['unknown_extent']} of the {todo} chat(s) have "
+                     "no known extent -- no archive has described them, so "
+                     "there is no honest estimate.")
+    lines += ["  Everything fetched this way lacks thinking and attachments "
+              "for good (3.2.1).", "  Only a later export can repair that, and "
+              "only by replacing the chat."]
+    lines += vanished_note()
+    lines += ["", "Nothing was written. Whichever way you choose, the protocol "
+                  "is updated only", "when the chats are actually fetched -- so "
+                  "a window that turns out too short",
+              "leaves the missing chats visible as pending, to fetch again."]
+    return lines
+
+
+def project_start_warnings(protocol: dict[str, Any]) -> list[str]:
+    """Check the hand-entered project start against what the protocol knows.
+
+    A date typed for the wrong project would silently shorten every export
+    window from here on, so it is checked against the earliest date the
+    protocol already holds: no chat of a project can predate the project.
+    """
+    start = protocol.get("project_created_at", "")
+    if not start:
+        return []
+    known = [(entry.get("created_at") or entry.get("created_after") or "", uuid)
+             for uuid, entry in protocol["chats"].items()]
+    known = [(value, uuid) for value, uuid in known if value]
+    if not known:
+        return []
+    earliest, uuid = min(known)
+    if earliest[:10] < start[:10]:
+        return [f"!! project_created_at is {start[:10]}, but chat {uuid[:8]} is "
+                f"dated {earliest[:10]} -- a chat cannot predate its project. "
+                "Wrong project's date, or the wrong project's chat list."]
+    return []
+
+
+def window_start(protocol: dict[str, Any]) -> dict[str, Any]:
+    """Compute how far back an export has to reach to cover what is pending.
+
+    The table in doku 2.4, as code. Every chat an export must cover contributes
+    a lower bound on its own creation, from the best source available:
+
+    * its ``created_at`` -- exact, but only a route that saw an archive has it;
+    * its ``created_after`` -- exact too: the project was listed then and this
+      chat was not in it, so it came later;
+    * the project's own ``created_at`` -- no chat of a project can predate the
+      project, so this bounds anything the first two cannot.
+
+    The window start is the earliest of those bounds. A chat with none of the
+    three is genuinely unbounded and forces a full export -- reported rather
+    than papered over, because a window that is too short loses content
+    silently while one that is too generous only costs download size.
+    """
+    project_start = protocol.get("project_created_at", "")
+    pending = {uuid: entry for uuid, entry in protocol["chats"].items()
+               if entry.get("status") in ("listed", "stale")}
+    bounds: dict[str, tuple[str, str]] = {}
+    unbounded = []
+    for uuid, entry in pending.items():
+        if entry.get("created_at"):
+            bounds[uuid] = (entry["created_at"], "created_at")
+        elif entry.get("created_after"):
+            bounds[uuid] = (entry["created_after"], "created_after")
+        elif project_start:
+            bounds[uuid] = (project_start, "project")
+        else:
+            unbounded.append(uuid)
+    if not pending:
+        return {"start": "", "source": "nothing-pending", "chats": [],
+                "unbounded": []}
+    if unbounded:
+        return {"start": "", "source": "unbounded", "chats": [],
+                "unbounded": sorted(unbounded)}
+    start = min(value for value, _ in bounds.values())
+    source = next(kind for value, kind in bounds.values() if value == start)
+    return {"start": start, "source": source,
+            "chats": sorted(u for u, (v, _) in bounds.items() if v == start),
+            "unbounded": []}
 
 
 def set_chat_status(store_dir: str, uuid: str, status: str,
@@ -1285,9 +1592,7 @@ def status_report(store: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def build_export(store: dict[str, Any], predecessor: str | None = None,
-                 successor: str | None = None,
-                 now: str = "") -> dict[str, Any]:
+def build_export(store: dict[str, Any], now: str = "") -> dict[str, Any]:
     """Build the export document for one chat.
 
     Turns go out in index order as a flat list of messages -- there is nothing
@@ -1310,16 +1615,14 @@ def build_export(store: dict[str, Any], predecessor: str | None = None,
                 for index in held_turns(store)]
     return {
         "metadata": {
-            "chat_date":     "unknown",
+            "created_at":    "unknown",
             "imported_at":   now,
-            "predecessor":   predecessor,
-            "successor":     successor,
             "chat_uuid":     store["chat_uuid"],
             "url":           store["url"] or
                              f"https://claude.ai/chat/{store['chat_uuid']}",
             "title":         store["title"],
             "source":        "read_conversation",
-            "source_updated_at": store["updated_at"],
+            "last_updated_at": store["updated_at"],
             "turns":         len(messages),
             "total_turns":   store["total_turns"] or None,
             "complete":      is_complete(store),
@@ -1381,8 +1684,7 @@ def cmd_export(args: argparse.Namespace) -> int:
         return 1
 
     now = args.now or datetime.datetime.now(datetime.timezone.utc).isoformat()
-    document = build_export(store, args.predecessor or None,
-                            args.successor or None, now=now)
+    document = build_export(store, now=now)
     # Without --out the name follows doku 2.3, so the protocol can carry it.
     out_path = args.out or f"{file_stem(store)}.json"
     _write_json_atomic(document, out_path, ".export-")
@@ -1418,6 +1720,22 @@ def cmd_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_plan(args: argparse.Namespace) -> int:
+    """Answer "what is new?" from a fresh chat list -- read-only."""
+    with open(args.raw, "r", encoding="utf-8") as handle:
+        records = parse_chat_list(handle.read())
+    if not records:
+        print("No <chat ...> blocks found in the dump.", file=sys.stderr)
+        return 1
+    state = load_state(args.store_dir)
+    now = args.now or datetime.datetime.now(datetime.timezone.utc).isoformat()
+    report = plan_report(state, records, now)
+    print("\n".join(format_plan(report, state)))
+    for line in project_start_warnings(state):
+        print(line, file=sys.stderr)
+    return 0
+
+
 def cmd_map(args: argparse.Namespace) -> int:
     """Record the chats of this scope from a ``recent_chats`` dump."""
     with open(args.raw, "r", encoding="utf-8") as handle:
@@ -1426,9 +1744,19 @@ def cmd_map(args: argparse.Namespace) -> int:
         print("No <chat ...> blocks found in the dump.", file=sys.stderr)
         return 1
 
-    state = update_state(args.store_dir, records)
+    previous_listed = load_state(args.store_dir).get("listed_at", "")
+    now = args.now or datetime.datetime.now(datetime.timezone.utc).isoformat()
+    state = update_state(args.store_dir, records, now)
+    if args.project_created:
+        state["project_created_at"] = args.project_created
+        save_state(args.store_dir, state)
+    for line in project_start_warnings(state):
+        print(line, file=sys.stderr)
     without_title = [record["uuid"] for record in records if not record["title"]]
     print(f"{len(records)} chat(s) recorded; {len(state['chats'])} known in total.")
+    if previous_listed:
+        print(f"Previous reconciliation: {previous_listed[:19]} -- chats new "
+              "since then were created after it.")
     if without_title:
         print(f"{len(without_title)} of them without a title -- that is normal, "
               "the title arrives with the first page that is read.")
@@ -1548,8 +1876,20 @@ def build_parser() -> argparse.ArgumentParser:
                          help="set the status of one chat by hand")
     p_state.set_defaults(func=cmd_state)
 
+    p_plan = sub.add_parser("plan", help="what is new, and how to fetch it "
+                                        "(writes nothing)")
+    p_plan.add_argument("--raw", required=True,
+                        help="file holding a fresh recent_chats dump")
+    p_plan.add_argument("--now", default="", help="timestamp instead of the clock")
+    p_plan.set_defaults(func=cmd_plan)
+
     p_map = sub.add_parser("map", help="record this scope's chats from recent_chats")
     p_map.add_argument("--raw", required=True, help="file holding the raw dump")
+    p_map.add_argument("--project-created", default="", dest="project_created",
+                       help="the source project's own creation date, read off "
+                            "a probe export")
+    p_map.add_argument("--now", default="",
+                       help="timestamp to record instead of the clock")
     p_map.set_defaults(func=cmd_map)
 
     p_ingest = sub.add_parser("ingest", help="merge read_conversation pages")
@@ -1563,10 +1903,6 @@ def build_parser() -> argparse.ArgumentParser:
     p_export = sub.add_parser("export", help="write the export document")
     p_export.add_argument("--chat", required=True, help="chat UUID")
     p_export.add_argument("--out", default="", help="output file (default: stdout)")
-    p_export.add_argument("--predecessor", default="",
-                          help="chat UUID of the preceding chat")
-    p_export.add_argument("--successor", default="",
-                          help="chat UUID of the following chat")
     p_export.add_argument("--now", default="",
                           help="timestamp to record instead of the clock")
     p_export.set_defaults(func=cmd_export)

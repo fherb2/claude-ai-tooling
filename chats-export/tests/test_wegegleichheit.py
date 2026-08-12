@@ -188,8 +188,7 @@ check("the text really is the wording, not the misleading flat field",
           for message in from_export["messages"]),
       str(from_export["messages"])[:160])
 
-for field in ("chat_uuid", "url", "title", "turns", "deleted",
-              "predecessor", "successor", "imported_at"):
+for field in ("chat_uuid", "url", "title", "turns", "deleted", "imported_at"):
     check(f"metadata agrees on {field}",
           from_export["metadata"][field] == from_read["metadata"][field],
           f"{from_export['metadata'][field]!r} vs {from_read['metadata'][field]!r}")
@@ -217,13 +216,14 @@ check("each path names itself in source",
       from_export["metadata"]["source"] == "account-export"
       and from_read["metadata"]["source"] == "read_conversation")
 
-# read_conversation supplies no created_at, so chat_date cannot agree. That is
+# read_conversation supplies no created_at, so it cannot agree. That is
 # a documented asymmetry, not drift -- but it must stay visible.
-check("the export path knows the chat date, the read path admits it does not",
-      from_export["metadata"]["chat_date"].startswith("2026-05-01")
-      and from_read["metadata"]["chat_date"] == "unknown",
-      f"{from_export['metadata']['chat_date']!r} vs "
-      f"{from_read['metadata']['chat_date']!r}")
+check("the export path knows the chat's creation date, the read path admits "
+      "it does not",
+      from_export["metadata"]["created_at"].startswith("2026-05-01")
+      and from_read["metadata"]["created_at"] == "unknown",
+      f"{from_export['metadata']['created_at']!r} vs "
+      f"{from_read['metadata']['created_at']!r}")
 
 # Everything else that only one path can observe must be empty on the other,
 # never absent -- otherwise a comparison of two files would trip over shape.
@@ -268,7 +268,12 @@ def run(*args):
     return subprocess.run([sys.executable, *args], capture_output=True, text=True)
 
 
-run(convert, "list", "--map", listing, "--out", out_export)
+# Both routes start from the same chat list, folded in at the same
+# reconciliation time -- otherwise the bound below cannot be compared, and the
+# real workflow starts that way on either route (doku 1.5).
+LISTED_AT = "2026-04-30T00:00:00+00:00"
+run(convert, "list", "--map", listing, "--out", out_export, "--now", LISTED_AT)
+run(read, "--store-dir", out_read, "map", "--raw", listing, "--now", LISTED_AT)
 result = run(convert, "convert", "--zip", archive_path, "--out", out_export,
              "--now", NOW)
 check("the zip route writes its file", result.returncode == 0, result.stderr)
@@ -303,7 +308,7 @@ check("the files agree on the metadata keys",
 differing = {key for key in file_export["metadata"]
              if file_export["metadata"][key] != file_read["metadata"][key]}
 check("only the fields that depend on the route differ",
-      differing == {"source", "chat_date", "total_turns", "complete",
+      differing == {"source", "created_at", "total_turns", "complete",
                     "turns_missing"},
       str(sorted(differing)))
 
@@ -342,11 +347,23 @@ for field in ("title", "turns", "status", "exported_updated_at",
 check("both routes count the chat as exported",
       entry_zip["status"] == "exported")
 
+# The reconciliation bound must be identical: both routes fold the same list
+# at the same time, so both must reach the same conclusion about how far back
+# an export has to go.
+check("both protocols stamp the same listed_at",
+      protocol_zip["listed_at"] == protocol_read["listed_at"] == LISTED_AT,
+      f"{protocol_zip['listed_at']!r} vs {protocol_read['listed_at']!r}")
+check("both routes bound a first-seen chat the same way",
+      entry_zip["created_after"] == entry_read["created_after"],
+      f"{entry_zip['created_after']!r} vs {entry_read['created_after']!r}")
+
 # Exactly the fields a route cannot know may differ -- mirroring 2.5.
 differing = {key for key in entry_zip if entry_zip[key] != entry_read[key]}
 check("only the route-dependent protocol fields differ",
       differing == {"created_at", "total_turns", "file"},
       str(sorted(differing)))
+check("created_after is NOT among them -- both routes compute the same bound",
+      "created_after" not in differing)
 check("the zip route knows created_at, the read route does not",
       entry_zip["created_at"] != "" and entry_read["created_at"] == "")
 check("the read route proves total_turns, the zip route does not claim it",
@@ -356,6 +373,76 @@ check("the read route proves total_turns, the zip route does not claim it",
 check("the file names differ only in the date segment",
       entry_zip["file"].split("_", 1)[1] == entry_read["file"].split("_", 1)[1],
       f"{entry_zip['file']} vs {entry_read['file']}")
+
+# ---------------------------------------------------------------------------
+# The window computation: same table, both implementations (doku 2.4)
+# ---------------------------------------------------------------------------
+
+# Vorgabe 2.9 keeps the two scripts separate, so window_start exists twice.
+# The table below is the guard against the two drifting apart -- a wrong window
+# is the one error that loses content silently.
+def prot(project_start, chats):
+    """Build a protocol skeleton for the window table."""
+    return {"project_created_at": project_start, "chats": chats}
+
+
+def chat(status, created_at="", created_after=""):
+    """One protocol entry, only the fields the window cares about."""
+    return {"status": status, "created_at": created_at,
+            "created_after": created_after}
+
+
+WINDOW_CASES = [
+    ("nothing pending at all",
+     prot("2025-01-01", {"a": chat("exported", "2026-01-01")}),
+     {"start": "", "source": "nothing-pending"}),
+    ("exact created_at wins when present",
+     prot("2025-01-01", {"a": chat("stale", "2026-03-01"),
+                         "b": chat("exported", "2020-01-01")}),
+     {"start": "2026-03-01", "source": "created_at"}),
+    ("the earliest pending chat sets the window",
+     prot("", {"a": chat("stale", "2026-03-01"),
+               "b": chat("stale", "2026-02-01")}),
+     {"start": "2026-02-01", "source": "created_at"}),
+    ("created_after is used when created_at is unknown",
+     prot("2025-01-01", {"a": chat("listed", "", "2026-05-01")}),
+     {"start": "2026-05-01", "source": "created_after"}),
+    ("created_at beats created_after on the same chat",
+     prot("", {"a": chat("listed", "2026-04-01", "2026-05-01")}),
+     {"start": "2026-04-01", "source": "created_at"}),
+    ("the project start bounds a chat with neither",
+     prot("2025-11-10", {"a": chat("listed")}),
+     {"start": "2025-11-10", "source": "project"}),
+    ("no bound anywhere is reported, not guessed",
+     prot("", {"a": chat("listed")}),
+     {"start": "", "source": "unbounded"}),
+    ("one unbounded chat outweighs any bounded ones",
+     prot("", {"a": chat("stale", "2026-03-01"), "b": chat("listed")}),
+     {"start": "", "source": "unbounded"}),
+]
+
+for label, protocol, expected in WINDOW_CASES:
+    got_zip = cec.window_start(protocol)
+    got_read = crs.window_start(protocol)
+    check(f"window -- {label} (zip)",
+          got_zip["start"] == expected["start"]
+          and got_zip["source"] == expected["source"], str(got_zip))
+    check(f"window -- {label}: both routes agree",
+          got_zip == got_read, f"{got_zip} vs {got_read}")
+
+# The implausible-date guard, likewise in both.
+IMPLAUSIBLE = prot("2026-01-01", {"a": chat("listed", "2025-06-01")})
+for name, module in (("zip", cec), ("read", crs)):
+    warnings = module.project_start_warnings(IMPLAUSIBLE)
+    check(f"a chat older than its project is flagged ({name})",
+          len(warnings) == 1 and "cannot predate" in warnings[0], str(warnings))
+    check(f"a plausible project date is not flagged ({name})",
+          module.project_start_warnings(
+              prot("2025-06-01", {"a": chat("listed", "2025-06-01")})) == [])
+    check(f"no project date means nothing to check ({name})",
+          module.project_start_warnings(
+              prot("", {"a": chat("listed", "2025-06-01")})) == [])
+
 
 shutil.rmtree(WORK, ignore_errors=True)
 

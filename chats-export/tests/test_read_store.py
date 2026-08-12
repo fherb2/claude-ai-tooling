@@ -41,10 +41,10 @@ UUID = "d64eea15-1547-40e6-9d04-ce58e9544874"
 
 
 def page(uuid=UUID, total=6, first=0, last=1, next_token="t2", prev_token="",
-         title="Flattening angled parts", turns=None):
+         title="Pruefstueck Lesepfad", turns=None):
     """Build one <chat> page in the observed read_conversation format."""
     attrs = [f'url="https://claude.ai/chat/{uuid}"',
-             'updated_at="2025-11-13T22:07:44.559082+00:00"',
+             'updated_at="2026-08-01T12:00:00.000000+00:00"',
              f'total_turns="{total}"', f'turns="{first}-{last}"']
     if next_token:
         attrs.append(f'next_page_token="{next_token}"')
@@ -72,7 +72,7 @@ check("uuid comes from the url", first_page["uuid"] == UUID, first_page["uuid"])
 check("total_turns is read as an integer", first_page["total_turns"] == 6)
 check("turn range is kept verbatim", first_page["range"] == "0-1")
 check("next page token is read", first_page["next_page_token"] == "t2")
-check("title is extracted", first_page["title"] == "Flattening angled parts")
+check("title is extracted", first_page["title"] == "Pruefstueck Lesepfad")
 check("both turns parse", len(first_page["turns"]) == 2)
 check("Human maps to user", first_page["turns"][0]["role"] == "user")
 check("Assistant maps to assistant", first_page["turns"][1]["role"] == "assistant")
@@ -325,7 +325,7 @@ check("CLI ingest names the next token", "next token: t2" in result.stdout,
 check("ingesting a page registers the chat in the state",
       UUID in read_state()["chats"], str(read_state()["chats"].keys()))
 check("the title from the page reaches the state",
-      read_state()["chats"][UUID]["title"] == "Flattening angled parts")
+      read_state()["chats"][UUID]["title"] == "Pruefstueck Lesepfad")
 
 result = run("status", "--chat", UUID)
 check("CLI status runs", result.returncode == 0, result.stderr)
@@ -525,7 +525,7 @@ check("an entry carries every field of Vorgabe 2.4",
 # A newer timestamp in a fresh chat list marks an exported chat stale.
 NEWER = ("<chat url='https://claude.ai/chat/" + UUID + "' "
          "updated_at='2026-09-01T00:00:00.000000Z'>Content:\n"
-         "Title: Flattening angled parts\n</chat>\n")
+         "Title: Pruefstueck Lesepfad\n</chat>\n")
 newer_map = os.path.join(WORK, "neuere-liste.txt")
 with open(newer_map, "w", encoding="utf-8") as handle:
     handle.write(NEWER)
@@ -558,14 +558,188 @@ result = subprocess.run(
     capture_output=True, text=True, cwd=AUTO_DIR)
 check("export without --out writes the 2.3 name with 'ohne-datum'",
       os.path.exists(os.path.join(
-          AUTO_DIR, f"ohne-datum_flattening-angled-parts_{UUID[:8]}.json")),
+          AUTO_DIR, f"ohne-datum_pruefstueck-lesepfad_{UUID[:8]}.json")),
       str(os.listdir(AUTO_DIR)) + result.stderr)
 check("the protocol notes the auto name",
       read_state()["chats"][UUID]["file"]
-      == f"ohne-datum_flattening-angled-parts_{UUID[:8]}.json",
+      == f"ohne-datum_pruefstueck-lesepfad_{UUID[:8]}.json",
       read_state()["chats"][UUID]["file"])
 check("the export records the fresh source state, clearing the stale verdict",
       read_state()["chats"][UUID]["status"] == "exported")
+
+
+# ---------------------------------------------------------------------------
+# The reconciliation bound on the reading route
+# ---------------------------------------------------------------------------
+
+BOUND_DIR = os.path.join(WORK, "schranke")
+FIRST_RUN, SECOND_RUN = "2026-03-01T00:00:00+00:00", "2026-04-01T00:00:00+00:00"
+
+
+def bound_run(name, uuids, when):
+    """Map a chat list into the bound fixture at a given reconciliation time."""
+    path = os.path.join(WORK, name)
+    with open(path, "w", encoding="utf-8") as handle:
+        for uuid in uuids:
+            handle.write(f"<chat url='https://claude.ai/chat/{uuid}' "
+                         f"updated_at='2026-02-01T00:00:00Z'>Content:\n"
+                         f"Title: Chat {uuid}\n</chat>\n")
+    return subprocess.run(
+        [sys.executable, SCRIPT, "--store-dir", BOUND_DIR, "map",
+         "--raw", path, "--now", when], capture_output=True, text=True)
+
+
+def bound_protocol():
+    """Read the protocol of the bound fixture."""
+    with open(os.path.join(BOUND_DIR, crs.STATE_FILENAME),
+              encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+result = bound_run("schranke-1.txt", ["alt-1"], FIRST_RUN)
+first = bound_protocol()
+check("the first mapping stamps listed_at",
+      first["listed_at"] == FIRST_RUN, str(first.get("listed_at")))
+check("a chat from the very first mapping has no bound",
+      first["chats"]["alt-1"]["created_after"] == "",
+      repr(first["chats"]["alt-1"]["created_after"]))
+check("the first mapping mentions no previous reconciliation",
+      "Previous reconciliation" not in result.stdout, result.stdout)
+
+result = bound_run("schranke-2.txt", ["alt-1", "neu-2"], SECOND_RUN)
+second = bound_protocol()
+check("the second mapping moves listed_at forward",
+      second["listed_at"] == SECOND_RUN, str(second.get("listed_at")))
+check("the newly mapped chat is bounded by the previous reconciliation",
+      second["chats"]["neu-2"]["created_after"] == FIRST_RUN,
+      repr(second["chats"]["neu-2"]["created_after"]))
+check("the bound of an already known chat is NOT overwritten",
+      second["chats"]["alt-1"]["created_after"] == "",
+      repr(second["chats"]["alt-1"]["created_after"]))
+check("the mapping reports the previous reconciliation",
+      FIRST_RUN[:19] in result.stdout, result.stdout)
+
+# This route never learns a real created_at, so the bound must survive
+# everything else the route does to an entry -- a status change goes through
+# the same entry-defaulting code that could silently reset it.
+subprocess.run([sys.executable, SCRIPT, "--store-dir", BOUND_DIR, "state",
+                "--chat", "neu-2", "--status", "started"],
+               capture_output=True, text=True)
+after_status = bound_protocol()["chats"]["neu-2"]
+check("a status change does not disturb the bound",
+      after_status["created_after"] == FIRST_RUN and
+      after_status["status"] == "started", str(after_status))
+check("and this route still has no created_at to offer",
+      after_status["created_at"] == "")
+
+
+# ---------------------------------------------------------------------------
+# plan: answer "what is new?" and change nothing
+# ---------------------------------------------------------------------------
+
+PLAN_DIR = os.path.join(WORK, "plan")
+
+
+def plan_list(name, entries):
+    """Write a chat list; entries are (uuid, updated_at, title)."""
+    path = os.path.join(WORK, name)
+    with open(path, "w", encoding="utf-8") as handle:
+        for uuid, updated, title in entries:
+            handle.write(f"<chat url='https://claude.ai/chat/{uuid}' "
+                         f"updated_at='{updated}'>Content:\nTitle: {title}\n"
+                         "</chat>\n")
+    return path
+
+
+def plan_run(raw, *extra):
+    """Invoke plan against the plan fixture."""
+    return subprocess.run(
+        [sys.executable, SCRIPT, "--store-dir", PLAN_DIR, "plan", "--raw", raw,
+         "--now", "2026-07-01T00:00:00+00:00", *extra],
+        capture_output=True, text=True)
+
+
+# Groundwork: one chat known and exported, one known but never fetched.
+subprocess.run(
+    [sys.executable, SCRIPT, "--store-dir", PLAN_DIR, "map", "--raw",
+     plan_list("plan-basis.txt", [("exp-1", "2026-01-01T00:00:00Z", "Exportiert"),
+                                  ("off-2", "2026-01-02T00:00:00Z", "Offen")]),
+     "--project-created", "2025-12-01", "--now", "2026-02-01T00:00:00+00:00"],
+    capture_output=True, text=True)
+with open(os.path.join(PLAN_DIR, crs.STATE_FILENAME), encoding="utf-8") as handle:
+    groundwork = json.load(handle)
+groundwork["chats"]["exp-1"].update({
+    "status": "exported", "created_at": "", "turns": 40, "total_turns": 40,
+    "exported_updated_at": "2026-01-01T00:00:00Z"})
+with open(os.path.join(PLAN_DIR, crs.STATE_FILENAME), "w",
+          encoding="utf-8") as handle:
+    json.dump(groundwork, handle)
+before = open(os.path.join(PLAN_DIR, crs.STATE_FILENAME), encoding="utf-8").read()
+
+# A fresh list: exp-1 has grown, off-2 is still pending, neu-3 is brand new,
+# and weg-4 is in the list but not the protocol... no: weg-4 tests the other
+# direction, so drop a known chat instead by leaving off-2 in and exp-1 out.
+result = plan_run(plan_list("plan-frisch.txt", [
+    ("exp-1", "2026-06-01T00:00:00Z", "Exportiert"),
+    ("off-2", "2026-01-02T00:00:00Z", "Offen"),
+    ("neu-3", "2026-06-15T00:00:00Z", "Ganz neu")]))
+out = result.stdout
+
+check("plan exits 0", result.returncode == 0, result.stderr)
+check("plan writes nothing at all",
+      open(os.path.join(PLAN_DIR, crs.STATE_FILENAME),
+           encoding="utf-8").read() == before)
+check("it counts the grown chat", "grown since the export     : 1" in out, out)
+check("it counts the new chat", "new, never seen            : 1" in out, out)
+check("it counts the chat an earlier run left pending",
+      "pending from an earlier run: 1" in out, out)
+check("it names all three as to fetch", "TO FETCH: 3 chat(s)" in out, out)
+check("a new chat's title comes from the fresh list, not the protocol",
+      "'Ganz neu'" in out, out)
+check("it offers the export route first",
+      out.index("OPTION A") < out.index("OPTION B"), out)
+check("the window falls back to the project start",
+      "from 2025-12-01 onwards" in out
+      and "no chat can be older" in out, out)
+check("option B counts the chats whose extent is unknown",
+      "2 of the 3 chat(s) have no known extent" in out, out)
+check("option B reports the known extent as pages",
+      "40 turn(s) of known extent" in out and "5 page(s)" in out, out)
+check("option B states the permanent loss",
+      "lacks thinking and attachments for good" in out, out)
+check("plan says outright that it wrote nothing",
+      "Nothing was written" in out, out)
+
+# A chat the protocol knows and the list no longer offers.
+result = plan_run(plan_list("plan-luecke.txt", [
+    ("exp-1", "2026-01-01T00:00:00Z", "Exportiert")]))
+check("a chat missing from the list is reported, not removed",
+      "gone from the list" in result.stdout
+      and "not paged" in result.stdout, result.stdout)
+check("and it is still in the protocol afterwards",
+      "off-2" in open(os.path.join(PLAN_DIR, crs.STATE_FILENAME),
+                      encoding="utf-8").read())
+
+# Nothing to do at all.
+result = plan_run(plan_list("plan-ruhe.txt", [
+    ("exp-1", "2026-01-01T00:00:00Z", "Exportiert")]))
+check("with nothing pending it says so instead of offering options",
+      "Nothing to fetch" in result.stdout
+      and "OPTION A" not in result.stdout, result.stdout)
+
+# Without a project start and without a bound, the window cannot be computed.
+NOBOUND_DIR = os.path.join(WORK, "plan-ohne")
+subprocess.run([sys.executable, SCRIPT, "--store-dir", NOBOUND_DIR, "map",
+                "--raw", plan_list("plan-ohne.txt",
+                                   [("k-1", "2026-01-01T00:00:00Z", "Kein Datum")]),
+                "--now", "2026-02-01T00:00:00+00:00"], capture_output=True)
+result = subprocess.run(
+    [sys.executable, SCRIPT, "--store-dir", NOBOUND_DIR, "plan", "--raw",
+     plan_list("plan-ohne.txt", [("k-1", "2026-01-01T00:00:00Z", "Kein Datum")]),
+     "--now", "2026-07-01T00:00:00+00:00"], capture_output=True, text=True)
+check("without any bound plan asks for the project date instead of guessing",
+      "no date bound at all" in result.stdout
+      and "--project-created" in result.stdout, result.stdout)
 
 
 # A missing store file for a started chat must be asked for by name.
