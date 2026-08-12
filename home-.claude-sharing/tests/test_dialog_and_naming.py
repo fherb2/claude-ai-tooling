@@ -283,7 +283,8 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
     folder.mkdir(parents=True, exist_ok=True)
     original_key, original_get = w.read_api_key, w.rest_get
 
-    def stub(connected: bool = True, need: int = 0, key: object = "k") -> None:
+    def stub(connected: bool = True, need: int = 0, key: object = "k",
+             paused: bool = False) -> None:
         w.read_api_key = lambda: key
 
         def get(path: str, api_key: str) -> object:
@@ -292,7 +293,8 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
                     "connected": connected, "startedAt": "t",
                     "inBytesTotal": 0, "outBytesTotal": 0}}}
             if path.startswith("/rest/system/config"):
-                return {"folders": [{"id": "F", "path": str(folder)}]}
+                return {"folders": [{"id": "F", "path": str(folder),
+                                     "paused": paused}]}
             if path.startswith("/rest/db/status"):
                 return {"needFiles": need}
             return None
@@ -329,6 +331,29 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         text, seconds = w.build_notice(state(), 3, folder)
         check("Konflikte verlängern", seconds, w.NOTICE_SECONDS_ATTENTION)
         check("Konfliktzahl wird genannt", "3 Konflikt(e)" in text, True)
+        check("ohne Pause kein Zusatz", "angehalten" in text, False)
+
+        # A hand-set pause stops the sync without anything looking broken --
+        # the very case the notice exists for (doku 1.7).
+        stub(paused=True)
+        text, seconds = w.build_notice(state(), 0, folder)
+        check("Pause verlängert", seconds, w.NOTICE_SECONDS_ATTENTION)
+        check("Pause wird genannt", text.startswith("Abgleich für diesen "
+                                                    "Ordner angehalten"), True)
+
+        # With conflicts open the pause is named alongside, not instead: it
+        # changes what the user has to do, since the resolution stays local.
+        text, seconds = w.build_notice(state(), 2, folder)
+        check("Pause neben Konflikten",
+              "2 Konflikt(e)" in text and "Abgleich angehalten" in text, True)
+
+        # A paused DEVICE is a different case and needs no own wording: it
+        # shows up as no connection (verified against the real configuration,
+        # doku 1.7).
+        stub(paused=False, connected=False)
+        text, _ = w.build_notice(state(), 0, folder)
+        check("angehaltenes Gerät heißt: keine Verbindung",
+              text.startswith("keine Verbindung"), True)
 
         # The one case where the notice is not decoration: without the
         # interface there are no figures, but an open conflict must still be

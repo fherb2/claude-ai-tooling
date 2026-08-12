@@ -777,11 +777,20 @@ def build_notice(state: WatchState, open_conflicts: int,
         if state.last_conflict_seen:
             hours = int(_age(state.last_conflict_seen).total_seconds() // 3600)
             since = f" seit {hours} Stunde(n)"
-        return (f"{open_conflicts} Konflikt(e){since} ungelöst",
+        # A pause changes what the user has to do -- the resolution would stay
+        # local -- so it is named alongside, not instead.
+        halted = "; Abgleich angehalten" if figures and figures["paused"] else ""
+        return (f"{open_conflicts} Konflikt(e){since} ungelöst{halted}",
                 NOTICE_SECONDS_ATTENTION)
 
     if figures is None:
         return None
+
+    if figures["paused"]:
+        # Before the connection check on purpose: a hand-set pause explains the
+        # silence better than its symptom, and it is the user's own doing.
+        return ("Abgleich für diesen Ordner angehalten — Änderungen und "
+                "Konfliktkopien bleiben liegen", NOTICE_SECONDS_ATTENTION)
 
     if not figures["connected"]:
         since = ""
@@ -827,11 +836,14 @@ def _human_bytes(count: float) -> str:
     return f"{count / step:.1f} GB"
 
 
-def folder_id_for(watch_dir: Path, api_key: str) -> Optional[str]:
-    """Syncthing's folder id for the watched directory, or None.
+def folder_config_for(watch_dir: Path,
+                      api_key: str) -> Optional[dict[str, Any]]:
+    """Syncthing's configuration entry for the watched directory, or None.
 
-    Needed because the backlog is asked per folder. Compares resolved paths,
-    since the configuration may hold "~/.claude" rather than an absolute path.
+    Returns the whole entry, not just the id: the backlog needs the id, and
+    the notice needs `paused` from the same answer (doku 1.7). Compares
+    resolved paths, since the configuration may hold "~/.claude" rather than
+    an absolute path.
     """
     config = rest_get("/rest/system/config", api_key)
     if not isinstance(config, dict):
@@ -845,7 +857,7 @@ def folder_id_for(watch_dir: Path, api_key: str) -> Optional[str]:
             continue
         try:
             if Path(str(folder.get("path") or "")).expanduser().resolve() == target:
-                return folder.get("id")
+                return folder
         except OSError:
             continue
     return None
@@ -887,14 +899,19 @@ def _sync_figures(state: WatchState, api_key: str,
         state.last_connected = _now()
 
     backlog = 0
-    folder = folder_id_for(watch_dir, api_key)
+    paused = False
+    folder = folder_config_for(watch_dir, api_key)
     if folder:
-        status = rest_get(f"/rest/db/status?folder={folder}", api_key)
+        # A pause the user set by hand stops the sync without anything looking
+        # broken -- exactly the case the notice exists for (doku 1.7). Read,
+        # never written: the watcher does not steer Syncthing (2.1).
+        paused = bool(folder.get("paused"))
+        status = rest_get(f"/rest/db/status?folder={folder.get('id')}", api_key)
         if isinstance(status, dict):
             backlog = int(status.get("needFiles") or 0)
 
-    return {"connected": connected, "incoming": incoming,
-            "outgoing": outgoing, "backlog": backlog}
+    return {"connected": connected, "incoming": incoming, "outgoing": outgoing,
+            "backlog": backlog, "paused": paused}
 
 
 def maybe_notify(state: WatchState, open_conflicts: int,
