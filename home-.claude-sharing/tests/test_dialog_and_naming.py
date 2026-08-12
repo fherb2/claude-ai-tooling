@@ -44,7 +44,7 @@ WHY THIS EXISTS -- every check guards against a specific, already-made error:
    must not claim a span it cannot know. Pinned here: the unit thresholds,
    which cases count as "asking for attention", and the one case where the
    notice is not decoration -- an open conflict is reported even when the REST
-   interface says nothing at all (doku 1.7).
+   interface says nothing at all (doku 1.8).
 
 This file deliberately does not test the escalation as a whole, the episode
 rule or the terminal launch: those need a screen and a human, and the
@@ -266,7 +266,7 @@ def check_transfer_temporaries(w: types.ModuleType, tmp_root: Path) -> None:
 
 
 def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
-    """Figures, wording and display time of the hourly notice (doku 1.7).
+    """Figures, wording and display time of the hourly notice (doku 1.8).
 
     Syncthing is replaced by a stub, so this runs without a running daemon.
     What it pins: the unit thresholds, which cases count as "asking for
@@ -334,7 +334,7 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         check("ohne Pause kein Zusatz", "angehalten" in text, False)
 
         # A hand-set pause stops the sync without anything looking broken --
-        # the very case the notice exists for (doku 1.7).
+        # the very case the notice exists for (doku 1.8).
         stub(paused=True)
         text, seconds = w.build_notice(state(), 0, folder)
         check("Pause verlängert", seconds, w.NOTICE_SECONDS_ATTENTION)
@@ -342,7 +342,7 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
                                                     "Ordner angehalten"), True)
 
         # With conflicts open, pause and backlog are named alongside, not
-        # instead: both change what the user has to do (doku 1.7).
+        # instead: both change what the user has to do (doku 1.8).
         text, seconds = w.build_notice(state(), 2, folder)
         check("Pause neben Konflikten",
               "2 Konflikt(e)" in text and "Abgleich angehalten" in text, True)
@@ -368,7 +368,7 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
 
         # A paused DEVICE is a different case and needs no own wording: it
         # shows up as no connection (verified against the real configuration,
-        # doku 1.7).
+        # doku 1.8).
         stub(paused=False, connected=False)
         text, _ = w.build_notice(state(), 0, folder)
         check("angehaltenes Gerät heißt: keine Verbindung",
@@ -376,7 +376,7 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
 
         # The one case where the notice is not decoration: without the
         # interface there are no figures, but an open conflict must still be
-        # reported (doku 1.7).
+        # reported (doku 1.8).
         stub(key=None)
         check("ohne REST keine Zahlenmeldung",
               w.build_notice(state(), 0, folder), None)
