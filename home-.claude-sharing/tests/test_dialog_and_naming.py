@@ -341,11 +341,30 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         check("Pause wird genannt", text.startswith("Abgleich für diesen "
                                                     "Ordner angehalten"), True)
 
-        # With conflicts open the pause is named alongside, not instead: it
-        # changes what the user has to do, since the resolution stays local.
+        # With conflicts open, pause and backlog are named alongside, not
+        # instead: both change what the user has to do (doku 1.7).
         text, seconds = w.build_notice(state(), 2, folder)
         check("Pause neben Konflikten",
               "2 Konflikt(e)" in text and "Abgleich angehalten" in text, True)
+
+        stub(need=4)
+        text, _ = w.build_notice(state(), 2, folder)
+        check("Rückstand neben Konflikten",
+              "2 Konflikt(e)" in text and "Rückstand: 4 Datei(en)" in text, True)
+
+        stub(need=4, paused=True)
+        text, _ = w.build_notice(state(), 2, folder)
+        check("Pause und Rückstand zugleich",
+              all(teil in text for teil in ("2 Konflikt(e)", "angehalten",
+                                            "Rückstand: 4 Datei(en)")), True)
+
+        # Same wording in both notices -- one source, no drift (doku 2.4).
+        stub(need=4)
+        ruhe, _ = w.build_notice(state(), 0, folder)
+        mit_konflikt, _ = w.build_notice(state(), 2, folder)
+        klausel = "; Rückstand: 4 Datei(en)"
+        check("Rückstands-Wortlaut identisch",
+              ruhe.endswith(klausel) and mit_konflikt.endswith(klausel), True)
 
         # A paused DEVICE is a different case and needs no own wording: it
         # shows up as no connection (verified against the real configuration,
