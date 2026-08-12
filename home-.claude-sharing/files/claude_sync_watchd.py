@@ -758,6 +758,16 @@ def rest_get(path: str, api_key: str) -> Optional[Any]:
         return None
 
 
+def _backlog_clause(count: int) -> str:
+    """The backlog wording, in one place.
+
+    It appears in two notices -- next to open conflicts and in the quiet form.
+    Two copies of the same sentence are the kind of duplication that drifts
+    apart (doku 2.4).
+    """
+    return f"; Rückstand: {count} Datei(en)" if count else ""
+
+
 def build_notice(state: WatchState, open_conflicts: int,
                  watch_dir: Path) -> Optional[tuple[str, int]]:
     """Assemble the hourly notice as text plus display time, or None.
@@ -777,10 +787,15 @@ def build_notice(state: WatchState, open_conflicts: int,
         if state.last_conflict_seen:
             hours = int(_age(state.last_conflict_seen).total_seconds() // 3600)
             since = f" seit {hours} Stunde(n)"
-        # A pause changes what the user has to do -- the resolution would stay
-        # local -- so it is named alongside, not instead.
-        halted = "; Abgleich angehalten" if figures and figures["paused"] else ""
-        return (f"{open_conflicts} Konflikt(e){since} ungelöst{halted}",
+        # Both a pause and a backlog change what the user has to do, so both
+        # are named alongside the conflict instead of waiting for a quiet hour
+        # that may not come while conflicts are open (doku 1.7).
+        extra = ""
+        if figures and figures["paused"]:
+            extra += "; Abgleich angehalten"
+        if figures:
+            extra += _backlog_clause(figures["backlog"])
+        return (f"{open_conflicts} Konflikt(e){since} ungelöst{extra}",
                 NOTICE_SECONDS_ATTENTION)
 
     if figures is None:
@@ -813,7 +828,7 @@ def build_notice(state: WatchState, open_conflicts: int,
     text = (f"abgeglichen: {_human_bytes(figures['outgoing'])} hoch, "
             f"{_human_bytes(figures['incoming'])} herunter{quiet}")
     if figures["backlog"]:
-        return (f"{text}; Rückstand: {figures['backlog']} Datei(en)",
+        return (text + _backlog_clause(figures["backlog"]),
                 NOTICE_SECONDS_ATTENTION)
     return (text, NOTICE_SECONDS_QUIET)
 
