@@ -1,0 +1,21 @@
+// Zugangsdaten niemals abgleichen - bewusst OHNE führenden Schraegstrich,
+// damit die Datei auf jeder Ebene ausgeschlossen ist
+.credentials.json
+
+// Ganze Verzeichnisse samt Inhalt
+/cache
+/downloads
+/telemetry
+
+// weitere, von Claude zum Ausschluss vorgeschlagen
+/ide
+/sessions
+/session-env
+/shell-snapshots
+
+// Fluechtige Dateien
+*.log
+*.sock
+
+// Synology-Papierkorb, falls im Zielordner aktiviert
+#recycle

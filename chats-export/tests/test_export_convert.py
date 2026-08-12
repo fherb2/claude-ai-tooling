@@ -641,8 +641,7 @@ with open(os.path.join(PROT_DIR, "2026-05-01_linear_lin-1.json"),
 check("the document follows §1.12: metadata plus messages",
       set(document) >= {"metadata", "messages"}, str(set(document)))
 check("the §1.12 fields are present",
-      set(document["metadata"]) >= {"chat_date", "imported_at", "predecessor",
-                                    "successor"},
+      set(document["metadata"]) >= {"created_at", "imported_at"},
       str(sorted(document["metadata"])))
 check("roles are user and assistant",
       {m["role"] for m in document["messages"]} == {"user", "assistant"},
@@ -651,9 +650,9 @@ check("the source is recorded",
       document["metadata"]["source"] == "account-export")
 check("imported_at is the timestamp that was handed in",
       document["metadata"]["imported_at"] == FIXED_NOW)
-check("source_updated_at records the state the export rests on",
-      document["metadata"]["source_updated_at"] == "2026-05-01T12:00:00.000000Z",
-      document["metadata"]["source_updated_at"])
+check("last_updated_at records the state the export rests on",
+      document["metadata"]["last_updated_at"] == "2026-05-01T12:00:00.000000Z",
+      document["metadata"]["last_updated_at"])
 
 entry = protocol()["chats"]["lin-1"]
 check("the protocol notes the file", entry["file"] == "2026-05-01_linear_lin-1.json")
@@ -919,6 +918,148 @@ check("report names the file that is mentioned by name only",
       result.stdout)
 check("report lists the block types left out of the text",
       "tool_use" in result.stdout, result.stdout)
+
+# ---------------------------------------------------------------------------
+# The reconciliation bound: listed_at and created_after
+# ---------------------------------------------------------------------------
+
+# Two listing runs. The first knows one chat and has no earlier run to compare
+# against; the second adds a chat, which can only have been created after the
+# first run -- that is the only lower bound a chat list can ever supply.
+BOUND_DIR = os.path.join(WORK, "schranke")
+FIRST_RUN, SECOND_RUN = "2026-03-01T00:00:00+00:00", "2026-04-01T00:00:00+00:00"
+
+
+def bound_list(name, uuids):
+    """Write a chat list holding the given uuids."""
+    path = os.path.join(WORK, name)
+    with open(path, "w", encoding="utf-8") as handle:
+        for uuid in uuids:
+            handle.write(f"<chat url='https://claude.ai/chat/{uuid}' "
+                         f"updated_at='2026-02-01T00:00:00Z'>Content:\n"
+                         f"Title: Chat {uuid}\n</chat>\n")
+    return path
+
+
+def bound_protocol():
+    """Read the protocol of the bound fixture."""
+    with open(os.path.join(BOUND_DIR, cec.PROTOCOL_FILENAME),
+              encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+result = run("list", "--map", bound_list("schranke-1.txt", ["alt-1"]),
+             "--out", BOUND_DIR, "--now", FIRST_RUN)
+first = bound_protocol()
+check("the first listing stamps listed_at",
+      first["listed_at"] == FIRST_RUN, str(first.get("listed_at")))
+check("a chat from the very first listing has no bound",
+      first["chats"]["alt-1"]["created_after"] == "",
+      repr(first["chats"]["alt-1"]["created_after"]))
+check("the first run says an export must reach the project start",
+      "project's own start date" in result.stdout, result.stdout)
+
+result = run("list", "--map", bound_list("schranke-2.txt", ["alt-1", "neu-2"]),
+             "--out", BOUND_DIR, "--now", SECOND_RUN)
+second = bound_protocol()
+check("the second listing moves listed_at forward",
+      second["listed_at"] == SECOND_RUN, str(second.get("listed_at")))
+check("the newly seen chat is bounded by the previous reconciliation",
+      second["chats"]["neu-2"]["created_after"] == FIRST_RUN,
+      repr(second["chats"]["neu-2"]["created_after"]))
+check("the bound of an already known chat is NOT overwritten",
+      second["chats"]["alt-1"]["created_after"] == "",
+      repr(second["chats"]["alt-1"]["created_after"]))
+check("the run names the date an export has to reach",
+      FIRST_RUN[:19] in result.stdout and "earliest an export" in result.stdout,
+      result.stdout)
+
+# A third run that adds nothing must not disturb the bounds it already holds.
+run("list", "--map", bound_list("schranke-3.txt", ["alt-1", "neu-2"]),
+    "--out", BOUND_DIR, "--now", "2026-05-01T00:00:00+00:00")
+third = bound_protocol()
+check("a run without new chats leaves every bound alone",
+      third["chats"]["neu-2"]["created_after"] == FIRST_RUN
+      and third["chats"]["alt-1"]["created_after"] == "",
+      str({u: e["created_after"] for u, e in third["chats"].items()}))
+check("but it still moves listed_at forward",
+      third["listed_at"] == "2026-05-01T00:00:00+00:00", third["listed_at"])
+
+# convert fills the real created_at; the bound stays as the weaker fallback.
+bound_zip = os.path.join(WORK, "schranke.zip")
+with zipfile.ZipFile(bound_zip, "w") as handle:
+    handle.writestr("conversations.json", json.dumps([conv("neu-2", "Chat neu-2", [
+        msg("b0", ROOT, "human", "hallo", "2026-03-15T10:00:00Z")],
+        created="2026-03-15T10:00:00.000000Z",
+        updated="2026-03-15T11:00:00.000000Z")]))
+run("convert", "--zip", bound_zip, "--out", BOUND_DIR, "--now", "T-BOUND")
+fourth = bound_protocol()
+check("convert supplies the real created_at",
+      fourth["chats"]["neu-2"]["created_at"].startswith("2026-03-15"),
+      fourth["chats"]["neu-2"]["created_at"])
+check("and leaves created_after in place as the weaker fallback",
+      fourth["chats"]["neu-2"]["created_after"] == FIRST_RUN,
+      fourth["chats"]["neu-2"]["created_after"])
+# The real date must sit inside the bound -- otherwise the bound was wrong.
+check("the real created_at is consistent with the bound",
+      fourth["chats"]["neu-2"]["created_at"] > FIRST_RUN)
+
+
+# The project start comes in by hand and drives the reported window.
+result = run("list", "--map", bound_list("schranke-4.txt", ["alt-1", "neu-2"]),
+             "--out", BOUND_DIR, "--now", "2026-06-01T00:00:00+00:00",
+             "--project-created", "2025-11-10")
+fifth = bound_protocol()
+check("list stores the hand-entered project start",
+      fifth["project_created_at"] == "2025-11-10",
+      str(fifth.get("project_created_at")))
+check("and reports the date an export has to reach",
+      "reach back to" in result.stdout, result.stdout)
+
+# A project date later than a chat it supposedly contains must be flagged --
+# typing the wrong project's date would silently shorten every window.
+result = run("list", "--map", bound_list("schranke-5.txt", ["alt-1"]),
+             "--out", BOUND_DIR, "--now", "2026-07-01T00:00:00+00:00",
+             "--project-created", "2026-06-15")
+check("an implausible project date is flagged on stderr",
+      "cannot predate" in result.stderr, result.stderr or result.stdout)
+
+# Without any bound at all, the run says so instead of guessing a window.
+EMPTY_DIR = os.path.join(WORK, "ohne-schranke")
+result = run("list", "--map", bound_list("schranke-6.txt", ["frisch-1"]),
+             "--out", EMPTY_DIR, "--now", "2026-06-01T00:00:00+00:00")
+check("with no bound at all the run asks for the project start",
+      "no date bound at all" in result.stdout
+      and "--project-created" in result.stdout, result.stdout)
+
+
+# ---------------------------------------------------------------------------
+# The prompt for step 2 of doku 1.5 -- getting the chat list at all
+# ---------------------------------------------------------------------------
+
+check("the mapping prompt exists and is non-empty",
+      bool(cec.MAPPING_PROMPT.strip()))
+check("it names the tool call, not just 'get me the chats'",
+      "recent_chats" in cec.MAPPING_PROMPT
+      and "sort_order" in cec.MAPPING_PROMPT, cec.MAPPING_PROMPT)
+check("it insists on a codeblock -- the fix for the swallowed-tags incident",
+      "codeblock" in cec.MAPPING_PROMPT.lower()
+      or "Codeblock" in cec.MAPPING_PROMPT, cec.MAPPING_PROMPT)
+check("it forbids reformatting into a table or numbered list",
+      "keine Tabelle" in cec.MAPPING_PROMPT
+      and "keine Nummerierung" in cec.MAPPING_PROMPT, cec.MAPPING_PROMPT)
+check("the module docstring points at MAPPING_PROMPT by name",
+      "MAPPING_PROMPT" in (cec.__doc__ or ""), cec.__doc__[:200])
+
+# The prompt must actually produce input parse_chat_list accepts -- otherwise
+# it is advice that does not match the parser it feeds.
+SAMPLE_DUMP = ("<chat url='https://claude.ai/chat/aaaaaaaa-1111-2222-3333-"
+              "444444444444' updated_at='2026-01-01T00:00:00Z'>\n"
+              "Title: Testchat\n</chat>\n")
+check("a dump shaped the way the prompt asks for parses correctly",
+      len(cec.parse_chat_list(SAMPLE_DUMP)) == 1
+      and cec.parse_chat_list(SAMPLE_DUMP)[0]["title"] == "Testchat")
+
 
 shutil.rmtree(WORK, ignore_errors=True)
 

@@ -11,6 +11,12 @@ archive gets, this describes the raw export itself.
 
 Diagnostic output only: structure and numbers, **never chat content**
 (Vorgabe 2.11) -- so the output is safe to paste into a conversation.
+
+Also lists every project in the archive by its ``created_at``: project files
+are never filtered by the export's date range, so even a one-week probe
+export names every project's true start date. That date bounds how far back
+a real export has to reach (``chat_export_convert.py list --project-created``,
+doku Vorgabe 2.4) -- no chat of a project can predate the project itself.
 """
 
 from __future__ import annotations
@@ -65,13 +71,30 @@ def report(path: str) -> None:
 
     # ---- projects: instructions and knowledge documents ------------------
     doc_count = doc_chars = 0
+    records = []
     for name in projects:
         project = load(archive, name)
         docs = project.get("docs") or []
         doc_count += len(docs)
         doc_chars += sum(len(d.get("content") or "") for d in docs)
+        records.append(project)
     print(f"    projects: {len(projects)}, {doc_count} knowledge document(s), "
           f"{doc_chars} chars in them")
+
+    # The project's created_at is the earliest any of its chats can be, so it
+    # bounds every export window (doku 2.4). Project files are NOT filtered by
+    # the export's date range, so even a one-week export lists them all --
+    # which is what makes a cheap probe export worth running (doku 3.1.1).
+    if records:
+        print()
+        print("=== projects by creation date -- the earliest an export must "
+              "reach for each")
+        for project in sorted(records, key=lambda p: p.get("created_at") or ""):
+            docs = project.get("docs") or []
+            print(f"    {(project.get('created_at') or '?')[:10]}  "
+                  f"{len(docs):>3} doc(s)  {(project.get('name') or '')[:52]!r}")
+        print("    Pass the date of the project you are migrating to "
+              "chat_export_convert list --project-created.")
 
     if "conversations.json" not in names:
         print("    !! no conversations.json in this archive")

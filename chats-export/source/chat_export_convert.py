@@ -6,11 +6,20 @@ to be self-contained for a chat upload (doku 2.9 is about those).  Chapter 3.1
 of ``implementation_doku.md`` holds the determinations this implements, chapter
 2 the repo-wide ones; the numbers quoted below come from there.
 
-    python3 chat_export_convert.py list    --map <dump> --out <dir> [--project N]
+    python3 chat_export_convert.py list    --map <dump> --out <dir> \
+                                            [--project N] [--project-created DATE]
     python3 chat_export_convert.py convert --zip <export.zip> --out <dir>
     python3 chat_export_convert.py diff    --out <dir>
     python3 chat_export_convert.py report  --out <dir>
     python3 chat_export_convert.py analyse --zip <export.zip> [--map <dump>]
+
+Getting the ``--map`` input is the one step this file cannot do for you: the
+chat list only exists inside a claude.ai chat, in the *source* project, via
+the built-in ``recent_chats`` tool -- no script, no upload, nothing to run
+there. Ask for it verbatim, with the literal prompt kept as ``MAPPING_PROMPT``
+below (module-level, printable): only a codeblock survives the markdown
+renderer, the ``<chat ...>`` tags outside one are silently swallowed as HTML
+(observed). Save the reply as a file and pass it as ``--map``.
 
 ``list`` comes first, always: it builds the protocol from a chat list, which is
 the only place the project a chat belongs to can be learned. ``convert`` then
@@ -54,6 +63,33 @@ content. Trigger words would break at the first change of language.
 **Hollow chats are deleted chats.** Messages present, no text anywhere. Verified
 in the browser: they no longer exist. Nothing recovers them, so they are marked
 rather than silently emptied.
+
+**Up to four files per chat, not just the conversation.** Alongside the chat
+file itself, ``convert`` writes ``.thinking.json`` (kept thinking blocks),
+``.attachments.json`` (uploaded files whose content came through, tracked
+separately from bare name-only references) and ``.creations.json`` (things the
+assistant produced -- artifacts, generated files, code edits) whenever a chat
+has any. All three are linked back to the conversation file by message UUID,
+never by position, because branches make positional linking wrong.
+
+**``protokoll.json`` is the one file that survives between runs.** It carries,
+per chat: status, timestamps, and the file names ``convert`` wrote for it, so a
+second run knows what to replace instead of duplicating. Two fields exist only
+to answer "how far back must the next export reach": ``created_after``, set the
+first time a chat is *seen* (not converted) to the timestamp of the previous
+``list``, and ``project_created_at``, typed in by hand via ``--project-created``
+after reading a project's own creation date off a probe export
+(``inspect_export.py`` lists them). ``window_start()`` combines both with each
+chat's own ``created_at`` once known, and ``list`` prints the result: the
+earliest date an account export needs to cover everything still pending.
+
+**``convert`` ends by printing ``INSTRUCTION_BLOCK``** -- a ready-made German
+paragraph for the *target* project's own instructions, telling that
+project's instance an archive exists and where, so it looks before asking.
+``MAPPING_PROMPT`` above is its counterpart for the *source* side.
+
+Every command that stamps a timestamp accepts ``--now`` to record a fixed one
+instead of the clock -- for reproducible test runs, not for daily use.
 """
 
 from __future__ import annotations
@@ -596,15 +632,13 @@ def chat_document(record: dict[str, Any], now: str,
     a record of anything.
     """
     metadata = {
-        "chat_date":    record["created_at"] or "unknown",
-        "imported_at":  now,
-        "predecessor":  None,
-        "successor":    None,
-        "chat_uuid":    record["uuid"],
-        "url":          f"https://claude.ai/chat/{record['uuid']}",
-        "title":        record["title"],
-        "source":       source,
-        "source_updated_at": record["updated_at"],
+        "created_at":     record["created_at"] or "unknown",
+        "imported_at":    now,
+        "chat_uuid":      record["uuid"],
+        "url":            f"https://claude.ai/chat/{record['uuid']}",
+        "title":          record["title"],
+        "source":         source,
+        "last_updated_at": record["updated_at"],
         "turns":        record["turns"],
         # This path has no independent yardstick: the archive is all there is,
         # so completeness cannot be proven and is not claimed.
@@ -722,7 +756,8 @@ def load_protocol(out_dir: str) -> dict[str, Any]:
     path = protocol_path(out_dir)
     if not os.path.exists(path):
         return {"protocol_version": PROTOCOL_VERSION, "project": "",
-                "order": "", "chats": {}}
+                "project_created_at": "", "order": "", "listed_at": "",
+                "chats": {}}
     with open(path, "r", encoding="utf-8") as handle:
         protocol = json.load(handle)
     protocol.setdefault("protocol_version", PROTOCOL_VERSION)
@@ -730,9 +765,17 @@ def load_protocol(out_dir: str) -> dict[str, Any]:
     # The reading route records the direction of work here; this route does
     # not use it but must not lose it either -- one protocol, one schema.
     protocol.setdefault("order", "")
+    # When the source project was last listed -- the reference point for the
+    # created_after bound below.
+    protocol.setdefault("listed_at", "")
+    # The project's own start date, read off a probe export by hand (doku 1.5)
+    # -- nothing in an archive links a conversation to a project, so no tool
+    # can derive it.
+    protocol.setdefault("project_created_at", "")
     protocol.setdefault("chats", {})
     for entry in protocol["chats"].values():
         entry.setdefault("side_files", [])
+        entry.setdefault("created_after", "")
     return protocol
 
 
@@ -743,14 +786,22 @@ def save_protocol(out_dir: str, protocol: dict[str, Any]) -> None:
 
 
 def update_from_list(protocol: dict[str, Any],
-                     records: list[dict[str, str]]) -> dict[str, int]:
+                     records: list[dict[str, str]],
+                     now: str = "") -> dict[str, int]:
     """Fold a chat list into the protocol and report what changed.
 
     This is what makes growth detectable without touching a single chat file:
     the list's ``updated_at`` against the timestamp the export rests on. A chat
     whose source moved on becomes ``stale`` and is fetched again; everything
     else stays untouched.
+
+    *now* stamps the reconciliation. A chat seen here for the first time gets
+    the **previous** reconciliation as ``created_after``: the source was listed
+    then and did not contain this chat, so it was created later. That is the
+    only lower bound available for a chat that has never been in an archive --
+    the chat list carries no ``created_at`` (doku 2.4).
     """
+    previous_listed = protocol.get("listed_at", "")
     counts = collections.Counter()
     for record in records:
         entry = protocol["chats"].get(record["uuid"])
@@ -758,6 +809,7 @@ def update_from_list(protocol: dict[str, Any],
             protocol["chats"][record["uuid"]] = {
                 "title":       record.get("title", ""),
                 "created_at":  "",
+                "created_after": previous_listed,
                 "listed_updated_at": record.get("updated_at", ""),
                 "exported_updated_at": "",
                 "turns":       0,
@@ -781,7 +833,76 @@ def update_from_list(protocol: dict[str, Any],
             counts["stale"] += 1
         else:
             counts["unchanged"] += 1
+    if now:
+        protocol["listed_at"] = now
     return dict(counts)
+
+
+def project_start_warnings(protocol: dict[str, Any]) -> list[str]:
+    """Check the hand-entered project start against what the protocol knows.
+
+    A date typed for the wrong project would silently shorten every export
+    window from here on, so it is checked against the earliest date the
+    protocol already holds: no chat of a project can predate the project.
+    """
+    start = protocol.get("project_created_at", "")
+    if not start:
+        return []
+    known = [(entry.get("created_at") or entry.get("created_after") or "", uuid)
+             for uuid, entry in protocol["chats"].items()]
+    known = [(value, uuid) for value, uuid in known if value]
+    if not known:
+        return []
+    earliest, uuid = min(known)
+    if earliest[:10] < start[:10]:
+        return [f"!! project_created_at is {start[:10]}, but chat {uuid[:8]} is "
+                f"dated {earliest[:10]} -- a chat cannot predate its project. "
+                "Wrong project's date, or the wrong project's chat list."]
+    return []
+
+
+def window_start(protocol: dict[str, Any]) -> dict[str, Any]:
+    """Compute how far back an export has to reach to cover what is pending.
+
+    The table in doku 2.4, as code. Every chat an export must cover contributes
+    a lower bound on its own creation, from the best source available:
+
+    * its ``created_at`` -- exact, but only a route that saw an archive has it;
+    * its ``created_after`` -- exact too: the project was listed then and this
+      chat was not in it, so it came later;
+    * the project's own ``created_at`` -- no chat of a project can predate the
+      project, so this bounds anything the first two cannot.
+
+    The window start is the earliest of those bounds. A chat with none of the
+    three is genuinely unbounded and forces a full export -- reported rather
+    than papered over, because a window that is too short loses content
+    silently while one that is too generous only costs download size.
+    """
+    project_start = protocol.get("project_created_at", "")
+    pending = {uuid: entry for uuid, entry in protocol["chats"].items()
+               if entry.get("status") in (STATUS_LISTED, STATUS_STALE)}
+    bounds: dict[str, tuple[str, str]] = {}
+    unbounded = []
+    for uuid, entry in pending.items():
+        if entry.get("created_at"):
+            bounds[uuid] = (entry["created_at"], "created_at")
+        elif entry.get("created_after"):
+            bounds[uuid] = (entry["created_after"], "created_after")
+        elif project_start:
+            bounds[uuid] = (project_start, "project")
+        else:
+            unbounded.append(uuid)
+    if not pending:
+        return {"start": "", "source": "nothing-pending", "chats": [],
+                "unbounded": []}
+    if unbounded:
+        return {"start": "", "source": "unbounded", "chats": [],
+                "unbounded": sorted(unbounded)}
+    start = min(value for value, _ in bounds.values())
+    source = next(kind for value, kind in bounds.values() if value == start)
+    return {"start": start, "source": source,
+            "chats": sorted(u for u, (v, _) in bounds.items() if v == start),
+            "unbounded": []}
 
 
 # ---------------------------------------------------------------------------
@@ -837,6 +958,21 @@ def check_mapping(records: list[dict[str, str]],
 # Commands
 # ---------------------------------------------------------------------------
 
+# Handed to the user verbatim (print it, or quote it in chat) before the first
+# ``list`` of a source project: the chat list has to come from a claude.ai
+# chat, and nothing here can fetch it. A codeblock is required -- outside one,
+# the '<chat ...>' tags are HTML to the markdown renderer and vanish silently.
+MAPPING_PROMPT = """\
+Gib mir die vollständige Liste aller Chats dieses Projekts als Rohausgabe,
+in einem einzigen Codeblock (drei Backticks, Sprache "text"). Rufe dazu
+recent_chats mit sort_order='asc' und n=20 auf und blättere mit after
+weiter, bis nichts Neues mehr kommt. Gib innerhalb des Blocks die
+<chat ...>-Blöcke wörtlich und unverändert aus, wie das Werkzeug sie
+liefert -- mit url und updated_at im Tag und der Title-Zeile darunter.
+Kein Kommentar, keine Tabelle, keine Nummerierung, kein Text vor oder nach
+dem Block."""
+
+
 INSTRUCTION_BLOCK = """\
 --- ab hier in die Projektanweisungen einfügen ---
 
@@ -867,7 +1003,11 @@ def cmd_list(args: argparse.Namespace) -> int:
     protocol = load_protocol(args.out)
     if args.project:
         protocol["project"] = args.project
-    counts = update_from_list(protocol, records)
+    if args.project_created:
+        protocol["project_created_at"] = args.project_created
+    previous_listed = protocol.get("listed_at", "")
+    now = args.now or datetime.datetime.now(datetime.timezone.utc).isoformat()
+    counts = update_from_list(protocol, records, now)
     save_protocol(args.out, protocol)
 
     print(f"{len(records)} chat(s) listed: {counts.get('new', 0)} new, "
@@ -878,6 +1018,23 @@ def cmd_list(args: argparse.Namespace) -> int:
                if entry["status"] in (STATUS_LISTED, STATUS_STALE)]
     print(f"{len(pending)} chat(s) waiting to be converted." if pending
           else "Nothing waiting -- every listed chat is already exported.")
+    for line in project_start_warnings(protocol):
+        print(line, file=sys.stderr)
+    window = window_start(protocol)
+    if window["source"] == "unbounded":
+        print(f"{len(window['unbounded'])} pending chat(s) have no date bound at "
+              "all -- give the project's start date with --project-created "
+              "(read it off a probe export, doku 1.5), or export everything.")
+    elif window["start"]:
+        print(f"An export has to reach back to {window['start'][:10]} to cover "
+              f"everything pending (from {window['source']}).")
+    if counts.get("new") and previous_listed:
+        print(f"The {counts['new']} new chat(s) were created after "
+              f"{previous_listed[:19]} -- that is the earliest an export has "
+              "to reach to cover them.")
+    elif counts.get("new") and not protocol.get("project_created_at"):
+        print("No earlier reconciliation to bound the new chats: an export has "
+              "to reach back to the project's own start date (doku 3.1.1).")
     return 0
 
 
@@ -1197,6 +1354,11 @@ def build_parser() -> argparse.ArgumentParser:
                         help="raw recent_chats dump; repeatable")
     p_list.add_argument("--out", required=True, help="output directory")
     p_list.add_argument("--project", default="", help="name of the source project")
+    p_list.add_argument("--project-created", default="", dest="project_created",
+                        help="the source project's own creation date, read off "
+                             "a probe export (inspect_export.py)")
+    p_list.add_argument("--now", default="",
+                        help="timestamp to record instead of the clock")
     p_list.set_defaults(func=cmd_list)
 
     p_convert = sub.add_parser("convert", help="convert the pending chats")

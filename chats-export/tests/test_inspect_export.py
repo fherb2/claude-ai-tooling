@@ -95,6 +95,7 @@ with zipfile.ZipFile(ARCHIVE, "w") as archive:
     archive.writestr("memories.json", json.dumps([]))
     archive.writestr("projects/p-1.json", json.dumps(
         {"uuid": "p-1", "name": "Projekt", "prompt_template": GEHEIM,
+         "created_at": "2026-01-05T08:00:00.000000Z",
          "docs": [{"content": GEHEIM * 3}]}))
     archive.writestr("conversations.json", json.dumps(CONVERSATIONS))
 
@@ -138,6 +139,13 @@ check("the schema watch lists all three key sets",
       and "block keys" in out, out)
 check("it says there is no project reference",
       "NONE -- a conversation does not say" in out, out)
+
+check("it lists the projects by creation date",
+      "projects by creation date" in out and "2026-01-05" in out, out)
+check("with the project name, which identifies it",
+      "Projekt" in out, out)
+check("and points at the flag that consumes the date",
+      "--project-created" in out, out)
 
 # The one check this tool exists to pass: nothing of the content leaks.
 check("no chat content appears in the output -- Vorgabe 2.11",

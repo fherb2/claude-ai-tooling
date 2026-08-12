@@ -7,7 +7,7 @@ Usage:
     python3 test_conflict_terminal_loop.py
 
 Background: currently, if the user cancels the zenity --list terminal
-disambiguation in detect_terminal(), the real fossil_claude_sync.py
+disambiguation in detect_terminal(), the real claude_sync_watchd.py
 silently falls back to the first found candidate. The intended behavior
 instead: on cancel, re-show the conflict question dialog with adjusted
 wording, asking whether to retry the terminal selection or abandon
@@ -18,7 +18,7 @@ its own (existing dialog_due() cooldown in the real script).
 
 This script prototypes exactly that control flow with zenity, against a
 dummy candidate list (same ones already validated in test_zenity_list.py).
-It does not import fossil_claude_sync and does not touch its real state
+It does not import claude_sync_watchd and does not touch its real state
 file -- purely a standalone control-flow probe.
 """
 

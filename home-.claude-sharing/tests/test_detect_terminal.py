@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """test_detect_terminal.py -- manual, interactive probe of the terminal
-detection and launch logic used in fossil_claude_sync.py's
+detection and launch logic used in claude_sync_watchd.py's
 detect_terminal() / launch_claude_session().
 
 Usage:
@@ -9,14 +9,14 @@ Usage:
 Reimplements the detection cascade (xdg-terminal-exec check, then the
 TERMINAL_CANDIDATES fallback list via shutil.which, then the zenity --list
 disambiguation for multiple matches) standalone, WITHOUT importing
-fossil_claude_sync or touching its real state file under
-~/.local/state/claude-fossil-sync/ -- this probe must stay side-effect-free
+claude_sync_watchd or touching its real state file under
+~/.claude-sync-watch/ -- this probe must stay side-effect-free
 outside of this tests/ directory.
 
 Once a terminal command is chosen, it launches
     [*terminal_cmd, str(HELPER_SCRIPT), TEST_PROMPT]
 which mirrors the real argv shape from launch_claude_session()
-(`[*terminal_cmd, "claude", prompt]`), but with the "claude" program
+(`[*terminal_cmd, CLAUDE_BINARY, "--append-system-prompt-file", ..., prompt]`), but with the "claude" program
 replaced by the harmless echo_test_helper.sh shipped alongside this
 script, so the actual `claude` CLI is never invoked by this test. Confirm
 by eye whether a terminal window opens and displays TEST_PROMPT unchanged,
@@ -27,7 +27,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-# Mirrors fossil_claude_sync.py's TERMINAL_CANDIDATES exactly.
+# Mirrors claude_sync_watchd.py's TERMINAL_CANDIDATES exactly.
 TERMINAL_CANDIDATES: list[tuple[str, str]] = [
     ("x-terminal-emulator", "-e"),
     ("gnome-terminal", "--"),
@@ -41,7 +41,7 @@ TERMINAL_CANDIDATES: list[tuple[str, str]] = [
 HELPER_SCRIPT = Path(__file__).parent / "echo_test_helper.sh"
 
 TEST_PROMPT = (
-    'A fossil update produced an unresolved merge conflict in "CLAUDE.md" -- '
+    'Syncthing left a conflict copy of "CLAUDE.md" behind -- '
     "please check: spaces, \"double quotes\", and it's apostrophes all survive?"
 )
 
