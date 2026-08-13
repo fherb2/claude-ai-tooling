@@ -51,10 +51,15 @@ rule or the terminal launch: those need a screen and a human, and the
 manual probes next to this file cover them (doku 3.8).
 """
 
+import contextlib
 import datetime
 import importlib.util
+import io
+import os
+import subprocess
 import sys
 import tempfile
+import time
 import types
 from pathlib import Path
 
@@ -164,6 +169,73 @@ def check_timeout_unit(w: types.ModuleType) -> None:
               for a in passed.get("command", [])), False)
 
 
+def check_terminal_dialogs(w: types.ModuleType) -> None:
+    """Auswahl- und Freitextdialog: Zeitablauf zaehlt wie Abbruch.
+
+    Warum das hier steht: Beide laufen innerhalb eines Durchgangs. Ein
+    unbeantwortetes Fenster hielte die Laufsperre, und eine gehaltene Sperre
+    macht den Waechter fuer alles andere taub -- kein weiterer Durchgang, keine
+    Meldung, kein Episodenende (doku 3.3). Der Fall trifft eine frische
+    Installation, einen verschwundenen Emulator und jeden weiteren Rechner,
+    denn nur der leere Zwischenspeicher fuehrt zu diesen Dialogen.
+    """
+    print("Terminal-Dialoge (Auswahl und Freitext):")
+    original = w.subprocess.run
+    gesehen = {}
+
+    def attrappe(code, ausgabe=""):
+        def lauf(command, *a, **k):
+            gesehen["command"] = command
+            return types.SimpleNamespace(returncode=code, stdout=ausgabe,
+                                         stderr="")
+        return lauf
+
+    try:
+        w.subprocess.run = attrappe(5)          # Zeitablauf
+        check("Auswahl: Zeitablauf wie Abbruch",
+              w.pick_from_list("T", "t", "S", ["konsole", "xterm"],
+                               w.DIALOG_TIMEOUT_SECONDS), (w.Answer.NO, None))
+        check("Auswahl: Zeitangabe uebergeben",
+              f"--timeout={w.DIALOG_TIMEOUT_SECONDS}" in gesehen["command"], True)
+
+        w.subprocess.run = attrappe(1)          # Abbruch
+        check("Auswahl: Abbruch bleibt Abbruch",
+              w.pick_from_list("T", "t", "S", ["konsole"],
+                               w.DIALOG_TIMEOUT_SECONDS), (w.Answer.NO, None))
+
+        w.subprocess.run = attrappe(0, "konsole\n")
+        check("Auswahl: Wahl kommt durch",
+              w.pick_from_list("T", "t", "S", ["konsole"],
+                               w.DIALOG_TIMEOUT_SECONDS), (w.Answer.YES, "konsole"))
+
+        w.subprocess.run = attrappe(5)
+        check("Freitext: Zeitablauf wie Abbruch",
+              w.ask_text("T", "t", w.DIALOG_TIMEOUT_SECONDS), (w.Answer.NO, None))
+        check("Freitext: Zeitangabe uebergeben",
+              f"--timeout={w.DIALOG_TIMEOUT_SECONDS}" in gesehen["command"], True)
+
+        w.subprocess.run = attrappe(0, " urxvt \n")
+        check("Freitext: Eingabe kommt bereinigt",
+              w.ask_text("T", "t", w.DIALOG_TIMEOUT_SECONDS), (w.Answer.YES, "urxvt"))
+
+        # Ohne Angabe darf kein --timeout mitgehen: die Vorversuchs-Skripte
+        # rufen beide Funktionen ohne Zeitangabe auf.
+        w.subprocess.run = attrappe(1)
+        w.pick_from_list("T", "t", "S", ["konsole"])
+        check("Auswahl: ohne Angabe kein --timeout",
+              any(str(x).startswith("--timeout") for x in gesehen["command"]), False)
+    finally:
+        w.subprocess.run = original
+
+    # Und die Eskalationsstrecke muss die Zeitangabe auch wirklich mitgeben.
+    quelle = DAEMON.read_text(encoding="utf-8")
+    abschnitt = quelle[quelle.index("def detect_terminal"):quelle.index("def build_handover")]
+    check("detect_terminal gibt sie beim Auswahldialog mit",
+          "DIALOG_TIMEOUT_SECONDS" in abschnitt.split("pick_from_list")[1][:400], True)
+    check("detect_terminal gibt sie bei der Freitexteingabe mit",
+          "DIALOG_TIMEOUT_SECONDS" in abschnitt.split("ask_text")[1][:400], True)
+
+
 def check_dialog_timing(w: types.ModuleType) -> None:
     """The two waiting times, and that a failure uses the shorter one."""
     print("Wartezeiten (2.9 und die Fehler-Ausnahme aus 3.3):")
@@ -257,7 +329,9 @@ def check_transfer_temporaries(w: types.ModuleType, tmp_root: Path) -> None:
             ".syncthing.Notiz.sync-conflict-20260811-120000-DEV.txt.tmp",
             "~syncthing~Andere.sync-conflict-20260811-120000-DEV.txt.tmp"):
         (folder / name).write_text("x", encoding="utf-8")
-    found = [p.name for p in w.find_conflicts(folder)]
+    gefunden, probleme = w.find_conflicts(folder)
+    found = [p.name for p in gefunden]
+    check("vollständiger Suchlauf meldet kein Problem", probleme, [])
     check("nur die fertige Kopie gefunden", found,
           ["Notiz.sync-conflict-20260811-120000-DEV.txt"])
     for entry in folder.iterdir():
@@ -388,6 +462,297 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
     folder.rmdir()
 
 
+def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
+    """Nothing that fails may fail quietly (doku 2.6).
+
+    Four places had thrown their evidence away. Each of them is invisible when
+    wrong -- that is the whole reason they stayed broken: a watcher whose
+    reports vanish looks exactly like a watcher with nothing to report.
+    """
+    print("Verschluckte Fehler (2.6):")
+    original = w.subprocess.run
+
+    def capture(call, *args) -> str:
+        """Run *call* and return what it wrote to the journal."""
+        buffer = io.StringIO()
+        with contextlib.redirect_stderr(buffer):
+            call(*args)
+        return buffer.getvalue()
+
+    # --- Die Einordnung gilt für alle drei Fenster gleich ------------------
+    faelle = [
+        ("Zustimmung", 0, "", w.Answer.YES),
+        ("Abbruch", 1, "", w.Answer.NO),
+        ("Zeitablauf", 5, "", w.Answer.NO),
+        ("keine Anzeige", 1, "cannot open display: :99", w.Answer.FAILED),
+        ("sonstiger Fehler", 255, "boom", w.Answer.FAILED),
+    ]
+    for label, code, err, erwartet in faelle:
+        w.subprocess.run = (lambda *a, _c=code, _e=err, **k:
+                            types.SimpleNamespace(returncode=_c, stdout="x\n",
+                                                  stderr=_e))
+        try:
+            check(f"Auswahl: {label}",
+                  w.pick_from_list("T", "t", "S", ["konsole"])[0], erwartet)
+            check(f"Freitext: {label}", w.ask_text("T", "t")[0], erwartet)
+        finally:
+            w.subprocess.run = original
+
+    # Eine nicht-leere Fehlerausgabe geht ins Journal, egal wie eingeordnet.
+    w.subprocess.run = (lambda *a, **k: types.SimpleNamespace(
+        returncode=0, stdout="konsole\n", stderr="Gtk-WARNING: irgendwas"))
+    try:
+        geschrieben = capture(lambda: w.pick_from_list("T", "t", "S", ["k"]))
+    finally:
+        w.subprocess.run = original
+    check("Auswahl: Fehlerausgabe landet im Journal",
+          "Gtk-WARNING" in geschrieben, True)
+
+    def fehlt(*args, **kwargs):
+        raise FileNotFoundError("zenity")
+
+    w.subprocess.run = fehlt
+    try:
+        check("Auswahl ohne zenity: nicht gezeigt, nicht abgebrochen",
+              w.pick_from_list("T", "t", "S", ["k"])[0], w.Answer.FAILED)
+        check("Freitext ohne zenity: nicht gezeigt, nicht abgebrochen",
+              w.ask_text("T", "t")[0], w.Answer.FAILED)
+    finally:
+        w.subprocess.run = original
+
+    # --- notify-send: Rückgabewert auswerten, Text draußen lassen ----------
+    w.subprocess.run = (lambda *a, **k: types.SimpleNamespace(
+        returncode=1, stdout=b"", stderr=b"kein Benachrichtigungsdienst"))
+    try:
+        geschrieben = capture(w.notify, "Claude-Sync", "abgeglichen: 1 kB", 5)
+    finally:
+        w.subprocess.run = original
+    check("notify-send: Rückgabewert wird gemeldet",
+          "Rückgabewert 1" in geschrieben, True)
+    check("notify-send: Fehlertext wird gemeldet",
+          "Benachrichtigungsdienst" in geschrieben, True)
+    check("notify-send: Meldungstext bleibt draußen",
+          "abgeglichen" in geschrieben, False)
+
+    # --- maybe_notify: Programmierfehler melden UND stempeln ---------------
+    original_build = w.build_notice
+
+    def kaputt(*args, **kwargs):
+        raise KeyError("backlog")
+
+    zustand = w.WatchState()
+    w.build_notice = kaputt
+    try:
+        geschrieben = capture(w.maybe_notify, zustand, 0, tmp_root)
+    finally:
+        w.build_notice = original_build
+    check("Ausnahme in der Meldung wird gemeldet",
+          "Betriebsmeldung fehlgeschlagen" in geschrieben, True)
+    check("mit Rückverfolgung", "KeyError" in geschrieben, True)
+    # Ohne Stempel bliebe die Meldung fällig und die Zeile käme im Takt der
+    # Dateiereignisse -- genau die Flut, die 2.6 ausschliesst.
+    check("und trotzdem gestempelt", zustand.notice_last_shown is not None, True)
+
+    ruhig = w.WatchState()
+    w.build_notice = lambda *a, **k: None
+    try:
+        w.maybe_notify(ruhig, 0, tmp_root)
+    finally:
+        w.build_notice = original_build
+    check("auch ein reguläres Nichts stempelt",
+          ruhig.notice_last_shown is not None, True)
+
+    # --- Der Ausgang muss bis zur Wartezeit durchkommen -------------------
+    # Der Kern von Befund 3: Fällt die Anzeige erst NACH der ersten Frage aus,
+    # stand dialog_failed schon auf False -- die halbe Stunde griff statt der
+    # kurzen Wiederholung, und der Nutzer hatte nichts gesehen (doku 3.3).
+    original_detect = w.detect_terminal
+    original_dir = w.TOOL_DIR
+    w.set_tool_dir(tmp_root / "eskalation")
+    paar = w.ConflictPair(copy=tmp_root / "a.sync-conflict-x.txt",
+                          original=tmp_root / "a.txt", device="DEV")
+    try:
+        w.subprocess.run = (lambda *a, **k: types.SimpleNamespace(
+            returncode=0, stdout=b"", stderr=b""))          # erste Frage: ja
+        w.detect_terminal = lambda state: (w.Answer.FAILED, None)
+        zustand = w.WatchState()
+        capture(w.escalate, [paar], zustand, tmp_root)
+        check("Anzeigeausfall in der Strecke setzt dialog_failed",
+              zustand.dialog_failed, True)
+        check("und damit gilt die kurze Wiederholung",
+              zustand.dialog_due(), False)   # 5 Minuten noch nicht um
+    finally:
+        w.detect_terminal = original_detect
+        w.subprocess.run = original
+        w.set_tool_dir(original_dir)
+
+    # --- find_conflicts: nichts gesehen ist nicht nichts gefunden ---------
+    check("fehlender Ordner wird gemeldet",
+          bool(w.find_conflicts(tmp_root / "gibtsnicht")[1]), True)
+    sperr = tmp_root / "gesperrt"
+    (sperr / "innen").mkdir(parents=True, exist_ok=True)
+    os.chmod(sperr / "innen", 0o000)
+    try:
+        _, probleme = w.find_conflicts(sperr)
+        if os.geteuid() == 0:
+            print("  übersprungen unlesbarer Unterordner (als root lesbar)")
+        else:
+            check("unlesbarer Unterordner wird gemeldet", bool(probleme), True)
+    finally:
+        os.chmod(sperr / "innen", 0o700)
+
+
+def _dead_pid() -> int:
+    """A pid that certainly no longer exists, and is fully reaped.
+
+    Waited for on purpose: an abandoned child lingers as a zombie, and a zombie
+    is exactly the case the daemon must NOT read as dead by number alone -- it
+    would make this helper check something other than intended.
+    """
+    process = subprocess.Popen(["/bin/true"])
+    process.wait()
+    return process.pid
+
+
+def _leave_a_zombie() -> int:
+    """Start and abandon a child so it lingers unreaped, like the daemon's."""
+    def spawn() -> int:
+        process = subprocess.Popen(["/bin/true"], start_new_session=True)
+        return process.pid          # object dropped on purpose, as in the daemon
+    pid = spawn()
+    time.sleep(0.3)
+    return pid
+
+
+def check_lock(w: types.ModuleType, tmp_root: Path) -> None:
+    """The run lock belongs to its holder, not to a clock.
+
+    The trap: a pass legitimately outlives any short age limit, because its
+    dialogs stay open for fifteen minutes each and it holds the lock for the
+    whole stretch. The old limit called anything older a crashed predecessor,
+    so the next pass stole the lock mid-dialog, read the state from before the
+    dialog and put a second window next to it (doku 3.2).
+    """
+    print("Laufsperre:")
+    original_dir = w.TOOL_DIR
+    w.set_tool_dir(tmp_root / "sperre")
+    stranger = subprocess.Popen(["/bin/sleep", "30"])
+    ancient = (datetime.datetime.now() - datetime.timedelta(days=1)).timestamp()
+    try:
+        # A living holder keeps the lock however old the file is. The holder is
+        # deliberately somebody else's pid: with our own, the release below
+        # could not tell "mine" from "foreign" apart at all.
+        w.LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+        w.LOCK_FILE.write_text(f"pid {stranger.pid} 2000-01-01T00:00:00\n",
+                               encoding="utf-8")
+        os.utime(w.LOCK_FILE, (ancient, ancient))
+        check("lebender Halter behält sie", w.acquire_lock(), False)
+        check("fremde Sperre bleibt liegen",
+              (w.release_lock(), w.LOCK_FILE.exists())[1], True)
+
+        # A dead holder leaves a leftover, and that may go.
+        w.LOCK_FILE.write_text(f"pid {_dead_pid()} 2000-01-01T00:00:00\n",
+                               encoding="utf-8")
+        os.utime(w.LOCK_FILE, (ancient, ancient))
+        check("toter Halter gibt sie frei", w.acquire_lock(), True)
+        check("eigene Sperre wird entfernt",
+              (w.release_lock(), w.LOCK_FILE.exists())[1], False)
+
+        # Unreadable holder: the age limit is the fallback, not a free pass.
+        w.LOCK_FILE.write_text("ohne pid\n", encoding="utf-8")
+        check("ohne PID entscheidet das Alter: frisch belegt",
+              w.acquire_lock(), False)
+        os.utime(w.LOCK_FILE, (ancient, ancient))
+        check("ohne PID entscheidet das Alter: alt freigegeben",
+              w.acquire_lock(), True)
+        w.LOCK_FILE.unlink(missing_ok=True)
+    finally:
+        stranger.kill()
+        stranger.wait()
+        w.set_tool_dir(original_dir)
+
+
+def check_session_detection(w: types.ModuleType) -> None:
+    """A session counts as running only while it demonstrably is.
+
+    Two lies the bare existence question cannot see, both measured: a terminal
+    that ended without being collected lingers as a zombie and answers "yes",
+    and a recycled number answers for a stranger. Past the quiet time the pid
+    therefore has to prove itself by its start time -- which is what protects a
+    session lasting longer than half an hour, the case the quiet time cannot
+    cover (doku 3.1, step 3).
+    """
+    print("Sitzungserkennung:")
+    now = datetime.datetime.now()
+    long_ago = (now - datetime.timedelta(hours=3)).isoformat()
+    recent = (now - datetime.timedelta(minutes=5)).isoformat()
+
+    check("ohne Angaben nicht laufend", w.WatchState().session_running(), False)
+    check("in der Ruhezeit laufend, ohne PID",
+          w.WatchState(session_started=recent).session_running(), True)
+    check("in der Ruhezeit laufend, PID tot",
+          w.WatchState(session_pid=_dead_pid(),
+                       session_started=recent).session_running(), True)
+    check("nach der Ruhezeit ohne PID: beendet",
+          w.WatchState(session_started=long_ago).session_running(), False)
+    check("nach der Ruhezeit, PID tot: beendet",
+          w.WatchState(session_pid=_dead_pid(),
+                       session_started=long_ago).session_running(), False)
+    # The reuse case: this process is alive, but it started long before the
+    # session was recorded -- so the number does not belong to that session.
+    check("nach der Ruhezeit, fremder Prozess: beendet",
+          w.WatchState(session_pid=os.getpid(),
+                       session_started=long_ago).session_running(), False)
+    # The long session: alive, and started when we recorded it.
+    own_start = w.process_running_since(os.getpid())
+    check("Startzeit des eigenen Prozesses lesbar", own_start is not None, True)
+    if own_start is not None:
+        check("nach der Ruhezeit, passende Startzeit: laufend",
+              w.WatchState(session_pid=os.getpid(),
+                           session_started=own_start.isoformat()
+                           ).session_running(), True)
+    # A zombie answers os.kill with "exists"; the state letter gives it away.
+    check("Zombie gilt als beendet",
+          w.process_running_since(_leave_a_zombie()), None)
+
+
+def check_missing_notify_send(w: types.ModuleType) -> None:
+    """A missing notify-send is a fault report, never a substitute channel.
+
+    Both halves stay invisible when wrong, and both were wrong: for two days on
+    one machine the notice text went to the journal instead of the screen, which
+    reads like a working watcher while nobody ever saw a notice (doku 2.6, 3.8).
+    """
+    print("Fehlendes notify-send:")
+    original = w.subprocess.run
+
+    def absent(command, *args, **kwargs):
+        raise FileNotFoundError(command[0])
+
+    def run_notices(*bodies: str) -> str:
+        captured = io.StringIO()
+        w.subprocess.run = absent
+        w._notify_missing_reported = False
+        try:
+            with contextlib.redirect_stderr(captured):
+                for body in bodies:
+                    w.notify("Claude-Sync", body)
+        finally:
+            w.subprocess.run = original
+            w._notify_missing_reported = False
+        return captured.getvalue()
+
+    written = run_notices("abgeglichen: 1.1 kB hoch", "abgeglichen: 2.2 kB hoch")
+    check("Meldungsinhalt bleibt draußen", "abgeglichen" in written, False)
+    check("Störung genau einmal je Lauf", written.count("notify-send"), 1)
+    check("nennt das nachzuinstallierende Paket",
+          "libnotify-bin" in written, True)
+    # Once per run, not once for ever: a package removed later must show up
+    # again. That is why the marker is a module variable and not a state field.
+    check("nach Neustart wieder gemeldet",
+          run_notices("abgeglichen: 3.3 kB hoch").count("notify-send"), 1)
+
+
 def main() -> int:
     if not DAEMON.exists():
         print(f"Nicht gefunden: {DAEMON}", file=sys.stderr)
@@ -395,9 +760,14 @@ def main() -> int:
     w = load_daemon()
     check_dialog_answers(w)
     check_timeout_unit(w)
+    check_terminal_dialogs(w)
     check_dialog_timing(w)
     check_naming(w)
+    check_session_detection(w)
+    check_missing_notify_send(w)
     with tempfile.TemporaryDirectory(prefix="claude-sync-probe-") as tmp:
+        check_lock(w, Path(tmp))
+        check_swallowed_errors(w, Path(tmp))
         check_transfer_temporaries(w, Path(tmp))
         check_notice(w, Path(tmp))
     print()

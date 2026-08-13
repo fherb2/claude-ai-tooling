@@ -1,5 +1,13 @@
 # Implementierungsdokumentation Chats-Export
 
+**In Entwicklung — nicht zur Benutzung vorgesehen.** Diese Dokumentation beschreibt ein Vorhaben im Bau. Halbfertige, lückenhafte und noch nicht zusammengeführte Passagen sind in dieser Phase der Normalzustand und kein Mangel: Was hier steht, ist Arbeitsstand, nicht Zusage.
+
+**Widersprüche zur `README.md` sind ausdrücklich erlaubt** und werden nicht nachgeführt. Sie hält bewusst einen älteren Stand samt Warnhinweis für fremde Leser und wird erst am Ende dieser Phase neu geschrieben (aus 1.1, 1.2 und 1.5). Widersprüche **innerhalb dieser Doku** und zwischen **Doku und Code** sind dagegen Defekte: Sie werden benannt und bekommen einen Fahrplanpunkt, keine Ausnahme.
+
+**Die Phase endet**, wenn zwei Dinge vorliegen — ein bestandener mehrstufiger Test an einem eigens dafür gebauten Testprojekt (aktives Weiterschreiben eines Chats zwischen zwei Läufen, Sitzungsübergabe, Fortsetzung eines früheren Chats) und ein erster Durchlauf in ein echtes Zielprojekt einschließlich Rückweg des Protokolls und wirksamer Projektanweisung. Dann fällt dieser Hinweis, und mit ihm der Warnhinweis der README.
+
+---
+
 Vier Teile. **Teil 1** beschreibt, was gebaut wird, wie es zusammenwirkt und wie es benutzt wird. **Teil 2** hält die Vorgaben, die quer über alle Werkzeuge gelten. **Teil 3** hält je Skript die Festlegungen, die dort umgesetzt werden, samt dem Kontext, der dafür erarbeitet wurde. **Teil 4** ist die Prüfliste gegenüber der laufenden Anthropic-Entwicklung. Teil 1 verweist für Details nach 2 und 3 und wiederholt sie nicht.
 
 Die **Beleglage** wird durchgehend ausgewiesen; die drei Stufen und ihre Regeln sind Vorgabe 2.1.
@@ -12,7 +20,9 @@ Die **Beleglage** wird durchgehend ausgewiesen; die drei Stufen und ihre Regeln 
 
 Chats aus claude.ai-Projekten sollen **im Zusammenhang ihres Projekts durchsuchbar** sein — nicht fortführbar. Sie dienen dazu, früher besprochenen Kontext wiederzufinden.
 
-Es ist ein **wiederkehrender Abgleich**, keine einmalige Migration: neue Chats kommen laufend hinzu, vorhandene können weitergelaufen sein.
+Beides ist vorgesehen: der **einmalige Umzug** und das **wiederholte Nachreichen**. Ausgelegt wird auf den zweiten Fall, weil er die härtere Anforderung stellt — neue Chats kommen laufend hinzu, vorhandene können weitergelaufen sein.
+
+Warum Nachreichen der Dauerbetrieb ist und nicht die Ausnahme, liegt an der Rollenteilung der Umgebungen: claude.ai und Claude Desktop sind die Orte für allgemeines Bearbeiten, Recherchieren und Durchdenken; Claude Code ist der Ort des eigentlichen Code-Building-Prozesses, und seine Sitzungen sind an einen dedizierten Rechner gebunden. Wer aus Gründen, die nur er selbst kennt, auf claude.ai weiterchattet, will dieselben Chats trotzdem im Quellcodeprojekt auswertbar haben.
 
 Je Chat entstehen bis zu drei Dateien — Gespräch, Denkschritte, Anhänge (Vorgabe 2.2) —, und daneben gibt es **genau eine** weitere: das Protokoll (1.4). Mehr Zustand gibt es nicht.
 
@@ -36,13 +46,21 @@ Daraus die Empfehlung: **wer warten kann, nimmt den Export** — auch beim Forts
 
 **Verbindlich** ist die Wegegleichheit der beiden Wege — Wortlaut, erlaubte Abweichungen und ihr Wächter stehen als Vorgabe 2.5. Warum sie nicht zur Laufzeit erzwingbar ist, sagt Vorgabe 2.9.
 
-## 1.3 Zielorte
+## 1.3 Richtungen und Zielorte
+
+**Zwei Richtungen, dasselbe Werkzeug.** Entwickelt wird gegen **claude.ai → Claude Code**; Ziel ist dort das versionierte Repo des Zielprojekts. Die zweite Richtung ist **claude.ai → claude.ai** — ein anderes Projekt, gegebenenfalls unter einem anderen Konto. Dort kann nur das Projektwissen Ziel sein, was unproblematisch ist: Dieselbe Dateistruktur trägt die Durchsuchbarkeit auch da. Entscheidend ist, dass das **kein anderes Werkzeug** ist. Es sind dieselben Dateien aus demselben Lauf; verschieden ist allein, wohin sie gelegt werden. Vorgabe 2.10 setzt das voraus („keine zielabhängige Ausgabeform"), hier steht der Grund.
 
 Primär das Git-Repo eines Claude-Code-Projekts, dort `<projekt>/.claude/imported_chats/`. Die Dateien sind über `Read`/`Grep` erreichbar: kein Projektwissen, kein RAG, kein undokumentierter Schwellwert, kein Kontextverbrauch, bis wirklich gelesen wird.
 
 Sekundär das Projektwissen einer claude.ai-/Desktop-/Cowork-Instanz — mit denselben Dateien, ohne zweite Ausgabeform; die Regeln dazu (ein flaches Verzeichnis je Quellprojekt, dieselben Dateien für beide Ziele) sind Vorgabe 2.10. JSON ist ein belegter Upload-Typ, und Projektdateien werden per Textextraktion verarbeitet.
 
-**Nicht** nach `~/.claude/projects/…`, aus drei Gründen: dort wird nach `cleanupPeriodDays` (Standard **30 Tage**) automatisch gelöscht — *„Files in the paths below are deleted on startup once they're older than"* (belegt, [claude-directory](https://code.claude.com/docs/en/claude-directory)); der Ort ist nicht versioniert und *„not shared across machines"*, während `<projekt>/.claude/` gerade deshalb versioniert wird; und §1.2 der Arbeitsanweisungen behält `~/.claude/` der Engine vor. Die dortige Ordnernamensstruktur bleibt als Zuordnungshilfe nützlich.
+**Als dritter Zielort** kommt `~/.claude/projects/<projekt>/` in Frage — für Chats, die gerade **nicht** ins geteilte Repo sollen, weil Fremde sie nicht mitlesen dürfen. Sie liegen dann als nebenher geführtes zweites Chat-Projekt neben den Sitzungen, auf die Claude Code ohnehin zugreift, und werden dorthin regelmäßig nachgereicht. Drei Bedingungen gehören untrennbar dazu:
+
+- **Die Aufbewahrungsdauer muss vorher hochgesetzt werden.** Dort wird nach `cleanupPeriodDays` aufgeräumt — *„The default is 30 days and the minimum is 1; setting `0` fails with a validation error"* (belegt, [claude-directory](https://code.claude.com/docs/en/claude-directory)); eine Obergrenze oder ein „aus" ist nicht dokumentiert. Das ist kein Ausschlussgrund, denn dieselbe Frist trifft ohnehin jede Claude-Code-Sitzung desselben Projekts — es ist eine **Nutzerpflicht**, die in die Anwenderdokumentation gehört. Namentlich aufgeräumt werden `projects/<p>/<sitzung>.jsonl` sowie `subagents/` und `tool-results/` je Sitzung; ob die Aufräumung auch **fremde** Dateien in diesem Ordner anfasst, sagt die Dokumentation nicht und bleibt Prüfpunkt (Kapitel 4).
+- **`claude project purge` löscht unabhängig von jeder Frist**: *„Transcripts and auto memory under `projects/`"* für ein Projekt (belegt, ebd.). Wer das Kommando benutzt, nimmt ein dort liegendes Archiv mit.
+- **§1.2 der Arbeitsanweisungen behält `~/.claude/` der Engine vor.** Ein Lauf, der dorthin schreibt, ist deshalb eine vom Nutzer ausdrücklich angeordnete Ausnahme und nie der Normalfall (Vorgabe 2.10).
+
+Dass der Ort nicht versioniert und *„not shared across machines"* ist, spricht hier ausnahmsweise nicht dagegen, sondern dafür — genau das ist der Zweck, während `<projekt>/.claude/` umgekehrt gerade wegen der Versionierung Primärziel ist. Die dortige Ordnernamensstruktur bleibt als Zuordnungshilfe nützlich.
 
 ## 1.4 Das Protokoll
 
@@ -126,7 +144,7 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 | Kontextfenster Opus 5 / Sonnet 5: 1 Mio Token auf bezahlten Plänen                                                                                                                         | belegt ([8606394](https://support.claude.com/en/articles/8606394-how-large-is-the-context-window-on-paid-claude-plans)) |
 | Ein langes Gespräch bricht nicht ab, sondern**fasst frühere Teile zusammen**                                                                                                              | belegt (ebd.)                                                                                                           |
 | Opus 4.7 und spätere Opus-Modelle erhalten**keine** Token-Budget-Tags                                                                                                                      | belegt ([Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows))                       |
-| Claude-Code-Transkripte:`~/.claude/projects/<p>/<id>.jsonl`, Format *„internal … changes between versions"*, Aufräumung nach 30 Tagen, **kein Import**                                   | belegt ([sessions](https://code.claude.com/docs/en/sessions))                                                           |
+| Claude-Code-Transkripte:`~/.claude/projects/<p>/<id>.jsonl`, Format *„internal … changes between versions"*, Aufräumung nach `cleanupPeriodDays` (Standard 30, Minimum 1, einstellbar), **kein Import**                                   | belegt ([sessions](https://code.claude.com/docs/en/sessions))                                                           |
 
 Formatnahe Fakten stehen bei dem Skript, das sie verarbeitet: Aufbau des Export-ZIP in 3.1.1, `read_conversation`-Envelope in 3.2.1, Suchschnipsel in 3.4. Was quer über alle Werkzeuge gilt, steht als Vorgabe in Kapitel 2; die Prüfliste gegen Anthropic-Änderungen ist Kapitel 4.
 
@@ -158,6 +176,7 @@ Damit sie nicht erneut abgeleitet werden:
 | Eine Erstmigration brauche einen Vollexport | Der Zeitraumfilter wirkt nicht auf `projects/`: ein Ein-Wochen-Export liefert jedes Projekt mit `created_at` und damit die exakte Fenstergrenze (3.1.1). |
 | Der Projektbeginn sei nur im Chat selbst zu erfahren | Weder `recent_chats` noch `read_conversation` liefern ein `created_at`, und keine öffentliche API kennt claude.ai-Projekte — außer der Compliance-API für Enterprise (4.5). Das Datum steht im Export. |
 | Der Lese-Weg sei dem Export gleichwertig | Er sieht **weder Denkschritte noch Anhänge** (3.2.1) — zusammen etwa so viel wie der Gesprächstext. Nachträglich ergänzen geht nicht, nur ersetzen. |
+| `~/.claude/projects/…` scheide als Zielort aus | Die Aufbewahrungsdauer ist einstellbar (`cleanupPeriodDays`) und trifft ohnehin jede Sitzung desselben Projekts. Für Chats, die niemand mitlesen soll, ist der Ort damit sogar der bequemste — unter den drei Bedingungen aus 1.3. |
 
 ---
 
@@ -167,7 +186,7 @@ Festlegungen, die quer über alle Werkzeuge dieses Ordners gelten. Aufnahmetest:
 
 ## 2.1 Beleglage
 
-Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind zwölf Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
+Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind dreizehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
 
 ## 2.2 Dateiformat der Chatdateien
 
@@ -286,7 +305,7 @@ Dieselbe Zusage gilt für `chat_export_convert.py` und `inspect_export.py`, obwo
 
 ## 2.10 Zielorte
 
-Primärziel ist `<projekt>/.claude/imported_chats/` im versionierten Repo des Zielprojekts. **Dieselben Dateien** dienen unverändert auch dem Projektwissen einer claude.ai-/Desktop-/Cowork-Instanz; es gibt keine zielabhängige Ausgabeform. Ein Verzeichnis je Quellprojekt, **flach** — Projektwissen kennt keine Unterordner. Niemals nach `~/.claude/projects/…` schreiben; die Gründe stehen in 1.3.
+Primärziel ist `<projekt>/.claude/imported_chats/` im versionierten Repo des Zielprojekts. **Dieselben Dateien** dienen unverändert auch dem Projektwissen einer claude.ai-/Desktop-/Cowork-Instanz; es gibt keine zielabhängige Ausgabeform. Ein Verzeichnis je Quellprojekt, **flach** — Projektwissen kennt keine Unterordner. Ein **dritter** Zielort ist `~/.claude/projects/<projekt>/`, für Chats, die nicht ins geteilte Repo dürfen — aber nur auf ausdrückliche Anordnung des Nutzers und nur unter den drei Bedingungen aus 1.3 (hochgesetzte Aufbewahrungsdauer, bewusst erteilte Ausnahme von §1.2 der Arbeitsanweisungen, Kenntnis von `claude project purge`). Ohne diese Anordnung schreibt kein Lauf dorthin.
 
 ## 2.11 Tests ohne echten Chatinhalt
 
@@ -431,7 +450,7 @@ Dazu ein fertig einfügbarer Textblock für die **Projektanweisungen**: dass ein
 
 ### 3.1.8 Offen
 
-- Ob die Projektzuordnung in die Datei gehört oder nur in den Verzeichnisbaum.
+- **Gehört die Projektzuordnung in die Chatdatei oder nur in den Verzeichnisbaum?** Offene Entwurfsfrage, aus dem Vorhandenen nicht entscheidbar: Sie braucht den Kontext eines echten Ablaufs. Sinnvoll am mehrstufigen Test zu klären, der beide Varianten praktisch vorführt.
 
 ## 3.2 `chat_read_store.py` — der Weg über `read_conversation`
 
@@ -525,6 +544,8 @@ Erhaltenswerte Einzelbefunde: Suchtreffer tragen `H: `/`A: `-Label und HTML-Enti
 
 Ob das Skript bleibt, ist zu entscheiden, sobald sich 3.1 und 3.2 bewährt haben.
 
+**Offen und derzeit nicht beurteilbar** ist, in welchem Verhältnis es zum übrigen Bestand steht: ob es Rückfallweg für Umgebungen ohne `read_conversation` bleibt, nur noch Ersatzteillager an Befunden ist oder ersatzlos entfällt. Die Entscheidung braucht Kontext, den wir noch nicht haben; bis dahin bleibt es unangetastet (Fahrplan 10).
+
 
 ---
 
@@ -563,7 +584,7 @@ Vorhandene Bausteine, auf denen das aufsetzen kann: `inspect_export.py` (3.3) al
 - Projektwissen: Textextraktion; RAG schaltet ab undokumentierter Schwelle automatisch (Community: Dateianzahl); Projektdateien im Container *„while remaining in context"* — Containerzugriff spart keinen Kontext (1.6).
 - Chat-Upload: 20 Dateien je Chat, JSON belegt zulässig — trägt die Übergabe der Protokolldatei (1.4/1.5).
 - Container-Netzzugang nur gegen Allowlist, `claude.ai` steht nicht darauf — ein Skript im Container kann den Export-Link nicht laden (1.7).
-- Claude-Code-Seite: `~/.claude/projects/…` wird nach `cleanupPeriodDays` (Standard 30 Tage) aufgeräumt — deshalb Vorgabe 2.10.
+- Claude-Code-Seite: `~/.claude/projects/…` wird nach `cleanupPeriodDays` aufgeräumt — Standard 30 Tage, Minimum 1, `0` ist ein Validierungsfehler, eine Obergrenze ist nicht dokumentiert (belegt). Namentlich betroffen sind `<sitzung>.jsonl` sowie `subagents/` und `tool-results/` je Sitzung; **ob fremde Dateien in diesem Ordner mit weggeräumt werden, sagt die Dokumentation nicht** — offener Prüfpunkt. Zweiter Löschweg: `claude project purge` entfernt *„Transcripts and auto memory under `projects/`"* für ein Projekt, unabhängig von der Frist. Beides trägt die Bedingungen des dritten Zielorts (1.3, Vorgabe 2.10).
 - Cowork: eigene ID-Welt, über beide Wege unerreichbar (1.6) — Entwicklung beobachten, Anthropic könnte hier den Umzugsweg schaffen, der dieses Werkzeug ablöst.
 ## 4.5 Compliance-API — der Weg, der dieses Werkzeug ablösen würde
 

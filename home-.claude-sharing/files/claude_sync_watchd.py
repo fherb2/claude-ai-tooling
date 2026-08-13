@@ -56,6 +56,7 @@ import shutil
 import subprocess
 import sys
 import time
+import traceback
 from pathlib import Path
 from typing import Any, Optional
 
@@ -135,6 +136,14 @@ DIALOG_TIMEOUT_SECONDS = 900
 # the toolkit message is not a guaranteed interface.
 DISPLAY_FAILURE_MARKERS = ("open display", "cannot open display", "no display")
 SESSION_QUIET_TIME = datetime.timedelta(minutes=30)
+
+# How far a process's start time may differ from the session start we recorded
+# and still count as the same process. Generous on purpose: the two clocks are
+# coarse (boot time to the second, process start to a hundredth), and the point
+# is not precision but telling our terminal from a stranger who got its number
+# minutes or hours later (doku 3.1, step 3).
+PID_START_TOLERANCE = datetime.timedelta(seconds=60)
+
 NOTICE_INTERVAL = datetime.timedelta(hours=1)
 
 # How long the hourly notice stays on screen. Good news may be brief -- it is
@@ -145,7 +154,14 @@ NOTICE_INTERVAL = datetime.timedelta(hours=1)
 NOTICE_SECONDS_QUIET = 5
 NOTICE_SECONDS_ATTENTION = 12
 SAFETY_SCAN_INTERVAL = datetime.timedelta(minutes=15)
-LOCK_STALE_AFTER = datetime.timedelta(minutes=5)
+
+# Fallback only, for a lock whose holder cannot be read. The holder's pid
+# decides (doku 3.2) -- a live holder keeps the lock however old it is. That
+# matters because a pass legitimately outlives any short limit: its dialogs
+# close themselves after fifteen minutes each, and the run lock is held for the
+# whole stretch. The old five-minute limit called anything older "a crashed
+# predecessor" and let the next pass steal the lock mid-dialog.
+LOCK_STALE_AFTER = datetime.timedelta(minutes=60)
 
 CLAUDE_BINARY = "/usr/bin/claude"
 
@@ -190,6 +206,12 @@ def _require_linux(what: str) -> None:
         )
 
 
+# Reported once per service run, not once per notice. The marker's purpose is
+# "not hourly" (doku 2.6), not "never again": one line per run keeps the defect
+# findable if the package is removed later, and needs no state field.
+_notify_missing_reported = False
+
+
 def notify(summary: str, body: str,
            seconds: int = NOTICE_SECONDS_QUIET) -> None:
     """Show a passive desktop notification. Never raises (doku 1.8).
@@ -197,16 +219,39 @@ def notify(summary: str, body: str,
     *seconds* is a request, not a guarantee: honouring `-t` is the
     notification daemon's decision (doku 1.8).
     """
+    global _notify_missing_reported
     if DRY_RUN:
         print(f"[dry-run] notify ({seconds}s): {summary} -- {body}")
         return
     _require_linux("Desktop notification")
     try:
-        subprocess.run(["notify-send", "-t", str(seconds * 1000),
-                        summary, body], capture_output=True, check=False)
+        result = subprocess.run(["notify-send", "-t", str(seconds * 1000),
+                                 summary, body], capture_output=True,
+                                check=False)
+        if result.returncode != 0:
+            # Present but unsuccessful: no notification daemon on the bus, no
+            # DBUS_SESSION_BUS_ADDRESS, a timeout. Without this line the hourly
+            # proof that the watcher lives could fail without a trace, and the
+            # user would read the silence as a dead service (doku 2.6).
+            # Deliberately WITHOUT the notice text: hourly it would be the
+            # chatter 2.6 rules out, and in the journal it would quietly become
+            # a third channel where 2.6 promises exactly two.
+            detail = (result.stderr or b"").decode("utf-8", "replace").strip()
+            print(f"'notify-send' endete mit Rückgabewert "
+                  f"{result.returncode}: {detail or 'ohne Meldung'}",
+                  file=sys.stderr, flush=True)
     except FileNotFoundError:
-        # A missing notify-send must not break conflict detection.
-        print(f"{summary}: {body}", file=sys.stderr)
+        # A missing notify-send must not break conflict detection (doku 1.8).
+        # The notice text itself does NOT go to the journal: hourly it would be
+        # the chatter doku 2.6 rules out, and it would quietly become a third
+        # channel where 2.6 promises exactly two. Reported once per run instead.
+        if not _notify_missing_reported:
+            _notify_missing_reported = True
+            print("'notify-send' fehlt — die stündliche Betriebsmeldung kann "
+                  "nicht am Bildschirm erscheinen. Bitte 'libnotify-bin' "
+                  "installieren: sudo apt install libnotify-bin. "
+                  "Konflikterkennung und Eskalation sind unberührt.",
+                  file=sys.stderr, flush=True)
 
 
 class Answer(enum.Enum):
@@ -252,9 +297,29 @@ def ask_question(title: str, text: str, ok_label: str, cancel_label: str,
         print("Dialog nicht möglich: 'zenity' ist nicht installiert.",
               file=sys.stderr, flush=True)
         return Answer.FAILED
+    return zenity_outcome(result)
 
-    detail = (result.stderr or b"").decode("utf-8", "replace").strip()
+
+def zenity_outcome(result: subprocess.CompletedProcess,
+                   expects_answer: bool = True) -> Answer:
+    """Classify a finished zenity call and journal whatever it said.
+
+    Kept in ONE place on purpose. The rule below used to live inside the
+    question dialog alone, and the other two windows of the escalation chain
+    drifted away from it: they read every non-zero return code as "cancelled"
+    and threw the error output away, so a display that broke mid-chain looked
+    exactly like a user postponing (doku 3.3).
+
+    *expects_answer* is False for a window that only informs. Its self-closing
+    is then the normal course and not worth a line.
+    """
+    stderr = result.stderr or b""
+    if isinstance(stderr, bytes):
+        stderr = stderr.decode("utf-8", "replace")
+    detail = stderr.strip()
     if detail:
+        # Unconditionally, whatever the classification below decides: a case
+        # this misjudges is then at least visible instead of silent (doku 3.3).
         print(f"zenity meldete (Rückgabewert {result.returncode}): {detail}",
               file=sys.stderr, flush=True)
 
@@ -263,7 +328,8 @@ def ask_question(title: str, text: str, ok_label: str, cancel_label: str,
     if result.returncode == 5:
         # Closed itself unanswered: nobody is sitting there. Treated like a
         # deferral, not like a defect -- the regular waiting time applies.
-        print("Dialog lief ohne Antwort ab.", file=sys.stderr, flush=True)
+        if expects_answer:
+            print("Dialog lief ohne Antwort ab.", file=sys.stderr, flush=True)
         return Answer.NO
 
     lowered = detail.lower()
@@ -275,33 +341,88 @@ def ask_question(title: str, text: str, ok_label: str, cancel_label: str,
     return Answer.NO
 
 
-def pick_from_list(title: str, text: str, column: str,
-                   options: list[str]) -> Optional[str]:
-    """Let the user pick one option. None means cancelled.
+def show_message(title: str, text: str,
+                 timeout_seconds: Optional[int] = DIALOG_TIMEOUT_SECONDS) -> None:
+    """Tell the user something that needs doing. No answer is evaluated.
+
+    A window rather than a desktop notification, because 2.9 draws the line not
+    at the tool but at the question "is a reaction needed" -- and here one is.
+    Failure to show it is not silent: every non-empty stderr reaches the journal,
+    as with every other dialog (doku 3.3).
+    """
+    _require_linux("Message dialog")
+    command = ["zenity", "--error", f"--title={title}", f"--text={text}"]
+    if timeout_seconds is not None:
+        command.append(f"--timeout={timeout_seconds}")
+    try:
+        result = subprocess.run(command, capture_output=True, check=False)
+    except FileNotFoundError:
+        print("Meldung nicht möglich: 'zenity' ist nicht installiert.",
+              file=sys.stderr, flush=True)
+        return
+    zenity_outcome(result, expects_answer=False)
+
+
+def pick_from_list(title: str, text: str, column: str, options: list[str],
+                   timeout_seconds: Optional[int] = None
+                   ) -> tuple[Answer, Optional[str]]:
+    """Let the user pick one option. Returns the outcome and the choice.
 
     Proven behaviour (doku 3.8, tests/test_zenity_list.py): the choice comes
     back as plain text with a trailing newline; cancelling yields empty
     output and return code one.
+
+    The outcome is returned alongside the value, not folded into "None",
+    because the caller has to tell a cancelling user from a display that
+    cannot be reached: only the second one keeps the short retry interval
+    instead of the half hour (doku 3.3).
+
+    The timeout matters as much here as for the question dialog: this runs
+    inside a pass, so an unanswered window would hold the run lock -- and a
+    held lock makes the watcher deaf to everything else (doku 3.3).
     """
     _require_linux("Selection dialog")
-    result = subprocess.run(
-        ["zenity", "--list", f"--title={title}", f"--text={text}",
-         f"--column={column}", *options],
-        capture_output=True, text=True, check=False)
-    if result.returncode != 0:
-        return None
-    return result.stdout.strip() or None
+    command = ["zenity", "--list", f"--title={title}", f"--text={text}",
+               f"--column={column}", *options]
+    if timeout_seconds is not None:
+        command.append(f"--timeout={timeout_seconds}")
+    try:
+        result = subprocess.run(command, capture_output=True, text=True,
+                                check=False)
+    except FileNotFoundError:
+        print("Auswahl nicht möglich: 'zenity' ist nicht installiert.",
+              file=sys.stderr, flush=True)
+        return Answer.FAILED, None
+    outcome = zenity_outcome(result)
+    if outcome is not Answer.YES:
+        return outcome, None
+    return outcome, (result.stdout.strip() or None)
 
 
-def ask_text(title: str, text: str) -> Optional[str]:
-    """Ask for free text. None means cancelled or empty."""
+def ask_text(title: str, text: str,
+             timeout_seconds: Optional[int] = None
+             ) -> tuple[Answer, Optional[str]]:
+    """Ask for free text. Returns the outcome and the entered text.
+
+    Same reasoning as for the selection dialog: the outcome is separate from
+    the value, and a timeout counts as a deferral because the pass holds the
+    run lock while this window waits (doku 3.3).
+    """
     _require_linux("Text entry dialog")
-    result = subprocess.run(
-        ["zenity", "--entry", f"--title={title}", f"--text={text}"],
-        capture_output=True, text=True, check=False)
-    if result.returncode != 0:
-        return None
-    return result.stdout.strip() or None
+    command = ["zenity", "--entry", f"--title={title}", f"--text={text}"]
+    if timeout_seconds is not None:
+        command.append(f"--timeout={timeout_seconds}")
+    try:
+        result = subprocess.run(command, capture_output=True, text=True,
+                                check=False)
+    except FileNotFoundError:
+        print("Eingabe nicht möglich: 'zenity' ist nicht installiert.",
+              file=sys.stderr, flush=True)
+        return Answer.FAILED, None
+    outcome = zenity_outcome(result)
+    if outcome is not Answer.YES:
+        return outcome, None
+    return outcome, (result.stdout.strip() or None)
 
 
 def child_environment() -> dict[str, str]:
@@ -333,12 +454,86 @@ def child_environment() -> dict[str, str]:
     return environment
 
 
+# The terminal stays a child of this process, so somebody has to collect its
+# exit status -- otherwise it lingers in the process table as a zombie. Keeping
+# the object is the whole mechanism: dropping it left the reaping to CPython's
+# housekeeping on the next Popen call anywhere in the daemon, which made it
+# depend on unrelated activity. Only one session runs at a time, and every pass
+# is serialised by the run lock, so a single slot needs no locking of its own.
+_session_process: Optional[subprocess.Popen] = None
+
+
 def spawn_detached(argv: list[str], cwd: Path) -> Optional[int]:
     """Start a process decoupled from this one; return its pid."""
+    global _session_process
     _require_linux("Terminal launch")
     process = subprocess.Popen(argv, cwd=str(cwd), start_new_session=True,
                                env=child_environment())
+    _session_process = process
     return process.pid
+
+
+def reap_finished_session() -> None:
+    """Collect the terminal's exit status once it has ended (doku 3.1, step 3).
+
+    Hygiene, not a fix: a zombie is recognised as such by its process state
+    anyway. This keeps the process table clean and makes the collection happen
+    at a defined moment instead of as a side effect of the next subprocess call.
+    """
+    global _session_process
+    if _session_process is not None and _session_process.poll() is not None:
+        _session_process = None
+
+
+def process_running_since(pid: int) -> Optional[datetime.datetime]:
+    """When *pid* started, or None if it is not a running process any more.
+
+    Exists because "does this pid exist" is the wrong question for deciding
+    whether our conflict session is still open (doku 3.1, step 3). It answers
+    yes in two cases where the session is over, and neither is visible to
+    ``os.kill(pid, 0)``:
+
+    * The terminal ended but nobody collected its status -- it lingers as a
+      zombie, and signal zero reaches it.
+    * The number was recycled and now belongs to a stranger. Linux hands pids
+      out cyclically, so this is a matter of uptime, not of luck.
+
+    None means the same thing in every case it can occur -- gone, zombie, or
+    ``/proc`` unreadable because the number belongs to another user, which
+    equally means it is not our session. The start time lets the caller tell
+    our own terminal from a stranger holding its old number.
+
+    Linux-specific and therefore in this section (doku 2.4): it reads the
+    process state and start time from ``/proc/<pid>/stat``. Windows gets its
+    own implementation here when 3.7 is built.
+    """
+    _require_linux("Process start time")
+    try:
+        raw = Path(f"/proc/{pid}/stat").read_text(encoding="utf-8")
+        # The second field is the executable name in brackets and may itself
+        # contain spaces and brackets, so fields are counted from the LAST
+        # closing bracket -- splitting the whole line would miscount.
+        fields = raw[raw.rindex(")") + 2:].split()
+        if fields[0] == "Z":
+            return None
+        ticks = int(fields[19])
+    except (OSError, ValueError, IndexError):
+        return None
+    boot = _boot_time()
+    if boot is None:
+        return None
+    return boot + datetime.timedelta(seconds=ticks / os.sysconf("SC_CLK_TCK"))
+
+
+def _boot_time() -> Optional[datetime.datetime]:
+    """Wall-clock time the system booted, from ``/proc/stat`` (doku 2.4)."""
+    try:
+        for line in Path("/proc/stat").read_text(encoding="utf-8").splitlines():
+            if line.startswith("btime "):
+                return datetime.datetime.fromtimestamp(int(line.split()[1]))
+    except (OSError, ValueError, IndexError):
+        return None
+    return None
 
 
 def process_alive(pid: int) -> bool:
@@ -385,6 +580,11 @@ class WatchState:
     session_started: Optional[str] = None
     # True when the last attempt could not be shown at all (doku 3.3).
     dialog_failed: bool = False
+    # True while the last search could not cover the whole directory (doku
+    # 3.1, step 1). Kept in the state only to report the CHANGE: a line per
+    # pass would arrive at the pace of file events, and the situation persists
+    # until someone fixes the permissions or the mount.
+    scan_incomplete: bool = False
     # Last time at least one device was connected -- the reference point for
     # "no connection since ..." in the notice (doku 1.8). Absent in state
     # files written by older versions, which stay readable.
@@ -420,11 +620,26 @@ class WatchState:
         does not, the daemon behaves as if there were none -- a dialog may
         return earlier, but the escalation is never lost.
         """
-        if self.session_pid is not None and process_alive(self.session_pid):
+        if self.session_started is None:
+            return False
+        if _age(self.session_started) < SESSION_QUIET_TIME:
             return True
-        if self.session_started is not None:
-            return _age(self.session_started) < SESSION_QUIET_TIME
-        return False
+        if self.session_pid is None:
+            return False
+        # Past the quiet time only the pid can still speak for the session, and
+        # only if it is demonstrably the process we started: same number AND a
+        # start time matching what we recorded. That is what protects a session
+        # lasting longer than half an hour -- the case the quiet time cannot
+        # cover -- while a zombie, a recycled number or a stranger's process all
+        # answer "not running" (doku 3.1, step 3).
+        started = process_running_since(self.session_pid)
+        if started is None:
+            return False
+        try:
+            recorded = datetime.datetime.fromisoformat(self.session_started)
+        except (ValueError, TypeError):
+            return False
+        return abs(started - recorded) <= PID_START_TOLERANCE
 
 
 def _now() -> str:
@@ -487,10 +702,17 @@ def acquire_lock() -> bool:
             except FileNotFoundError:
                 # Released between the failed create and the stat: try again.
                 continue
-            if age < LOCK_STALE_AFTER:
+            holder = lock_holder()
+            if holder is not None and process_alive(holder):
+                return False
+            if holder is None and age < LOCK_STALE_AFTER:
                 return False
             if attempt == 1:
-                # Older than any real pass could be: a crashed predecessor.
+                whose = (f"von PID {holder}" if holder is not None
+                         else "ohne lesbare PID")
+                print(f"Laufsperre {whose} war ein Überrest (Alter "
+                      f"{int(age.total_seconds())} s) und wurde entfernt.",
+                      file=sys.stderr, flush=True)
                 LOCK_FILE.unlink(missing_ok=True)
                 continue
             return False
@@ -501,8 +723,36 @@ def acquire_lock() -> bool:
     return False
 
 
+def lock_holder() -> Optional[int]:
+    """The pid recorded in the lock file, or None if it cannot be read.
+
+    None is the honest answer for "unreadable", not a guess: the caller then
+    falls back to the age limit instead of treating the lock as free.
+    """
+    try:
+        first = LOCK_FILE.read_text(encoding="utf-8").split()
+    except OSError:
+        return None
+    if len(first) >= 2 and first[0] == "pid":
+        try:
+            return int(first[1])
+        except ValueError:
+            return None
+    return None
+
+
 def release_lock() -> None:
-    """Drop the pass lock."""
+    """Drop the pass lock -- but only our own.
+
+    Releasing indiscriminately turns one overlap into a cascade: the finishing
+    pass deletes the lock of the pass that overtook it, and a third one walks
+    straight in (doku 3.2).
+    """
+    holder = lock_holder()
+    if holder is not None and holder != os.getpid():
+        print(f"Laufsperre gehört PID {holder}, nicht diesem Durchgang — "
+              "nicht entfernt.", file=sys.stderr, flush=True)
+        return
     LOCK_FILE.unlink(missing_ok=True)
 
 
@@ -528,24 +778,38 @@ class ConflictPair:
         return f"{self.original.name}{marked}"
 
 
-def find_conflicts(watch_dir: Path) -> list[Path]:
+def find_conflicts(watch_dir: Path) -> tuple[list[Path], list[str]]:
     """Search the watched directory for conflict copies.
 
+    Returns the findings **and** whatever kept the search from being complete.
+    That second list is the whole point: "found nothing" and "could not look"
+    used to be the same empty answer, and the second one is the worst outcome
+    for a tool that exists only to escalate -- it reports calm for ever while
+    seeing nothing, and calm is the normal state (doku 3.1 step 1, 1.5, F7).
+    Two ways it happens: the watched directory is gone or unreadable (moved,
+    a mount point away, permissions changed), and a subdirectory that
+    ``os.walk`` silently skips because it cannot be entered.
+
     Keys on the fixed literal only -- date, time and device format are not
-    guaranteed (doku 3.1, step 1). Skips archived versions, Syncthing's own
-    directory, and files still being received: a copy in transit carries the
-    marker inside a temporary name and would otherwise be reported as a pair
-    whose original never existed.
+    guaranteed. Skips archived versions, Syncthing's own directory, and files
+    still being received: a copy in transit carries the marker inside a
+    temporary name and would otherwise be reported as a pair whose original
+    never existed.
     """
     found: list[Path] = []
+    problems: list[str] = []
     if not watch_dir.is_dir():
-        return found
-    for root, dirs, files in os.walk(watch_dir):
+        return found, [f"{watch_dir}: nicht vorhanden oder kein Verzeichnis"]
+
+    def note(error: OSError) -> None:
+        problems.append(f"{error.filename}: {error.strerror}")
+
+    for root, dirs, files in os.walk(watch_dir, onerror=note):
         dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
         for name in files:
             if CONFLICT_MARKER in name and not is_transfer_temporary(name):
                 found.append(Path(root) / name)
-    return sorted(found)
+    return sorted(found), problems
 
 
 def pair_conflicts(copies: list[Path]) -> list[ConflictPair]:
@@ -578,20 +842,26 @@ def pair_conflicts(copies: list[Path]) -> list[ConflictPair]:
 # (tests/test_detect_terminal.py, tests/test_zenity_list.py).
 # ---------------------------------------------------------------------------
 
-def detect_terminal(state: WatchState) -> Optional[list[str]]:
-    """Return an argv prefix that opens a terminal running an appended command.
+def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
+    """Find an argv prefix that opens a terminal running an appended command.
 
-    Cached in the state file and reused as long as the command still exists
-    (doku 3.3). None means the user cancelled the choice.
+    Returns the outcome next to the result: a command with ``Answer.YES``, a
+    cancelled choice with ``Answer.NO``, and a dialog that could not be shown
+    at all with ``Answer.FAILED``. The last one has to reach the caller,
+    because only it keeps the short retry interval instead of the half hour
+    (doku 3.3) -- folded into a bare "None" it looked like a user postponing.
+
+    The result is cached in the state file and reused as long as the command
+    still exists.
     """
     if state.terminal_cmd and shutil.which(state.terminal_cmd[0]):
-        return state.terminal_cmd
+        return Answer.YES, state.terminal_cmd
 
     # freedesktop's own solution first; it does its own caching.
     if shutil.which("xdg-terminal-exec"):
         chosen = ["xdg-terminal-exec", "--"]
         state.terminal_cmd = chosen
-        return chosen
+        return Answer.YES, chosen
 
     found = [(binary, arg) for binary, arg in TERMINAL_CANDIDATES
              if shutil.which(binary)]
@@ -599,24 +869,26 @@ def detect_terminal(state: WatchState) -> Optional[list[str]]:
     if len(found) == 1:
         chosen = [found[0][0], found[0][1]]
     elif len(found) > 1:
-        selected = pick_from_list(
+        outcome, selected = pick_from_list(
             "Claude-Sync: Terminal wählen",
             "Mehrere Terminal-Emulatoren gefunden. Welcher soll für die "
             "Konfliktsitzung verwendet werden?",
-            "Terminal", [binary for binary, _ in found])
+            "Terminal", [binary for binary, _ in found],
+            DIALOG_TIMEOUT_SECONDS)
         if selected is None:
-            return None
+            return outcome, None
         chosen = [selected, dict(found).get(selected, "-e")]
     else:
-        entered = ask_text(
+        outcome, entered = ask_text(
             "Claude-Sync: Terminal-Emulator",
-            "Kein bekannter Terminal-Emulator gefunden. Bitte Befehl angeben:")
+            "Kein bekannter Terminal-Emulator gefunden. Bitte Befehl angeben:",
+            DIALOG_TIMEOUT_SECONDS)
         if entered is None:
-            return None
+            return outcome, None
         chosen = [entered, "-e"]
 
     state.terminal_cmd = chosen
-    return chosen
+    return Answer.YES, chosen
 
 
 def build_handover(pairs: list[ConflictPair], watch_dir: Path) -> str:
@@ -649,6 +921,24 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
     (doku 3.3). The working directory is the watched directory, which is the
     only way to set it -- Claude Code takes it from the calling process.
     """
+    # Without the instruction file Claude Code refuses to start at all: it
+    # answers "Append system prompt file not found" and exits, so the terminal
+    # flashes up and is gone (doku 3.3). Unchecked, the daemon would record a
+    # pid and treat the episode as in progress -- the escalation would burn,
+    # silently, and the next question came half an hour later. The installer
+    # covers this at setup time only, and --tool-dir bypasses it entirely.
+    TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+    if not INSTRUCTION_FILE.is_file():
+        print(f"Arbeitsanweisung fehlt: {INSTRUCTION_FILE} — keine Sitzung "
+              "gestartet.", file=sys.stderr, flush=True)
+        show_message(
+            "Claude-Sync: Konfliktlösung nicht möglich",
+            f"Die Arbeitsanweisung {INSTRUCTION_FILE} fehlt. Ohne sie kann "
+            "keine Konfliktsitzung starten. Bitte den Inhalt des "
+            "files/-Ordner aus der Repo-Quelle von claude-sync-watch "
+            "vollständig nach ~/.claude-sync-watch kopieren. Dort ist auch "
+            "das fehlende File 'konfliktloesung.md' enthalten.")
+        return None
     # Argument order is load-bearing, not cosmetic: ``--add-dir`` is variadic
     # (``--add-dir <directories...>``), so it swallows every following argument
     # as another directory. With the prompt placed after it, the session
@@ -687,7 +977,13 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
         print(f"[dry-run] would ask about {len(pairs)} conflict(s):\n{listing}")
         return
 
+    # Saved before the dialog opens, not with the rest of the pass at the end:
+    # the dialog stays on screen for up to fifteen minutes, and a pass that
+    # overlaps despite the run lock would otherwise read a state in which no
+    # dialog had been shown -- and put a second window next to this one
+    # (doku 3.2, 3.3).
     state.dialog_last_shown = _now()
+    save_state(state)
     answer = ask_question("Claude-Sync: Konflikt", text, "Jetzt lösen",
                           "Später", DIALOG_TIMEOUT_SECONDS)
     if answer is not Answer.YES:
@@ -699,15 +995,25 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
     state.dialog_failed = False
 
     while True:
-        terminal_cmd = detect_terminal(state)
+        outcome, terminal_cmd = detect_terminal(state)
         if terminal_cmd is not None:
             break
-        if ask_question(
-                "Claude-Sync: Terminal nötig",
-                "Zur Bearbeitung des Konflikts wird ein Terminal für die "
-                "Claude-Sitzung benötigt. Auswahl erneut versuchen?",
-                "Erneut versuchen", "Abbrechen",
-                DIALOG_TIMEOUT_SECONDS) is not Answer.YES:
+        # An outage of the display is not a deferral, wherever in the chain it
+        # happens: nobody saw anything, so the short retry interval applies
+        # (doku 3.3). Without this the half hour from 2.9 took hold, because
+        # dialog_failed had already been cleared above.
+        if outcome is Answer.FAILED:
+            state.dialog_failed = True
+            return
+        retry = ask_question(
+            "Claude-Sync: Terminal nötig",
+            "Zur Bearbeitung des Konflikts wird ein Terminal für die "
+            "Claude-Sitzung benötigt. Auswahl erneut versuchen?",
+            "Erneut versuchen", "Abbrechen", DIALOG_TIMEOUT_SECONDS)
+        if retry is Answer.FAILED:
+            state.dialog_failed = True
+            return
+        if retry is not Answer.YES:
             return
 
     pid = launch_session(terminal_cmd, pairs, watch_dir)
@@ -940,14 +1246,28 @@ def maybe_notify(state: WatchState, open_conflicts: int,
     """
     if not state.notice_due():
         return
+    # Stamped for the ATTEMPT, not for the success -- and before anything can
+    # go wrong. Two reasons, both learned the hard way (doku 2.6): a line in
+    # the except branch below would otherwise appear at the pace of file
+    # events, because an unstamped notice stays due for ever. And build_notice
+    # legitimately returns None when no conflict is open and no API key can be
+    # read, so on a machine whose Syncthing configuration sits elsewhere the
+    # hourly rhythm would never establish itself.
+    state.notice_last_shown = _now()
     try:
         notice = build_notice(state, open_conflicts, watch_dir)
     except Exception:
-        notice = None
+        # Everything the suppliers handle themselves -- unreachable interface,
+        # missing key, oddly shaped answer -- already returns None (doku 3.1,
+        # point 3). What arrives here is a programming error, and 2.6 has no
+        # exception for those. With the traceback, because a report nobody can
+        # locate is not a report.
+        print("Betriebsmeldung fehlgeschlagen:\n"
+              + traceback.format_exc().rstrip(), file=sys.stderr, flush=True)
+        return
     if notice is None:
         return
     text, seconds = notice
-    state.notice_last_shown = _now()
     notify("Claude-Sync", text, seconds)
 
 
@@ -960,14 +1280,34 @@ def run_pass(watch_dir: Path, reason: str) -> int:
     if not acquire_lock():
         return -1
     try:
+        reap_finished_session()
         state = load_state()
-        copies = find_conflicts(watch_dir)
+        copies, problems = find_conflicts(watch_dir)
         pairs = pair_conflicts(copies)
 
-        if not pairs:
+        # Reported on the CHANGE, in both directions -- see the state field.
+        if problems and not state.scan_incomplete:
+            print(f"Suchlauf unvollständig, {len(problems)} Stelle(n) nicht "
+                  f"lesbar: {problems[0]}", file=sys.stderr, flush=True)
+        elif not problems and state.scan_incomplete:
+            print("Suchlauf wieder vollständig.", file=sys.stderr, flush=True)
+        state.scan_incomplete = bool(problems)
+
+        if not state.session_running():
+            # The state gets a way back. Without it the last pid stayed in the
+            # file for ever and every pass kept asking the system about a number
+            # that had long stopped meaning anything (doku 3.2).
+            state.session_pid = None
+            state.session_started = None
+
+        if not pairs and not problems:
             # No finding: the episode ends by itself. That is the normal case
             # when the conflict was resolved on another machine and the
             # resolution has arrived here (doku 1.6, 3.1 step 4).
+            #
+            # Only on a COMPLETE search, though: an incomplete one would look
+            # exactly like a resolved conflict, and a watcher that cannot see
+            # would close the episode it is supposed to be guarding.
             state.conflict_active = False
         else:
             state.last_conflict_seen = _now()

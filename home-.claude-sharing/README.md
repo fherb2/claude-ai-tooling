@@ -4,7 +4,7 @@
 
 # Stand: Noch in Überarbeitung. Nicht benutzen!
 
-Status: **Wächter gebaut, noch nicht im Betrieb erprobt.** Die Doku steht (`implementierungs_doku.md`); der Abgleich selbst läuft auf zwei Rechnern produktiv. Die Konfliktbehandlung liegt als vollständiger Satz Dateien in `files/`, ist aber noch auf keinem Rechner eingerichtet und hat noch keinen echten Konflikt gesehen. Offene Fragen (F3, F6–F10) stehen im Anhang der Doku.
+Status: **Im Betrieb beim Entwickler, nicht zur Weitergabe freigegeben.** Der Abgleich läuft seit dem 11. August 2026 auf zwei Rechnern, der Wächter ist auf beiden als Dienst eingerichtet und hat echte Konflikte behandelt. Die Doku (`implementierungs_doku.md`) ist in sich geprüft und gegen den Code abgeglichen; die Befunde dieses Abgleichs werden gerade abgearbeitet (Anhang B der Doku). Der Warnhinweis oben bleibt stehen, solange das Werkzeug ausschließlich beim Entwickler im Quasi-Testbetrieb läuft — er entfällt erst, wenn es auch Kollegen benutzen dürfen. Offene Fragen (F3, F7, F11) stehen im Anhang der Doku.
 
 ## Ziel
 
@@ -29,10 +29,10 @@ Der Dienst startet danach bei jeder Anmeldung an der grafischen Sitzung von selb
 - Der Abgleich selbst läuft ereignisgesteuert im Hintergrund und braucht im Alltag kein Zutun — Änderungen sind meist binnen Sekunden auf dem Vermittlungsknoten, ausgeschaltete Rechner holen beim nächsten Start selbsttätig nach.
 - Zwei Gewohnheiten helfen, Konflikte gar nicht erst entstehen zu lassen: nach dem Einschalten erst den Abgleich ankommen lassen und dann mit Claude arbeiten; und einen Rechner nicht ausschalten, solange der Abgleich sichtbar offen ist.
 - Bei einem Konflikt: ein Dialog fragt, ob jetzt gelöst werden soll; bei Zustimmung öffnet sich ein Terminal mit einer Claude-Code-Sitzung, die die betroffenen Dateien einzeln mit dem Nutzer durchgeht und erst nach dessen ausdrücklicher Zustimmung schreibt oder löscht.
-- Ein neuer Rechner wird zweistufig angebunden: erst Tests gegen einen eigenen Hilfsordner, dann die geführte Zusammenführung des gewachsenen Bestands.
+- Ein neuer Rechner bringt in der Regel ein eigenständig gewachsenes `~/.claude` mit, das nicht überschrieben werden darf. Er wird deshalb geführt angebunden: Bestand sichern, `.stignore` **vor** dem Teilen anlegen, den Erstabgleich abwarten und die dabei entstehenden Konfliktkopien in einer Sitzung zusammenführen. Dieser Zusammenführungsschritt ist der geplante Teil des Verfahrens, keine Störung.
 
 ## Weiterführendes
 
 - `implementierungs_doku.md` — vollständiges Konzept (Zusammenhänge, Vorgaben, Einheiten) samt Fragenkatalog
-- `fahrplan.md` — aktueller Stand und nächste Schritte
+- `fahrplan.md` — nächste Schritte; `status.md` — was davon schon abgearbeitet ist
 - `Syncthing-Synology-Konfigurationsanleitung-allgemein.md` — Einrichtung des Vermittlungsknotens und der Clients
