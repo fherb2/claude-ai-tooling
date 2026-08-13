@@ -11,9 +11,13 @@
 # require editing it, and keeping the unit a static file is deliberate
 # (implementierungs_doku.md, 2.7 and 3.5).
 #
-# This script installs nothing on your behalf. If a prerequisite is missing
-# it names the command to fix it and stops -- installing packages requires
-# your consent, and an installer is no place to work around that (doku 3.5).
+# This script installs nothing behind your back. Where a package is missing it
+# says what breaks, offers to install it, and acts only on an explicit "yes"
+# (doku 3.5). What the older rule forbade was installing silently, not asking:
+# a question obtains your consent instead of working around it.
+#
+# It therefore needs a terminal and refuses to run without one. An unattended
+# install would leave you unable to answer and unable to see what happened.
 
 set -euo pipefail
 
@@ -36,6 +40,79 @@ fail() {
     fi
     exit 1
 }
+
+# Every warning pauses afterwards. Without the pause the next block overruns
+# it: the hint about a missing notification tool was printed exactly as
+# intended and still went unnoticed, because five more blocks followed and a
+# success message was the last thing on screen (doku 3.5).
+WARN_PAUSE_SECONDS=3
+
+warn() {
+    printf '%s\n\n' "$1" >&2
+    sleep "$WARN_PAUSE_SECONDS"
+}
+
+# Offer to install a missing package instead of only naming the command.
+# Arguments: package, what doing without costs, the abort text -- empty makes
+# the package optional and a refusal survivable -- then the command that tests
+# whether it is there. The answer is read from /dev/tty, not from standard
+# input, so a redirection cannot swallow the question; sudo reads the password
+# from the same place, which is why a password prompt does not disturb this
+# script (measured, doku 3.5).
+ensure_package() {
+    local package="$1" consequence="$2" abort_text="$3"
+    shift 3
+    if "$@" >/dev/null 2>&1; then
+        return 0
+    fi
+    printf '\n%s fehlt — %s\n' "$package" "$consequence" >&2
+    printf 'Jetzt nachinstallieren? Das Skript ruft dazu\n' >&2
+    printf '    sudo apt install %s\n' "$package" >&2
+    printf 'auf; das System fragt dabei nach dem Passwort. [j/N] ' >&2
+    local answer=""
+    # Belt and braces: the terminal check above already rules this out, so a
+    # failure here means the terminal vanished mid-run. Treated as "no" -- and
+    # quietly, because the shell's own redirection error would say nothing the
+    # user could act on.
+    # The order of the redirections matters: bash applies them left to right,
+    # so 2>/dev/null has to come first to swallow the failure message of the
+    # one after it. Reversed, the shell reports the missing terminal itself.
+    read -r answer 2>/dev/null < /dev/tty || answer=""
+    case "$answer" in
+        j|J|ja|Ja|JA|y|Y|yes|Yes)
+            local apt_log=""
+            printf 'Installiere %s …\n' "$package"
+            # apt's output is captured and shown only on failure: this whole
+            # change exists because the run was too talkative to be read. The
+            # "unstable CLI interface" notice apt emits without a tty lands in
+            # the same capture and stays invisible unless something breaks.
+            if apt_log="$(sudo apt install -y "$package" 2>&1)" \
+                    && "$@" >/dev/null 2>&1; then
+                printf '%s ist installiert.\n\n' "$package"
+                return 0
+            fi
+            printf 'Die Installation von %s ist fehlgeschlagen:\n' "$package" >&2
+            printf '%s\n' "$apt_log" >&2
+            ;;
+    esac
+    if [ -n "$abort_text" ]; then
+        fail "$package fehlt — $consequence" "$abort_text"
+    fi
+    warn "Weiter ohne $package."
+}
+
+# --- 0. Terminal ----------------------------------------------------------
+# Checked before anything else: every step below may ask a question, and sudo
+# needs a terminal to read a password from. Opening /dev/tty is the only valid
+# test -- the device file exists even without a controlling terminal, so a file
+# test would always succeed (measured). A failing redirection inside an `if`
+# condition is exempt from `set -e`, so this cannot abort the script by itself.
+if ! ( : < /dev/tty ) 2>/dev/null; then
+    fail "Kein Terminal — dieses Skript fragt nach und braucht eine Antwort." \
+"Eine Einrichtung ohne Rückmeldung an den Nutzer wird bewusst nicht
+unterstützt: Sie könnten weder eine Rückfrage beantworten noch sehen, was
+dabei geschieht. Bitte das Skript in einem Terminal starten."
+fi
 
 # --- 1. Location ----------------------------------------------------------
 # Checked first: everything below assumes the prescribed path.
@@ -93,9 +170,9 @@ Dort das Erst-Start-Gespraech durchlaufen (Theme waehlen; 'auto' passt sich
 dem Terminal an) und '/login' ausfuehren. Danach dieses Skript erneut starten."
         ;;
     "")
-        printf 'Hinweis: Die Anmeldeprüfung lieferte keine Antwort.\n' >&2
-        printf 'Der Dienst wird trotzdem eingerichtet; bitte einmal von Hand\n' >&2
-        printf '"claude" starten und sicherstellen, dass es antwortet.\n\n' >&2
+        warn 'Hinweis: Die Anmeldeprüfung lieferte keine Antwort.
+Der Dienst wird trotzdem eingerichtet; bitte einmal von Hand
+"claude" starten und sicherstellen, dass es antwortet.'
         ;;
 esac
 
@@ -114,21 +191,33 @@ Distribution installieren, zum Beispiel:
     sudo apt install python3"
 
 printf 'Prüfe die Beobachtungsbibliothek in %s …\n' "$SERVICE_PYTHON"
-"$SERVICE_PYTHON" -c 'import watchdog' 2>/dev/null || fail \
-    "Die Python-Beobachtungsbibliothek 'watchdog' fehlt in $SERVICE_PYTHON." \
-"Bitte über die Distribution installieren, zum Beispiel:
+ensure_package python3-watchdog \
+    "der Wächter kann ohne sie keine Dateiänderung bemerken" \
+"Ein 'pip install' in einer Virtualenv hilft hier nicht: Der Dienst startet
+$SERVICE_PYTHON, nicht das python3 dieser Shell. Bitte das Distributionspaket
+installieren:
 
     sudo apt install python3-watchdog
 
-Ein 'pip install' in einer Virtualenv hilft hier nicht: Der Dienst startet
-$SERVICE_PYTHON, nicht das python3 dieser Shell. Danach dieses Skript erneut
-starten."
+Danach dieses Skript erneut starten." \
+    "$SERVICE_PYTHON" -c 'import watchdog'
 
-command -v zenity >/dev/null 2>&1 || fail \
-    "'zenity' fehlt — ohne es kann kein Dialog erscheinen." \
-"Bitte über die Distribution installieren, zum Beispiel:
+ensure_package zenity \
+    "ohne es kann kein Dialog erscheinen" \
+"Der Wächter eskaliert ausschließlich über Zenity-Dialoge (Doku 2.9); ohne sie
+bliebe ein Konflikt unbemerkt liegen. Bitte über die Distribution installieren:
 
-    sudo apt install zenity"
+    sudo apt install zenity" \
+    command -v zenity
+
+# Optional, and deliberately so: without it only the hourly notice is missing
+# while conflict detection and escalation work in full (doku 1.8). It must be
+# noticed all the same -- this very gap went unnoticed on one machine for two
+# days, because nothing checked for it here (doku 3.8).
+ensure_package libnotify-bin \
+    "ohne dieses Paket fehlt notify-send, und die stündliche Betriebsmeldung kann nicht am Bildschirm erscheinen. Der Wächter meldet das einmal je Lauf im Journal, aber erst beim ersten fälligen Durchgang, spätestens nach einer Stunde. Konflikterkennung und Eskalation sind unberührt" \
+    "" \
+    command -v notify-send
 
 command -v systemctl >/dev/null 2>&1 || fail \
     "'systemctl' nicht gefunden — dieses Skript richtet einen systemd-Benutzerdienst ein." \
@@ -148,25 +237,30 @@ if [ -f "$WATCH_DIR/.stignore" ]; then
     if cmp -s "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"; then
         printf 'Ausschlussliste stimmt mit der maßgeblichen Fassung überein.\n'
     else
-        printf 'WARNUNG: %s/.stignore weicht von der Fassung in diesem\n' "$WATCH_DIR" >&2
-        printf 'Ordner ab. Die Datei wandert nicht mit dem Abgleich, Abweichungen\n' >&2
-        printf 'zwischen den Rechnern fallen also nie von selbst auf. Unterschiede:\n\n' >&2
-        diff -u "$WATCH_DIR/.stignore" "$SCRIPT_DIR/.stignore" >&2 || true
-        printf '\nMaßgeblich ist die Fassung hier. Uebernehmen mit:\n' >&2
-        printf '    cp %s/.stignore %s/.stignore\n' "$SCRIPT_DIR" "$WATCH_DIR" >&2
-        printf 'Danach in Syncthing die Ordnereinstellungen neu einlesen lassen.\n\n' >&2
+        # The diff goes into the message instead of straight to the terminal,
+        # so the whole warning is one block and the pause comes after all of it.
+        stignore_diff="$(diff -u "$WATCH_DIR/.stignore" "$SCRIPT_DIR/.stignore" || true)"
+        warn "WARNUNG: $WATCH_DIR/.stignore weicht von der Fassung in diesem
+Ordner ab. Die Datei wandert nicht mit dem Abgleich, Abweichungen
+zwischen den Rechnern fallen also nie von selbst auf. Unterschiede:
+
+$stignore_diff
+
+Maßgeblich ist die Fassung hier. Übernehmen mit:
+    cp $SCRIPT_DIR/.stignore $WATCH_DIR/.stignore
+Danach in Syncthing die Ordnereinstellungen neu einlesen lassen."
     fi
 else
-    printf 'WARNUNG: %s/.stignore fehlt — nichts ist ausgeschlossen,\n' "$WATCH_DIR" >&2
-    printf 'auch nicht die Zugangsdaten. Bitte die Fassung aus diesem Ordner\n' >&2
-    printf 'kopieren, bevor weiter abgeglichen wird:\n' >&2
-    printf '    cp %s/.stignore %s/.stignore\n\n' "$SCRIPT_DIR" "$WATCH_DIR" >&2
+    warn "WARNUNG: $WATCH_DIR/.stignore fehlt — nichts ist ausgeschlossen,
+auch nicht die Zugangsdaten. Bitte die Fassung aus diesem Ordner
+kopieren, bevor weiter abgeglichen wird:
+    cp $SCRIPT_DIR/.stignore $WATCH_DIR/.stignore"
 fi
 
 if command -v pgrep >/dev/null 2>&1 && ! pgrep -x syncthing >/dev/null 2>&1; then
-    printf 'Hinweis: Syncthing scheint gerade nicht zu laufen.\n' >&2
-    printf 'Der Dienst wird trotzdem eingerichtet; ohne laufendes Syncthing\n' >&2
-    printf 'entstehen aber keine Konfliktkopien und die Betriebsmeldung entfällt.\n\n' >&2
+    warn 'Hinweis: Syncthing scheint gerade nicht zu laufen.
+Der Dienst wird trotzdem eingerichtet; ohne laufendes Syncthing
+entstehen aber keine Konfliktkopien und die Betriebsmeldung entfällt.'
 fi
 
 # --- 4. Install -----------------------------------------------------------

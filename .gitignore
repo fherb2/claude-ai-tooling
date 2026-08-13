@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 
+# In case a local python venv will be needed, use this:
+.venv/
+
 # Ablage fuer Untersuchungsmaterial (echte Chatinhalte, Exportdumps): die
 # Inhalte werden nie versioniert, der Ordner selbst schon -- er ist der
 # verabredete Platz dafuer. Gilt fuer jeden so benannten Ordner, egal wie
@@ -10,6 +13,7 @@ __pycache__/
 !**/test_results/.gitkeep
 **/test_data/*
 !**/test_data/.gitkeep
+**/test_project
 
 # rein persönliche Daten, die nie den Rechner verlassen
 Fossil-Synology-Konfigurationsanleitung-Herbrand.md
