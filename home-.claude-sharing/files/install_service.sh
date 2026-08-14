@@ -149,14 +149,14 @@ done
 installieren und sicherstellen, dass es unter /usr/bin/claude erreichbar
 ist."
 
-# Vorhanden genügt nicht: die Konfliktsitzung ist wertlos, wenn die
-# Terminal-Fassung nicht angemeldet ist. Ohne diese Pruefung richtet sich der
-# Dienst ein, zeigt brav Dialoge und oeffnet Terminals, in denen nichts
-# Sinnvolles passiert -- ein stiller Ausfall.
+# Present is not enough: the conflict session is worthless if the terminal
+# installation is not logged in. Without this check the service installs
+# itself, dutifully shows dialogs and opens terminals in which nothing
+# useful happens -- a silent failure.
 #
-# Der Aufruf kostet einen Bruchteil eines Cent an Tokens und einen
-# Netzzugriff. NICHT mit --bare: das meldet eine vorhandene Anmeldung
-# faelschlich als fehlend (beobachtet, Doku 3.8).
+# The call costs a fraction of a cent in tokens and one network access.
+# NOT with --bare: that reports an existing login as missing (observed,
+# doku 3.8).
 printf 'Prüfe die Anmeldung von Claude Code (ein kurzer Aufruf) …\n'
 login_probe="$(timeout 120 /usr/bin/claude -p "ok" 2>&1 || true)"
 case "$login_probe" in
@@ -176,11 +176,11 @@ Der Dienst wird trotzdem eingerichtet; bitte einmal von Hand
         ;;
 esac
 
-# Geprueft wird genau der Interpreter, den die Unit startet -- NICHT das
-# "python3" dieser Shell. Auf einem Rechner, dessen Shell ein Virtualenv im
-# PATH fuehrt, sind das zwei verschiedene Interpreter, und nur einer sieht die
-# Distributionspakete: Die Pruefung meldete dort "watchdog fehlt", waehrend der
-# Dienst lauffaehig war, und schickte in eine Sackgasse (beobachtet, Doku 3.8).
+# Checked is exactly the interpreter the unit starts -- NOT the "python3" of
+# this shell. On a machine whose shell carries a virtualenv in PATH those are
+# two different interpreters, and only one of them sees the distribution
+# packages: the check reported "watchdog missing" there while the service was
+# perfectly able to run, and sent the user down a dead end (observed, 3.8).
 SERVICE_PYTHON=/usr/bin/python3
 
 [ -x "$SERVICE_PYTHON" ] || fail \
@@ -228,11 +228,37 @@ Vorlage steht in $UNIT_NAME."
     "Der zu überwachende Ordner $WATCH_DIR existiert nicht." \
 "Erwartet wird das von Syncthing abgeglichene ~/.claude."
 
-# Die Ausschlussliste wandert nicht mit dem Abgleich (Doku 2.8): Abweichungen
-# zwischen den Rechnern fallen sonst NIE von selbst auf. Deshalb ist die
-# Fassung in diesem Ordner die maßgebliche, und hier wird verglichen. Nur eine
-# Warnung, kein Abbruch: Eine abweichende Ausschlussliste ist ein Mangel, aber
-# kein Grund, den Waechter nicht einzurichten.
+# The directory being there says nothing about it being synchronised, and 3.5
+# used to promise the second while checking the first -- exactly the silent
+# failure the checklist exists for. The watcher answers this itself, because it
+# already owns the configuration location, the key, the REST call and the path
+# comparison; a second implementation here would violate 2.4 and the Windows
+# counterpart would need a third. Read-only by contract: no lock, no state file.
+#
+# A warning, never an abort. Case 2 means the interface said nothing, and from
+# that the script may conclude nothing; case 1 means the watcher would run
+# flawlessly and find nothing for ever, which the user has to learn -- but a
+# watcher without a synced folder is useless, not harmful.
+printf 'Prüfe, ob %s von Syncthing abgeglichen wird …\n' "$WATCH_DIR"
+folder_check="$("$SERVICE_PYTHON" "$SCRIPT_DIR/claude_sync_watchd.py" \
+    --check-folder --watch-dir "$WATCH_DIR" 2>&1)" && folder_state=0 \
+    || folder_state=$?
+case "$folder_state" in
+    0) printf '%s\n' "$folder_check" ;;
+    1) warn "WARNUNG: $folder_check
+Der Wächter wird eingerichtet und läuft, findet aber nie einen Konflikt,
+weil dieser Ordner nicht am Abgleich teilnimmt. Bitte ihn in Syncthing
+teilen — die Anleitung steht in der Konfigurationsanleitung." ;;
+    *) warn "Hinweis: $folder_check
+Ob der Ordner abgeglichen wird, ist damit offen. Der Dienst wird
+eingerichtet; bitte in Syncthings Oberfläche nachsehen." ;;
+esac
+
+# The exclusion list does not travel with the sync (doku 2.8): differences
+# between the machines would otherwise NEVER surface by themselves. The copy
+# in this folder is therefore the authoritative one, and this is where it is
+# compared. A warning only, not an abort: a diverging exclusion list is a
+# defect, but no reason to leave the watcher uninstalled.
 if [ -f "$WATCH_DIR/.stignore" ]; then
     if cmp -s "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"; then
         printf 'Ausschlussliste stimmt mit der maßgeblichen Fassung überein.\n'
@@ -271,9 +297,19 @@ mkdir -p "$UNIT_TARGET_DIR"
 cp "$SCRIPT_DIR/$UNIT_NAME" "$UNIT_TARGET_DIR/$UNIT_NAME"
 
 systemctl --user daemon-reload
-systemctl --user enable --now "$UNIT_NAME"
+systemctl --user enable "$UNIT_NAME"
 
-printf '\nFertig. Status:\n\n'
+# restart, not "enable --now": the latter starts the service only if it is not
+# already running, so re-installing a NEW version reported success while the OLD
+# process kept running -- observed on 2026-08-14, file copied at 20:20, process
+# from 10:21 (doku 3.5). This script exists to put THIS version into service.
+# The restart costs nothing: the watcher keeps no state in memory that it does
+# not restore from its file, and the scan on startup catches up on what it
+# missed. A conflict session running at that moment is unaffected -- it is a
+# detached process, the run lock is transient, and its pid is in the state file.
+systemctl --user restart "$UNIT_NAME"
+
+printf '\nFertig, Dienst neu gestartet. Status:\n\n'
 systemctl --user --no-pager status "$UNIT_NAME" || true
 
 printf '\nLaufende Ausgabe mitlesen:\n'

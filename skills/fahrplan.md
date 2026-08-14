@@ -4,10 +4,10 @@ Reine Abfolge der Arbeitsschritte, keine Inhalte. Details zu jedem Schritt stehe
 
 ## Schritte
 
-1. **Design des ersten Skills (Übersetzung software-entwicklungsnaher Dokumente) besprechen — Punkt für Punkt, nicht alles auf einmal.** Bereits geklärt: Vorhaben-Status (eigenständig), Speicherort-Semantik, Testverfahren, Doku-Struktur. Noch offen und als Nächstes dran: ob und wie der Skill den Nutzer bei Aktivierung selbst nach bestimmten Entscheidungen fragt (z. B. Übersetzungsrichtung, ob der Sync-Workflow — eine Änderung aus einer Sprachfassung in die andere nachziehen — mit abgedeckt wird), um nicht für jede Nuance einen eigenen, fast identischen Skill zu brauchen.
-2. Danach die Glossar-Idee (feste Begriffsliste für Terminologie-Entscheidungen wie „Pipe bleibt Pipe") bei der inhaltlichen Ausgestaltung einbringen.
-3. Danach die restlichen offenen Punkte einzeln besprechen: Umgang mit Codeblöcken (wörtliche Wiedergabe vs. illustrative Beispiele), Umgang mit Eigennamen/Produktnamen und wörtlichen Code-Markern, Namenskonvention für Zieldateien (`<datei>.de.md`), Standard-Umgang mit Lizenz-/Rechtstexten, Ein-Absatz-pro-Zeile-Formatierung, Ton/Anrede.
-4. `README.md` (Deutsch) für dieses Vorhaben erstellen — welche Lizenz dafür anwendbar ist, ist noch zu klären.
-5. Segment 2 (Vorgaben) füllen, sobald projektweite Festlegungen abgestimmt sind.
-6. Ersten Skill entwerfen und als erstes Kapitel in Segment 3 dokumentieren.
+3. Die verbliebenen offenen Punkte des Übersetzungs-Skills einzeln besprechen und in `SKILL.md` sowie Kapitel 3.1 festschreiben: Namenskonvention für Zieldateien (`<datei>.de.md`), Sync-Workflow (Änderung von einer Sprachfassung in die andere nachziehen), Standard-Umgang mit Lizenz- und Rechtstexten, Ein-Absatz-pro-Zeile-Formatierung, Ton und Anrede.
 7. Klären, ob der automatische „Transport" eines fertigen Skills an seinen Zielort (`.claude/skills/` bzw. `~/.claude/skills/`) Teil dieses Vorhabens werden soll, oder ob das dauerhaft beim Nutzer bzw. bei `home-.claude-sharing` bleibt.
+9. Die drei Skill-Entwürfe (`translation-task`, `parallel-sessions`, `software-dev-doc-fh`) mit dem Nutzer durchgehen — Inhalt, Umfang, Wortlaut der Trigger — und freigeben oder überarbeiten. Grundlage sind die bestehenden `CLAUDE.md`-Dateien in diesem Repo, im Home-Verzeichnis und in den übrigen Projekten unter `~/git/`.
+10. Für `parallel-sessions` die beiden offenen Festlegungen entscheiden (Kapitel 3.2): Branch-Benennung der Werkbank im Worktree-Modus und Umgang mit `arbeitsdaten.json` beim Zusammenführen. Ergebnis gehört in die `CLAUDE.md` der betroffenen Projekte, nicht in den Skill.
+11. Für „Softwareaufgabe erkennen" (Kapitel 3.4) entscheiden, ob es ein eigenständiger Skill oder die Vorstufe von `software-dev-doc-fh` wird; den Trigger dabei nach Vorgabe 2.1 geankert neu formulieren.
+12. Die freigegebenen Skills an ihren Zielorten installieren und im Alltag erproben — insbesondere, ob die stillen Trigger im echten Betrieb zuverlässig und ohne Fehlauslösungen greifen.
+13. Klären, ob die vorhandenen Skills `konzept-segmentierung` und `konsistenzpruefung` in dieses Vorhaben überführt und dem Namensschema angeglichen werden.

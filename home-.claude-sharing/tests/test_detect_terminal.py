@@ -27,7 +27,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-# Mirrors claude_sync_watchd.py's TERMINAL_CANDIDATES exactly.
+# Mirrors the list returned by claude_sync_watchd.py's terminal_candidates()
+# exactly -- deliberately a copy, because this probe runs without importing it.
 TERMINAL_CANDIDATES: list[tuple[str, str]] = [
     ("x-terminal-emulator", "-e"),
     ("gnome-terminal", "--"),
