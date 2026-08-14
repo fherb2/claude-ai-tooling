@@ -170,70 +170,69 @@ def check_timeout_unit(w: types.ModuleType) -> None:
 
 
 def check_terminal_dialogs(w: types.ModuleType) -> None:
-    """Auswahl- und Freitextdialog: Zeitablauf zaehlt wie Abbruch.
+    """Selection and text dialog: a timeout counts as a cancellation.
 
-    Warum das hier steht: Beide laufen innerhalb eines Durchgangs. Ein
-    unbeantwortetes Fenster hielte die Laufsperre, und eine gehaltene Sperre
-    macht den Waechter fuer alles andere taub -- kein weiterer Durchgang, keine
-    Meldung, kein Episodenende (doku 3.3). Der Fall trifft eine frische
-    Installation, einen verschwundenen Emulator und jeden weiteren Rechner,
-    denn nur der leere Zwischenspeicher fuehrt zu diesen Dialogen.
+    Why this is here: both run inside a pass. An unanswered window would hold
+    the run lock, and a held lock makes the watcher deaf to everything else --
+    no further pass, no notice, no end of episode (doku 3.3). The case hits a
+    fresh installation, a vanished emulator and every additional machine,
+    because only an empty cache leads to these dialogs at all.
     """
     print("Terminal-Dialoge (Auswahl und Freitext):")
     original = w.subprocess.run
-    gesehen = {}
+    spied = {}
 
-    def attrappe(code, ausgabe=""):
-        def lauf(command, *a, **k):
-            gesehen["command"] = command
-            return types.SimpleNamespace(returncode=code, stdout=ausgabe,
+    def make_run(code, stdout_text=""):
+        def fake_run(command, *a, **k):
+            spied["command"] = command
+            return types.SimpleNamespace(returncode=code, stdout=stdout_text,
                                          stderr="")
-        return lauf
+        return fake_run
 
     try:
-        w.subprocess.run = attrappe(5)          # Zeitablauf
+        w.subprocess.run = make_run(5)          # timed out
         check("Auswahl: Zeitablauf wie Abbruch",
               w.pick_from_list("T", "t", "S", ["konsole", "xterm"],
                                w.DIALOG_TIMEOUT_SECONDS), (w.Answer.NO, None))
         check("Auswahl: Zeitangabe uebergeben",
-              f"--timeout={w.DIALOG_TIMEOUT_SECONDS}" in gesehen["command"], True)
+              f"--timeout={w.DIALOG_TIMEOUT_SECONDS}" in spied["command"], True)
 
-        w.subprocess.run = attrappe(1)          # Abbruch
+        w.subprocess.run = make_run(1)          # cancelled
         check("Auswahl: Abbruch bleibt Abbruch",
               w.pick_from_list("T", "t", "S", ["konsole"],
                                w.DIALOG_TIMEOUT_SECONDS), (w.Answer.NO, None))
 
-        w.subprocess.run = attrappe(0, "konsole\n")
+        w.subprocess.run = make_run(0, "konsole\n")
         check("Auswahl: Wahl kommt durch",
               w.pick_from_list("T", "t", "S", ["konsole"],
                                w.DIALOG_TIMEOUT_SECONDS), (w.Answer.YES, "konsole"))
 
-        w.subprocess.run = attrappe(5)
+        w.subprocess.run = make_run(5)
         check("Freitext: Zeitablauf wie Abbruch",
               w.ask_text("T", "t", w.DIALOG_TIMEOUT_SECONDS), (w.Answer.NO, None))
         check("Freitext: Zeitangabe uebergeben",
-              f"--timeout={w.DIALOG_TIMEOUT_SECONDS}" in gesehen["command"], True)
+              f"--timeout={w.DIALOG_TIMEOUT_SECONDS}" in spied["command"], True)
 
-        w.subprocess.run = attrappe(0, " urxvt \n")
+        w.subprocess.run = make_run(0, " urxvt \n")
         check("Freitext: Eingabe kommt bereinigt",
               w.ask_text("T", "t", w.DIALOG_TIMEOUT_SECONDS), (w.Answer.YES, "urxvt"))
 
-        # Ohne Angabe darf kein --timeout mitgehen: die Vorversuchs-Skripte
-        # rufen beide Funktionen ohne Zeitangabe auf.
-        w.subprocess.run = attrappe(1)
+        # Without a value no --timeout may be passed: the pre-study scripts
+        # call both functions without one.
+        w.subprocess.run = make_run(1)
         w.pick_from_list("T", "t", "S", ["konsole"])
         check("Auswahl: ohne Angabe kein --timeout",
-              any(str(x).startswith("--timeout") for x in gesehen["command"]), False)
+              any(str(x).startswith("--timeout") for x in spied["command"]), False)
     finally:
         w.subprocess.run = original
 
-    # Und die Eskalationsstrecke muss die Zeitangabe auch wirklich mitgeben.
-    quelle = DAEMON.read_text(encoding="utf-8")
-    abschnitt = quelle[quelle.index("def detect_terminal"):quelle.index("def build_handover")]
+    # And the escalation chain really has to pass the value on.
+    daemon_source = DAEMON.read_text(encoding="utf-8")
+    snippet = daemon_source[daemon_source.index("def detect_terminal"):daemon_source.index("def build_handover")]
     check("detect_terminal gibt sie beim Auswahldialog mit",
-          "DIALOG_TIMEOUT_SECONDS" in abschnitt.split("pick_from_list")[1][:400], True)
+          "DIALOG_TIMEOUT_SECONDS" in snippet.split("pick_from_list")[1][:400], True)
     check("detect_terminal gibt sie bei der Freitexteingabe mit",
-          "DIALOG_TIMEOUT_SECONDS" in abschnitt.split("ask_text")[1][:400], True)
+          "DIALOG_TIMEOUT_SECONDS" in snippet.split("ask_text")[1][:400], True)
 
 
 def check_dialog_timing(w: types.ModuleType) -> None:
@@ -329,9 +328,9 @@ def check_transfer_temporaries(w: types.ModuleType, tmp_root: Path) -> None:
             ".syncthing.Notiz.sync-conflict-20260811-120000-DEV.txt.tmp",
             "~syncthing~Andere.sync-conflict-20260811-120000-DEV.txt.tmp"):
         (folder / name).write_text("x", encoding="utf-8")
-    gefunden, probleme = w.find_conflicts(folder)
-    found = [p.name for p in gefunden]
-    check("vollständiger Suchlauf meldet kein Problem", probleme, [])
+    found_paths, problems_found = w.find_conflicts(folder)
+    found = [p.name for p in found_paths]
+    check("vollständiger Suchlauf meldet kein Problem", problems_found, [])
     check("nur die fertige Kopie gefunden", found,
           ["Notiz.sync-conflict-20260811-120000-DEV.txt"])
     for entry in folder.iterdir():
@@ -429,16 +428,16 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         stub(need=4, paused=True)
         text, _ = w.build_notice(state(), 2, folder)
         check("Pause und Rückstand zugleich",
-              all(teil in text for teil in ("2 Konflikt(e)", "angehalten",
+              all(chunk in text for chunk in ("2 Konflikt(e)", "angehalten",
                                             "Rückstand: 4 Datei(en)")), True)
 
         # Same wording in both notices -- one source, no drift (doku 2.4).
         stub(need=4)
-        ruhe, _ = w.build_notice(state(), 0, folder)
-        mit_konflikt, _ = w.build_notice(state(), 2, folder)
-        klausel = "; Rückstand: 4 Datei(en)"
+        quiet_state, _ = w.build_notice(state(), 0, folder)
+        conflict_state, _ = w.build_notice(state(), 2, folder)
+        clause_text = "; Rückstand: 4 Datei(en)"
         check("Rückstands-Wortlaut identisch",
-              ruhe.endswith(klausel) and mit_konflikt.endswith(klausel), True)
+              quiet_state.endswith(clause_text) and conflict_state.endswith(clause_text), True)
 
         # A paused DEVICE is a different case and needs no own wording: it
         # shows up as no connection (verified against the real configuration,
@@ -479,34 +478,34 @@ def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
             call(*args)
         return buffer.getvalue()
 
-    # --- Die Einordnung gilt für alle drei Fenster gleich ------------------
-    faelle = [
+    # --- The classification is the same for all three windows -------------
+    outcome_cases = [
         ("Zustimmung", 0, "", w.Answer.YES),
         ("Abbruch", 1, "", w.Answer.NO),
         ("Zeitablauf", 5, "", w.Answer.NO),
         ("keine Anzeige", 1, "cannot open display: :99", w.Answer.FAILED),
         ("sonstiger Fehler", 255, "boom", w.Answer.FAILED),
     ]
-    for label, code, err, erwartet in faelle:
+    for label, code, err, want in outcome_cases:
         w.subprocess.run = (lambda *a, _c=code, _e=err, **k:
                             types.SimpleNamespace(returncode=_c, stdout="x\n",
                                                   stderr=_e))
         try:
             check(f"Auswahl: {label}",
-                  w.pick_from_list("T", "t", "S", ["konsole"])[0], erwartet)
-            check(f"Freitext: {label}", w.ask_text("T", "t")[0], erwartet)
+                  w.pick_from_list("T", "t", "S", ["konsole"])[0], want)
+            check(f"Freitext: {label}", w.ask_text("T", "t")[0], want)
         finally:
             w.subprocess.run = original
 
-    # Eine nicht-leere Fehlerausgabe geht ins Journal, egal wie eingeordnet.
+    # A non-empty error output reaches the journal, however it is classified.
     w.subprocess.run = (lambda *a, **k: types.SimpleNamespace(
         returncode=0, stdout="konsole\n", stderr="Gtk-WARNING: irgendwas"))
     try:
-        geschrieben = capture(lambda: w.pick_from_list("T", "t", "S", ["k"]))
+        journal_text = capture(lambda: w.pick_from_list("T", "t", "S", ["k"]))
     finally:
         w.subprocess.run = original
     check("Auswahl: Fehlerausgabe landet im Journal",
-          "Gtk-WARNING" in geschrieben, True)
+          "Gtk-WARNING" in journal_text, True)
 
     def fehlt(*args, **kwargs):
         raise FileNotFoundError("zenity")
@@ -524,82 +523,108 @@ def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
     w.subprocess.run = (lambda *a, **k: types.SimpleNamespace(
         returncode=1, stdout=b"", stderr=b"kein Benachrichtigungsdienst"))
     try:
-        geschrieben = capture(w.notify, "Claude-Sync", "abgeglichen: 1 kB", 5)
+        journal_text = capture(w.notify, "Claude-Sync", "abgeglichen: 1 kB", 5)
     finally:
         w.subprocess.run = original
     check("notify-send: Rückgabewert wird gemeldet",
-          "Rückgabewert 1" in geschrieben, True)
+          "Rückgabewert 1" in journal_text, True)
     check("notify-send: Fehlertext wird gemeldet",
-          "Benachrichtigungsdienst" in geschrieben, True)
+          "Benachrichtigungsdienst" in journal_text, True)
     check("notify-send: Meldungstext bleibt draußen",
-          "abgeglichen" in geschrieben, False)
+          "abgeglichen" in journal_text, False)
 
-    # --- maybe_notify: Programmierfehler melden UND stempeln ---------------
+    # --- maybe_notify: report the programming error AND stamp the time -----
     original_build = w.build_notice
 
     def kaputt(*args, **kwargs):
         raise KeyError("backlog")
 
-    zustand = w.WatchState()
+    probe_state = w.WatchState()
     w.build_notice = kaputt
     try:
-        geschrieben = capture(w.maybe_notify, zustand, 0, tmp_root)
+        journal_text = capture(w.maybe_notify, probe_state, 0, tmp_root)
     finally:
         w.build_notice = original_build
     check("Ausnahme in der Meldung wird gemeldet",
-          "Betriebsmeldung fehlgeschlagen" in geschrieben, True)
-    check("mit Rückverfolgung", "KeyError" in geschrieben, True)
-    # Ohne Stempel bliebe die Meldung fällig und die Zeile käme im Takt der
-    # Dateiereignisse -- genau die Flut, die 2.6 ausschliesst.
-    check("und trotzdem gestempelt", zustand.notice_last_shown is not None, True)
+          "Betriebsmeldung fehlgeschlagen" in journal_text, True)
+    check("mit Rückverfolgung", "KeyError" in journal_text, True)
+    # Without the stamp the notice would stay due and the line would arrive
+    # at the pace of file events -- the very flood 2.6 rules out.
+    check("und trotzdem gestempelt", probe_state.notice_last_shown is not None, True)
 
-    ruhig = w.WatchState()
+    silent_state = w.WatchState()
     w.build_notice = lambda *a, **k: None
     try:
-        w.maybe_notify(ruhig, 0, tmp_root)
+        w.maybe_notify(silent_state, 0, tmp_root)
     finally:
         w.build_notice = original_build
     check("auch ein reguläres Nichts stempelt",
-          ruhig.notice_last_shown is not None, True)
+          silent_state.notice_last_shown is not None, True)
 
-    # --- Der Ausgang muss bis zur Wartezeit durchkommen -------------------
-    # Der Kern von Befund 3: Fällt die Anzeige erst NACH der ersten Frage aus,
-    # stand dialog_failed schon auf False -- die halbe Stunde griff statt der
-    # kurzen Wiederholung, und der Nutzer hatte nichts gesehen (doku 3.3).
+    # --- The outcome has to reach the waiting time ------------------------
+    # The heart of finding 3: if the display fails only AFTER the first
+    # question, dialog_failed had already been cleared -- the half hour took
+    # hold instead of the short retry, and the user had seen nothing (3.3).
     original_detect = w.detect_terminal
     original_dir = w.TOOL_DIR
     w.set_tool_dir(tmp_root / "eskalation")
-    paar = w.ConflictPair(copy=tmp_root / "a.sync-conflict-x.txt",
+    sample_pair = w.ConflictPair(copy=tmp_root / "a.sync-conflict-x.txt",
                           original=tmp_root / "a.txt", device="DEV")
     try:
         w.subprocess.run = (lambda *a, **k: types.SimpleNamespace(
             returncode=0, stdout=b"", stderr=b""))          # erste Frage: ja
         w.detect_terminal = lambda state: (w.Answer.FAILED, None)
-        zustand = w.WatchState()
-        capture(w.escalate, [paar], zustand, tmp_root)
+        probe_state = w.WatchState()
+        capture(w.escalate, [sample_pair], probe_state, tmp_root)
         check("Anzeigeausfall in der Strecke setzt dialog_failed",
-              zustand.dialog_failed, True)
+              probe_state.dialog_failed, True)
         check("und damit gilt die kurze Wiederholung",
-              zustand.dialog_due(), False)   # 5 Minuten noch nicht um
+              probe_state.dialog_due(), False)   # the five minutes are not up
     finally:
         w.detect_terminal = original_detect
         w.subprocess.run = original
         w.set_tool_dir(original_dir)
 
-    # --- find_conflicts: nichts gesehen ist nicht nichts gefunden ---------
+    # --- Platform-dependent data live inside the capsule (2.4) ------------
+    # They have to be findable at the capsule's calls instead of sitting among
+    # the constants at the top -- that is what 2.4's refusal to list them
+    # rests on. Checked here: they refuse on an unsupported platform rather
+    # than guessing.
+    original_windows = w._is_windows
+    w._is_windows = lambda: True
+    try:
+        for name in ("syncthing_config_candidates", "terminal_candidates",
+                     "claude_binary", "_boot_time"):
+            try:
+                getattr(w, name)()
+                did_refuse = False
+            except NotImplementedError:
+                did_refuse = True
+            check(f"{name} verweigert auf fremder Plattform", did_refuse, True)
+        # And the refusal must not look like a programming error: it would
+        # otherwise reach the journal hourly, with a traceback.
+        probe_state = w.WatchState()
+        journal_text = capture(w.maybe_notify, probe_state, 0, tmp_root)
+        check("nicht bediente Plattform ohne Rückverfolgung",
+              "Traceback" in journal_text, False)
+        check("und mit Verweis auf 3.7", "3.7" in journal_text, True)
+    finally:
+        w._is_windows = original_windows
+
+    # --- find_conflicts: seeing nothing is not finding nothing ------------
     check("fehlender Ordner wird gemeldet",
           bool(w.find_conflicts(tmp_root / "gibtsnicht")[1]), True)
-    sperr = tmp_root / "gesperrt"
-    (sperr / "innen").mkdir(parents=True, exist_ok=True)
-    os.chmod(sperr / "innen", 0o000)
+    blocked_dir = tmp_root / "gesperrt"
+    (blocked_dir / "innen").mkdir(parents=True, exist_ok=True)
+    os.chmod(blocked_dir / "innen", 0o000)
     try:
-        _, probleme = w.find_conflicts(sperr)
+        _, problems_found = w.find_conflicts(blocked_dir)
         if os.geteuid() == 0:
             print("  übersprungen unlesbarer Unterordner (als root lesbar)")
         else:
-            check("unlesbarer Unterordner wird gemeldet", bool(probleme), True)
+            check("unlesbarer Unterordner wird gemeldet", bool(problems_found), True)
     finally:
-        os.chmod(sperr / "innen", 0o700)
+        os.chmod(blocked_dir / "innen", 0o700)
 
 
 def _dead_pid() -> int:
@@ -716,6 +741,134 @@ def check_session_detection(w: types.ModuleType) -> None:
           w.process_running_since(_leave_a_zombie()), None)
 
 
+def check_episode_clock(w: types.ModuleType, tmp_root: Path) -> None:
+    """The conflict hint counts from the start of the episode, not the sighting.
+
+    One field served both spans, and they are opposites: the quiet form counts
+    from the last sighting, which every pass refreshes while a conflict is open.
+    Passes run at least every fifteen minutes, so the hint could only ever read
+    "0 Stunde(n)" -- a reminder that reads like a fresh find and invites another
+    deferral. The example in 1.8, "seit 9 Stunde(n) ungelöst", was unreachable
+    (doku 1.8, 3.2).
+    """
+    print("Uhr der Episode:")
+    now = datetime.datetime.now()
+    long_open = (now - datetime.timedelta(hours=9, minutes=5)).isoformat()
+    just_seen = (now - datetime.timedelta(minutes=3)).isoformat()
+    original_key = w.read_api_key
+    w.read_api_key = lambda: None            # keine echte Konfiguration lesen
+    try:
+        text, _ = w.build_notice(
+            w.WatchState(conflict_since=long_open, last_conflict_seen=just_seen),
+            3, tmp_root)
+        check("Frist kommt aus dem Episodenbeginn", "seit 9 Stunde(n)" in text, True)
+        # Der eigentliche Nachweis: die frische Sichtung darf sie nicht drücken.
+        check("frische Sichtung ändert sie nicht", "0 Stunde(n)" in text, False)
+        text, _ = w.build_notice(
+            w.WatchState(last_conflict_seen=just_seen), 3, tmp_root)
+        check("ohne Episodenbeginn keine Frist", "seit" in text, False)
+    finally:
+        w.read_api_key = original_key
+    # Die Gegenrichtung: Die Ruheform zählt weiter ab der Sichtung und darf den
+    # Episodenbeginn nicht heranziehen. Sie braucht Zahlen, also eine Attrappe.
+    original_key, original_get = w.read_api_key, w.rest_get
+    w.read_api_key = lambda: "k"
+    w.rest_get = lambda path, api_key: (
+        {"connections": {"DEV": {"connected": True, "startedAt": "t",
+                                 "inBytesTotal": 0, "outBytesTotal": 0}}}
+        if path.startswith("/rest/system/connections") else
+        {"folders": [{"id": "F", "path": str(tmp_root), "paused": False}]}
+        if path.startswith("/rest/system/config") else {"needBytes": 0})
+    try:
+        text, _ = w.build_notice(
+            w.WatchState(last_conflict_seen=long_open,
+                         conflict_since=just_seen), 0, tmp_root)
+        check("Ruheform zählt ab der Sichtung", "seit 9 Stunde(n)" in text, True)
+    finally:
+        w.read_api_key, w.rest_get = original_key, original_get
+
+    # Verhaltensprobe über zwei echte Durchgänge: Episode beginnt und endet.
+    original_dir, original_notify = w.TOOL_DIR, w.maybe_notify
+    w.set_tool_dir(tmp_root / "episode")
+    w.maybe_notify = lambda *a, **k: None     # sonst liest der Durchgang REST
+    watched = tmp_root / "beobachtet"
+    watched.mkdir(parents=True, exist_ok=True)
+    kopie = watched / "N.sync-conflict-20260814-120000-DEV.txt"
+    try:
+        (watched / "N.txt").write_text("x", encoding="utf-8")
+        kopie.write_text("y", encoding="utf-8")
+        w.DRY_RUN = True                      # kein Dialog, keine Sitzung
+        w.run_pass(watched, "Prüfung")
+        gesetzt = w.load_state().conflict_since
+        check("Episodenbeginn beim ersten Fund gesetzt", gesetzt is not None, True)
+        w.run_pass(watched, "Prüfung")
+        check("zweiter Fund lässt ihn stehen",
+              w.load_state().conflict_since, gesetzt)
+        kopie.unlink()
+        w.run_pass(watched, "Prüfung")
+        check("Episodenende leert ihn",
+              w.load_state().conflict_since, None)
+    finally:
+        w.DRY_RUN = False
+        w.maybe_notify = original_notify
+        w.set_tool_dir(original_dir)
+        for entry in watched.iterdir():
+            entry.unlink()
+        watched.rmdir()
+
+
+def check_folder_check(w: types.ModuleType, tmp_root: Path) -> None:
+    """The folder check: three outcomes, and read-only by contract.
+
+    The installer used to promise that the watched directory is *configured*
+    while testing that a directory exists -- the silent failure the whole
+    checklist exists for (doku 3.5). The three outcomes have to stay apart,
+    because only the middle one is a finding: an unreachable interface permits
+    no conclusion at all.
+
+    The read-only property is pinned here rather than trusted: a run lock taken
+    by this switch would be read as "not configured" whenever a pass happens to
+    hold it, and a state write would overwrite that pass's state.
+    """
+    print("Freigabe-Prüfung:")
+    original_key, original_get = w.read_api_key, w.rest_get
+    shared = tmp_root / "geteilt"
+    shared.mkdir(parents=True, exist_ok=True)
+    try:
+        w.read_api_key = lambda: "k"
+        w.rest_get = lambda path, api_key: (
+            {"folders": [{"id": "abcde-fghij", "path": str(shared),
+                          "paused": False}]}
+            if path.startswith("/rest/system/config") else None)
+        check("Freigabe gefunden", w.check_folder(shared), 0)
+        check("anderer Ordner: keine Freigabe",
+              w.check_folder(tmp_root / "fremd"), 1)
+
+        w.rest_get = lambda path, api_key: None          # Schnittstelle stumm
+        check("Schnittstelle stumm: nicht prüfbar", w.check_folder(shared), 2)
+
+        w.read_api_key = lambda: None                    # kein Schlüssel
+        check("kein Schlüssel: nicht prüfbar", w.check_folder(shared), 2)
+    finally:
+        w.read_api_key, w.rest_get = original_key, original_get
+
+    # Die zugesicherte Eigenschaft: keine Sperre, kein Schreiben.
+    original_dir = w.TOOL_DIR
+    w.set_tool_dir(tmp_root / "unberuehrt")
+    try:
+        w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
+        w.save_state(w.WatchState(conflict_active=True))
+        before = w.STATE_FILE.read_bytes()
+        w.read_api_key = lambda: "k"
+        w.rest_get = lambda path, api_key: None
+        w.check_folder(shared)
+        check("keine Laufsperre entstanden", w.LOCK_FILE.exists(), False)
+        check("Zustandsdatei unverändert", w.STATE_FILE.read_bytes(), before)
+    finally:
+        w.read_api_key, w.rest_get = original_key, original_get
+        w.set_tool_dir(original_dir)
+
+
 def check_missing_notify_send(w: types.ModuleType) -> None:
     """A missing notify-send is a fault report, never a substitute channel.
 
@@ -768,6 +921,8 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="claude-sync-probe-") as tmp:
         check_lock(w, Path(tmp))
         check_swallowed_errors(w, Path(tmp))
+        check_episode_clock(w, Path(tmp))
+        check_folder_check(w, Path(tmp))
         check_transfer_temporaries(w, Path(tmp))
         check_notice(w, Path(tmp))
     print()

@@ -15,6 +15,12 @@ Usage
                                           ~/.claude-sync-watch) -- for tests,
                                           so a trial run never touches the
                                           real installation
+    claude_sync_watchd.py --check-folder  report whether Syncthing has the
+                                          watched directory as a folder and
+                                          exit: 0 configured, 1 not
+                                          configured, 2 could not tell.
+                                          Read-only -- no lock, no state
+                                          file (doku 3.5)
 
 Long-running user service. The operating system notifies it of file changes;
 it does not poll. On every pass it searches the watched directory for
@@ -163,23 +169,10 @@ SAFETY_SCAN_INTERVAL = datetime.timedelta(minutes=15)
 # predecessor" and let the next pass steal the lock mid-dialog.
 LOCK_STALE_AFTER = datetime.timedelta(minutes=60)
 
-CLAUDE_BINARY = "/usr/bin/claude"
-
+# Platform-neutral: Syncthing listens on this address on every system. The
+# location of its configuration is not, and therefore lives in the platform
+# section below (doku 2.4).
 SYNCTHING_API = "http://127.0.0.1:8384"
-SYNCTHING_CONFIG_CANDIDATES = [
-    Path.home() / ".local" / "state" / "syncthing" / "config.xml",
-    Path.home() / ".config" / "syncthing" / "config.xml",
-]
-
-TERMINAL_CANDIDATES: list[tuple[str, str]] = [
-    ("x-terminal-emulator", "-e"),
-    ("gnome-terminal", "--"),
-    ("konsole", "-e"),
-    ("xfce4-terminal", "-e"),
-    ("alacritty", "-e"),
-    ("kitty", "-e"),
-    ("xterm", "-e"),
-]
 
 DRY_RUN = False
 
@@ -212,6 +205,56 @@ def _require_linux(what: str) -> None:
 _notify_missing_reported = False
 
 
+def syncthing_config_candidates() -> list[Path]:
+    """Where Syncthing keeps its configuration, most likely first (doku 2.4).
+
+    A platform-dependent *location*, so it belongs here and not in the
+    configuration block at the top. The rule in 2.4 covers not only actions
+    but data -- paths, program names, candidate lists -- because its whole
+    justification for listing nothing is that the capsule is the directory:
+    what depends on the platform is found at its calls. A path pair sitting
+    among the constants is found at no call at all.
+
+    Windows keeps it under %LOCALAPPDATA% (doku 3.7).
+    """
+    _require_linux("Syncthing configuration location")
+    return [Path.home() / ".local" / "state" / "syncthing" / "config.xml",
+            Path.home() / ".config" / "syncthing" / "config.xml"]
+
+
+def terminal_candidates() -> list[tuple[str, str]]:
+    """Known terminal emulators and the flag that runs a command in them.
+
+    In priority order; the caller takes the first that exists. X11 names, so
+    platform-dependent data -- the Windows counterpart is wt.exe/PowerShell
+    (doku 3.7). Mirrored deliberately in tests/test_detect_terminal.py, which
+    reimplements the cascade without importing this file.
+    """
+    _require_linux("Terminal candidate list")
+    return [
+        ("x-terminal-emulator", "-e"),
+        ("gnome-terminal", "--"),
+        ("konsole", "-e"),
+        ("xfce4-terminal", "-e"),
+        ("alacritty", "-e"),
+        ("kitty", "-e"),
+        ("xterm", "-e"),
+    ]
+
+
+def claude_binary() -> str:
+    """Absolute path of the Claude Code program (doku 3.3, 3.5).
+
+    Absolute and not resolved through the search path: a systemd user service
+    starts with a sparse environment and would not find it. That makes it a
+    platform-dependent location like the two above, and it is capsuled rather
+    than kept as a named exception -- an exception in 2.4 would reintroduce
+    through the back door the enumeration that 2.4 rejects.
+    """
+    _require_linux("Claude Code location")
+    return "/usr/bin/claude"
+
+
 def notify(summary: str, body: str,
            seconds: int = NOTICE_SECONDS_QUIET) -> None:
     """Show a passive desktop notification. Never raises (doku 1.8).
@@ -221,7 +264,7 @@ def notify(summary: str, body: str,
     """
     global _notify_missing_reported
     if DRY_RUN:
-        print(f"[dry-run] notify ({seconds}s): {summary} -- {body}")
+        print(f"[dry-run] Meldung ({seconds}s): {summary} -- {body}")
         return
     _require_linux("Desktop notification")
     try:
@@ -526,7 +569,13 @@ def process_running_since(pid: int) -> Optional[datetime.datetime]:
 
 
 def _boot_time() -> Optional[datetime.datetime]:
-    """Wall-clock time the system booted, from ``/proc/stat`` (doku 2.4)."""
+    """Wall-clock time the system booted, from ``/proc/stat`` (doku 2.4).
+
+    Refuses explicitly rather than relying on its only caller being
+    guarded: a location under /proc is as platform-dependent as any
+    other, and the next caller might not be guarded.
+    """
+    _require_linux("Boot time")
     try:
         for line in Path("/proc/stat").read_text(encoding="utf-8").splitlines():
             if line.startswith("btime "):
@@ -576,6 +625,11 @@ class WatchState:
     # values for the hourly byte delta (doku 3.1, point 1).
     transfer_baseline: dict[str, Any] = dataclasses.field(default_factory=dict)
     last_conflict_seen: Optional[str] = None
+    # When the current episode began -- a second clock, because the two spans
+    # the notice can name are opposites: the quiet form counts from the last
+    # sighting, the conflict hint from the start of the episode (doku 1.8, 3.2).
+    # One field for both could only ever say "0 hours".
+    conflict_since: Optional[str] = None
     session_pid: Optional[int] = None
     session_started: Optional[str] = None
     # True when the last attempt could not be shown at all (doku 3.3).
@@ -863,7 +917,7 @@ def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
         state.terminal_cmd = chosen
         return Answer.YES, chosen
 
-    found = [(binary, arg) for binary, arg in TERMINAL_CANDIDATES
+    found = [(binary, arg) for binary, arg in terminal_candidates()
              if shutil.which(binary)]
 
     if len(found) == 1:
@@ -947,13 +1001,13 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
     # so the prompt is safe behind it.
     argv = [
         *terminal_cmd,
-        CLAUDE_BINARY,
+        claude_binary(),
         "--add-dir", str(TOOLS_DIR),
         "--append-system-prompt-file", str(INSTRUCTION_FILE),
         build_handover(pairs, watch_dir),
     ]
     if DRY_RUN:
-        print("[dry-run] would launch:", " ".join(repr(a) for a in argv))
+        print("[dry-run] würde starten:", " ".join(repr(a) for a in argv))
         return None
     return spawn_detached(argv, cwd=watch_dir)
 
@@ -974,7 +1028,7 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
         "Jetzt lösen?"
     )
     if DRY_RUN:
-        print(f"[dry-run] would ask about {len(pairs)} conflict(s):\n{listing}")
+        print(f"[dry-run] würde nach {len(pairs)} Konflikt(en) fragen:\n{listing}")
         return
 
     # Saved before the dialog opens, not with the rest of the pass at the end:
@@ -1033,7 +1087,7 @@ def read_api_key() -> Optional[str]:
     logged, never written into a notice, and lives outside the synchronised
     directory (doku 3.1, point 2).
     """
-    for candidate in SYNCTHING_CONFIG_CANDIDATES:
+    for candidate in syncthing_config_candidates():
         if not candidate.exists():
             continue
         try:
@@ -1089,9 +1143,15 @@ def build_notice(state: WatchState, open_conflicts: int,
     # pointer replaces the statistics so a postponed resolution does not fade
     # from view -- and it must appear even when the interface says nothing.
     if open_conflicts:
+        # From the START of the episode, not from the last sighting: the
+        # sighting is refreshed by every pass while the conflict is open, and
+        # passes run at least every fifteen minutes -- the span could therefore
+        # only ever read "0 Stunde(n)", which turns a reminder into the report
+        # of a fresh find (doku 1.8). Without the field, no span at all: an
+        # older state file must not be made to claim zero.
         since = ""
-        if state.last_conflict_seen:
-            hours = int(_age(state.last_conflict_seen).total_seconds() // 3600)
+        if state.conflict_since:
+            hours = int(_age(state.conflict_since).total_seconds() // 3600)
             since = f" seit {hours} Stunde(n)"
         # Both a pause and a backlog change what the user has to do, so both
         # are named alongside the conflict instead of waiting for a quiet hour
@@ -1256,6 +1316,14 @@ def maybe_notify(state: WatchState, open_conflicts: int,
     state.notice_last_shown = _now()
     try:
         notice = build_notice(state, open_conflicts, watch_dir)
+    except NotImplementedError as unsupported:
+        # The documented refusal of the platform capsule (doku 2.4), not a
+        # defect. Caught before the branch below on purpose: reported as a
+        # programming error with a traceback it would be a lie -- and an
+        # hourly one -- at the very place this pass made truthful.
+        print(f"Betriebsmeldung auf dieser Plattform nicht bedient "
+              f"({unsupported}); siehe 3.7.", file=sys.stderr, flush=True)
+        return
     except Exception:
         # Everything the suppliers handle themselves -- unreachable interface,
         # missing key, oddly shaped answer -- already returns None (doku 3.1,
@@ -1300,24 +1368,36 @@ def run_pass(watch_dir: Path, reason: str) -> int:
             state.session_pid = None
             state.session_started = None
 
-        if not pairs and not problems:
-            # No finding: the episode ends by itself. That is the normal case
-            # when the conflict was resolved on another machine and the
-            # resolution has arrived here (doku 1.6, 3.1 step 4).
-            #
-            # Only on a COMPLETE search, though: an incomplete one would look
-            # exactly like a resolved conflict, and a watcher that cannot see
-            # would close the episode it is supposed to be guarding.
-            state.conflict_active = False
-        else:
+        # Three cases, not two: "found something", "found nothing", and "could
+        # not look properly". The third one must leave the episode untouched --
+        # ending it would make a blind watcher look like a resolved conflict,
+        # and starting one would escalate a finding that does not exist.
+        if pairs:
             state.last_conflict_seen = _now()
             was_active = state.conflict_active
             state.conflict_active = True
+            if not was_active:
+                # The episode's own clock, separate from the last sighting: the
+                # notice says how long the conflict has been OPEN, and the
+                # sighting is refreshed on every pass while it is (doku 1.8,
+                # 3.2). Set on the transition only, so a restart during an open
+                # episode does not put the clock back -- and so a state file
+                # from an older version keeps it empty, which drops the span
+                # instead of claiming zero.
+                state.conflict_since = _now()
             if state.session_running():
                 # The user is working on it right now -- no dialog (step 3).
                 pass
             elif state.dialog_due() or not was_active:
                 escalate(pairs, state, watch_dir)
+        elif problems:
+            pass
+        else:
+            # No finding on a complete search: the episode ends by itself. That
+            # is the normal case when the conflict was resolved on another
+            # machine and the resolution has arrived here (doku 1.6, 3.1 step 4).
+            state.conflict_active = False
+            state.conflict_since = None
 
         maybe_notify(state, len(pairs), watch_dir)
         save_state(state)
@@ -1326,7 +1406,7 @@ def run_pass(watch_dir: Path, reason: str) -> int:
         # deliberate: the safety scan runs every 15 minutes and would otherwise
         # fill the journal with "nothing".
         if pairs or DRY_RUN:
-            print(f"[{reason}] {len(pairs)} conflict(s) in {watch_dir}",
+            print(f"[{reason}] {len(pairs)} Konflikt(e) in {watch_dir}",
                   flush=True)
         return len(pairs)
     finally:
@@ -1351,10 +1431,10 @@ def watch_forever(watch_dir: Path) -> int:
         from watchdog.events import FileSystemEventHandler
         from watchdog.observers import Observer
     except ImportError:
-        print("The Python package 'watchdog' is required but not installed.\n"
-              "Install it through your distribution (for example: "
-              "sudo apt install python3-watchdog) and start the service "
-              "again.", file=sys.stderr)
+        print("Die Python-Beobachtungsbibliothek 'watchdog' fehlt.\n"
+              "Bitte über die Distribution installieren (zum Beispiel: "
+              "sudo apt install python3-watchdog) und den Dienst erneut "
+              "starten.", file=sys.stderr)
         return 1
 
     # A conflict name is always a finished finding, never an intermediate
@@ -1373,11 +1453,11 @@ def watch_forever(watch_dir: Path) -> int:
 
         def on_created(self, event: Any) -> None:
             if self._relevant(event):
-                run_pass(watch_dir, "event:created")
+                run_pass(watch_dir, "Ereignis: angelegt")
 
         def on_moved(self, event: Any) -> None:
             if self._relevant(event):
-                run_pass(watch_dir, "event:moved")
+                run_pass(watch_dir, "Ereignis: verschoben")
 
         def on_deleted(self, event: Any) -> None:
             # A copy that disappears ends the episode. Without this the state
@@ -1386,9 +1466,9 @@ def watch_forever(watch_dir: Path) -> int:
             # copy vanishing because it was resolved elsewhere is the normal
             # case, not an edge one (doku 3.1, step 1).
             if self._relevant(event):
-                run_pass(watch_dir, "event:deleted")
+                run_pass(watch_dir, "Ereignis: gelöscht")
 
-    run_pass(watch_dir, "startup scan")
+    run_pass(watch_dir, "Startlauf")
 
     observer = Observer()
     observer.schedule(ConflictHandler(), str(watch_dir), recursive=True)
@@ -1398,7 +1478,7 @@ def watch_forever(watch_dir: Path) -> int:
         while True:
             time.sleep(30)
             if datetime.datetime.now() - last_safety >= SAFETY_SCAN_INTERVAL:
-                run_pass(watch_dir, "safety scan")
+                run_pass(watch_dir, "Sicherheitslauf")
                 last_safety = datetime.datetime.now()
     except KeyboardInterrupt:
         pass
@@ -1411,6 +1491,50 @@ def watch_forever(watch_dir: Path) -> int:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
+def check_folder(watch_dir: Path) -> int:
+    """Report whether Syncthing has *watch_dir* as a folder. Three outcomes.
+
+    Exists because `install_service.sh` promised more than it checked: it
+    tested that a directory is there, while 3.5 assured that the directory is
+    *configured*. The difference is the silent failure the whole checklist is
+    meant to prevent -- a watcher on a machine whose ~/.claude is not synced
+    runs flawlessly, finds nothing ever, and reports no backlog precisely
+    because it finds no folder.
+
+    Deliberately here and not reimplemented in the shell script: the check
+    needs the platform-dependent configuration location, the key, the REST
+    call and the path comparison that tolerates "~/.claude" instead of an
+    absolute path -- all of it already present. A second implementation would
+    violate 2.4, and the Windows counterpart (3.7) would need a third.
+
+    **Read-only by contract** (doku 3.5): no run lock, no state file, no tool
+    directory. A refused lock would be read as "not configured" by the caller,
+    which would be a wrong verdict drawn from a coincidence of timing; and a
+    state write would overwrite the state of a pass running at the same moment.
+
+    Returns 0 when the folder is configured, 1 when it is not, and 2 when that
+    could not be determined -- the caller must keep those apart, because only
+    the middle one is a finding.
+    """
+    api_key = read_api_key()
+    if not api_key:
+        print("Freigabe nicht prüfbar: Syncthings API-Schlüssel ist nicht "
+              "lesbar.", file=sys.stderr)
+        return 2
+    folder = folder_config_for(watch_dir, api_key)
+    if folder is None:
+        if rest_get("/rest/system/config", api_key) is None:
+            print("Freigabe nicht prüfbar: Syncthings Schnittstelle antwortet "
+                  "nicht.", file=sys.stderr)
+            return 2
+        print(f"Syncthing kennt keine Freigabe für {watch_dir} — der Ordner "
+              "wird nicht abgeglichen.", file=sys.stderr)
+        return 1
+    paused = " (angehalten)" if folder.get("paused") else ""
+    print(f"Freigabe gefunden: {folder.get('id')}{paused}.")
+    return 0
+
 
 def main(argv: Optional[list[str]] = None) -> int:
     """Parse arguments and either run one pass or watch indefinitely."""
@@ -1426,6 +1550,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--tool-dir", default="",
                         help="where this daemon's own files live "
                              "(default: ~/.claude-sync-watch; for tests)")
+    parser.add_argument("--check-folder", action="store_true",
+                        help="report whether Syncthing has the watched "
+                             "directory as a folder, then exit")
     args = parser.parse_args(argv)
 
     DRY_RUN = args.dry_run
@@ -1433,14 +1560,19 @@ def main(argv: Optional[list[str]] = None) -> int:
         set_tool_dir(Path(args.tool_dir).expanduser())
     watch_dir = Path(args.watch_dir).expanduser()
 
+    # Answered before the directory check below and before anything that
+    # writes: this switch is read-only by contract (doku 3.5).
+    if args.check_folder:
+        return check_folder(watch_dir)
+
     if not watch_dir.is_dir():
-        print(f"Watched directory does not exist: {watch_dir}", file=sys.stderr)
+        print(f"Überwachungsordner existiert nicht: {watch_dir}", file=sys.stderr)
         return 1
 
     if args.once:
-        count = run_pass(watch_dir, "single pass")
+        count = run_pass(watch_dir, "Einzellauf")
         if count < 0:
-            print("Another pass is currently running; did nothing.",
+            print("Ein anderer Durchgang läuft gerade; nichts getan.",
                   file=sys.stderr)
             return 1
         return 0
