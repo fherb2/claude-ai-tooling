@@ -4,7 +4,7 @@ Ein Shell-Skript, das die Quelldateien eines Projekts in einer einzigen, struktu
 
 Nützlich für die Arbeit über Web-KI-Agenten bzw. in einer unsicheren Umgebung, in der der KI-Agent keinen direkten Zugriff auf den Rechner haben soll.
 
-> **Hinweis:** Dieses Tool ist derzeit speziell auf [Claude](https://claude.ai) zugeschnitten – der erzeugte Header spricht es direkt über einen `@Claude:`-Block an (siehe Abschnitt „Ausgabeformat" weiter unten). Für einen anderen KI-Agenten müsste dieser Block entsprechend angepasst werden.
+> **Hinweis:** Der erzeugte Header beschreibt nur das Format – er richtet sich an keinen bestimmten KI-Agenten und weist auch keinen an, etwas zu tun. Die eigentlichen Anweisungen liegen in `project_source.instructions.md` (Option `-i`), das du dort einträgst, wo dein Agent seine ständigen Anweisungen entgegennimmt. Grund: Mehrere Agenten behandeln den Inhalt hochgeladener Dokumente bewusst als Daten und befolgen darin enthaltene Anweisungen nicht zuverlässig.
 
 ---
 
@@ -30,7 +30,8 @@ Der Hauptanwendungsfall ist das Hochladen von `project_source.txt` als Wissensdo
 - **Verzeichnisausschluss** — überspringt Build-Artefakte, Caches oder Backup-Ordner anhand des bloßen Verzeichnisnamens, in beliebiger Tiefe, über `EXCLUDE_DIRS`.
 - **Standardmäßiger Punkt-Ausschluss** — Dateien und Verzeichnisse, deren Name mit `.` beginnt (z. B. `.git`, `.vscode`, `.env`, `.gitignore`), werden bei `SOURCE_DIRS`-Scans immer übersprungen, sofern sie nicht explizit in `EXPLICIT_FILES` aufgeführt sind.
 - **Strukturierte `#!PKSRC`-Metadaten-Marker** — jeder Datei-Block trägt einen laufbezogenen Zeitstempel und den individuellen letzten Änderungszeitpunkt der Datei.
-- **KI-lesbarer Header** — eine Präambel in der Ausgabe weist die KI an, wie die Metadaten zu interpretieren sind und wie veraltete Ergebnisse zu kennzeichnen sind.
+- **Selbstbeschreibender Header** — eine Präambel erklärt in drei einzeln durchsuchbaren Abschnitten (`NOTE_TO_READER`, `FORMAT_DESCRIPTION`, `DATE_TIME_CHECK`), wie die Datei aufgebaut ist und woran sich veraltete Suchergebnisse erkennen lassen. Jeder Abschnitt trägt einen eigenen `#!PKSRC`-Marker, sodass auch ein einzelnes Bruchstück der Datei noch selbsterklärend ist, wenn ein Retrieval-System nur dieses ausliefert.
+- **Anweisungsdatei für KI-Agenten** — `-i` schreibt zusätzlich `project_source.instructions.md` mit den eigentlichen Anweisungen. Header und Anweisungsdatei speisen sich aus denselben Textblöcken im Skript und können deshalb nicht auseinanderlaufen.
 - **Robuster Umgang mit fehlenden Einträgen** — ein nicht existierender `SOURCE_DIRS`- oder `EXPLICIT_FILES`-Eintrag erzeugt eine Warnung auf stderr; die übrige Ausgabe wird normal erzeugt.
 - **Alphabetisch sortierte Ausgabe** — Dateien werden verzeichnisübergreifend nach Pfad sortiert, sodass das Ergebnis deterministisch und leicht zu diffen ist. Dateien mit identischem Namen in unterschiedlichen Verzeichnissen werden NICHT dedupliziert — jede wird einzeln aufgeführt, unterscheidbar anhand ihres Pfads im Block-Header.
 
@@ -127,6 +128,9 @@ Jede Datei oder jedes Verzeichnis, deren/dessen bloßer Name mit `.` beginnt (z.
 # Für diesen Lauf zusätzlich reine Textdateien einschließen
 ./packsrc.sh -txt
 
+# Zusätzlich die Anweisungsdatei für KI-Agenten schreiben
+./packsrc.sh -i
+
 # Flags kombinieren
 ./packsrc.sh -md -txt
 
@@ -134,7 +138,7 @@ Jede Datei oder jedes Verzeichnis, deren/dessen bloßer Name mit `.` beginnt (z.
 ./packsrc.sh -h
 ```
 
-Die Ausgabe wird immer nach `./project_source.txt` geschrieben, in das Verzeichnis, aus dem das Skript aufgerufen wird. Die Datei wird bei jedem Lauf überschrieben.
+Die Ausgabe wird immer nach `./project_source.txt` geschrieben, in das Verzeichnis, aus dem das Skript aufgerufen wird. Die Datei wird bei jedem Lauf überschrieben. Mit `-i` entsteht daneben `./project_source.instructions.md`; deren Inhalt hängt nicht vom Lauf ab, ein erneuter Aufruf schreibt also eine identische Datei.
 
 ---
 
@@ -145,7 +149,14 @@ Die Ausgabe wird immer nach `./project_source.txt` geschrieben, in das Verzeichn
 ```
 #!PKSRC:HEADER:BEGIN | project_source.txt | pksrc_ts: 2025-03-14_10-23-45
 #
-# @Claude: ...  (AI instructions — see section below)
+#!PKSRC:HEADER:NOTE_TO_READER
+# < wofür die beiden folgenden Abschnitte da sind >
+#
+#!PKSRC:HEADER:FORMAT_DESCRIPTION
+# < Aufbau der Datei und Bedeutung der Felder >
+#
+#!PKSRC:HEADER:DATE_TIME_CHECK
+# < woran veraltete Suchergebnisse zu erkennen sind >
 #
 #!PKSRC:HEADER:END
 
@@ -172,24 +183,31 @@ Das Präfix `#!PKSRC` kommt in normalem Python-, CUDA-, Shell- oder Konfiguratio
 
 ### Erkennung veralteter Ergebnisse
 
-Der Header weist die KI an, `pksrc_ts` immer mit anzugeben, wenn sie sich auf ein Suchergebnis bezieht. Weicht der zitierte Zeitstempel vom Zeitstempel der aktuell hochgeladenen Datei ab, stammt das Ergebnis aus einem veralteten Index – die KI wird angewiesen, ausdrücklich darauf hinzuweisen.
+Der Abschnitt `DATE_TIME_CHECK` im Header beschreibt den Zusammenhang: Jeder Block wiederholt den `pksrc_ts` des Laufs, aus dem er stammt. Antwortet ein Agent aus einem früheren, gecachten Suchergebnis, trägt der zitierte Inhalt einen älteren `pksrc_ts` als die `#!PKSRC:HEADER:BEGIN`-Zeile der aktuell hochgeladenen Datei. Weichen die beiden Werte voneinander ab, ist das Ergebnis überholt.
 
 `file_mtime` erlaubt dir (und der KI) zu überprüfen, ob eine bestimmte Quelldatei bei einem gegebenen Implementierungsschritt tatsächlich angefasst wurde, ohne die Git-Historie nachsehen zu müssen.
 
-### Anweisungen im KI-Header
+### Anweisungsdatei `project_source.instructions.md`
 
-Der Header-Block enthält derzeit Anweisungen, die für [Claude](https://claude.ai) geschrieben sind. Wenn du einen anderen KI-Agenten verwendest, kannst du den `@Claude:`-Block nahe dem Anfang des Skripts anpassen — es handelt sich um eine einfache mehrzeilige `echo`-Sequenz ohne besondere Syntax.
+Der Header beschreibt, er weist nicht an. Das ist Absicht: Mehrere KI-Agenten behandeln den Inhalt hochgeladener Dokumente bewusst als Daten und befolgen darin enthaltene Anweisungen nicht zuverlässig — im Extremfall werden sie als Injektionsversuch bewertet. Verlässlich befolgt wird nur, was im dafür vorgesehenen Kanal steht.
+
+`./packsrc.sh -i` schreibt deshalb zusätzlich `project_source.instructions.md`. Deren Inhalt trägst du dort ein, wo dein Agent seine ständigen Anweisungen entgegennimmt — Projektanweisungen bei Claude, das Instructions-Feld eines Gemini-Gems, `AGENTS.md`, `CLAUDE.md` oder der System-Prompt deines eigenen Tooling.
+
+Die beiden Abschnitte `FORMAT_DESCRIPTION` und `DATE_TIME_CHECK` stehen im Skript genau einmal, in den Funktionen `emit_format_description` und `emit_date_time_check`; Header und Anweisungsdatei werden beide daraus gebaut. Wer den Wortlaut ändern will, ändert ihn dort — **nicht** in `project_source.instructions.md`, die beim nächsten `-i`-Lauf überschrieben wird. Die in diesem Repository liegende Fassung ist genau so erzeugt und dient als Vorschau; wer nur `packsrc.sh` in ein eigenes Projekt kopiert, erzeugt sie dort mit `-i` selbst.
 
 ---
 
 ## Typischer Workflow
 
 1. **Einmal konfigurieren** — `SOURCE_DIRS`, `BASE_EXTENSIONS`, `EXCLUDE_DIRS` und `EXPLICIT_FILES` für dein Projekt festlegen.
-2. **Neu erzeugen** — das Skript nach jedem relevanten Commit oder jeder Arbeitssitzung ausführen.
-3. **Hochladen** — `project_source.txt` in die Knowledge Base deines KI-Projekts legen (z. B. als Projektdokument in Claude).
-4. **Arbeiten** — die KI verfügt nun über präzisen, zeitgestempelten Kontext für alle Quelldateien und kann veraltete Index-Ergebnisse automatisch erkennen.
+2. **Einmal einrichten** — `./packsrc.sh -i` aufrufen und den Inhalt von `project_source.instructions.md` in die ständigen Anweisungen deines KI-Agenten eintragen.
+3. **Neu erzeugen** — das Skript nach jedem relevanten Commit oder jeder Arbeitssitzung ausführen.
+4. **Hochladen** — `project_source.txt` in die Knowledge Base deines KI-Projekts legen (z. B. als Projektdokument in Claude).
+5. **Arbeiten** — die KI verfügt nun über präzisen, zeitgestempelten Kontext für alle Quelldateien und kann veraltete Index-Ergebnisse erkennen.
 
-Es empfiehlt sich, `project_source.txt` in die `.gitignore` aufzunehmen, da es sich um ein generiertes Artefakt handelt.
+Es empfiehlt sich, `project_source.txt` in die `.gitignore` aufzunehmen, da es sich um ein generiertes Artefakt handelt. `project_source.instructions.md` gehört dagegen mit ins Repository, damit alle Beteiligten denselben Anweisungstext eintragen.
+
+> **Umstieg von einer früheren Fassung:** Bis dahin enthielt der Header einen deutschen `@Claude:`-Block mit den Anweisungen. Der ist entfallen. Wer sich darauf verlassen hat, holt Schritt 2 einmal nach; am Format der Datei-Blöcke ändert sich nichts.
 
 ---
 

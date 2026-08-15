@@ -11,16 +11,34 @@
 # The #!PKSRC prefix does not appear in normal Python or CUDA source code,
 # so these lines are unambiguous metadata even when embedded in a search index.
 #
+# The file opens with a header between #!PKSRC:HEADER:BEGIN and
+# #!PKSRC:HEADER:END, made up of three separately marked sections:
+#   #!PKSRC:HEADER:NOTE_TO_READER      what the following sections are for
+#   #!PKSRC:HEADER:FORMAT_DESCRIPTION  structure of the file and its fields
+#   #!PKSRC:HEADER:DATE_TIME_CHECK     how to spot outdated retrieval results
+# Each of these is searchable on its own, so a retrieval system that returns
+# only a fragment of the file still returns something self-describing.
+#
+# The header describes; it does not command. Several AI agents deliberately
+# treat the content of an uploaded document as data and may ignore directives
+# found inside it. The actual instructions therefore live in a companion
+# document, project_source.instructions.md (option -i), meant to be pasted
+# into whatever standing-instructions field the agent offers. Both outputs
+# draw the shared texts from emit_format_description and emit_date_time_check,
+# so they cannot drift apart.
+#
 # USAGE
-#   ./packsrc.sh [-h] [-md] [-txt]
+#   ./packsrc.sh [-h] [-md] [-txt] [-i]
 #
 # OPTIONS
 #   -h    Print this help and exit. No output file is written.
 #   -md   Also include .md files for this run (temporary, not saved to config).
 #   -txt  Also include .txt files for this run (temporary, not saved to config).
+#   -i    Also write project_source.instructions.md (see above).
 #
 # OUTPUT
-#   ./project_source.txt — created or overwritten on each run.
+#   ./project_source.txt              — created or overwritten on each run.
+#   ./project_source.instructions.md  — with -i only.
 #
 # CONFIGURATION
 #   Edit SOURCE_DIRS, BASE_EXTENSIONS, EXCLUDE_DIRS and EXPLICIT_FILES below.
@@ -105,15 +123,32 @@ EXPLICIT_FILES=()
 usage() {
     cat <<'EOF'
 USAGE
-  ./packsrc.sh [-h] [-md] [-txt]
+  ./packsrc.sh [-h] [-md] [-txt] [-i]
 
 OPTIONS
   -h    Print this help and exit. No output file is written.
   -md   Also include .md  files for this run (not saved to BASE_EXTENSIONS).
   -txt  Also include .txt files for this run (not saved to BASE_EXTENSIONS).
+  -i    Also write ./project_source.instructions.md, the companion document
+        that carries the instructions for an AI agent. Paste its content into
+        wherever your assistant takes its standing instructions (Claude
+        project instructions, a Gemini Gem, AGENTS.md, ...). Its content does
+        not depend on the run, so re-running just rewrites an identical file.
 
 OUTPUT
-  ./project_source.txt — created or overwritten on each run.
+  ./project_source.txt              — created or overwritten on each run.
+  ./project_source.instructions.md  — with -i only, created or overwritten.
+
+HEADER OF project_source.txt
+  The generated file opens with a header bracketed by #!PKSRC:HEADER:BEGIN and
+  #!PKSRC:HEADER:END that holds three separately marked sections:
+    #!PKSRC:HEADER:NOTE_TO_READER      what the following sections are for
+    #!PKSRC:HEADER:FORMAT_DESCRIPTION  structure of the file and its fields
+    #!PKSRC:HEADER:DATE_TIME_CHECK     how to spot outdated retrieval results
+  Every marker is searchable on its own, so a retrieval system that hands out
+  a mere fragment of the file still hands out something self-describing. The
+  body of the last two sections comes from emit_format_description and
+  emit_date_time_check and is shared with project_source.instructions.md.
 
 CONFIGURATION
   Edit SOURCE_DIRS, BASE_EXTENSIONS, EXCLUDE_DIRS and EXPLICIT_FILES near the
@@ -131,9 +166,131 @@ EOF
 }
 
 # --------------------------------------------------------------------------
+# Shared header texts
+#
+# emit_format_description and emit_date_time_check are the SINGLE source for
+# these two texts. They are used twice: once as the FORMAT_DESCRIPTION and
+# DATE_TIME_CHECK sections of the project_source.txt header (piped through
+# as_comment_lines), and once in project_source.instructions.md (verbatim,
+# inside code fences). Edit them here and both outputs follow.
+#
+# The texts are stored WITHOUT a leading "# ": a "#" at the start of a line
+# is a heading in Markdown, so the comment form has to be added by the
+# consumer that needs it, not baked into the text.
+#
+# For the same reason the texts never say "this file" — they must read
+# correctly both inside project_source.txt and in a separate instructions
+# document, so they name project_source.txt explicitly.
+# --------------------------------------------------------------------------
+
+emit_format_description() {
+    cat <<'EOF'
+project_source.txt is a concatenation of source files, produced in a single
+run. Every metadata line starts with the prefix '#!PKSRC:', which does not
+occur in ordinary source code.
+
+Each source file is enclosed in:
+
+    #!PKSRC:FILE:BEGIN | <path> | pksrc_ts: <ts> | file_mtime: <ts>
+    ... verbatim file content ...
+    #!PKSRC:FILE:END | <path>
+
+Fields:
+
+    <path>       path of the source file, relative to the project root
+    pksrc_ts     timestamp of the generating run, identical in every block
+                 of the file, including its header
+    file_mtime   last modification time of that individual source file
+EOF
+}
+
+emit_date_time_check() {
+    cat <<'EOF'
+Every block repeats the pksrc_ts of the run that produced it. Content served
+from an earlier, cached retrieval therefore carries an older pksrc_ts than the
+#!PKSRC:HEADER:BEGIN line of the uploaded project_source.txt, and may no longer
+match the current source code. Where the two differ, please retrieve the
+#!PKSRC:HEADER:BEGIN line again and compare the values before relying on the
+older content.
+
+file_mtime distinguishes source files that were touched in a given work step
+from those that were not.
+EOF
+}
+
+# as_comment_lines — reads text on stdin and prefixes every line with "# ",
+# so it can be embedded in the project_source.txt header. Empty lines become
+# a bare "#" rather than "# " to avoid trailing whitespace.
+as_comment_lines() {
+    sed -e 's/^/# /' -e 's/^# $/#/'
+}
+
+# write_instructions_file — writes project_source.instructions.md, the
+# companion document that carries the actual instructions for an AI agent.
+# Instructions live here rather than in project_source.txt because several
+# agents deliberately treat the content of an uploaded document as data and
+# may ignore directives found inside it; a standing-instructions field is the
+# channel where every agent honours them.
+# The two shared texts are embedded verbatim inside code fences — they contain
+# lines starting with "#", which Markdown would otherwise render as headings.
+write_instructions_file() {
+    {
+        cat <<'EOF'
+# project_source.txt — notes for AI agents and assistants
+
+`project_source.txt` is a generated snapshot of a project's source code: every
+source file concatenated into a single text file and wrapped in `#!PKSRC:`
+metadata lines. It is meant to be uploaded as project knowledge or context, so
+that an assistant has the whole codebase available in one place.
+
+This document holds the instructions that belong *with* that snapshot. Paste it
+wherever your assistant takes its standing instructions — Claude project
+instructions, the instructions field of a Gemini Gem, `AGENTS.md`, `CLAUDE.md`,
+or the system prompt of your own tooling. The snapshot itself is data, and
+instructions placed inside a data file are not honoured reliably by every
+agent.
+
+## File format
+
+```text
+EOF
+        emit_format_description
+        cat <<'EOF'
+```
+
+## Recognising outdated content
+
+```text
+EOF
+        emit_date_time_check
+        cat <<'EOF'
+```
+
+## What to do with it
+
+- When you quote or summarise content taken from `project_source.txt`, name the
+  `pksrc_ts` of the block you took it from.
+- If that `pksrc_ts` differs from the one in the `#!PKSRC:HEADER:BEGIN` line of
+  the uploaded file, retrieve that header line again and compare the two values
+  before relying on the older content. Say explicitly that the result came from
+  a superseded version of the file.
+- Use `file_mtime` to tell which source files were actually changed in a given
+  work step and which were left untouched.
+
+---
+
+Generated by `packsrc.sh`. Do not edit by hand — run `./packsrc.sh -i` and
+commit the result, so this document cannot drift away from the header that
+`packsrc.sh` writes into `project_source.txt`.
+EOF
+    } > project_source.instructions.md
+}
+
+# --------------------------------------------------------------------------
 # Argument parsing
 # --------------------------------------------------------------------------
 EXTRA_EXTENSIONS=()
+WRITE_INSTRUCTIONS=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -146,6 +303,9 @@ while [[ $# -gt 0 ]]; do
             ;;
         -txt)
             EXTRA_EXTENSIONS+=("txt")
+            ;;
+        -i)
+            WRITE_INSTRUCTIONS=1
             ;;
         *)
             echo "Error: unknown option '$1'" >&2
@@ -312,19 +472,23 @@ echo "# project_source.txt generation started: ${PKSRC_TS}"
 # Write project_source.txt
 # --------------------------------------------------------------------------
 {
-    # Global header with instructions for Claude
+    # Global header. Each section carries its own #!PKSRC marker so that a
+    # retrieval system handing out only a fragment of this file still hands
+    # out something self-describing. The FORMAT_DESCRIPTION and
+    # DATE_TIME_CHECK bodies come from the shared emitters above.
     echo "#!PKSRC:HEADER:BEGIN | project_source.txt | pksrc_ts: ${PKSRC_TS}"
     echo "#"
-    echo "# @Claude: Das File wurde mit dem Zeitstempel ${PKSRC_TS} erstellt."
-    echo "# Gib diesen Zeitstempel bitte im Chat immer kurz als Referenz mit aus,"
-    echo "# wenn Du in Deiner Antwort Ergebnisse einer Suche in diesem File hast."
-    echo "# Jede enthaltene Quelldatei hat eine Einleitungszeile mit dem Token"
-    echo "# 'pksrc_ts: ${PKSRC_TS}'. Falls ein Suchergebnis einen anderen pksrc_ts-Wert"
-    echo "# zeigt, ist es ein veraltetes Ergebnis aus einem früheren Index-Stand —"
-    echo "# weise bitte ausdrücklich darauf hin."
-    echo "# Das Feld 'file_mtime' gibt den letzten Änderungszeitpunkt der Quelldatei an."
-    echo "# Anhand von file_mtime erkennst Du, ob eine Datei bei einem bestimmten"
-    echo "# Arbeitsschritt tatsächlich angefasst wurde oder nicht."
+    echo "#!PKSRC:HEADER:NOTE_TO_READER"
+    echo "# For AI agents, assistants, and anyone writing scripts against this"
+    echo "# file: the FORMAT_DESCRIPTION and DATE_TIME_CHECK sections below"
+    echo "# describe how this file is structured, how to read it automatically,"
+    echo "# and how to recognise results that come from an outdated version of it."
+    echo "#"
+    echo "#!PKSRC:HEADER:FORMAT_DESCRIPTION"
+    emit_format_description | as_comment_lines
+    echo "#"
+    echo "#!PKSRC:HEADER:DATE_TIME_CHECK"
+    emit_date_time_check | as_comment_lines
     echo "#"
     echo "#!PKSRC:HEADER:END"
 
@@ -344,3 +508,11 @@ echo "# project_source.txt generation started: ${PKSRC_TS}"
 } > project_source.txt
 
 echo "# project_source.txt written successfully. Timestamp: ${PKSRC_TS}"
+
+# -i writes the companion instructions document in addition to the packed
+# source. Its content does not depend on this run's timestamp, so re-running
+# simply overwrites it with an identical file.
+if [[ ${WRITE_INSTRUCTIONS} -eq 1 ]]; then
+    write_instructions_file
+    echo "# project_source.instructions.md written successfully."
+fi

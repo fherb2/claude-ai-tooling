@@ -14,6 +14,7 @@ __pycache__/
 **/test_data/*
 !**/test_data/.gitkeep
 **/test_project
+project_source.txt
 
 # rein persönliche Daten, die nie den Rechner verlassen
 Fossil-Synology-Konfigurationsanleitung-Herbrand.md

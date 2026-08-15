@@ -4,7 +4,7 @@ A shell script that bundles project source files into a single, structured text 
 
 Useful for working via web AI agents, or in an insecure environment where the AI agent is not meant to have direct access to the computer.
 
-> **Note:** This tool is currently tailored specifically to [Claude](https://claude.ai) — the generated header addresses it directly via an `@Claude:` block (see the Output format section below). Adapting it for a different AI agent would require rewriting that block.
+> **Note:** The generated header only describes the format — it addresses no particular AI agent and instructs none of them to do anything. The actual instructions live in `project_source.instructions.md` (option `-i`), which you paste into wherever your agent takes its standing instructions. The reason: several agents deliberately treat the content of an uploaded document as data and do not reliably honour instructions found inside it.
 
 ---
 
@@ -30,7 +30,8 @@ The primary use case is uploading `project_source.txt` as a knowledge document t
 - **Directory exclusion** — skip build artefacts, caches, or backup folders by bare directory name, at any depth, via `EXCLUDE_DIRS`.
 - **Default dot-exclusion** — files and directories whose name starts with `.` (e.g. `.git`, `.vscode`, `.env`, `.gitignore`) are always skipped in `SOURCE_DIRS` scans, unless explicitly listed in `EXPLICIT_FILES`.
 - **Structured `#!PKSRC` metadata markers** — every file block carries a run timestamp and the file's individual last-modification time.
-- **AI-readable header** — a preamble in the output instructs the AI how to interpret the metadata and how to signal stale results.
+- **Self-describing header** — a preamble explains, in three separately searchable sections (`NOTE_TO_READER`, `FORMAT_DESCRIPTION`, `DATE_TIME_CHECK`), how the file is structured and how to recognise stale search results. Each section carries its own `#!PKSRC` marker, so even a single fragment of the file remains self-describing when a retrieval system hands out nothing else.
+- **Instructions file for AI agents** — `-i` additionally writes `project_source.instructions.md`, which carries the actual instructions. Header and instructions file are built from the same text blocks inside the script and therefore cannot drift apart.
 - **Graceful handling of missing entries** — a `SOURCE_DIRS` or `EXPLICIT_FILES` entry that does not exist emits a warning on stderr; the rest of the output is produced normally.
 - **Alphabetically sorted output** — files are sorted by path across all directories combined, so the result is deterministic and easy to diff. Files with identical names in different directories are NOT deduplicated — each is listed separately, distinguishable by its path in the block header.
 
@@ -127,6 +128,9 @@ Any file or directory whose bare name starts with `.` (e.g. `.git`, `.vscode`, `
 # Also include plain-text files for this run only
 ./packsrc.sh -txt
 
+# Also write the instructions file for AI agents
+./packsrc.sh -i
+
 # Combine flags
 ./packsrc.sh -md -txt
 
@@ -134,7 +138,7 @@ Any file or directory whose bare name starts with `.` (e.g. `.git`, `.vscode`, `
 ./packsrc.sh -h
 ```
 
-Output is always written to `./project_source.txt` in the directory from which the script is invoked. The file is overwritten on every run.
+Output is always written to `./project_source.txt` in the directory from which the script is invoked. The file is overwritten on every run. With `-i`, `./project_source.instructions.md` is written alongside it; its content does not depend on the run, so invoking it again writes an identical file.
 
 ---
 
@@ -145,7 +149,14 @@ Output is always written to `./project_source.txt` in the directory from which t
 ```
 #!PKSRC:HEADER:BEGIN | project_source.txt | pksrc_ts: 2025-03-14_10-23-45
 #
-# @Claude: ...  (AI instructions — see section below)
+#!PKSRC:HEADER:NOTE_TO_READER
+# < what the two sections below are for >
+#
+#!PKSRC:HEADER:FORMAT_DESCRIPTION
+# < structure of the file and meaning of its fields >
+#
+#!PKSRC:HEADER:DATE_TIME_CHECK
+# < how to recognise stale search results >
 #
 #!PKSRC:HEADER:END
 
@@ -172,24 +183,31 @@ The `#!PKSRC` prefix does not appear in normal Python, CUDA, shell, or configura
 
 ### Stale-result detection
 
-The header instructs the AI to always cite `pksrc_ts` when referencing a search result. If the cited timestamp differs from the timestamp of the currently uploaded file, the result originates from a stale index — the AI is instructed to flag this explicitly.
+The `DATE_TIME_CHECK` section of the header describes the mechanism: every block repeats the `pksrc_ts` of the run it came from. When an agent answers out of an earlier, cached retrieval, the quoted content carries an older `pksrc_ts` than the `#!PKSRC:HEADER:BEGIN` line of the currently uploaded file. Where the two values differ, the result is superseded.
 
 `file_mtime` lets you (and the AI) verify whether a specific source file was actually touched during a given implementation step, without having to look at git history.
 
-### AI header instructions
+### The `project_source.instructions.md` file
 
-The header block currently contains instructions written for [Claude](https://claude.ai). If you use a different AI agent, you can adapt the `@Claude:` block near the top of the script — it is a plain multi-line `echo` sequence and requires no special syntax.
+The header describes; it does not command. That is deliberate: several AI agents treat the content of an uploaded document as data on purpose and do not reliably honour instructions found inside it — in the extreme, such instructions are judged to be an injection attempt. Only what sits in the channel provided for it is honoured reliably.
+
+`./packsrc.sh -i` therefore additionally writes `project_source.instructions.md`. Paste its content into wherever your agent takes its standing instructions — Claude project instructions, the instructions field of a Gemini Gem, `AGENTS.md`, `CLAUDE.md`, or the system prompt of your own tooling.
+
+The two sections `FORMAT_DESCRIPTION` and `DATE_TIME_CHECK` exist exactly once in the script, in the functions `emit_format_description` and `emit_date_time_check`; both the header and the instructions file are built from them. To change the wording, change it there — **not** in `project_source.instructions.md`, which the next `-i` run overwrites. The copy kept in this repository was produced that way and serves as a preview; if you copy only `packsrc.sh` into a project of your own, generate it there with `-i`.
 
 ---
 
 ## Typical workflow
 
 1. **Configure once** — set `SOURCE_DIRS`, `BASE_EXTENSIONS`, `EXCLUDE_DIRS` and `EXPLICIT_FILES` for your project.
-2. **Regenerate** — run the script after each relevant commit or work session.
-3. **Upload** — place `project_source.txt` in your AI project's knowledge base (e.g. as a project document in Claude).
-4. **Work** — the AI now has accurate, timestamped context for all source files and can detect outdated index results automatically.
+2. **Set up once** — run `./packsrc.sh -i` and paste the content of `project_source.instructions.md` into your AI agent's standing instructions.
+3. **Regenerate** — run the script after each relevant commit or work session.
+4. **Upload** — place `project_source.txt` in your AI project's knowledge base (e.g. as a project document in Claude).
+5. **Work** — the AI now has accurate, timestamped context for all source files and can detect outdated index results.
 
-It is recommended to add `project_source.txt` to `.gitignore` since it is a generated artefact.
+It is recommended to add `project_source.txt` to `.gitignore` since it is a generated artefact. `project_source.instructions.md`, by contrast, belongs in the repository, so that everyone involved pastes the same instruction text.
+
+> **Upgrading from an earlier version:** until now the header carried a German `@Claude:` block holding the instructions. That block is gone. If you relied on it, do step 2 once; the format of the file blocks is unchanged.
 
 ---
 
