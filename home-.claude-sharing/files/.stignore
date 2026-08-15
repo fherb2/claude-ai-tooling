@@ -7,11 +7,17 @@
 /downloads
 /telemetry
 
-// weitere, von Claude zum Ausschluss vorgeschlagen
+// Rechnergebundenes: Sitzungsmerker, Umgebung, Shell-Aufnahmen, IDE-Anbindung
+// Begruendung je Muster in 3.9 der Doku
 /ide
 /sessions
 /session-env
 /shell-snapshots
+
+// Momentaufnahmen vor jeder Bearbeitung, fuer /rewind. Rechnergebunden und
+// entbehrlich; ersetzt wird die Funktion durch die Checkpoint-Commits.
+// Begruendung und Preis des Ausschlusses in 1.3 der Doku
+/file-history
 
 // Fluechtige Dateien
 *.log

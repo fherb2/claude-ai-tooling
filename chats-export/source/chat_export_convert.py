@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Read a claude.ai account data export and make sense of its conversations.
 
-Runs locally, never uploaded -- unlike ``chat_read_store.py`` it does not have
-to be self-contained for a chat upload (doku 2.9 is about those).  Chapter 3.1
+Runs locally, never uploaded, so the first half of doku 2.9 does not bind it:
+unlike ``chat_read_store.py`` it may import freely and need not hold small
+helpers twice.  The second half does bind it -- this docstring is the whole
+operating manual, because Claude Code reads it and not necessarily the
+implementation doc, and ``tests/test_docstrings.py`` guards that.  Chapter 3.1
 of ``implementation_doku.md`` holds the determinations this implements, chapter
 2 the repo-wide ones; the numbers quoted below come from there.
 
@@ -24,7 +27,8 @@ renderer, the ``<chat ...>`` tags outside one are silently swallowed as HTML
 ``list`` comes first, always: it builds the protocol from a chat list, which is
 the only place the project a chat belongs to can be learned. ``convert`` then
 writes the chats the protocol is waiting for. ``diff`` reports the standing from
-the protocol alone -- no archive, no chat file, not one character of chat text.
+the protocol alone -- no archive, no chat file, not one character of chat text
+-- including how far back the next export has to reach.
 ``report`` says what could not be carried over. ``analyse`` describes what the
 reader makes of an archive without writing anything, which is a different
 question than ``inspect_export.py`` answers: that one describes the raw export,
@@ -49,16 +53,19 @@ is kept regardless, because its subtree is not a duplicate.
 **Text comes from the content blocks, not from ``text``.** The flat ``text``
 field *contains the thinking*: 20.8 million characters against 11.3 million in
 the text blocks, the difference being the reasoning. Taking it would flood the
-archive with internal deliberation. Only text blocks contribute; ``tool_use``
-and ``tool_result`` are counted so the loss stays visible, and whether they
-should travel is still open (doku 3.1.8).
+archive with internal deliberation. Three cases, not two: text blocks make up
+the conversation; a ``tool_use`` whose input carries a work goes into the
+creations file (below); everything else in ``tool_use`` and all of
+``tool_result`` is counted but never stored -- 28.6 million characters of
+mostly foreign or duplicated material, which would be ballast (doku 3.1.3).
 
 **Thinking goes into a file of its own.** It is not redundant -- only 9 % of its
-vocabulary reappears in the answer -- so it is kept, but separately: a reader of
-the conversation would otherwise carry 84 % of the archive's volume. Selection
-is structural and never by content: empty ``thinking_hidden`` blocks and blocks
-under 200 characters go, which is a third of the entries and 0.8 % of the
-content. Trigger words would break at the first change of language.
+vocabulary reappears in the answer -- so it is kept, but separately: inline, it
+would add 84 % on top of the conversation itself, so every read of a chat would
+carry close to twice the text. Selection is structural and never by content:
+empty ``thinking_hidden`` blocks and blocks under 200 characters go, which is a
+third of the entries and 0.8 % of the content. Trigger words would break at the
+first change of language.
 
 **Hollow chats are deleted chats.** Messages present, no text anywhere. Verified
 in the browser: they no longer exist. Nothing recovers them, so they are marked
@@ -80,13 +87,28 @@ first time a chat is *seen* (not converted) to the timestamp of the previous
 ``list``, and ``project_created_at``, typed in by hand via ``--project-created``
 after reading a project's own creation date off a probe export
 (``inspect_export.py`` lists them). ``window_start()`` combines both with each
-chat's own ``created_at`` once known, and ``list`` prints the result: the
-earliest date an account export needs to cover everything still pending.
+chat's own ``created_at`` once known, and ``window_lines()`` puts it in words
+for both ``list`` and ``diff`` -- one wording, because two commands phrasing
+the same calculation is how a report and its preview drift apart. The result
+is the earliest date an account export needs to cover everything still
+pending.
 
-**``convert`` ends by printing ``INSTRUCTION_BLOCK``** -- a ready-made German
-paragraph for the *target* project's own instructions, telling that
-project's instance an archive exists and where, so it looks before asking.
+**``convert`` ends by printing an instruction block** -- a ready-made German
+paragraph the user pastes into the *target* project, telling that project's
+instance an archive exists and where, so it looks before asking.
 ``MAPPING_PROMPT`` above is its counterpart for the *source* side.
+
+``INSTRUCTION_BLOCKS`` holds one wording per target and ``--target`` picks it:
+``repo`` for a Claude Code repository (the default), ``knowledge`` for
+claude.ai project knowledge, ``home`` for ``~/.claude/projects/...``. They
+differ in the two things the block exists to say -- where the archive is and
+how the instance reaches it (Grep and Read on paths, versus project knowledge)
+-- and the ``home`` one adds that the directory sits outside the working
+directory and has to be made accessible to the session first. The files
+written are the same for all three; doku 2.10 is about those, not about this
+console output. The flag changes nothing but the wording. Path and file kinds
+are filled in from the run itself, so the block never announces an
+``.attachments.json`` that was not written.
 
 Every command that stamps a timestamp accepts ``--now`` to record a fixed one
 instead of the clock -- for reproducible test runs, not for daily use.
@@ -102,6 +124,7 @@ import os
 import re
 import sys
 import tempfile
+import textwrap
 import zipfile
 from typing import Any
 
@@ -480,8 +503,8 @@ def render(messages: list[dict[str, Any]],
 
     The thinking of a message is deliberately *not* put into the record: it is
     handed back separately, keyed by the message uuid, because it goes into its
-    own file.  Otherwise 84 % of the archive's volume would sit in every read of
-    a conversation.
+    own file.  Inline it would add 84 % on top of the conversation itself, so
+    every read of a chat would carry close to twice the text.
     """
     rendered, dropped, without, thinking = [], collections.Counter(), [], []
     attachments, creations, dropped_thinking = [], [], 0
@@ -905,6 +928,25 @@ def window_start(protocol: dict[str, Any]) -> dict[str, Any]:
             "unbounded": []}
 
 
+def window_lines(protocol: dict[str, Any]) -> list[str]:
+    """State the window in words, for every command that has a protocol.
+
+    One wording for all callers on purpose. ``list`` reports it right after a
+    listing run, ``diff`` when looking at the standing without fetching a fresh
+    list -- and two commands phrasing the same calculation in their own words
+    is exactly how a report and its preview drift apart.
+    """
+    window = window_start(protocol)
+    if window["source"] == "unbounded":
+        return [f"{len(window['unbounded'])} pending chat(s) have no date bound "
+                "at all -- give the project's start date with --project-created "
+                "(read it off a probe export, doku 1.5), or export everything."]
+    if window["start"]:
+        return [f"An export has to reach back to {window['start'][:10]} to "
+                f"cover everything pending (from {window['source']})."]
+    return []
+
+
 # ---------------------------------------------------------------------------
 # The chat list: the project mapping the export lacks
 # ---------------------------------------------------------------------------
@@ -973,13 +1015,30 @@ Kein Kommentar, keine Tabelle, keine Nummerierung, kein Text vor oder nach
 dem Block."""
 
 
-INSTRUCTION_BLOCK = """\
+# One text per target, because the three differ in exactly the two things the
+# block exists to say: where the archive is and how the instance reaches it
+# (doku 1.3). The files themselves stay identical everywhere -- vorgabe 2.10 is
+# about those, not about this console output. ``{where}`` takes the real output
+# path, ``{files}`` the kinds actually written; both are filled in by
+# ``instruction_block`` so the block never promises a file that is not there.
+INSTRUCTION_BLOCKS = {
+    "repo": """\
+--- ab hier in die CLAUDE.md des Zielprojekts einfügen ---
+
+Unter `{where}` liegt ein Archiv früherer Chats dieses Projekts: {files}
+
+Bevor du zu etwas nachfragst, das früher schon besprochen worden sein könnte,
+sieh mit `Grep` im Archiv nach und lies den Treffer mit `Read`. Ein Treffer
+nennt Datum und Titel des Chats -- benutze das in deiner Antwort, damit
+nachvollziehbar bleibt, woher die Auskunft kommt. Findest du nichts, sag das
+ausdrücklich, statt zu vermuten.
+
+--- Ende des Einschubs ---
+""",
+    "knowledge": """\
 --- ab hier in die Projektanweisungen einfügen ---
 
-Im Projektwissen liegt ein Archiv früherer Chats dieses Projekts: eine
-JSON-Datei je Chat mit den Redebeiträgen, dazu je eine `.thinking.json` mit den
-Überlegungen, die zu einer Antwort führten. Die Datei `protokoll.json` sagt,
-welche Chats vorliegen und auf welchem Stand.
+Im Projektwissen liegt ein Archiv früherer Chats dieses Projekts: {files}
 
 Bevor du zu etwas nachfragst, das früher schon besprochen worden sein könnte,
 sieh im Archiv nach. Ein Treffer nennt Datum und Titel des Chats -- benutze das
@@ -987,7 +1046,61 @@ in deiner Antwort, damit nachvollziehbar bleibt, woher die Auskunft kommt.
 Findest du nichts, sag das ausdrücklich, statt zu vermuten.
 
 --- Ende des Einschubs ---
-"""
+""",
+    "home": """\
+--- ab hier in die CLAUDE.md des Zielprojekts einfügen ---
+
+Unter `{where}` liegt ein Archiv früherer Chats dieses Projekts: {files}
+
+Der Ordner liegt außerhalb des Arbeitsverzeichnisses. Die Sitzung erreicht ihn
+nur, wenn er ihr als zusätzliches Verzeichnis freigegeben ist -- ist er das
+nicht, sag es, statt das Archiv für leer zu halten.
+
+Bevor du zu etwas nachfragst, das früher schon besprochen worden sein könnte,
+sieh mit `Grep` im Archiv nach und lies den Treffer mit `Read`. Ein Treffer
+nennt Datum und Titel des Chats -- benutze das in deiner Antwort, damit
+nachvollziehbar bleibt, woher die Auskunft kommt. Findest du nichts, sag das
+ausdrücklich, statt zu vermuten.
+
+--- Ende des Einschubs ---
+""",
+}
+
+
+# What each file kind is called in the block, in reading order.
+FILE_KIND_WORDS = [
+    (THINKING_SUFFIX,   "je eine `.thinking.json` mit den Überlegungen, die zu "
+                        "einer Antwort führten"),
+    (ATTACHMENT_SUFFIX, "je eine `.attachments.json` mit dem Inhalt "
+                        "hochgeladener Dateien"),
+    (CREATION_SUFFIX,   "je eine `.creations.json` mit dem, was die KI erzeugt "
+                        "hat -- Artefakte, Dateien, Änderungen"),
+]
+
+
+def instruction_block(target: str, out_dir: str, protocol: dict[str, Any]) -> str:
+    """Build the paragraph the user pastes into the target project.
+
+    The file kinds come from the protocol rather than from a fixed list: a run
+    that produced no attachments must not announce an ``.attachments.json``,
+    or the instance goes looking for something that is not there.
+    """
+    present = {suffix for entry in protocol["chats"].values()
+               for name in entry.get("side_files") or []
+               for suffix, _ in FILE_KIND_WORDS if name.endswith(suffix)}
+    parts = ["eine JSON-Datei je Chat mit den Redebeiträgen"]
+    parts += [words for suffix, words in FILE_KIND_WORDS if suffix in present]
+    files = ", ".join(parts) + (". Die Datei `protokoll.json` sagt, welche "
+                                "Chats vorliegen und auf welchem Stand.")
+    text = INSTRUCTION_BLOCKS[target].format(where=out_dir, files=files)
+    # Rewrapped paragraph by paragraph, because the substitutions make the
+    # first one arbitrarily long and the block is pasted into a CLAUDE.md or
+    # into project instructions, where one endless line reads badly. Long
+    # words stay whole so a path is never broken across lines.
+    return "\n\n".join(
+        textwrap.fill(paragraph, width=78, break_long_words=False,
+                      break_on_hyphens=False)
+        for paragraph in text.split("\n\n"))
 
 
 def cmd_list(args: argparse.Namespace) -> int:
@@ -1020,14 +1133,8 @@ def cmd_list(args: argparse.Namespace) -> int:
           else "Nothing waiting -- every listed chat is already exported.")
     for line in project_start_warnings(protocol):
         print(line, file=sys.stderr)
-    window = window_start(protocol)
-    if window["source"] == "unbounded":
-        print(f"{len(window['unbounded'])} pending chat(s) have no date bound at "
-              "all -- give the project's start date with --project-created "
-              "(read it off a probe export, doku 1.5), or export everything.")
-    elif window["start"]:
-        print(f"An export has to reach back to {window['start'][:10]} to cover "
-              f"everything pending (from {window['source']}).")
+    for line in window_lines(protocol):
+        print(line)
     if counts.get("new") and previous_listed:
         print(f"The {counts['new']} new chat(s) were created after "
               f"{previous_listed[:19]} -- that is the earliest an export has "
@@ -1126,7 +1233,7 @@ def cmd_convert(args: argparse.Namespace) -> int:
               "stay pending; do not guess.")
     if written:
         print()
-        print(INSTRUCTION_BLOCK)
+        print(instruction_block(args.target, args.out, protocol))
     return 0
 
 
@@ -1160,6 +1267,17 @@ def cmd_diff(args: argparse.Namespace) -> int:
                   + (f"  listed {entry['listed_updated_at'][:19]} vs exported "
                      f"{entry['exported_updated_at'][:19]}"
                      if status == STATUS_STALE else ""))
+
+    # The same window statement 'list' makes, available without fetching a
+    # fresh chat list: 'what is still missing' and 'how far back must the next
+    # export reach' are one question asked twice.
+    lines = window_lines(protocol)
+    if lines:
+        print()
+        for line in lines:
+            print(line)
+    for line in project_start_warnings(protocol):
+        print(line, file=sys.stderr)
 
     missing_files = []
     for uuid, entry in protocol["chats"].items():
@@ -1247,12 +1365,25 @@ def cmd_report(args: argparse.Namespace) -> int:
             lines.append(f"  {name}")
             lines += [f"      {mark}" for mark in marks]
 
+    # The kept thinking blocks are counted from the side files, not from the
+    # conversation metadata: that carries only ``dropped_thinking``, and adding
+    # a "kept" field would change the file format for both routes (vorgabe 2.2,
+    # 2.5) for the sake of one report line.
+    for name in sorted(os.listdir(args.out)):
+        if not name.endswith(THINKING_SUFFIX):
+            continue
+        with open(os.path.join(args.out, name), "r", encoding="utf-8") as handle:
+            document = json.load(handle)
+        totals["thinking_kept"] += sum(len(entry.get("blocks") or [])
+                                       for entry in document.get("thinking") or [])
+
     print(f"Losses and peculiarities in {args.out}")
     print()
     print("\n".join(lines) if lines else "  nothing to report")
     print()
     print(f"Hollow chats (content gone for good): {totals['deleted']}")
     print(f"Resends skipped: {totals['duplicates']}")
+    print(f"Thinking blocks carried over: {totals['thinking_kept']}")
     print(f"Thinking blocks dropped as empty or too short: {totals['thinking']}")
     print(f"Side branches kept: {totals['branches']}")
     print(f"Attachments carried over with their content: {totals['carried']}")
@@ -1308,6 +1439,9 @@ def cmd_analyse(args: argparse.Namespace) -> int:
         totals["empty"] += int(record["empty"])
         totals["attachments"] += len(record["attachments_without_content"])
         totals["carried"] += sum(len(e["files"]) for e in record["attachments"])
+        totals["creations"] += sum(len(e["works"]) for e in record["creations"])
+        totals["thinking_kept"] += sum(len(e["blocks"]) for e in record["thinking"])
+        totals["thinking_dropped"] += record["dropped_thinking"]
         for kind, count in record["dropped_blocks"].items():
             totals[f"block:{kind}"] += count
 
@@ -1337,6 +1471,10 @@ def cmd_analyse(args: argparse.Namespace) -> int:
           f"without messages: {totals['empty']}")
     print(f"  attachments carried with content: {totals['carried']}, "
           f"mentioned by name only: {totals['attachments']}")
+    print(f"  thinking blocks carried: {totals['thinking_kept']}, "
+          f"dropped as empty or too short: {totals['thinking_dropped']}")
+    print(f"  creations carried (artifacts, created files, edits): "
+          f"{totals['creations']}")
     blocks = {key[6:]: value for key, value in totals.items()
               if key.startswith("block:")}
     print(f"  block types left out: {blocks or 'none'}")
@@ -1364,6 +1502,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_convert = sub.add_parser("convert", help="convert the pending chats")
     p_convert.add_argument("--zip", required=True, help="export archive")
     p_convert.add_argument("--out", required=True, help="output directory")
+    p_convert.add_argument("--target", default="repo",
+                           choices=sorted(INSTRUCTION_BLOCKS),
+                           help="where the archive will be read: 'repo' (a "
+                                "Claude Code repository, the default), "
+                                "'knowledge' (claude.ai project knowledge) or "
+                                "'home' (~/.claude/projects/...). Picks the "
+                                "wording of the closing instruction block and "
+                                "nothing else")
     p_convert.add_argument("--now", default="",
                            help="timestamp to record instead of the clock")
     p_convert.set_defaults(func=cmd_convert)

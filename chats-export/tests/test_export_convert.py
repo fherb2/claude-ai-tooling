@@ -624,8 +624,73 @@ check("convert writes the two mapped chats", "2 chat(s) written" in result.stdou
 check("convert names the listed chat that is not in the archive",
       "gibt-es-nicht" in result.stdout and "do not guess" in result.stdout,
       result.stdout)
-check("convert prints the block for the project instructions",
-      "in die Projektanweisungen einfügen" in result.stdout, result.stdout)
+check("convert prints the repo block when no target is given",
+      "in die CLAUDE.md des Zielprojekts einfügen" in result.stdout,
+      result.stdout)
+check("the repo block names the real output directory",
+      PROT_DIR in result.stdout, result.stdout)
+check("the repo block sends the instance to Grep and Read",
+      "`Grep`" in result.stdout and "`Read`" in result.stdout, result.stdout)
+
+
+# ---------------------------------------------------------------------------
+# The instruction block, per target and per file kind
+# ---------------------------------------------------------------------------
+# Unit level, not through the CLI: convert writes each chat once, so a second
+# run has nothing to write and prints no block at all.
+
+def block_protocol(*side_files: str) -> dict:
+    """A protocol carrying exactly the given side files on one chat."""
+    return {"chats": {"uuid": {"side_files": list(side_files)}}}
+
+
+def flat(target: str, where: str, *side_files: str) -> str:
+    """The block with its line breaks collapsed.
+
+    The block is rewrapped to 78 columns, so a phrase can straddle a line
+    break. These checks are about what it says, not how it is laid out; the
+    layout has a check of its own below.
+    """
+    return " ".join(
+        cec.instruction_block(target, where, block_protocol(*side_files)).split())
+
+
+plain = flat("repo", "/ziel")
+check("a run without side files announces none of them",
+      not any(suffix in plain for suffix, _ in cec.FILE_KIND_WORDS), plain)
+check("conversation files and the protocol are always announced",
+      "JSON-Datei je Chat" in plain and "protokoll.json" in plain, plain)
+
+rich = flat("repo", "/ziel", "a" + cec.THINKING_SUFFIX,
+            "a" + cec.CREATION_SUFFIX)
+check("only the kinds actually written are announced",
+      cec.THINKING_SUFFIX in rich and cec.CREATION_SUFFIX in rich
+      and cec.ATTACHMENT_SUFFIX not in rich, rich)
+
+knowledge = flat("knowledge", "/ziel")
+check("the knowledge block speaks of project knowledge, not of a path",
+      "Im Projektwissen" in knowledge and "/ziel" not in knowledge, knowledge)
+check("the knowledge block goes into the project instructions",
+      "in die Projektanweisungen einfügen" in knowledge, knowledge)
+
+home = flat("home", "/heim")
+check("the home block names the path and the access condition",
+      "/heim" in home and "außerhalb des Arbeitsverzeichnisses" in home, home)
+
+laid_out = cec.instruction_block("repo", "/ziel/imported_chats",
+                                 block_protocol("a" + cec.THINKING_SUFFIX,
+                                                "a" + cec.ATTACHMENT_SUFFIX,
+                                                "a" + cec.CREATION_SUFFIX))
+check("the block stays within 78 columns",
+      max(len(line) for line in laid_out.splitlines()) <= 78, laid_out)
+
+long_path = "/sehr/langer/pfad/" + "verzeichnis/" * 6 + "archiv"
+check("a path longer than the column width is never broken up",
+      long_path in cec.instruction_block("repo", long_path, block_protocol()))
+
+check("there is one block per documented target",
+      set(cec.INSTRUCTION_BLOCKS) == {"repo", "knowledge", "home"},
+      str(sorted(cec.INSTRUCTION_BLOCKS)))
 
 files = sorted(os.listdir(PROT_DIR))
 check("a chat file was written per converted chat",
@@ -919,6 +984,79 @@ check("report names the file that is mentioned by name only",
 check("report lists the block types left out of the text",
       "tool_use" in result.stdout, result.stdout)
 
+
+# ---------------------------------------------------------------------------
+# analyse and report have to agree on what travels
+# ---------------------------------------------------------------------------
+# They approach the same material from opposite sides -- analyse reads the
+# archive, report the files written from it -- so agreement is a statement
+# about both, not one line read twice. This is the guard against the drift
+# that had analyse silent about thinking and creations while report counted
+# them. Two fixtures, because no single one carries all three kinds; the
+# closing checks make sure neither comparison is 0 against 0.
+
+ALL_KINDS = conv("all-1", "Alles auf einmal", [
+    dict(msg("k0", ROOT, "human", "hier das Skript", "2026-05-15T10:00:00Z"),
+         attachments=[{"file_name": "kernel.py", "file_type": "text/x-python",
+                       "file_size": 8, "extracted_content": "print(1)"}]),
+    msg("k1", "k0", "assistant", "", "2026-05-15T10:01:00Z", blocks=[
+        thinking_block(LONG),
+        thinking_block("zu kurz"),
+        {"type": "text", "text": "hier ist es"},
+        {"type": "tool_use", "name": "create_file",
+         "input": {"path": "plan.md", "file_text": "# DATEIINHALT"}},
+    ]),
+])
+ALL_DIR = os.path.join(WORK, "alles")
+all_zip = os.path.join(WORK, "alles.zip")
+with zipfile.ZipFile(all_zip, "w") as handle:
+    handle.writestr("conversations.json", json.dumps([ALL_KINDS]))
+all_map = os.path.join(WORK, "alles-liste.txt")
+with open(all_map, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/all-1' "
+                 "updated_at='2026-05-15T12:00:00Z'></chat>\n")
+run("list", "--map", all_map, "--out", ALL_DIR)
+run("convert", "--zip", all_zip, "--out", ALL_DIR, "--now", "T-ALL")
+
+MARKERS = [
+    ("thinking blocks carried",
+     "Thinking blocks carried over:", "thinking blocks carried:"),
+    ("thinking blocks dropped",
+     "dropped as empty or too short:", "dropped as empty or too short:"),
+    ("creations", "Creations carried over (artifacts, created files, edits):",
+     "creations carried (artifacts, created files, edits):"),
+    ("attachments with content", "Attachments carried over with their content:",
+     "attachments carried with content:"),
+]
+
+
+def number_after(text: str, marker: str) -> int:
+    """The number directly following ``marker``."""
+    return int(text.split(marker, 1)[1].split()[0].strip(",."))
+
+
+def compare_commands(label: str, out_dir: str, zip_path: str,
+                     map_path: str) -> str:
+    """Check every shared figure of report and analyse over one fixture."""
+    reported = run("report", "--out", out_dir).stdout
+    analysed = run("analyse", "--zip", zip_path, "--map", map_path).stdout
+    for what, in_report, in_analyse in MARKERS:
+        left, right = (number_after(reported, in_report),
+                       number_after(analysed, in_analyse))
+        check(f"{label}: analyse and report agree on {what}", left == right,
+              f"report={left}, analyse={right}")
+    return reported
+
+
+compare_commands("thinking fixture", THINK_DIR, THINK_ARCHIVE, think_map)
+compare_commands("creations fixture", CRT_DIR, crt_zip, crt_map)
+figures = compare_commands("all kinds at once", ALL_DIR, all_zip, all_map)
+
+for what, in_report, _ in MARKERS:
+    check(f"the comparison of {what} is not 0 against 0",
+          number_after(figures, in_report) > 0, figures)
+
+
 # ---------------------------------------------------------------------------
 # The reconciliation bound: listed_at and created_after
 # ---------------------------------------------------------------------------
@@ -1031,6 +1169,33 @@ result = run("list", "--map", bound_list("schranke-6.txt", ["frisch-1"]),
 check("with no bound at all the run asks for the project start",
       "no date bound at all" in result.stdout
       and "--project-created" in result.stdout, result.stdout)
+
+# diff answers the same question without a fresh chat list. Both commands go
+# through window_lines(), and these checks hold them to it: a second wording
+# is how a preview and its report drift apart.
+listed = run("list", "--map", bound_list("schranke-7.txt", ["alt-1", "neu-2"]),
+             "--out", BOUND_DIR, "--now", "2026-08-01T00:00:00+00:00").stdout
+differed = run("diff", "--out", BOUND_DIR).stdout
+window_line = next(line for line in listed.splitlines()
+                   if "reach back to" in line)
+check("diff names the window without a fresh list",
+      window_line in differed, differed)
+check("diff still needs neither archive nor chat file",
+      "Protocol:" in differed and "reach back to" in differed, differed)
+
+unbounded_diff = run("diff", "--out", EMPTY_DIR).stdout
+unbounded_line = next(line for line in result.stdout.splitlines()
+                      if "no date bound at all" in line)
+check("diff gives the same advice when nothing bounds the window",
+      unbounded_line in unbounded_diff, unbounded_diff)
+
+# The typo guard reaches diff as well: a wrong project date shortens every
+# future window, and diff is where one looks between two listing runs.
+run("list", "--map", bound_list("schranke-8.txt", ["alt-1"]), "--out", BOUND_DIR,
+    "--now", "2026-08-02T00:00:00+00:00", "--project-created", "2026-06-15")
+check("diff flags an implausible project date too",
+      "cannot predate" in run("diff", "--out", BOUND_DIR).stderr,
+      run("diff", "--out", BOUND_DIR).stderr)
 
 
 # ---------------------------------------------------------------------------

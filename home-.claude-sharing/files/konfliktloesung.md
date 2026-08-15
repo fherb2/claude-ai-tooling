@@ -60,6 +60,8 @@ Ergibt eine Entscheidung, dass eine Datei oder ein Ordner künftig **gar nicht m
 
 Wurde auf Empfehlung aus Schritt 1 von Hand angehalten, erinnere den Nutzer daran, den Abgleich wieder einzuschalten. Bestehen Zweifel, ob die Lösung trägt, ist Angehaltenlassen die richtige Wahl.
 
+Sage ihm in diesem Fall auch, dass für einen wirklichen Fehlschlag ein geordneter Rückgriff auf einen früheren Stand vorgesehen ist — Syncthing archiviert eintreffende Fremdänderungen, bevor es sie überschreibt — und dass er dafür seine eigene Notfall-Beschreibung heranzieht. Das ist ein **eigener Vorgang nach dieser Sitzung**, nicht deren Fortsetzung: Der Archivbestand ist ausdrücklich kein Werkzeug, um den Konflikt zu lösen, an dem du gerade arbeitest. Suche dort nicht selbst und hole von dort nichts hervor.
+
 ### 6. Berichten und ausdrücklich abschließen
 
 Zum Schluss knapp: betroffene Paare, Entscheidung je Paar, was geschrieben und was gelöscht wurde, ob Ausschlüsse geändert wurden.

@@ -77,7 +77,7 @@ REQUIRED_CONCEPTS = {
     ],
     "chat_export_convert.py": [
         "attachments", "creations", "thinking", "protokoll.json",
-        "window_start", "MAPPING_PROMPT", "INSTRUCTION_BLOCK",
+        "window_start", "MAPPING_PROMPT", "INSTRUCTION_BLOCKS",
     ],
     "inspect_export.py": [
         "created_at", "project",

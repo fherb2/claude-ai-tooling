@@ -159,6 +159,18 @@ NOTICE_INTERVAL = datetime.timedelta(hours=1)
 # does, GNOME Shell ignores it).
 NOTICE_SECONDS_QUIET = 5
 NOTICE_SECONDS_ATTENTION = 12
+
+# The pause wording, in one place because it appears in two notices (doku 3.1,
+# point 4). Two deliberate forms, and they are laid out side by side so that
+# changing one and forgetting the other shows up in the diff: an appended
+# half-sentence where a conflict already carries the message, and a full
+# sentence where the pause IS the message. Constants, not a function like
+# `_backlog_clause`: that one carries a decision (empty at zero), the pause
+# carries none -- the branch has already tested it. Function where something is
+# decided, constant where there is only text.
+PAUSE_CLAUSE_SHORT = "; Abgleich angehalten"
+PAUSE_SENTENCE = ("Abgleich für diesen Ordner angehalten — Änderungen und "
+                  "Konfliktkopien bleiben liegen")
 SAFETY_SCAN_INTERVAL = datetime.timedelta(minutes=15)
 
 # Fallback only, for a lock whose holder cannot be read. The holder's pid
@@ -1012,17 +1024,50 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
     return spawn_detached(argv, cwd=watch_dir)
 
 
+def defer(state: WatchState) -> None:
+    """Note that the user had the opportunity and did not take it (doku 2.9).
+
+    The waiting time is counted from the deferral, not from the moment the
+    dialog appeared. That matters because a dialog closes itself after fifteen
+    minutes: stamped at the appearance, half the promised half hour was already
+    gone when the deferral happened, and the next dialog could arrive twice as
+    early as 2.9 assures. Called at every exit of the chain that is a deferral,
+    not only after the first question -- the chain can take three quarters of an
+    hour before the last one.
+
+    The early stamp in `escalate` stays: it protects against a crash mid-chain,
+    it makes an overlapping pass see the episode rule, and after a dialog that
+    could not be shown at all it is exactly right -- there the short retry runs
+    from the attempt, because nobody deferred anything.
+    """
+    state.dialog_last_shown = _now()
+
+
 def escalate(pairs: list[ConflictPair], state: WatchState,
              watch_dir: Path) -> None:
     """Run the dialog chain and, on approval, start the session (doku 3.3).
 
-    Cancelling the terminal choice does not silently pick one: it asks once
-    whether to try again, and a second cancel ends the chain without further
-    questions -- the episode reports itself again later anyway.
+    Cancelling the terminal choice does not silently pick one: it asks whether
+    to try again, and cancelling that ends the chain -- the episode reports
+    itself again later anyway.
+
+    Choosing to retry starts another round, and the number of rounds is
+    deliberately not capped (doku 3.3). A cap would lock out the very user who
+    is sitting there trying: the chain would end and 2.9 would then hold the
+    next dialog back for half an hour. Leaving costs one click instead. The run
+    lock is held throughout, but every round requires a deliberate click, so
+    the deafness from finding 25 -- which is about a lock nobody is watching --
+    does not apply here. What bounds the unattended case is the self-close
+    time: a timed-out retry question ends the chain after at most three windows.
     """
+    # The list is labelled, as it is in the handover text: what follows are the
+    # ORIGINALS, not the copies whose number the line above states. Without the
+    # label the names read as the copies' names, which they are not -- they
+    # carry neither the date nor the device suffix (doku 1.8, 3.3).
     listing = "\n".join(f"  {pair.describe()}" for pair in pairs)
     text = (
-        f"Syncthing hat {len(pairs)} Konfliktkopie(n) angelegt:\n\n{listing}\n\n"
+        f"Syncthing hat {len(pairs)} Konfliktkopie(n) angelegt.\n\n"
+        f"Betroffene Originale:\n{listing}\n\n"
         "Zur Bearbeitung öffnet sich eine Claude-Code-Sitzung in einem "
         "Terminal. Gegebenenfalls ist dafür ein Terminal-Programm auszuwählen.\n\n"
         "Jetzt lösen?"
@@ -1040,11 +1085,14 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
     save_state(state)
     answer = ask_question("Claude-Sync: Konflikt", text, "Jetzt lösen",
                           "Später", DIALOG_TIMEOUT_SECONDS)
+    if answer is Answer.FAILED:
+        # Nothing was shown, so nothing was deferred: the stamp above stands,
+        # and the short retry interval runs from the ATTEMPT (doku 3.3).
+        state.dialog_failed = True
+        return
     if answer is not Answer.YES:
-        # A failed dialog is not a deferral: it keeps the short retry interval
-        # so the next pass tries again instead of falling silent for half an
-        # hour (doku 3.3).
-        state.dialog_failed = answer is Answer.FAILED
+        state.dialog_failed = False
+        defer(state)
         return
     state.dialog_failed = False
 
@@ -1068,6 +1116,9 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
             state.dialog_failed = True
             return
         if retry is not Answer.YES:
+            # Also a deferral, and it can arrive up to three quarters of an
+            # hour after the first question -- counted from here, not from then.
+            defer(state)
             return
 
     pid = launch_session(terminal_cmd, pairs, watch_dir)
@@ -1121,9 +1172,15 @@ def rest_get(path: str, api_key: str) -> Optional[Any]:
 def _backlog_clause(count: int) -> str:
     """The backlog wording, in one place.
 
-    It appears in two notices -- next to open conflicts and in the quiet form.
-    Two copies of the same sentence are the kind of duplication that drifts
-    apart (doku 2.4).
+    It appears in three notices -- next to open conflicts, next to a pause, and
+    in the quiet form. Two copies of the same sentence are the kind of
+    duplication that drifts apart (doku 2.4).
+
+    What it counts is the incoming direction only: `needFiles` is what THIS
+    machine lacks against the cluster's latest version. What we hold and the
+    other side lacks would need a completion call per device, which 3.1 point 5
+    turns down on purpose. Named here because the pause sentence speaks of both
+    directions while this number can only vouch for one (doku 1.8).
     """
     return f"; Rückstand: {count} Datei(en)" if count else ""
 
@@ -1132,9 +1189,9 @@ def build_notice(state: WatchState, open_conflicts: int,
                  watch_dir: Path) -> Optional[tuple[str, int]]:
     """Assemble the hourly notice as text plus display time, or None.
 
-    Three cases ask for attention and get the long display time: open
-    conflicts, no connection at all, and a backlog. Everything else is the
-    sign of life and may be brief (doku 1.8).
+    Four cases ask for attention and get the long display time: open conflicts,
+    a hand-set pause, no connection at all, and a backlog. Everything else is
+    the sign of life and may be brief (doku 1.8).
     """
     api_key = read_api_key()
     figures = _sync_figures(state, api_key, watch_dir) if api_key else None
@@ -1158,7 +1215,7 @@ def build_notice(state: WatchState, open_conflicts: int,
         # that may not come while conflicts are open (doku 1.8).
         extra = ""
         if figures and figures["paused"]:
-            extra += "; Abgleich angehalten"
+            extra += PAUSE_CLAUSE_SHORT
         if figures:
             extra += _backlog_clause(figures["backlog"])
         return (f"{open_conflicts} Konflikt(e){since} ungelöst{extra}",
@@ -1170,8 +1227,11 @@ def build_notice(state: WatchState, open_conflicts: int,
     if figures["paused"]:
         # Before the connection check on purpose: a hand-set pause explains the
         # silence better than its symptom, and it is the user's own doing.
-        return ("Abgleich für diesen Ordner angehalten — Änderungen und "
-                "Konfliktkopien bleiben liegen", NOTICE_SECONDS_ATTENTION)
+        # The backlog comes along, as it does next to a conflict: a pause does
+        # not make the number less relevant, and a backlog DURING a pause is
+        # the expected case (doku 1.8).
+        return (PAUSE_SENTENCE + _backlog_clause(figures["backlog"]),
+                NOTICE_SECONDS_ATTENTION)
 
     if not figures["connected"]:
         since = ""
@@ -1191,8 +1251,18 @@ def build_notice(state: WatchState, open_conflicts: int,
     else:
         quiet = "; Zählung neu begonnen"
 
-    text = (f"abgeglichen: {_human_bytes(figures['outgoing'])} hoch, "
-            f"{_human_bytes(figures['incoming'])} herunter{quiet}")
+    if figures["comparable"]:
+        text = (f"abgeglichen: {_human_bytes(figures['outgoing'])} hoch, "
+                f"{_human_bytes(figures['incoming'])} herunter{quiet}")
+    else:
+        # A sentence instead of zeroes. "0 B hoch, 0 B herunter" would stand for
+        # three different situations at once -- a quiet hour, a lost reference
+        # point, and a sync that has really stalled -- and the third is the one
+        # this notice exists for (doku 1.8). The wording holds for both ways of
+        # losing the reference: a reconnect and a first pass. The prefix stays
+        # on purpose; it is what makes the hourly notice recognisable.
+        text = ("abgeglichen: Zähler neu gesetzt — Bytes erst in der nächsten "
+                f"Meldung{quiet}")
     if figures["backlog"]:
         return (text + _backlog_clause(figures["backlog"]),
                 NOTICE_SECONDS_ATTENTION)
@@ -1260,6 +1330,12 @@ def _sync_figures(state: WatchState, api_key: str,
     # startedAt is unchanged (doku 3.1, point 1).
     incoming = outgoing = 0
     connected = False
+    # All or nothing: the sum is only trustworthy if EVERY known device
+    # contributed a delta. One device without a reference point makes the sum
+    # incomplete, and an incomplete number that looks plausible is worse than a
+    # sentence naming the situation (doku 1.8). A disconnected device does not
+    # spoil this: its startedAt is empty now as it was then, so it matches.
+    comparable = True
     baseline: dict[str, Any] = {}
     for device, info in (connections.get("connections") or {}).items():
         if not isinstance(info, dict):
@@ -1275,6 +1351,11 @@ def _sync_figures(state: WatchState, api_key: str,
         if isinstance(previous, dict) and previous.get("startedAt") == started:
             incoming += max(0, current_in - int(previous.get("in") or 0))
             outgoing += max(0, current_out - int(previous.get("out") or 0))
+        else:
+            # Either the connection was re-established -- every reconnect
+            # restarts Syncthing's counters at zero -- or this is the first pass
+            # ever. Either way this device's traffic is missing from the sum.
+            comparable = False
     state.transfer_baseline = baseline
     if connected:
         state.last_connected = _now()
@@ -1292,7 +1373,7 @@ def _sync_figures(state: WatchState, api_key: str,
             backlog = int(status.get("needFiles") or 0)
 
     return {"connected": connected, "incoming": incoming, "outgoing": outgoing,
-            "backlog": backlog, "paused": paused}
+            "backlog": backlog, "paused": paused, "comparable": comparable}
 
 
 def maybe_notify(state: WatchState, open_conflicts: int,
@@ -1400,7 +1481,16 @@ def run_pass(watch_dir: Path, reason: str) -> int:
             state.conflict_since = None
 
         maybe_notify(state, len(pairs), watch_dir)
-        save_state(state)
+        # The only place a dry pass would write: the two other save_state calls
+        # sit behind DRY_RUN exits that return earlier. One guard is therefore
+        # enough, and adding more elsewhere would only suggest otherwise.
+        # Without it a dry run against a real installation moved the live
+        # service's state -- it would take away its next notice and shift the
+        # episode -- while 3.8 worked around that by hand (doku 3.1, 3.2).
+        if DRY_RUN:
+            print("[dry-run] Zustand nicht geschrieben.", flush=True)
+        else:
+            save_state(state)
         # One line per pass that found something -- as a service this is the
         # only trace in the journal (doku 3.5). Silence on an empty finding is
         # deliberate: the safety scan runs every 15 minutes and would otherwise
