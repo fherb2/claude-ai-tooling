@@ -79,7 +79,7 @@ TOOL_DIR = Path.home() / ".claude-sync-watch"
 STATE_FILE = TOOL_DIR / "zustand.json"
 LOCK_FILE = TOOL_DIR / ".lauf.lock"
 INSTRUCTION_FILE = TOOL_DIR / "konfliktloesung.md"
-TOOLS_DIR = TOOL_DIR / "werkzeuge"
+TOOLS_DIR = TOOL_DIR / "tools"
 
 
 def set_tool_dir(directory: Path) -> None:
@@ -89,7 +89,7 @@ def set_tool_dir(directory: Path) -> None:
     STATE_FILE = TOOL_DIR / "zustand.json"
     LOCK_FILE = TOOL_DIR / ".lauf.lock"
     INSTRUCTION_FILE = TOOL_DIR / "konfliktloesung.md"
-    TOOLS_DIR = TOOL_DIR / "werkzeuge"
+    TOOLS_DIR = TOOL_DIR / "tools"
 
 DEFAULT_WATCH_DIR = Path.home() / ".claude"
 
