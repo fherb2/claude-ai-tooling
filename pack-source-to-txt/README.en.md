@@ -1,17 +1,17 @@
 # Pack Source for AI
 
-A shell script that bundles project source files into a single, structured text file ready for upload to an AI agent's knowledge base.
+A **shell script that bundles project source files into a single, structured text file** ready for upload to an AI agent's knowledge base.
 
 Useful for working via web AI agents, or in an insecure environment where the AI agent is not meant to have direct access to the computer.
 
-Example use with Claude:
+**Example use** with Claude:
 
 1. Run `./packsrc.sh` on the command line.
 2. Drag the new `project_source.txt` file into the project knowledge on Claude.ai.
 
-Done. The entire source code now sits in that one file, structured and searchable.
+   Done. The entire source code now sits in that one file, structured and searchable.
 
-> **Note:** The generated header in `project_source.txt` only describes the format — it addresses no particular AI agent and instructs none of them to do anything. The actual instructions live in `project_source.instructions.md` (option `-i`), which you paste into wherever your agent takes its standing instructions. The reason: several agents deliberately treat the content of an uploaded document as data and do not reliably honour instructions found inside it.
+> **Note:** The header generated in `project_source.txt` merely describes the format – it is not directed at any specific AI agent, nor does it instruct any agent to do anything. The actual instructions are contained in `project_source.instructions.md` (option `-i`), which is entered at the point where the agent receives its instructions. Reason: Several agents deliberately treat the content of uploaded documents as data and do not reliably follow any instructions contained therein.
 
 ---
 
@@ -25,9 +25,25 @@ Done. The entire source code now sits in that one file, structured and searchabl
 
 The primary use case is uploading `project_source.txt` as a knowledge document to an AI agent (such as [Claude](https://claude.ai)), giving it precise and up-to-date context about the entire codebase in one place.
 
+**Web-based versions of AI agents can therefore also be used to drive software development forward or to check code for errors and make changes.** This is not quite as convenient as having the agent read and edit the code directly within the project, but it is far less time-consuming than one might imagine. This allows you to work **in security-critical environments** where unsupervised or poorly supervised access to system resources is not permitted. (A skill is currently being developed to further optimise this use case.)
+
+### Don’t forget the .gitignore entry
+
+The output file contains the entire source code and would take up unnecessary space in the Git repository. So don’t forget to include the entry (including the short description file):
+
+```plaintext
+# packaged source code by packsrc script and it's AI instruction file
+project_source.txt
+project_source.instruction.md
+```
+
 ---
 
 ## Features
+
+**Configuration takes place in the header of the script**, so the script is usually run within the project without any arguments or a configuration file, and it generates the source code text file `project_source.txt`.
+
+The text file is **structured using meta-prefixesstructured using meta-prefixes** `#!PKSRC: ...` and **is self-descriptive** thanks to its header. However, processing by an AI agent can be optimised using the auxiliary file `project_source.instruction.md`.
 
 - **Multi-directory support** — scan one or more source directories per run; configurable via `SOURCE_DIRS`.
 - **Recursive whole-project scan** — use `"./"` as a `SOURCE_DIRS` entry to scan the entire project root recursively, instead of listing individual subdirectories.
@@ -145,13 +161,13 @@ Any file or directory whose bare name starts with `.` (e.g. `.git`, `.vscode`, `
 ./packsrc.sh -h
 ```
 
-Output is always written to `./project_source.txt` in the directory from which the script is invoked. The file is overwritten on every run. With `-i`, `./project_source.instructions.md` is written alongside it; its content does not depend on the run, so invoking it again writes an identical file.
+**Output** is always **written to `./project_source.txt` in the directory from which the script is invoked**. The file is overwritten on every run. With `-i`, `./project_source.instructions.md` is written alongside it; its content does not depend on the run, so invoking it again writes an identical file.
 
 ---
 
 ## Output format
 
-`project_source.txt` is a plain-text file with the following structure:
+**`project_source.txt` is a plain-text file with the following structure:**
 
 ```
 #!PKSRC:HEADER:BEGIN | project_source.txt | pksrc_ts: 2025-03-14_10-23-45
@@ -212,9 +228,7 @@ The two sections `FORMAT_DESCRIPTION` and `DATE_TIME_CHECK` exist exactly once i
 4. **Upload** — place `project_source.txt` in your AI project's knowledge base (e.g. as a project document in Claude).
 5. **Work** — the AI now has accurate, timestamped context for all source files and can detect outdated index results.
 
-It is recommended to add `project_source.txt` to `.gitignore` since it is a generated artefact. `project_source.instructions.md`, by contrast, belongs in the repository, so that everyone involved pastes the same instruction text.
-
-> **Upgrading from an earlier version:** until now the header carried a German `@Claude:` block holding the instructions. That block is gone. If you relied on it, do step 2 once; the format of the file blocks is unchanged.
+It is recommended to add `project_source.txt` to `.gitignore` since it is a generated artefact. 
 
 ---
 
@@ -246,6 +260,7 @@ Add `test_project/` and `test_results/` to `.gitignore` as well, in case a faile
 
 - **2026-06-19** — Initial version.
 - **2026-07-03** — Added `EXPLICIT_FILES` config (bare name / `./` / `/` / `~/` forms), empty-string `BASE_EXTENSIONS` entry for extension-less files, recursive `"./"` `SOURCE_DIRS` entry, default dot-exclusion for hidden files/directories, `full_script_test.py` acceptance test suite, and `-h`/`--no-cleanup`/`--clean-up` command line options.
+- **2026-08-15** – Modified for use with any AI agents; self-description improved; creates a separate instruction file for AI agents
 
 ---
 
