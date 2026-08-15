@@ -908,6 +908,36 @@ def pair_conflicts(copies: list[Path]) -> list[ConflictPair]:
 # (tests/test_detect_terminal.py, tests/test_zenity_list.py).
 # ---------------------------------------------------------------------------
 
+def _distinct_terminals(
+        candidates: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    """The candidates that exist, one entry per actual program (doku 3.3).
+
+    ``x-terminal-emulator`` is not an emulator but Debian's alternatives link
+    to one of the others, so the plain list offers the same program twice --
+    three lines for two programs, measured on this machine.
+
+    Which of the two survives is not a matter of taste: every candidate carries
+    ITS OWN launch flag, and six of the seven use ``-e`` while gnome-terminal
+    needs ``--``. Where the link points at gnome-terminal, picking the link
+    would launch it with the flag this very table calls wrong for it. The entry
+    whose own name matches the resolved program therefore wins. If none
+    matches, the link points at something unknown to us and is kept -- there it
+    is the best guess available.
+    """
+    seen: dict[Path, tuple[str, str]] = {}
+    for binary, arg in candidates:
+        path = shutil.which(binary)
+        if not path:
+            continue
+        try:
+            target = Path(path).resolve()
+        except OSError:
+            target = Path(path)
+        if target not in seen or target.name == binary:
+            seen[target] = (binary, arg)
+    return list(seen.values())
+
+
 def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
     """Find an argv prefix that opens a terminal running an appended command.
 
@@ -929,8 +959,7 @@ def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
         state.terminal_cmd = chosen
         return Answer.YES, chosen
 
-    found = [(binary, arg) for binary, arg in terminal_candidates()
-             if shutil.which(binary)]
+    found = _distinct_terminals(terminal_candidates())
 
     if len(found) == 1:
         chosen = [found[0][0], found[0][1]]
