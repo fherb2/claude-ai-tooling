@@ -1,17 +1,17 @@
 # Pack Source for AI
 
-Ein Shell-Skript, das die Quelldateien eines Projekts in einer einzigen, strukturierten Textdatei bündelt – bereit zum Hochladen in die Knowledge Base eines KI-Agenten.
+Ein **Shell-Skript, das die Quelldateien eines Projekts in einer einzigen, strukturierten Textdatei bündelt** – bereit zum Hochladen in die Knowledge Base eines KI-Agenten.
 
 Nützlich für die Arbeit über Web-KI-Agenten bzw. in einer unsicheren Umgebung, in der der KI-Agent keinen direkten Zugriff auf den Rechner haben soll.
 
-Beispielnutzung mit Claude:
+**Beispielnutzung** mit Claude:
 
 1. `./packsrc.sh` auf der Kommandozeile.
 2. Neues File `project_source.txt` zu Claude.ai in das Projektwissen ziehen.
 
-Fertig. Der gesamte Quellcode liegt im File; strukturiert durchsuchbar.
+   Fertig. Der gesamte Quellcode liegt im File; strukturiert durchsuchbar.
 
-> **Hinweis:** Der erzeugte Header in `project_source.txt` beschreibt nur das Format – er richtet sich an keinen bestimmten KI-Agenten und weist auch keinen an, etwas zu tun. Die eigentlichen Anweisungen liegen in `project_source.instructions.md` (Option `-i`), das du dort einträgst, wo dein Agent seine ständigen Anweisungen entgegennimmt. Grund: Mehrere Agenten behandeln den Inhalt hochgeladener Dokumente bewusst als Daten und befolgen darin enthaltene Anweisungen nicht zuverlässig.
+> **Hinweis:** Der erzeugte Header in `project_source.txt` beschreibt nur das Format – er richtet sich an keinen bestimmten KI-Agenten und weist auch keinen an, etwas zu tun. Die eigentlichen Anweisungen liegen in `project_source.instructions.md` (Option `-i`), das dort eingetragen wird, wo der Agent seine Anweisungen entgegennimmt. Grund: Mehrere Agenten behandeln den Inhalt hochgeladener Dokumente bewusst als Daten und befolgen darin enthaltene Anweisungen nicht zuverlässig.
 
 ---
 
@@ -20,14 +20,29 @@ Fertig. Der gesamte Quellcode liegt im File; strukturiert durchsuchbar.
 `packsrc.sh` sammelt Quelldateien aus einem oder mehreren Projektverzeichnissen in einer einzigen `project_source.txt`. Jede Datei wird in eindeutige Metadaten-Blöcke eingebettet, die es einem KI-Agenten – oder jedem anderen Tool – ermöglichen:
 
 - zu erkennen, welche Dateien enthalten sind und wo sie im Projektbaum liegen,
-- aktuelle Index-Ergebnisse anhand eines laufbezogenen Zeitstempels von veralteten, gecachten zu unterscheiden,
-- zu bestimmen, wann jede einzelne Datei zuletzt geändert wurde.
+- aktuelle Index-Ergebnisse anhand eines laufbezogenen Zeitstempels von veralteten, gecachten zu unterscheiden.
 
 Der Hauptanwendungsfall ist das Hochladen von `project_source.txt` als Wissensdokument zu einem KI-Agenten (etwa [Claude](https://claude.ai)), wodurch dieser an einer einzigen Stelle präzisen und aktuellen Kontext über die gesamte Codebase erhält.
+
+**Es lassen sich somit auch mit Web-Versionen von KI-Agenten Softwareentwicklungen vorantreiben oder Code auf Fehler untersuchen und ändern.** Das ist nicht ganz so bequem, als den Code gleich im Projekt vom Agenten lesen und bearbeiten zu lassen, aber weit weniger zeitproblematisch, als man śich es vorstellen würde. Auf diese Weise lässt sich **in sicherheitskritischen Umgebungen** arbeiten, wo der schwach oder nicht überwachte Zugriff auf Systemressourcen unzulässig ist. (Zur weiteren Optimierung dieser Nutzungsart, wird ist ein Skill in Vorbereitung.)
+
+### .gitignore-Eintrag nicht vergessen
+
+Das Ausgabefile enthält den gesamten Quelltext und würde im Git-Repo sinnlos redundanten Speicherplatz kosten. Deshalb den Eintrag (einschließlich des kurzen Beschreibungsfiles) nicht vergessen:
+
+```plaintext
+# packaged source code by packsrc script and it's AI instruction file
+project_source.txt
+project_source.instruction.md
+```
 
 ---
 
 ## Funktionen
+
+Die **Konfigurationen erfolgt im Kopf des Scriptes**, sodass das Script üblicherweise völlig ohne Argumente und ohne Konfigurationsfile im Projekt gestartet wird und das Quellcode-Textfile `project_source.txt` erstellt.
+
+Das Textfile ist **mit Meta-Prefixen** `#!PKSRC: ...` **strukturiert**, und durch einen Header **selbstbeschreibend**. Die Verarbeitung durch einen KI Agenten kann aber mit dem Hilfsfile `project_source.instruction.md` optimiert werden.
 
 - **Mehrere Quellverzeichnisse** — pro Lauf werden ein oder mehrere Quellverzeichnisse gescannt; konfigurierbar über `SOURCE_DIRS`.
 - **Rekursiver Gesamt-Scan** — mit `"./"` als `SOURCE_DIRS`-Eintrag wird das gesamte Projekt-Wurzelverzeichnis rekursiv gescannt, statt einzelne Unterverzeichnisse aufzulisten.
@@ -68,7 +83,7 @@ cp pack-source-for-ai/packsrc.sh /path/to/your/project/
 chmod +x /path/to/your/project/packsrc.sh
 ```
 
-Das Skript ist bewusst in sich geschlossen gehalten, sodass es unverändert in jedes beliebige Projekt eingesetzt werden kann (nur der Abschnitt `CONFIGURATION` wird bearbeitet).
+Das Skript ist bewusst in sich geschlossen gehalten, sodass es unverändert in jedes beliebige Projekt eingesetzt werden kann (nur der Script-Abschnitt `CONFIGURATION` wird bearbeitet).
 
 ---
 
@@ -145,13 +160,13 @@ Jede Datei oder jedes Verzeichnis, deren/dessen bloßer Name mit `.` beginnt (z.
 ./packsrc.sh -h
 ```
 
-Die Ausgabe wird immer nach `./project_source.txt` geschrieben, in das Verzeichnis, aus dem das Skript aufgerufen wird. Die Datei wird bei jedem Lauf überschrieben. Mit `-i` entsteht daneben `./project_source.instructions.md`; deren Inhalt hängt nicht vom Lauf ab, ein erneuter Aufruf schreibt also eine identische Datei.
+**Die Ausgabe** wird immer nach `./project_source.txt` geschrieben, **in das Verzeichnis, aus dem das Skript aufgerufen wird**. Die Datei wird bei jedem Lauf ungefragt überschrieben. Mit `-i` entsteht daneben `./project_source.instructions.md`; deren Inhalt hängt nicht vom Lauf ab, ein erneuter Aufruf schreibt also eine identische Datei.
 
 ---
 
 ## Ausgabeformat
 
-`project_source.txt` ist eine reine Textdatei mit folgender Struktur:
+**`project_source.txt` ist eine reine Textdatei mit folgender Struktur:**
 
 ```
 #!PKSRC:HEADER:BEGIN | project_source.txt | pksrc_ts: 2025-03-14_10-23-45
@@ -212,9 +227,7 @@ Die beiden Abschnitte `FORMAT_DESCRIPTION` und `DATE_TIME_CHECK` stehen im Skrip
 4. **Hochladen** — `project_source.txt` in die Knowledge Base deines KI-Projekts legen (z. B. als Projektdokument in Claude).
 5. **Arbeiten** — die KI verfügt nun über präzisen, zeitgestempelten Kontext für alle Quelldateien und kann veraltete Index-Ergebnisse erkennen.
 
-Es empfiehlt sich, `project_source.txt` in die `.gitignore` aufzunehmen, da es sich um ein generiertes Artefakt handelt. `project_source.instructions.md` gehört dagegen mit ins Repository, damit alle Beteiligten denselben Anweisungstext eintragen.
-
-> **Umstieg von einer früheren Fassung:** Bis dahin enthielt der Header einen deutschen `@Claude:`-Block mit den Anweisungen. Der ist entfallen. Wer sich darauf verlassen hat, holt Schritt 2 einmal nach; am Format der Datei-Blöcke ändert sich nichts.
+Es empfiehlt sich, `project_source.txt` in die `.gitignore` aufzunehmen, da es sich um ein generiertes Artefakt handelt.
 
 ---
 
@@ -246,6 +259,7 @@ Nimm auch `test_project/` und `test_results/` in die `.gitignore` auf, für den 
 
 - **2026-06-19** — Erste Version.
 - **2026-07-03** — `EXPLICIT_FILES`-Konfiguration hinzugefügt (Formen: reiner Name / `./` / `/` / `~/`), Leerstring-Eintrag in `BASE_EXTENSIONS` für Dateien ohne Endung, rekursiver `"./"`-Eintrag in `SOURCE_DIRS`, standardmäßiger Punkt-Ausschluss für versteckte Dateien/Verzeichnisse, Abnahmetest-Suite `full_script_test.py` sowie die Kommandozeilenoptionen `-h`/`--no-cleanup`/`--clean-up`.
+- **2026-08-15** – Umgebaut für einen Einsatz mit beliebigen KI Agenten, Selbstbeschreibung verbessert, erstellt ein separates Anweisungsfile für KI Agenten
 
 ---
 
