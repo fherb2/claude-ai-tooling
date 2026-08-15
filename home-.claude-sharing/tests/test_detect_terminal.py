@@ -53,7 +53,19 @@ def detect() -> list[str]:
         return ["xdg-terminal-exec", "--"]
 
     print("xdg-terminal-exec NOT found -> falling back to candidate list.")
-    found = [(b, a) for b, a in TERMINAL_CANDIDATES if shutil.which(b)]
+    # Mirrors _distinct_terminals() in claude_sync_watchd.py -- again a copy on
+    # purpose. One entry per actual program: x-terminal-emulator is Debian's
+    # alternatives link, and the entry whose own name matches the resolved
+    # program wins, because the launch flag belongs to that program (doku 3.3).
+    seen: dict[Path, tuple[str, str]] = {}
+    for binary, arg in TERMINAL_CANDIDATES:
+        path = shutil.which(binary)
+        if not path:
+            continue
+        target = Path(path).resolve()
+        if target not in seen or target.name == binary:
+            seen[target] = (binary, arg)
+    found = list(seen.values())
     print(f"Candidates found on this machine: {[b for b, _ in found]}")
 
     if len(found) == 1:

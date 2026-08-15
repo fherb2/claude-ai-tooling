@@ -235,6 +235,83 @@ def check_terminal_dialogs(w: types.ModuleType) -> None:
           "DIALOG_TIMEOUT_SECONDS" in snippet.split("ask_text")[1][:400], True)
 
 
+def check_terminal_duplicates(w: types.ModuleType, tmp_root: Path) -> None:
+    """One line per program, and the flag has to follow the program (doku 3.3).
+
+    Real files and a real symlink instead of a patched resolve(): the whole
+    point is that the link and its target are the same program on disk, and a
+    stubbed resolver would only test the stub. Only ``which`` is stubbed, so
+    the test does not depend on which emulators this machine happens to have.
+    """
+    print("Terminal-Entdoppelung:")
+    binaries = tmp_root / "bin"
+    binaries.mkdir(parents=True, exist_ok=True)
+    (binaries / "konsole").write_text("#!/bin/sh\n", encoding="utf-8")
+    (binaries / "gnome-terminal").write_text("#!/bin/sh\n", encoding="utf-8")
+    (binaries / "xterm").write_text("#!/bin/sh\n", encoding="utf-8")
+    link = binaries / "x-terminal-emulator"
+    original_which = w.shutil.which
+
+    def present(*names: str):
+        """Let only these names exist, x-terminal-emulator via the link."""
+        w.shutil.which = lambda binary: (str(binaries / binary)
+                                         if binary in names else None)
+
+    try:
+        # Der Fall dieses Rechners: drei Funde, zwei Programme.
+        link.unlink(missing_ok=True)
+        link.symlink_to(binaries / "konsole")
+        present("x-terminal-emulator", "konsole", "xterm")
+        found = w._distinct_terminals(w.terminal_candidates())
+        check("Doppeleintrag verschwindet", [b for b, _ in found],
+              ["konsole", "xterm"])
+
+        # Und die Regel, warum konsole gewinnt: der Schalter gehört zum
+        # Programm. Zeigt der Link auf gnome-terminal, wäre -e falsch.
+        link.unlink()
+        link.symlink_to(binaries / "gnome-terminal")
+        present("x-terminal-emulator", "gnome-terminal")
+        found = w._distinct_terminals(w.terminal_candidates())
+        check("der konkrete Name gewinnt samt seinem Schalter", found,
+              [("gnome-terminal", "--")])
+        check("und aus zwei Funden wird einer -- kein Dialog mehr",
+              len(found), 1)
+
+        # Zeigt der Link auf etwas, das wir nicht kennen, bleibt er stehen:
+        # dort ist er der beste Griff, den wir haben.
+        (binaries / "terminator").write_text("#!/bin/sh\n", encoding="utf-8")
+        link.unlink()
+        link.symlink_to(binaries / "terminator")
+        present("x-terminal-emulator")
+        check("unbekanntes Ziel: die Alternative bleibt",
+              w._distinct_terminals(w.terminal_candidates()),
+              [("x-terminal-emulator", "-e")])
+
+        # Und der Beweis, dass die Kaskade die Entdoppelung wirklich benutzt.
+        # Ohne ihn prüfen die Fälle oben nur eine Funktion, die niemand ruft --
+        # eine Leerprobe an detect_terminal bliebe dann stumm (beobachtet).
+        original_pick = w.pick_from_list
+        angeboten: list[list[str]] = []
+        try:
+            link.unlink()
+            link.symlink_to(binaries / "konsole")
+            present("x-terminal-emulator", "konsole", "xterm")
+
+            def spy(title, text, label, options, timeout=None):
+                angeboten.append(list(options))
+                return w.Answer.YES, "konsole"
+
+            w.pick_from_list = spy
+            outcome, cmd = w.detect_terminal(w.WatchState())
+            check("der Auswahldialog bekommt die entdoppelte Liste",
+                  angeboten, [["konsole", "xterm"]])
+            check("und liefert den gewählten Befehl", cmd, ["konsole", "-e"])
+        finally:
+            w.pick_from_list = original_pick
+    finally:
+        w.shutil.which = original_which
+
+
 def check_dialog_timing(w: types.ModuleType) -> None:
     """The two waiting times, and that a failure uses the shorter one."""
     print("Wartezeiten (2.9 und die Fehler-Ausnahme aus 3.3):")
@@ -1158,6 +1235,7 @@ def main() -> int:
         check_lock(w, Path(tmp))
         check_swallowed_errors(w, Path(tmp))
         check_episode_clock(w, Path(tmp))
+        check_terminal_duplicates(w, Path(tmp))
         check_dry_run(w, Path(tmp))
         check_folder_check(w, Path(tmp))
         check_deferral_stamp(w, Path(tmp))

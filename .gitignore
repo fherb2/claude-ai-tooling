@@ -5,6 +5,10 @@ __pycache__/
 # In case a local python venv will be needed, use this:
 .venv/
 
+# temporary files
+*.tmp.*
+*.tmp
+
 # Ablage fuer Untersuchungsmaterial (echte Chatinhalte, Exportdumps): die
 # Inhalte werden nie versioniert, der Ordner selbst schon -- er ist der
 # verabredete Platz dafuer. Gilt fuer jeden so benannten Ordner, egal wie
