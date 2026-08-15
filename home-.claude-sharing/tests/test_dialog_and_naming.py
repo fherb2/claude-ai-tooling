@@ -357,14 +357,15 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
     original_key, original_get = w.read_api_key, w.rest_get
 
     def stub(connected: bool = True, need: int = 0, key: object = "k",
-             paused: bool = False) -> None:
+             paused: bool = False, started: str = "t",
+             totals: tuple[int, int] = (0, 0)) -> None:
         w.read_api_key = lambda: key
 
         def get(path: str, api_key: str) -> object:
             if path.startswith("/rest/system/connections"):
                 return {"connections": {"DEV": {
-                    "connected": connected, "startedAt": "t",
-                    "inBytesTotal": 0, "outBytesTotal": 0}}}
+                    "connected": connected, "startedAt": started,
+                    "inBytesTotal": totals[0], "outBytesTotal": totals[1]}}}
             if path.startswith("/rest/system/config"):
                 return {"folders": [{"id": "F", "path": str(folder),
                                      "paused": paused}]}
@@ -374,9 +375,18 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
 
         w.rest_get = get
 
-    def state(seen: object = "2026-08-01T00:00:00") -> object:
+    # The reference point is seeded by default and matches the stub's startedAt.
+    # Without it every call would land in the "counters were reset" branch and
+    # the checks below would quietly stop testing the normal case -- which is
+    # exactly what happened before that branch existed: the figures were never
+    # anything but zero, and no check noticed.
+    def state(seen: object = "2026-08-01T00:00:00",
+              baseline: object = None) -> object:
+        if baseline is None:
+            baseline = {"DEV": {"in": 0, "out": 0, "startedAt": "t"}}
         return w.WatchState(last_conflict_seen=seen,
-                            last_connected="2026-08-01T00:00:00")
+                            last_connected="2026-08-01T00:00:00",
+                            transfer_baseline=baseline)
 
     try:
         stub()
@@ -387,6 +397,42 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         text, seconds = w.build_notice(state(seen=None), 0, folder)
         check("ohne Bezugspunkt keine Frist",
               "Zählung neu begonnen" in text and "seit" not in text, True)
+
+        # The first check ever to look at the byte figures themselves. Until now
+        # the stub returned constant totals, so the delta was always zero and
+        # "0 B hoch, 0 B herunter" passed for a working computation.
+        stub(totals=(2200, 1100))
+        text, seconds = w.build_notice(state(), 0, folder)
+        check("Bytes erscheinen bei gültigem Bezug",
+              f"{w._human_bytes(1100)} hoch" in text
+              and f"{w._human_bytes(2200)} herunter" in text, True)
+        check("gültiger Bezug ohne Ersatzsatz",
+              "Zähler neu gesetzt" in text, False)
+
+        # Every reconnect restarts Syncthing's counters, so a delta across it
+        # would be meaningless. The notice says that instead of showing zeroes,
+        # which would look like a stalled sync (doku 1.8).
+        stub(started="t2", totals=(2200, 1100))
+        text, seconds = w.build_notice(state(), 0, folder)
+        check("nach Neuverbindung ein Satz statt Nullen",
+              "Zähler neu gesetzt" in text and "0 B" not in text, True)
+        check("der Satz darf kurz stehen", seconds, w.NOTICE_SECONDS_QUIET)
+
+        # First pass ever: no reference point at all. Same truth, same wording.
+        stub(totals=(2200, 1100))
+        text, _ = w.build_notice(state(baseline={}), 0, folder)
+        check("frische Installation, derselbe Satz",
+              "Zähler neu gesetzt" in text, True)
+
+        # The backlog is a stock figure, not a delta -- untouched by a reconnect,
+        # and it keeps its longer display time.
+        stub(started="t2", need=3)
+        text, seconds = w.build_notice(state(), 0, folder)
+        check("Rückstand steht neben dem Satz",
+              "Zähler neu gesetzt" in text
+              and "Rückstand: 3 Datei(en)" in text, True)
+        check("Rückstand verlängert auch hier", seconds,
+              w.NOTICE_SECONDS_ATTENTION)
 
         stub(need=7)
         text, seconds = w.build_notice(state(), 0, folder)
@@ -413,6 +459,17 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         check("Pause verlängert", seconds, w.NOTICE_SECONDS_ATTENTION)
         check("Pause wird genannt", text.startswith("Abgleich für diesen "
                                                     "Ordner angehalten"), True)
+        check("Pausenform ohne Rückstand nennt keinen",
+              "Rückstand" in text, False)
+
+        # A pause does not make the backlog less relevant, and a backlog DURING
+        # a pause is the expected case (doku 1.8). Without conflicts the pause
+        # branch used to leave the function at once and drop the number.
+        stub(need=5, paused=True)
+        text, _ = w.build_notice(state(), 0, folder)
+        check("Rückstand in der Pausenform",
+              text.startswith("Abgleich für diesen Ordner angehalten")
+              and text.endswith("; Rückstand: 5 Datei(en)"), True)
 
         # With conflicts open, pause and backlog are named alongside, not
         # instead: both change what the user has to do (doku 1.8).
@@ -431,13 +488,43 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
               all(chunk in text for chunk in ("2 Konflikt(e)", "angehalten",
                                             "Rückstand: 4 Datei(en)")), True)
 
-        # Same wording in both notices -- one source, no drift (doku 2.4).
+        # Same wording in all three notices -- one source, no drift (doku 2.4).
         stub(need=4)
-        quiet_state, _ = w.build_notice(state(), 0, folder)
-        conflict_state, _ = w.build_notice(state(), 2, folder)
+        quiet_text, _ = w.build_notice(state(), 0, folder)
+        conflict_text, _ = w.build_notice(state(), 2, folder)
+        stub(need=4, paused=True)
+        paused_text, _ = w.build_notice(state(), 0, folder)
         clause_text = "; Rückstand: 4 Datei(en)"
-        check("Rückstands-Wortlaut identisch",
-              quiet_state.endswith(clause_text) and conflict_state.endswith(clause_text), True)
+        check("Rückstands-Wortlaut in drei Formen identisch",
+              all(form.endswith(clause_text)
+                  for form in (quiet_text, conflict_text, paused_text)), True)
+
+        # Two deliberate forms, not one: an appended half-sentence where a
+        # conflict already carries the message, a full sentence where the pause
+        # IS the message (doku 3.1, point 4).
+        check("zwei Pausenfassungen, nicht eine",
+              w.PAUSE_CLAUSE_SHORT != w.PAUSE_SENTENCE
+              and w.PAUSE_CLAUSE_SHORT.startswith("; ")
+              and not w.PAUSE_SENTENCE.startswith(";"), True)
+
+        # Both notices draw from the constants instead of carrying their own
+        # literal: swapping the constants must swap the notices. Comparing the
+        # text against the constant would not show that -- a branch with its own
+        # copy of the same words would pass just as well.
+        original_short = w.PAUSE_CLAUSE_SHORT
+        original_sentence = w.PAUSE_SENTENCE
+        w.PAUSE_CLAUSE_SHORT, w.PAUSE_SENTENCE = "; KURZ", "LANG"
+        try:
+            stub(paused=True)
+            marked_quiet, _ = w.build_notice(state(), 0, folder)
+            marked_conflict, _ = w.build_notice(state(), 2, folder)
+        finally:
+            w.PAUSE_CLAUSE_SHORT = original_short
+            w.PAUSE_SENTENCE = original_sentence
+        check("lange Pausenfassung kommt aus der Konstante",
+              marked_quiet.startswith("LANG"), True)
+        check("kurze Pausenfassung kommt aus der Konstante",
+              marked_conflict.endswith("; KURZ"), True)
 
         # A paused DEVICE is a different case and needs no own wording: it
         # shows up as no connection (verified against the real configuration,
@@ -583,6 +670,46 @@ def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
     finally:
         w.detect_terminal = original_detect
         w.subprocess.run = original
+        w.set_tool_dir(original_dir)
+
+    # --- The retry loop is unbounded on purpose (3.3) ----------------------
+    # Every round takes a deliberate click, and a cap would lock out the very
+    # user who is sitting there trying: the chain would end and 2.9 would hold
+    # the next dialog back for half an hour. Pinned here so that capping the
+    # loop later cannot slip through while the doku still calls it unbounded.
+    original_ask = w.ask_question
+    w.set_tool_dir(tmp_root / "runden")
+    calls = {"detect": 0}
+    answers = [w.Answer.YES,   # Jetzt lösen
+               w.Answer.YES,   # Erneut versuchen
+               w.Answer.YES,   # und noch einmal
+               w.Answer.YES,   # und noch einmal
+               w.Answer.NO]    # Abbrechen
+    original_launch = w.launch_session
+    try:
+        def counting_detect(state: object) -> tuple[object, object]:
+            calls["detect"] += 1
+            return (w.Answer.NO, None)      # Auswahl abgebrochen, kein Ausfall
+
+        w.detect_terminal = counting_detect
+        # A guard, not decoration: the loop under test can only be left with a
+        # command in hand, so this must never run. If someone ever caps the loop,
+        # it falls out with terminal_cmd None -- and the real launch_session
+        # would find no instruction file in this throwaway tool dir and put a
+        # REAL zenity window on the screen for fifteen minutes. Observed while
+        # running exactly that falsification.
+        w.launch_session = lambda *a, **k: None
+        w.ask_question = (lambda *a, **k:
+                          answers.pop(0) if answers else w.Answer.NO)
+        loop_state = w.WatchState()
+        w.escalate([sample_pair], loop_state, tmp_root)
+        check("jede Runde fragt erneut nach dem Terminal", calls["detect"], 4)
+        check("Abbrechen beendet die Strecke", answers, [])
+        check("die abgebrochene Runde gilt als Vertagung",
+              loop_state.dialog_last_shown is not None, True)
+    finally:
+        w.ask_question = original_ask
+        w.detect_terminal = original_detect
         w.set_tool_dir(original_dir)
 
     # --- Platform-dependent data live inside the capsule (2.4) ------------
@@ -788,16 +915,22 @@ def check_episode_clock(w: types.ModuleType, tmp_root: Path) -> None:
         w.read_api_key, w.rest_get = original_key, original_get
 
     # Verhaltensprobe über zwei echte Durchgänge: Episode beginnt und endet.
+    # Die Dialoge werden über eine Attrappe von `escalate` unterdrückt, NICHT
+    # über DRY_RUN: Ein Trockendurchgang schreibt den Zustand nicht mehr
+    # (doku 3.1), und dieser Fall prüft gerade, dass er geschrieben wird. Mit
+    # DRY_RUN blieben zwei der drei Prüfungen grün, ohne etwas zu prüfen --
+    # sie verglichen None mit None.
     original_dir, original_notify = w.TOOL_DIR, w.maybe_notify
+    original_escalate = w.escalate
     w.set_tool_dir(tmp_root / "episode")
     w.maybe_notify = lambda *a, **k: None     # sonst liest der Durchgang REST
+    w.escalate = lambda *a, **k: None         # kein Dialog, keine Sitzung
     watched = tmp_root / "beobachtet"
     watched.mkdir(parents=True, exist_ok=True)
     kopie = watched / "N.sync-conflict-20260814-120000-DEV.txt"
     try:
         (watched / "N.txt").write_text("x", encoding="utf-8")
         kopie.write_text("y", encoding="utf-8")
-        w.DRY_RUN = True                      # kein Dialog, keine Sitzung
         w.run_pass(watched, "Prüfung")
         gesetzt = w.load_state().conflict_since
         check("Episodenbeginn beim ersten Fund gesetzt", gesetzt is not None, True)
@@ -809,7 +942,56 @@ def check_episode_clock(w: types.ModuleType, tmp_root: Path) -> None:
         check("Episodenende leert ihn",
               w.load_state().conflict_since, None)
     finally:
+        w.escalate = original_escalate
+        w.maybe_notify = original_notify
+        w.set_tool_dir(original_dir)
+        for entry in watched.iterdir():
+            entry.unlink()
+        watched.rmdir()
+
+
+def check_dry_run(w: types.ModuleType, tmp_root: Path) -> None:
+    """A dry pass leaves the state file alone (doku 3.1).
+
+    It used to write it, so a dry run against a real installation took the live
+    service's next notice away and could shift its episode. The counter-check
+    matters as much as the check: without it this group would pass just as well
+    if save_state had stopped working altogether.
+    """
+    print("Trockenmodus:")
+    original_dir, original_notify = w.TOOL_DIR, w.maybe_notify
+    original_escalate = w.escalate
+    w.set_tool_dir(tmp_root / "trocken")
+    w.maybe_notify = lambda *a, **k: None
+    w.escalate = lambda *a, **k: None
+    watched = tmp_root / "trocken-beobachtet"
+    watched.mkdir(parents=True, exist_ok=True)
+    kopie = watched / "T.sync-conflict-20260814-120000-DEV.txt"
+    try:
+        (watched / "T.txt").write_text("x", encoding="utf-8")
+        kopie.write_text("y", encoding="utf-8")
+        w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
+        w.save_state(w.WatchState())                  # ein Ausgangsstand
+        vorher = w.STATE_FILE.read_bytes()
+
+        w.DRY_RUN = True
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            w.run_pass(watched, "Trockenprobe")
+        journal = buffer.getvalue()
+        check("Trockenlauf lässt die Zustandsdatei unverändert",
+              w.STATE_FILE.read_bytes() == vorher, True)
+        check("und sagt es in der Ausgabe",
+              "Zustand nicht geschrieben" in journal, True)
         w.DRY_RUN = False
+
+        # Gegenprobe: Der reguläre Durchgang schreibt sehr wohl.
+        w.run_pass(watched, "Vergleichslauf")
+        check("der reguläre Durchgang schreibt",
+              w.STATE_FILE.read_bytes() != vorher, True)
+    finally:
+        w.DRY_RUN = False
+        w.escalate = original_escalate
         w.maybe_notify = original_notify
         w.set_tool_dir(original_dir)
         for entry in watched.iterdir():
@@ -869,6 +1051,60 @@ def check_folder_check(w: types.ModuleType, tmp_root: Path) -> None:
         w.set_tool_dir(original_dir)
 
 
+def check_deferral_stamp(w: types.ModuleType, tmp_root: Path) -> None:
+    """The waiting time counts from the deferral, not from the appearance.
+
+    A dialog closes itself after fifteen minutes. Stamped at the appearance,
+    half of the promised half hour was gone by the time the deferral happened,
+    and the next dialog could arrive twice as early as 2.9 assures. The check
+    has to prove WHEN the stamp was taken, not merely that it is young -- both
+    look the same to a "is it recent?" question. The zenity stub therefore
+    records the moment it returns, and the stamp must lie after it.
+    """
+    print("Wartezeit ab der Vertagung:")
+    original_dir, original_run = w.TOOL_DIR, w.subprocess.run
+    w.set_tool_dir(tmp_root / "vertagung")
+    sample_pair = w.ConflictPair(copy=tmp_root / "a.sync-conflict-x.txt",
+                                original=tmp_root / "a.txt", device="DEV")
+    returned_at = {}
+
+    def answering(code: int, err: bytes = b""):
+        def run(*args, **kwargs):
+            returned_at["at"] = w._now()          # Zeitpunkt der Rückkehr
+            return types.SimpleNamespace(returncode=code, stderr=err)
+        return run
+
+    try:
+        # Zeitablauf (Rückgabewert 5) gilt als Vertagung.
+        w.subprocess.run = answering(5)
+        probe_state = w.WatchState()
+        w.escalate([sample_pair], probe_state, tmp_root)
+        check("Stempel liegt nach der Antwort",
+              probe_state.dialog_last_shown >= returned_at["at"], True)
+        check("und gilt nicht als gescheitert", probe_state.dialog_failed, False)
+
+        # Abbruch durch den Nutzer: dasselbe.
+        w.subprocess.run = answering(1)
+        probe_state = w.WatchState()
+        w.escalate([sample_pair], probe_state, tmp_root)
+        check("auch bei Abbruch nach der Antwort",
+              probe_state.dialog_last_shown >= returned_at["at"], True)
+
+        # Gegenprobe: Ein nicht gezeigter Dialog ist KEINE Vertagung -- dort
+        # muss der frühe Stempel stehen bleiben, damit die kurze Wiederholung
+        # ab dem Versuch läuft.
+        w.subprocess.run = answering(1, b"cannot open display: :99")
+        probe_state = w.WatchState()
+        w.escalate([sample_pair], probe_state, tmp_root)
+        check("nicht gezeigt: gescheitert vermerkt",
+              probe_state.dialog_failed, True)
+        check("nicht gezeigt: Stempel nicht nachgezogen",
+              probe_state.dialog_last_shown < returned_at["at"], True)
+    finally:
+        w.subprocess.run = original_run
+        w.set_tool_dir(original_dir)
+
+
 def check_missing_notify_send(w: types.ModuleType) -> None:
     """A missing notify-send is a fault report, never a substitute channel.
 
@@ -922,7 +1158,9 @@ def main() -> int:
         check_lock(w, Path(tmp))
         check_swallowed_errors(w, Path(tmp))
         check_episode_clock(w, Path(tmp))
+        check_dry_run(w, Path(tmp))
         check_folder_check(w, Path(tmp))
+        check_deferral_stamp(w, Path(tmp))
         check_transfer_temporaries(w, Path(tmp))
         check_notice(w, Path(tmp))
     print()

@@ -5,6 +5,17 @@ Ergänzung zu `~/.claude/CLAUDE.md` (im Folgenden „Arbeitsanweisungen"),
 **alle Vorhaben** dieses Repos gilt. Was nur eines betrifft, gehört in
 dessen `fahrplan.md` unter „Dauerhaft", nicht hierher.
 
+**Und es bleibt bei diesen zwei Ebenen.** Eine dritte — eine `CLAUDE.md` in
+einem Unterordner oder eine pfadgebundene Regel unter `.claude/rules/` — ist
+möglich, aber für unsere Arbeitsweise untauglich: Beide laden erst, wenn
+Claude eine Datei aus dem betreffenden Ordner liest, und beide werden nach
+einer Kompaktierung **nicht** wieder eingespielt, anders als die Projekt-
+CLAUDE.md (belegt, [memory](https://code.claude.com/docs/en/memory)). Bei
+einem Kontexthaushalt, der Kompaktierung als Normalfall einplant
+(Arbeitsanweisungen §1.9), wären solche Regeln nach der ersten Verdichtung
+verschwunden. Was ein einzelnes Vorhaben dauerhaft binden soll, steht
+deshalb in seinem Fahrplan unter „Dauerhaft" oder in seiner Doku.
+
 ## Zuerst lesen: `.claude/arbeitsdaten.json`
 
 Diese Datei wird **nicht** automatisch in den Kontext geladen — anders als
@@ -42,16 +53,16 @@ Nachlässigkeit:
 |               | `chats-export/`                        | `home-.claude-sharing/`                   | `pack-source-to-txt/`                  | `skills/`                              |
 | ------------- | -------------------------------------- | ------------------------------------------ | --------------------------------------- | --------------------------------------- |
 | Doku          | `implementation_doku.md`, vier Kapitel | `implementierungs_doku.md`, drei Segmente | keine — nur `README.md`/`README.de.md` | `implementation_doku.md`, drei Segmente |
-| Status        | `Statusueberblick.md`                  | `status.md`                                | —                                        | `status.md`                             |
+| Status        | `status.md`                            | `status.md`                                | —                                        | `status.md`                             |
 | Fahrplan      | eigener, mit Abschnitt „Dauerhaft“     | eigener, mit Abschnitt „Dauerhaft“         | —                                        | eigener, mit Abschnitt „Dauerhaft“      |
-| Eigenes Wort  | kalt / warm                            | —                                           | —                                        | —                                        |
+| Eigenes Wort  | kalt / warm / Beobachtung              | —                                           | —                                        | —                                        |
 
 Dazu, was aus der Tabelle nicht hervorgeht: Kapitel 4 von `chats-export` ist
 die Prüfliste gegen Änderungen bei Anthropic, ein viertes Segment über §2.4
-hinaus. `Statusueberblick.md` ist eine datierte Momentaufnahme und
-ausdrücklich **keine** zu pflegende Doku, `status.md` dagegen führt nur
-abgearbeitete Fahrplaneinträge (§2.6). **kalt** heißt prüfbar ohne echtes
-Konto, **warm** nur mit. `pack-source-to-txt` ist kein über Konzept- und
+hinaus. Die drei Prüfarten von
+`chats-export` — **kalt**, **warm** und **Beobachtung** — sind normativ in
+`chats-export/implementation_doku.md` 4.1 festgelegt; hier steht bewusst
+keine zweite Definition. `pack-source-to-txt` ist kein über Konzept- und
 Implementierungsdoku entwickeltes eigenes Vorhaben, sondern ein von extern
 übernommenes und angepasstes Werkzeug — daher keine Segment-Doku, kein
 Fahrplan, keine Status-Datei, nur die README in Englisch (Original) und
