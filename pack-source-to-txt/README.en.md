@@ -4,7 +4,14 @@ A shell script that bundles project source files into a single, structured text 
 
 Useful for working via web AI agents, or in an insecure environment where the AI agent is not meant to have direct access to the computer.
 
-> **Note:** The generated header only describes the format — it addresses no particular AI agent and instructs none of them to do anything. The actual instructions live in `project_source.instructions.md` (option `-i`), which you paste into wherever your agent takes its standing instructions. The reason: several agents deliberately treat the content of an uploaded document as data and do not reliably honour instructions found inside it.
+Example use with Claude:
+
+1. Run `./packsrc.sh` on the command line.
+2. Drag the new `project_source.txt` file into the project knowledge on Claude.ai.
+
+Done. The entire source code now sits in that one file, structured and searchable.
+
+> **Note:** The generated header in `project_source.txt` only describes the format — it addresses no particular AI agent and instructs none of them to do anything. The actual instructions live in `project_source.instructions.md` (option `-i`), which you paste into wherever your agent takes its standing instructions. The reason: several agents deliberately treat the content of an uploaded document as data and do not reliably honour instructions found inside it.
 
 ---
 
