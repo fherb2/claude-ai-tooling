@@ -317,9 +317,11 @@ Alles, was dieses Vorhaben mitbringt, liegt in **einem** Ordner: `~/.claude-sync
 ├── uninstall_service.sh      meldet den Dienst wieder ab (3.5)
 ├── konfliktloesung.md        Arbeitsanweisung (3.4)
 ├── .stignore                 maßgebliche Ausschlussliste (2.8)
-├── werkzeuge/                per --add-dir freigegebenes Verzeichnis, vorerst leer
+├── tools/                    per --add-dir freigegebenes Verzeichnis, vorerst leer
 └── zustand.json              Merker (3.2)
 ```
+
+**`tools/` hieß bis zum 15. August 2026 `werkzeuge/`.** Umbenannt nach der Sprachregel — Bezeichner und Ablageorte im Code sind englisch, und die Konstante `TOOLS_DIR` war es längst; allein der Ordner trug einen deutschen Namen. Der Ordner bleibt bestehen, auch solange er leer ist: Er ist über `--add-dir` Teil des Aufrufs (3.3), und sein Platzhalter hält ihn in der Versionierung. Auf bereits eingerichteten Rechnern bleibt der alte Ordner liegen; die Einrichtung weist darauf hin (3.5).
 
 Bewusst **nicht** aufgeteilt über `~/.local/bin`, `~/.local/share` und `~/.local/state`: Das ist die Ablage für Systempakete; ein persönliches Hilfsmittel aus einer Handvoll Dateien wird dort im Ernstfall nicht gesucht. Auffindbarkeit geht hier vor Konvention.
 
@@ -516,7 +518,7 @@ Die Zeitangabe ist in **Sekunden** zu machen (`--timeout=900`). Eine Dauerangabe
 | Bestandteil                                                           | Zweck                                                                                                                  |
 | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `/usr/bin/claude`                                                     | **absoluter** Pfad; ein systemd-Benutzerdienst startet mit karger Umgebung und fände `claude` sonst nicht im Suchpfad |
-| `--add-dir ~/.claude-sync-watch/werkzeuge`                            | Zugriff auf spätere Hilfsskripte                                                                                      |
+| `--add-dir ~/.claude-sync-watch/tools`                                | Zugriff auf spätere Hilfsskripte                                                                                      |
 | `--append-system-prompt-file ~/.claude-sync-watch/konfliktloesung.md` | die Arbeitsanweisung als Rahmen der gesamten Sitzung                                                                   |
 | Übergabetext                                                         | nennt **den zu durchsuchenden Ordner** sowie die betroffenen Originale samt Gerätekennung                              |
 
@@ -604,6 +606,10 @@ Prüft zuerst die Vorbedingungen, **in dieser Reihenfolge und mit der hier genan
 - **Syncthing läuft** — **Warnung**, und selbst die entfällt, wenn `pgrep` fehlt. Richtig so: Ohne laufendes Syncthing entstehen keine Konfliktkopien, aber der Dienst ist deswegen nicht falsch eingerichtet.
 - **`~/.claude/.stignore` gegen die maßgebliche Fassung** — **Warnung** mit Unterschieden und Kopierbefehl (Begründung in 2.8).
 - **Das Werkzeug für die Betriebsmeldung (`notify-send`, Paket `libnotify-bin`) — Zubehör, kein Abbruchgrund.** Die Unterscheidung ist die Sache selbst: Ohne dieses Werkzeug fehlt allein die stündliche Anzeige, während Konflikterkennung und Eskalation vollständig arbeiten (Zusicherung in 1.8) — den Dienst deswegen zu verweigern, wäre unverhältnismäßig. Geprüft werden muss es trotzdem, denn der eigentliche Defekt war nicht fehlende Härte, sondern **Stille**: Auf einem Rechner fehlte es von der Einrichtung an, und weil hier nicht geprüft wurde, lief die Installation ohne Beanstandung durch (Belege in 3.8). Das Fehlen ist dabei **kein** zulässiger Unterschied zwischen den Rechnern im Sinne von 2.8, sondern die Verletzung der dort geforderten Gleichheit — die Prüfung setzt sie durch, statt die Abweichung nachträglich zu erlauben. Wird die Rückfrage abgelehnt, bleibt es bei der Warnung und die Einrichtung läuft weiter.
+
+**Angelegt wird genau eines:** der Ordner `tools/`, falls er fehlt (2.7). Es ist die einzige Stelle, an der die Einrichtung etwas erzeugt, das nicht die Unit ist, und sie ist nötig, weil `--add-dir` auf einen fehlenden Ordner die Sitzung scheitern ließe (3.3). Der Grundsatz „das Skript installiert nichts nach" bleibt davon unberührt — er meint Pakete.
+
+**Entfernt wird dagegen nichts.** Bis zum 15. August 2026 hieß der Ordner `werkzeuge/`; wer eine ältere Einrichtung überschreibt, behält ihn zusätzlich. Das Skript **nennt** ihn dann samt Löschbefehl, statt ihn wegzuräumen: Löschen auf einem fremden Rechner ist Sache des Nutzers, und niemand außer ihm weiß, ob er dort etwas abgelegt hat.
 
 Danach: Unit kopieren, `systemctl --user daemon-reload`, aktivieren und **immer neu starten**, abschließend den Status ausgeben.
 
@@ -1589,3 +1595,15 @@ A **und** C, obwohl der Review C nur als Kür anbietet und die Wirkung „nur ko
 **Geprüft: 162 Fälle** (vorher 156), neue Gruppe „Terminal-Entdoppelung". Sie arbeitet mit **echten** Dateien und einem echten Symlink in einem Wegwerf-Ordner statt mit einem verbogenen `resolve()`: Der Kern der Sache ist, dass Verknüpfung und Ziel auf der Platte dasselbe Programm sind — ein nachgebauter Auflöser prüfte nur den Nachbau. Gestellt ist allein `which`, damit der Fall nicht davon abhängt, welche Emulatoren dieser Rechner zufällig hat. Drei Lagen: der Fall dieses Rechners, die Verknüpfung auf `gnome-terminal` samt richtigem Schalter, und die Verknüpfung auf ein unbekanntes Ziel.
 
 **Die Leerprobe hat dabei einen Mangel im Prüffall selbst aufgedeckt, und der ist die Lehre dieses Schritts.** Die ersten Fälle riefen die Entdoppelung **einzeln** auf. Als ich die Kaskade auf ihren alten Stand zurücksetzte — also die Entdoppelung ausschaltete —, blieb das Prüfskript **stumm**: Die Funktion gab es ja noch, und sie arbeitete richtig; nur benutzte sie niemand mehr. Geprüft war damit eine Funktion, keine Wirkung. Es ist derselbe Fehler, den die Bearbeitung von Befund 15 an anderer Stelle vermieden hat, und er ist mir hier trotzdem unterlaufen. Ergänzt ist deshalb ein Fall, der `detect_terminal` **wirklich durchläuft** und über eine Attrappe von `pick_from_list` mitschreibt, welche Namen im Fenster angeboten würden. Erst er bringt die Leerprobe zum Anschlagen — mit der sprechenden Ausgabe `['x-terminal-emulator', 'konsole', 'xterm']` gegen die erwarteten zwei Zeilen. **Als Regel für künftige Prüffälle:** Wer eine neue Hilfsfunktion prüft, prüft zwei Dinge — dass sie richtig rechnet, und dass der Aufrufer sie benutzt. Das zweite ist das, was eine Rücknahme bemerkt.
+
+### Befund 23 — was die Einrichtung anlegt, und die Umbenennung des Ordners
+
+**Vom Befund war nur die Hälfte offen.** Die vier geprüften Dateien stehen bereits namentlich in der Prüfliste von 3.5 — sie kamen bei der Bearbeitung von Befund 12 mit, was der Review selbst vermerkt. Offen war allein das **Anlegen** von `tools/`. Das steht jetzt dort, mit dem Grund (`--add-dir` auf einen fehlenden Ordner ließe die Sitzung scheitern) und mit der Abgrenzung, dass „das Skript installiert nichts nach" Pakete meint, nicht Verzeichnisse.
+
+**Zusätzlich auf Wunsch des Entwicklers: `werkzeuge/` heißt jetzt `tools/`.** Sachlich eine Sprachbereinigung — Bezeichner und Ablageorte sind nach 2.5 englisch, die Konstante `TOOLS_DIR` war es längst, allein der Ordner trug einen deutschen Namen.
+
+Erwogen und **verworfen** wurde dabei ein zweiter Wunsch, den Ordner erst anzulegen, wenn er etwas anderes als `.gitkeep` enthält. Die Prüfung ergab, dass das weiter reicht, als es aussieht: Der Ordner wird als `--add-dir` übergeben, also müsste bei leerem Ordner der **Schalter entfallen**, und das berührt die in Befund 29 getroffene Entscheidung, seine Existenz zu garantieren. Hinzu kam, dass der Platzhalter den Ordner beim Ausrollen ohnehin auf jedes Zielsystem trägt, die Regel also nur halb gewirkt hätte. Der Entwickler hat daraufhin entschieden, den Ordner leben zu lassen und nur umzubenennen — Befund 29 bleibt damit unangetastet.
+
+**Der alte Ordner wird genannt, nicht gelöscht.** Wer eine ältere Einrichtung überschreibt, behält `werkzeuge/` zusätzlich. Das Installskript weist darauf hin und gibt den Löschbefehl aus, entfernt aber nichts: Löschen auf einem fremden Rechner ist Sache des Nutzers (§1.6 der Arbeitsanweisungen), und niemand außer ihm weiß, ob dort etwas liegt. Damit bleibt die Eigenschaft erhalten, dass die Einrichtung **nur anlegt und nie wegnimmt**.
+
+**Geprüft:** 162 Fälle unverändert grün, `bash -n` über das Installskript, und der Wächter zeigt in beiden Lagen auf den neuen Ordner — regulär und nach `--tool-dir`. **Offen geblieben und hier vermerkt, damit es nicht verlorengeht:** Kein Prüffall nagelt den Aufruf aus `launch_session` fest, weder Reihenfolge noch Inhalt der Argumente, obwohl 3.3 die Reihenfolge ausdrücklich „tragend" nennt und ein Fehler dort schon einmal eine Sitzung ohne Prompt starten ließ. Das ist eine eigene Lücke, kein Teil dieses Befundes.

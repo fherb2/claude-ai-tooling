@@ -139,7 +139,18 @@ for file in claude_sync_watchd.py "$UNIT_NAME" konfliktloesung.md .stignore; do
 Ordner 'files/' aus dem Repo vollständig hierher kopieren."
 done
 
-[ -d "$SCRIPT_DIR/werkzeuge" ] || mkdir -p "$SCRIPT_DIR/werkzeuge"
+[ -d "$SCRIPT_DIR/tools" ] || mkdir -p "$SCRIPT_DIR/tools"
+
+# The folder was called 'werkzeuge' until 15 August 2026. Copying the new
+# files/ over an existing installation leaves the old one behind, so it is
+# named here rather than removed: deleting on someone's machine is the user's
+# call (doku 3.5), and the folder may hold scripts nobody else knows about.
+if [ -d "$SCRIPT_DIR/werkzeuge" ]; then
+    warn "Hinweis: $SCRIPT_DIR/werkzeuge/ ist der frühere Name des
+Ordners 'tools' und wird nicht mehr verwendet. Er bleibt liegen, bis Du
+ihn entfernst — nachsehen, ob etwas darin steht, und dann:
+    rm -r $SCRIPT_DIR/werkzeuge"
+fi
 
 # --- 3. Prerequisites -----------------------------------------------------
 
