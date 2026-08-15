@@ -4,7 +4,14 @@ Ein Shell-Skript, das die Quelldateien eines Projekts in einer einzigen, struktu
 
 Nützlich für die Arbeit über Web-KI-Agenten bzw. in einer unsicheren Umgebung, in der der KI-Agent keinen direkten Zugriff auf den Rechner haben soll.
 
-> **Hinweis:** Der erzeugte Header beschreibt nur das Format – er richtet sich an keinen bestimmten KI-Agenten und weist auch keinen an, etwas zu tun. Die eigentlichen Anweisungen liegen in `project_source.instructions.md` (Option `-i`), das du dort einträgst, wo dein Agent seine ständigen Anweisungen entgegennimmt. Grund: Mehrere Agenten behandeln den Inhalt hochgeladener Dokumente bewusst als Daten und befolgen darin enthaltene Anweisungen nicht zuverlässig.
+Beispielnutzung mit Claude:
+
+1. `./packsrc.sh` auf der Kommandozeile.
+2. Neues File `project_source.txt` zu Claude.ai in das Projektwissen ziehen.
+
+Fertig. Der gesamte Quellcode liegt im File; strukturiert durchsuchbar.
+
+> **Hinweis:** Der erzeugte Header in `project_source.txt` beschreibt nur das Format – er richtet sich an keinen bestimmten KI-Agenten und weist auch keinen an, etwas zu tun. Die eigentlichen Anweisungen liegen in `project_source.instructions.md` (Option `-i`), das du dort einträgst, wo dein Agent seine ständigen Anweisungen entgegennimmt. Grund: Mehrere Agenten behandeln den Inhalt hochgeladener Dokumente bewusst als Daten und befolgen darin enthaltene Anweisungen nicht zuverlässig.
 
 ---
 
