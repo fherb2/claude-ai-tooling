@@ -7,14 +7,18 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 ## Was es gibt
 
 
-| Baustein                | Anliegen                                                                                                                                                                                           |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ✅ [`pack-source-to-txt/`](pack-source-to-txt/README.md)   | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                      |
-| 🚧 [`chats-export/`](chats-export/README.md)         | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.     |
-| ⚠️ [`home-.claude-sharing/`](home-.claude-sharing/README.md) | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
-| ☑ [`skills/`](skills/README.md)               | Statt viele CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit "stillem" Trigger**.             |
+| Baustein                                                      | Anliegen                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ✅[`pack-source-to-txt/`](pack-source-to-txt/README.md)       | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
+| 🚧[`chats-export/`](chats-export/README.md)                   | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.                                            |
+| ⚠️[`home-.claude-sharing/`](home-.claude-sharing/README.md) | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
+| ☑[`skills/`](skills/README.md)                               | Statt viele CLAUDE.md-Anweisungen:**Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit "stillem" Trigger**.                                                    |
 
 (✅ einsatzbereit · 🚧 in Arbeit · ⚠️ mit Vorbehalt · ☑ abh. vom Skill)
+
+### **Anwendungshinweise** weiter unten in dieser README:
+
+* **[Aufbewahrungsdauer von Chats bei Claude Code](#aufbewahrungsdauer-von-chats-bei-claude-code)**
 
 ## pack-source-to-txt (nicht auf Claude beschränkt)
 
@@ -51,6 +55,27 @@ Wiederverwendbare Skills für Claude Code: Anweisungen, die nicht dauerhaft in `
 Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Situationen, die niemand ausspricht. Der Anthropic-Standard, einen Skill aktiv vom Nutzer zu starten oder im Skill über `description:` per Trigger-Wörter im Chat automatisch zu starten, erweitert das Konzept der stillen Trigger auch ein Start aus dem Kontext des Chats heraus. Das ist keine Claude-Code-Erweiterung, sondern wird über besondere Formulierungsregeln in CLAUDE.md erreicht. Details zur Nachnutzung in diesem Baustein.
 
 **Stand:** Der Stand der einzelnen Skills wird in der [zugehörigen README](skills/README.md) einzeln ausgewiesen.
+
+## Anwendungshinweise
+
+### Aufbewahrungsdauer von Chats bei Claude Code
+
+Claude Code legt Chats und die zugehörigen Daten und Sicherungskopien von zu ändernden Files in `~/.claude/` ab. **Die Aufbewahrungsdauer ist standardmäßig nur 30 Tage. Wer später auf Wissen aus diesen Chats zurückgreifen will, hat keine Chance.**
+
+Die Aufbewahrungsdauer lässt sich in `~/.claude/settings.json` mit dem Schlüssel `cleanupPeriodDays` **umkonfigurieren**.
+
+**Beispiel für 3 Jahre:**
+
+```json
+{
+  "cleanupPeriodDays": 1095
+}
+
+```
+
+Der Schlüssel ist prinzipiell in allen Settings-Ebenen zulässig — `~/.claude/settings.json` (Nutzer), `<projekt>/.claude/settings.json`, `<projekt>/.claude/settings.local.json`.
+
+**Ausgenommen sind aber einige Pfade** — vor allem `history.jsonl` (jeder je getippte Prompt mit Zeitstempel und Projektpfad) und das Auto-Memory unter `projects/<projekt>/memory/`. Die bleiben unbefristet liegen. Wer also die Aufbewahrungsdauer als Datenschutz-Stellschraube liest, greift mit `cleanupPeriodDays` allein zu kurz; die Doku nennt dafür zusätzlich `CLAUDE_CODE_SKIP_PROMPT_HISTORY` und `claude project purge`.
 
 ## Lizenz
 
