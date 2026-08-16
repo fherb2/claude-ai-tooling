@@ -11,3 +11,5 @@ Reine Abfolge der Arbeitsschritte, keine Inhalte. Details zu jedem Schritt stehe
 11. Für „Softwareaufgabe erkennen" (Kapitel 3.4) entscheiden, ob es ein eigenständiger Skill oder die Vorstufe von `software-dev-doc-fh` wird; den Trigger dabei nach Vorgabe 2.1 geankert neu formulieren.
 12. Die freigegebenen Skills an ihren Zielorten installieren und im Alltag erproben — insbesondere, ob die stillen Trigger im echten Betrieb zuverlässig und ohne Fehlauslösungen greifen.
 13. Klären, ob die vorhandenen Skills `konzept-segmentierung` und `konsistenzpruefung` in dieses Vorhaben überführt und dem Namensschema angeglichen werden.
+14. Den stillen Trigger von `common-code-generation-de` nach 1.6 messen: Wegwerf-Projekt mit Ladeindikator, Description des echten Skills, nicht-interaktive Läufe gegen Sonnet. Beide Bedingungen einzeln prüfen — den Anker an einer Anfrage, die wie eine reine Frage klingt und in einer Codeänderung endet, und das Frontend-Ereignis. Ergebnis in Kapitel 3.5 nachtragen.
+15. `common-code-generation-de` in die `README.md` aufnehmen (Abschnitt „Die Skills im Einzelnen" nach Vorgabe 2.3); dort stehen bisher nur die drei zuerst entwickelten Skills.
