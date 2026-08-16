@@ -12,7 +12,7 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 | ✅[`pack-source-to-txt/`](pack-source-to-txt/README.en.md)                | **The whole project codebase as a single file**: precise, up-to-date project context for an AI without access to the machine.                                                                                                      |
 | 🚧[`chats-export/`](chats-export/README.md) (in German)                   | **Transferring chats from Claude.ai between different user accounts, or sorted by project, into local Claude instances** (Claude Code) — which Anthropic does not offer so far.                                                   |
 | ⚠️[`home-.claude-sharing/`](home-.claude-sharing/README.md) (in German) | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
-| ☑[`skills/`](skills/README.md) (in German)                               | Instead of many CLAUDE.md instructions:**have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger**.                                                |
+| ☑[`skills/`](skills/README.en.md)                                        | Instead of many CLAUDE.md instructions:**have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger**.                                                |
 
 (✅ ready to use · 🚧 in progress · ⚠️ with reservations · ☑ depends on the skill)
 
@@ -54,7 +54,7 @@ Reusable skills for Claude Code: instructions that do not permanently cost conte
 
 Along with that, the concept of **silent triggers** developed here — triggers for situations nobody puts into words. The Anthropic standard has a skill either started by the user or fired automatically on trigger words given in the skill's `description:`; silent triggers extend that by a start out of the context of the chat. This is not an extension of Claude Code, but is achieved through particular rules of wording in CLAUDE.md. Details on reuse in this component.
 
-**Status:** the status of the individual skills is stated separately in the [corresponding README](skills/README.md) (in German).
+**Status:** the status of the individual skills is stated separately in the [corresponding README](skills/README.en.md).
 
 ## Usage notes
 
