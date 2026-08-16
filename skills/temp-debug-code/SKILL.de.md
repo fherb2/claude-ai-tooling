@@ -1,6 +1,6 @@
 ---
 name: temp-debug-code
-description: Kennzeichnungsregeln für temporären Debug-Code — eingefügte Debug- und print-Ausgaben sowie zum Testen stillgelegter Originalcode werden mit festen, suchbaren Marken versehen, damit sie später rückstandsfrei entfernt und der Originalzustand vollständig wiederhergestellt werden kann. Verwenden, bevor Du in einer Sitzung zum ersten Mal eine Debug-Ausgabe einfügst oder bestehenden Code zum Testen auskommentierst, oder wenn der Nutzer /temp-debug-code aufruft.
+description: Kennzeichnungsregeln für temporären Debug-Code — eingefügte Debug- und print-Ausgaben sowie zum Testen stillgelegter Originalcode werden mit festen, suchbaren Marken versehen, damit sie später rückstandsfrei entfernt und der Originalzustand vollständig wiederhergestellt werden kann. Verwenden, bevor in einer Sitzung zum ersten Mal eine Debug-Ausgabe eingefügt oder bestehender Code zum Testen auskommentiert wird, oder wenn der Nutzer /temp-debug-code aufruft.
 license: CC0-1.0
 ---
 
@@ -100,7 +100,7 @@ Originalcode, der für die Fehlersuche weichen muss, wird **ausschließlich ausk
 ## Worauf Du beim Ändern außerdem achtest
 
 - An Entscheidungsstellen — Verzweigungen, Case-Aufteilungen — und in Schleifen kommt es besonders auf die richtige Anwendung der Marken an, damit der Originalzustand mit minimalem Aufwand und für den Nutzer nachvollziehbar wiederherstellbar bleibt.
-- Übernimm die Einrückung des Entwicklers beziehungsweise die der verwendeten Programmiersprache unverändert.
+- Übernimm die vorgefundene Einrückung beziehungsweise die der verwendeten Programmiersprache unverändert.
 
 ## Debug-Code wieder entfernen
 
@@ -113,7 +113,7 @@ Wenn Du Debug-Code entfernst, prüfe sehr genau, ob dabei stillgelegter Original
 
 ## Fundstellen, die diesen Vorgaben nicht folgen
 
-Findest Du im Quelltext Zeilen, die sich nicht exakt an diese Vorgaben halten, informiere den Entwickler und schlage ihm die Korrektur vor. Zeige ihm dazu beispielhaft das Ergebnis der Korrektur im Chat, damit er leichter entscheiden kann. Keine solche Korrektur ohne vorherige Zustimmung des Entwicklers.
+Findest Du im Quelltext Zeilen, die sich nicht exakt an diese Vorgaben halten, informiere den Nutzer und schlage ihm die Korrektur vor. Zeige ihm dazu beispielhaft das Ergebnis der Korrektur im Chat, damit er leichter entscheiden kann. Keine solche Korrektur ohne vorherige Zustimmung des Nutzers.
 
 ## Beispiel
 

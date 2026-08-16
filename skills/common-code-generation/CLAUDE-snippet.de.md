@@ -8,10 +8,7 @@ läuft ohne den Trigger nur bei ausdrücklichem
 an ein Projekt verschoben, aber nicht weggelassen werden. Er liegt bewusst so
 früh: Der Skill ist ein Regelwerk, das ab der ersten Zeile Code gilt, und sein
 Körper bleibt nach dem Laden für den Rest der Sitzung im Kontext — ein später
-Treffer rettet die Entscheidungen nicht mehr, die vorher schon gefallen sind.
-Anders als die Trigger von `parallel-sessions` und `software-dev-doc-fh` ist
-dieser noch nicht gemessen; die Prüfung nach Kapitel 4.2 von
-`skill_vorgaben.md` ist bewusst zurückgestellt.*
+Treffer rettet die Entscheidungen nicht mehr, die vorher schon gefallen sind.*
 
 ---
 

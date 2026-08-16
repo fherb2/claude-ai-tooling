@@ -11,9 +11,7 @@ deshalb an die eigene Handlung, und der Satz „auch dann, wenn der Nutzer
 nicht von Debugging gesprochen hat" ist der wirksame Teil. Beim Anpassen an
 ein Projekt darf er verschoben, aber nicht weggelassen werden. Der zweite
 Absatz ist der Anker für die andere Hälfte des Skills, das Aufräumen; ohne
-ihn feuert der Skill nur beim Einfügen und nie beim Entfernen. Gemessen ist
-dieser Trigger noch nicht; die Prüfung nach Kapitel 1.6 der
-Implementierungsdoku steht aus.*
+ihn feuert der Skill nur beim Einfügen und nie beim Entfernen.*
 
 ---
 

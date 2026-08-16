@@ -9,10 +9,7 @@ session …") may be moved when adapting it to a project, but not left out. It
 lies deliberately this early: the skill is a set of rules that applies from
 the first line of code onward, and its body stays in the context for the rest
 of the session once loaded — a late hit no longer rescues the decisions that
-have already been made. Unlike the triggers of `parallel-sessions` and
-`software-dev-doc-fh`, this one has not yet been measured; the check
-described in chapter 4.2 of `skill_vorgaben.md` has deliberately been
-deferred.*
+have already been made.*
 
 ---
 
