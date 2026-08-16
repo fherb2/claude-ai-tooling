@@ -18,6 +18,8 @@ Was Skills sind, wie sie aufgebaut sind und wie Claude Code sie lädt, beschreib
 
 Skills, die einen solchen Trigger brauchen, bringen dafür eine Datei `CLAUDE-snippet.md` in ihrem Ordner mit.
 
+**Jeder Skill liegt in zwei Sprachfassungen vor,** einer deutschen und einer englischen. Beide liegen im selben Ordner und unterscheiden sich durch ein Sprachkürzel vor der Endung: `SKILL.de.md` und `SKILL.en.md`, ebenso `README.de.md`/`README.en.md` und `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Installiert wird genau **eine** der beiden Fassungen, und dabei entfällt das Kürzel — Claude Code erkennt ausschließlich den Namen `SKILL.md`. Der Ordnername ist in beiden Fassungen derselbe und trägt nie ein Kürzel; dasselbe gilt für den Skill-Namen im Frontmatter und damit für den Aufruf `/<skill-name>`.
+
 ### Installation
 
 1. **Zielort wählen.** Ein Skill gilt entweder für alle Projekte des Nutzers oder nur für eines:
@@ -27,7 +29,7 @@ Skills, die einen solchen Trigger brauchen, bringen dafür eine Datei `CLAUDE-sn
    | Persönlich | `~/.claude/skills/<skill-name>/SKILL.md` | alle Projekte des Nutzers |
    | Projekt    | `.claude/skills/<skill-name>/SKILL.md`   | nur dieses Projekt        |
 
-2. **Skill-Ordner kopieren.** Der Ordner hier hat bereits genau die Struktur des Zielorts — er wird unverändert dorthin kopiert, mit allem, was darin liegt.
+2. **Skill-Ordner kopieren, Sprachfassung wählen.** Der Ordner hier hat bereits genau die Struktur des Zielorts. Kopiert wird er unter seinem unveränderten Namen; von jeder Datei kommt nur die gewünschte Sprachfassung mit, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`. Bleibt das Kürzel stehen, findet Claude Code den Skill nicht.
 
 3. **Stillen Trigger übernehmen, falls vorhanden.** Liegt im Ordner eine `CLAUDE-snippet.md`, wird ihr Inhalt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts übernommen — bei einem persönlichen Skill in `~/.claude/CLAUDE.md`, bei einem Projekt-Skill in dessen `CLAUDE.md`. Der Text oberhalb der Trennlinie ist die Anleitung dazu und wird nicht mitkopiert.
 
@@ -83,7 +85,7 @@ Drei Regeln — zwei davon aus Messungen und nicht aus Geschmack, die dritte aus
 
 **Installation.** Wie in Kapitel 2, **mit** stillem Trigger (`CLAUDE-snippet.md`). Dessen Wortlaut ist an eine Handlung gebunden („bevor du zum ersten Mal …") — dieser Anker darf verschoben, aber nicht weggelassen werden, sonst löst der Trigger nicht mehr aus.
 
-### 3.4 `common-code-generation-de`
+### 3.4 `common-code-generation`
 
 **Wozu.** Allgemeine Regeln für das Erzeugen und Ändern von Code — die Art Festlegungen, die sonst in jeder `CLAUDE.md` wiederholt stehen müsste. **Nicht** Gegenstand: die Pflicht, vor einer Dateiänderung einen Plan vorzulegen; die bleibt in der `CLAUDE.md`, weil ein Skill nur wahrscheinlich lädt, eine Schutzregel aber sicher greifen muss.
 
