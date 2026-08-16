@@ -8,7 +8,7 @@ Anweisungen an Claude sammeln sich in `CLAUDE.md`-Dateien an, und jede Zeile dar
 
 Skills lösen das: Der Inhalt liegt in einer eigenen Datei und wird erst geladen, wenn er gebraucht wird. In der `CLAUDE.md` bleibt höchstens ein kurzer Absatz stehen, der sagt, *wann* nachzuladen ist — nicht *was* dort steht.
 
-Dieses Vorhaben entwickelt solche Skills und dokumentiert dabei, wie ihre Auslösung tatsächlich funktioniert. Die Erkenntnisse aus den zugehörigen Messreihen stehen in `implementation_doku.md`; diese README beschreibt nur das Ergebnis: was es gibt und wie man es benutzt.
+Dieses Vorhaben entwickelt solche Skills und dokumentiert dabei, wie ihre Auslösung tatsächlich funktioniert. Die Erkenntnisse aus den zugehörigen Messreihen stehen in `skill_vorgaben.md`; diese README beschreibt nur das Ergebnis: was es gibt und wie man es benutzt.
 
 ## 2 Skills beschaffen und installieren
 
@@ -31,17 +31,19 @@ Skills, die einen solchen Trigger brauchen, bringen dafür eine Datei `CLAUDE-sn
 
 3. **Stillen Trigger übernehmen, falls vorhanden.** Liegt im Ordner eine `CLAUDE-snippet.md`, wird ihr Inhalt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts übernommen — bei einem persönlichen Skill in `~/.claude/CLAUDE.md`, bei einem Projekt-Skill in dessen `CLAUDE.md`. Der Text oberhalb der Trennlinie ist die Anleitung dazu und wird nicht mitkopiert.
 
-4. **`CLAUDE-snippet.md` am Zielort löschen.** Sie hat ihren Zweck erfüllt. Bliebe sie liegen, entstünde eine zweite Fassung des Triggers, die beim nächsten Anpassen auseinanderdriftet.
+4. **`CLAUDE-snippet.md` und `README.md` am Zielort löschen.** Beide haben ihren Zweck erfüllt. Beim Snippet ist das zwingend: Bliebe es liegen, entstünde eine zweite Fassung des Triggers, die beim nächsten Anpassen auseinanderdriftet. Die README beschreibt den Arbeitsstand in der Quelle, nicht das installierte Werkzeug — sie darf bleiben, nützt am Zielort aber nichts.
 
 Ohne Schritt 3 und 4 funktioniert der Skill weiterhin — aber nur, wenn er ausdrücklich mit `/<skill-name>` aufgerufen wird.
 
 ### Beim Anpassen eines Triggers
 
-Zwei Regeln, die aus Messungen stammen und nicht aus Geschmack:
+Drei Regeln — zwei davon aus Messungen und nicht aus Geschmack, die dritte aus Anthropics eigener Vorgabe:
 
 **Die `description` des Skills entscheidet zuerst.** Sie beginnt mit dem Hauptanwendungsfall und benutzt die Wörter, die ein Nutzer von sich aus sagen würde. Wer dort eine Einordnung voranstellt („Testskill…", „Interne Fassung…") oder projektinterne Fachbegriffe verwendet, die in keiner Anfrage vorkommen, kann den Trigger unwirksam machen — gemessen: derselbe Trigger-Text feuerte mit guter Beschreibung, mit schwacher nicht.
 
-**Ein Trigger sollte an ein Ereignis oder eine Handlung gebunden sein,** nicht bloß an eine Eigenschaft der Aufgabe. „Behalte im Blick, ob diese Aufgabe komplex ist" trägt sich nicht selbst; „bevor du zum ersten Mal eine Datei änderst, prüfe …" oder „taucht eine Datei auf, die du nicht angefasst hast, dann …" lösen zuverlässig aus. Die Messreihen dazu stehen in `implementation_doku.md`, Kapitel 1.5.
+**Ein Trigger sollte an ein Ereignis oder eine Handlung gebunden sein,** nicht bloß an eine Eigenschaft der Aufgabe. „Behalte im Blick, ob diese Aufgabe komplex ist" trägt sich nicht selbst; „bevor du zum ersten Mal eine Datei änderst, prüfe …" oder „taucht eine Datei auf, die du nicht angefasst hast, dann …" lösen zuverlässig aus. Die Messreihen dazu stehen in `skill_vorgaben.md`, Kapitel 3.
+
+**Die `description` steht in der dritten Person.** Sie beschreibt den Skill — „Übersetzt Dokumente …", „Verwenden, sobald …" — und spricht niemanden an, weder Claude noch den Nutzer. Das ist keine Stilfrage: Die Beschreibung wird in den Systemprompt eingefügt, und ein wechselnder Blickwinkel stört dort die Auswahl unter vielen Skills. Anthropic sagt das ausdrücklich — *„Always write in third person […] inconsistent point-of-view can cause discovery problems"* ([Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 
 ## 3 Die Skills im Einzelnen
 
@@ -80,6 +82,24 @@ Zwei Regeln, die aus Messungen stammen und nicht aus Geschmack:
 **Erweitern.** Zwei Festlegungen tragen die übrigen und sollten beim Anpassen nicht fallen: die Prosa-Code-Grenze (sonst prüft man später Code gegen Code) und die Regel, dass jede Aussage genau ein normatives Zuhause hat (sonst entstehen zwei Fassungen derselben Festlegung, die auseinanderdriften). Der Aufnahmetest für Segment 2 — „man muss auf eine Datei zeigen und sagen können, das verletzt diese Vorgabe" — ist das Werkzeug, mit dem sich entscheiden lässt, wohin eine neue Aussage gehört.
 
 **Installation.** Wie in Kapitel 2, **mit** stillem Trigger (`CLAUDE-snippet.md`). Dessen Wortlaut ist an eine Handlung gebunden („bevor du zum ersten Mal …") — dieser Anker darf verschoben, aber nicht weggelassen werden, sonst löst der Trigger nicht mehr aus.
+
+### 3.4 `common-code-generation-de`
+
+**Wozu.** Allgemeine Regeln für das Erzeugen und Ändern von Code — die Art Festlegungen, die sonst in jeder `CLAUDE.md` wiederholt stehen müsste. **Nicht** Gegenstand: die Pflicht, vor einer Dateiänderung einen Plan vorzulegen; die bleibt in der `CLAUDE.md`, weil ein Skill nur wahrscheinlich lädt, eine Schutzregel aber sicher greifen muss.
+
+**Was er konkret tut.** Er legt fest, dass alles im Quelltext — Bezeichner, Kommentare, Docstrings — auf Englisch steht und dass selbst gewählte Namen dem Nutzer zur Entscheidung vorgelegt werden. Er verbietet ungefragte Erweiterungen des Funktionsumfangs. Er gibt eine Rangfolge der Ressourcen vor (Rechenzeit, Arbeitsspeicher, Massenspeicher) und verlangt, jeden Optimierungsvorschlag vorher gegen die Realität zu prüfen: ob er sich im tatsächlichen Anwendungsfall lohnt und ob sein Effekt über die Gesamtapplikation überhaupt messbar ist. Dazu ein Sonderfall — die Anordnung von Abbruchkriterien in Schleifen nach Vorwissen über die Daten, samt dem Hinweis, dass der Compiler die Reihenfolge im Maschinencode ohnehin ändert.
+
+**Besonderheiten.** Der Anker des Triggers liegt am frühestmöglichen Moment der Sitzung, nicht bei der ersten Benennung oder dem ersten Optimierungsvorschlag. Grund: Der Skill ist kein Ablauf, sondern ein Regelwerk, das ab der ersten Zeile Code gilt — und weil sein Körper nach dem Laden im Kontext bleibt und nicht neu gelesen wird, rettet ein später Treffer die Entscheidungen nicht mehr, die vorher gefallen sind.
+
+**Erweitern.** Der Anker darf beim Anpassen verschoben, aber nicht weggelassen werden. Und die Plan-Pflicht gehört nicht in den Skill geholt, so verlockend das aussieht: Ein Trigger ist probabilistisch, eine Schutzregel muss sicher greifen.
+
+**Installation.** Wie in Kapitel 2, **mit** stillem Trigger (`CLAUDE-snippet.md`).
+
+## 4 Offene Punkte des Vorhabens
+
+Was an einem einzelnen Skill offen ist, steht in dessen eigener `README.md` im Skill-Ordner. Übergreifend offen ist:
+
+- **Transport an den Zielort.** Ob das Kopieren eines fertigen Skills nach `.claude/skills/` bzw. `~/.claude/skills/` automatisiert wird, ist nicht entschieden. Derzeit bleibt es Handarbeit des Nutzers. Naheliegend wäre eine Anbindung an `home-.claude-sharing`, das bereits einen Sync-Mechanismus für `~/.claude` unterhält.
 
 ## Lizenz
 

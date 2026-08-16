@@ -3,7 +3,8 @@
 Ergänzung zu `~/.claude/CLAUDE.md` (im Folgenden „Arbeitsanweisungen"),
 **keine Kopie**: Hier steht nur, was dort nicht steht — und nur, was für
 **alle Vorhaben** dieses Repos gilt. Was nur eines betrifft, gehört in
-dessen `fahrplan.md` unter „Dauerhaft", nicht hierher.
+dessen `fahrplan.md` unter „Dauerhaft" — in `skills/` in die `README.md` des
+betroffenen Skills —, nicht hierher.
 
 **Und es bleibt bei diesen zwei Ebenen.** Eine dritte — eine `CLAUDE.md` in
 einem Unterordner oder eine pfadgebundene Regel unter `.claude/rules/` — ist
@@ -52,9 +53,9 @@ Nachlässigkeit:
 
 |               | `chats-export/`                        | `home-.claude-sharing/`                   | `pack-source-to-txt/`                  | `skills/`                              |
 | ------------- | -------------------------------------- | ------------------------------------------ | --------------------------------------- | --------------------------------------- |
-| Doku          | `implementation_doku.md`, vier Kapitel | `implementierungs_doku.md`, drei Segmente | keine — nur `README.md`/`README.de.md` | `implementation_doku.md`, drei Segmente |
-| Status        | `status.md`                            | `status.md`                                | —                                        | `status.md`                             |
-| Fahrplan      | eigener, mit Abschnitt „Dauerhaft“     | eigener, mit Abschnitt „Dauerhaft“         | —                                        | eigener, mit Abschnitt „Dauerhaft“      |
+| Doku          | `implementation_doku.md`, vier Kapitel | `implementierungs_doku.md`, drei Segmente | keine — nur `README.md`/`README.de.md` | `skill_vorgaben.md`, keine Segmente     |
+| Status        | `status.md`                            | `status.md`                                | —                                        | —                                       |
+| Fahrplan      | eigener, mit Abschnitt „Dauerhaft“     | eigener, mit Abschnitt „Dauerhaft“         | —                                        | — (README je Skill)                     |
 | Eigenes Wort  | kalt / warm / Beobachtung              | —                                           | —                                        | —                                        |
 
 Dazu, was aus der Tabelle nicht hervorgeht: Kapitel 4 von `chats-export` ist
@@ -66,11 +67,33 @@ keine zweite Definition. `pack-source-to-txt` ist kein über Konzept- und
 Implementierungsdoku entwickeltes eigenes Vorhaben, sondern ein von extern
 übernommenes und angepasstes Werkzeug — daher keine Segment-Doku, kein
 Fahrplan, keine Status-Datei, nur die README in Englisch (Original) und
-Deutsch.
+Deutsch. `skills/` hat seine Segmentstruktur, seinen Fahrplan und seine
+Statusdatei am 16. August 2026 abgelegt: Dort entsteht kein Quellcode,
+sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte, von
+denen keiner auf einem anderen aufbaut. Die projektweiten Vorgaben stehen
+seither in `skills/skill_vorgaben.md`, der Arbeitsstand jedes einzelnen
+Skills in der `README.md` seines Ordners. Die Begründung im Wortlaut steht
+im Kopf von `skill_vorgaben.md`.
 
 Die READMEs von `chats-export` und `home-.claude-sharing` tragen den
 Hinweis „Nicht benutzen!“; beide sind nicht zur Weitergabe freigegeben.
 `pack-source-to-txt` und `skills` unterliegen dieser Einschränkung nicht.
+
+## Die Vorgaben lesen, bevor eine Datei des Vorhabens entsteht oder sich ändert
+
+Was für ein einzelnes Vorhaben gilt, steht in dessen Doku — bei den beiden
+Vorhaben mit Segmentstruktur in Segment 2 („Vorgaben"), bei `skills/` in
+`skill_vorgaben.md`. Diese Texte werden **nicht** automatisch in den Kontext
+geladen, anders als diese Datei. Deshalb gilt hier ausdrücklich: Wer eine
+Datei eines Vorhabens anlegt oder ändert, liest **vorher** dessen Vorgaben
+vollständig — nicht nur die Sektion, die zur Aufgabe gehört.
+
+Der Grund steckt in der Natur dieser Vorgaben: Sie halten fest, was man der
+einzelnen Datei nicht ansieht. Dass etwa die `description` eines Skills
+gegen eine Vorgabe verstößt, erkennt man nicht beim Lesen der `SKILL.md`,
+sondern nur gegen `skills/skill_vorgaben.md`. Wer die Vorgaben nicht kennt,
+schreibt den Verstoß gutgläubig hin — und der nächste Review meldet ihn zu
+Recht.
 
 ## Fahrplan-Nummerierung
 
@@ -83,7 +106,8 @@ Vorhaben mit eigenem Fahrplan und für den Fragenkatalog einer Doku genauso.
 
 Gilt für jede Befundliste in diesem Repo — Doku-Review, Code-Review,
 Docstring-Review. Welche derzeit offen sind, sagt der Fahrplan des
-jeweiligen Vorhabens.
+jeweiligen Vorhabens — in `skills/` stattdessen die `README.md` des
+betroffenen Skills.
 
 - Jeder Befund wird **einzeln vorgelegt und besprochen**, nicht selbständig
   ausgeführt. Die Entscheidung liegt beim Entwickler.
@@ -126,7 +150,9 @@ Plan-Dateien**:
 - **Alles andere** → im **Fahrplan**, im betreffenden Schritt ausdetailliert.
   §2.6 beschreibt den Fahrplan ohnehin als „die nächsten Schritte in
   aufgabenangemessener Detaillierung", und §1.9 verlangt, diese Detaillierung
-  vor einer Komprimierung zu vertiefen — das ist genau ein Plan.
+  vor einer Komprimierung zu vertiefen — das ist genau ein Plan. In `skills/`
+  gibt es keinen Fahrplan: Dort steht der Plan unter „Offen" in der
+  `README.md` des betroffenen Skills.
 
 In beiden Fällen steht **höchstens ein** noch nicht ausgeführter Plan
 gleichzeitig da, deutlich als solcher gekennzeichnet. Sein Zweck ist die

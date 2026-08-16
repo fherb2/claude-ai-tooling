@@ -10,8 +10,8 @@ früh: Der Skill ist ein Regelwerk, das ab der ersten Zeile Code gilt, und sein
 Körper bleibt nach dem Laden für den Rest der Sitzung im Kontext — ein später
 Treffer rettet die Entscheidungen nicht mehr, die vorher schon gefallen sind.
 Anders als die Trigger von `parallel-sessions` und `software-dev-doc-fh` ist
-dieser noch nicht gemessen; die Prüfung nach Kapitel 1.6 der
-Implementierungsdoku steht aus.*
+dieser noch nicht gemessen; die Prüfung nach Kapitel 4.2 von
+`skill_vorgaben.md` ist bewusst zurückgestellt.*
 
 ---
 
@@ -23,8 +23,3 @@ auch, wenn niemand von Code gesprochen hat und die Anfrage wie eine
 Frage klingt — „warum bricht das Skript bei großen Dateien ab?",
 „kannst du mal schauen, warum die Liste leer bleibt?" —, denn auch
 daraus entsteht geänderter Quelltext.
-
-Und sobald erkennbar wird, dass die Applikation ein eigenes Frontend
-enthält oder Daten an ein externes Frontend liefert, konsultiere den
-Skill ebenfalls: Für den Entwurf der Bedienung gelten dann zusätzliche
-Regeln.
