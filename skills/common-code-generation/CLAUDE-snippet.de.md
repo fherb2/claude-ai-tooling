@@ -2,7 +2,7 @@
 den Skill auslöst. Beim Installieren: alles unterhalb der Trennlinie in die
 `CLAUDE.md` des Zielorts übernehmen, danach diese Datei löschen. Der Skill
 läuft ohne den Trigger nur bei ausdrücklichem
-`/common-code-generation-de`-Aufruf.*
+`/common-code-generation`-Aufruf.*
 
 *Der Anker („bevor du in einer Sitzung zum ersten Mal …") darf beim Anpassen
 an ein Projekt verschoben, aber nicht weggelassen werden. Er liegt bewusst so
@@ -18,7 +18,7 @@ dieser noch nicht gemessen; die Prüfung nach Kapitel 4.2 von
 ## Regeln beim Schreiben von Code
 
 Bevor du in einer Sitzung zum ersten Mal Quelltext schreibst oder
-änderst, konsultiere den Skill `common-code-generation-de`. Das gilt
+änderst, konsultiere den Skill `common-code-generation`. Das gilt
 auch, wenn niemand von Code gesprochen hat und die Anfrage wie eine
 Frage klingt — „warum bricht das Skript bei großen Dateien ab?",
 „kannst du mal schauen, warum die Liste leer bleibt?" —, denn auch

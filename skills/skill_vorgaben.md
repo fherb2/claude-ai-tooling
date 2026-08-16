@@ -23,7 +23,7 @@ Der Ordner `skills/` in diesem Repository wird von Claude Code nicht erkannt. Ei
 
 (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills))
 
-Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5). Installieren ist dann ein Kopiervorgang ohne Umbau. Der automatische Transport an den Zielort ist derzeit nicht Teil dieses Vorhabens.
+Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5). Installieren ist dann ein Kopiervorgang mit genau einem Handgriff: Das Sprachkürzel entfällt aus den Dateinamen (5.1). Der automatische Transport an den Zielort ist derzeit nicht Teil dieses Vorhabens.
 
 ### 1.2 Ladeverhalten
 
@@ -134,7 +134,7 @@ Der Minimalaufbau ist als Messinstrument gegengeprüft: Mit der vollständigen r
 
 ## 5 Aufbau eines Skill-Ordners
 
-Jeder Skill liegt unter `skills/<skill-name>/`. Enthalten sind:
+Jeder Skill liegt unter `skills/<skill-name>/`. Der Ordnername trägt **kein** Sprachkürzel; die Dateien darin tragen es (5.1). Enthalten sind:
 
 - **`SKILL.md`** — verpflichtend. Frontmatter mit `name` (gleich dem Ordnernamen), `description` (der reguläre Trigger, nach Kapitel 2 formuliert) und `license`. Letzteres ist reine Deklaration für den Leser: „Claude Code accepts the field but doesn't act on it" (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Welche Lizenz gewählt wird, gibt Anthropic nicht vor (recherchiert am 14. August 2026); hier gilt einheitlich CC0, begründet in der Gesamt-README. Für den Umfang empfiehlt dieselbe Quelle, unter 500 Zeilen zu bleiben — eine Empfehlung, keine harte Grenze.
 - **`README.md`** — verpflichtend. Arbeitsstand und offene Punkte dieses Skills, Aufbau nach 6.1.
@@ -148,6 +148,30 @@ Jeder Skill liegt unter `skills/<skill-name>/`. Enthalten sind:
 **Zusatzdateien, die zur Laufzeit gelesen oder geschrieben werden,** spricht der Skill über `${CLAUDE_SKILL_DIR}` an. Der Platzhalter wird laut offizieller Doku nur in Claude Code tatsächlich ersetzt; in claude.ai bliebe ein solcher Verweis wörtlicher Text bzw. die nötigen Datei-Werkzeuge fehlen ganz (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein Skill, der in beiden Umgebungen laufen soll, kann daraus seine Umgebung erkennen: Gelingt der Zugriff auf einen echten, aufgelösten Pfad, läuft er lokal.
 
 **Zum `name`:** Kleinbuchstaben, Ziffern und Bindestriche, höchstens 64 Zeichen, keine XML-Tags, nicht die reservierten Wörter „anthropic" und „claude". Anthropic empfiehlt die Verlaufsform (`processing-pdfs`) und lässt Substantiv- und Handlungsformen ausdrücklich als Alternative zu (belegt, [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); die Skills hier folgen der Substantivform. Kodiert ein Skill die Arbeitsweise einer bestimmten Person statt einer allgemein gültigen, gehört ein Kürzel in den Namen (`software-dev-doc-fh`). Das macht im Namen sichtbar, dass es andere Arbeitsweisen gibt, und lädt dazu ein, dafür einen eigenen Skill zu schreiben, statt diesen zu verbiegen.
+
+### 5.1 Zwei Sprachfassungen
+
+**Jeder Skill dieses Vorhabens liegt in einer deutschen und einer englischen Fassung vor.** Das ist bindend und gilt für alle Skills, auch die bereits vorhandenen. Ein Skill, dem eine der beiden Fassungen fehlt, ist unfertig; der Punkt gehört dann unter „Offen" in seine README (6.1).
+
+Beide Fassungen liegen im **selben** Ordner. Unterschieden werden sie durch ein Sprachkürzel unmittelbar vor der Endung `.md`:
+
+| Deutsch                  | Englisch                 |
+| ------------------------ | ------------------------ |
+| `SKILL.de.md`            | `SKILL.en.md`            |
+| `README.de.md`           | `README.en.md`           |
+| `CLAUDE-snippet.de.md`   | `CLAUDE-snippet.en.md`   |
+
+Das gilt für **alle** Dateien des Skill-Ordners, die Prosa enthalten — nicht nur für die `SKILL.md`. Wo dieses Dokument die bloßen Namen `SKILL.md`, `README.md` oder `CLAUDE-snippet.md` verwendet, ist die Datei unabhängig von ihrer Sprachfassung gemeint.
+
+**Beim Installieren wird das Sprachkürzel entfernt.** Kopiert wird genau eine der beiden Fassungen; sie heißt am Zielort `SKILL.md`. Claude Code erkennt keinen anderen Namen — eine `SKILL.de.md` am Zielort ist kein Skill. Der Ordnername bleibt dabei unverändert, denn er trug nie ein Kürzel.
+
+Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
+
+- Das Frontmatter-Feld **`name` trägt kein Sprachkürzel**. Es muss dem Ordnernamen gleichen (Kapitel 5), und der Ordner heißt in beiden Fassungen gleich. Die deutsche und die englische `SKILL` tragen also denselben `name`.
+- Der **Slash-Aufruf** heißt entsprechend `/<skill-name>`, nie `/<skill-name>-de`. Wo die `description` ihn selbst nennt, gehört er ohne Kürzel dort hinein.
+- Die beiden Fassungen sind **Übersetzungen desselben Skills**, keine zwei Skills. Sie tragen dieselben Regeln, dieselben Anker und dieselbe Struktur. Weicht eine inhaltlich ab, ist das ein Fehler, kein Sprachunterschied.
+
+**Warum überhaupt zwei Fassungen.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können — `skills/` unterliegt anders als `chats-export/` und `home-.claude-sharing/` keiner Weitergabebeschränkung. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
 
 ---
 

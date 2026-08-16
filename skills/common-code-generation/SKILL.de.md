@@ -1,6 +1,6 @@
 ---
-name: common-code-generation-de
-description: Regeln für das Erzeugen und Ändern von Code — englische Benennungen, kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher; Benennungen und Optimierungen werden vorgeschlagen, nicht entschieden. Verwenden, bevor in einer Sitzung zum ersten Mal Code entsteht oder geändert wird oder eine Optimierung vorgeschlagen wird, oder wenn der Nutzer /common-code-generation-de aufruft.
+name: common-code-generation
+description: Regeln für das Erzeugen und Ändern von Code — englische Benennungen, kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher; Benennungen und Optimierungen werden vorgeschlagen, nicht entschieden. Verwenden, bevor in einer Sitzung zum ersten Mal Code entsteht oder geändert wird oder eine Optimierung vorgeschlagen wird, oder wenn der Nutzer /common-code-generation aufruft.
 license: CC0-1.0
 ---
 
