@@ -2,29 +2,44 @@
 
 *[English version](README.en.md)*
 
-Wiederverwendbare Skills für Claude Code, samt der Trigger, die sie auslösen. Dieses Verzeichnis ist die Quelle — hier werden die Skills entwickelt und gepflegt. Wirksam werden sie erst, wenn sie an ihren Zielort kopiert wurden (Kapitel 2).
+Wiederverwendbare Skills für Claude Code, samt der Trigger, die sie auslösen. Dieses Verzeichnis ist die Quelle — hier werden die Skills entwickelt und gepflegt. Wirksam werden sie erst, wenn sie an ihren Zielort kopiert wurden (Kapitel 3).
 
-## 1 Zweck
+## 1 Die Skills im Einzelnen
 
-Dieses Vorhaben entwickelt und pflegt Skills zur allgemeinen Verwendung mit Claude (Web und lokal und auf allen Ebenen von Nutzer bis Projekt)
 
-Es wird ein Konzept der "Stillen Trigger" eingeführt um umgesetzt, dass auch schwächeren Modellen erlaubt, sehr früh aus dem Kontext heraus einen Skill zu starten.
+| Skill                                                                    | Zweck                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`common-code-generation/`](common-code-generation/README.de.md)<br>✅☑ | **Allgemeine Regeln der Zusammenarbeit und Ausführung des Erzeugens und Änderns von Code abseits von Code-Style-Regeln**: z.B.: kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher                                                                                                             |
+| [`parallel-sessions/`](parallel-sessions/README.md)<br>✅                | **Mehrere Claude-Instanzen gleichzeitig im selben Repository**: Arbeit mit oder ohne Worktree. Klärt die Zusammenarbeit, wenn mehrere Claude-Code-Instanzen gleichzeitig im selben Repository arbeiten.                                                                                                                              |
+| [`software-dev-doc-fh/`](software-dev-doc-fh/README.md)<br>🚧            | **Dokumentationsstandard für die Planung vor der Kodierung und die laufende Mitschrift des Implementierten** — was umgesetzt wird, welche Festlegungen getroffen wurden und warum so und nicht anders. Softwareprojektbegleitende Dokumentation als Basis für Coding, Fehlersuche und späterer Schluss- und Anwenderdokumentation. |
+| [`softwareaufgabe-erkennen/`](softwareaufgabe-erkennen/README.md)<br>🚧  | **Erkennen, dass eine Anfrage auf zu schreibende oder zu ändernde Software hinausläuft** — auch wenn sie Wörter wie „Code" oder „programmieren" nie benutzt. Bisher eine festgehaltene Idee samt Messergebnis, noch kein Skill.                                                                                                  |
+| [`temp-debug-code/`](temp-debug-code/README.de.md)<br>✅☑                    | **Eindeutige Kennzeichnung von Code, der nur für einen laufenden Debugging-Vorgang zugefügt oder geändert wird** — nicht für Debug-Code, der dauerhaft im Quelltext bleiben soll.                                                                                                                                                 |
+| [`translation-task/`](translation-task/README.md)<br>🚧                  | **Übersetzung von Dokumenten mit softwareentwicklungsnahem Inhalt** — README-Dateien, Konzept- und Implementierungsdokumente, Anleitungen. Nicht auf eine Sprachrichtung festgelegt.                                                                                                                                                 |
+| [`web-code-artefacts/`](web-code-artefacts/README.md)<br>🚧              | **Umgang mit Code-Artefakten im Web-Frontend**: wann Code als Artefakt entsteht und wann als Änderungsanweisung im Chat, und in welcher Form Änderungen an bereits übernommenem Code mitgeteilt werden.                                                                                                                             |
+
+(✅ deutsche Fassung fertig und nutzbar · ☑ englische Fassung fertig und nutzbar · 🚧 in Arbeit · ⚠️ mit Vorbehalt)
+
+## 2 Zweck
+
+Dieses Vorhaben entwickelt und pflegt Skills zur allgemeinen Verwendung mit Claude — im Web und lokal, auf allen Ebenen von Nutzer bis Projekt.
+
+Eingeführt und umgesetzt wird dabei ein Konzept der **stillen Trigger**, das auch schwächeren Modellen erlaubt, einen Skill sehr früh aus dem Kontext heraus zu starten.
 
 Vorgaben für diesen Bereich `skills/` und Erkenntnisse aus den zugehörigen Messreihen stehen in `skill_vorgaben.md`. Diese README beschreibt nur das Ergebnis: Was es gibt und wie man es benutzt. Jedes Skill hat dazu noch ein eigenes README-File mit speziellen Hinweisen und dem jeweiligen Entwicklungszustand des Skills.
 
-## 2 Skills beschaffen und installieren
+## 3 Skills beschaffen und installieren
 
 Was Skills sind, wie sie aufgebaut sind und wie Claude Code sie lädt, beschreibt die offizielle Dokumentation: **[Extend Claude with skills](https://code.claude.com/docs/en/skills)**. Diese README setzt das als bekannt voraus.
 
 **Was hier hinzukommt, sind stille Trigger:**
 
-Die von Anthropic vorgesehene Technik löst einen Skill über seine `description` aus: Passt sie zur Anfrage, wird der Skill geladen. Das funktioniert gut, wenn der Nutzer etwas verlangt, das dem Skill offensichtlich entspricht. Es funktioniert nicht oder schlecht, wenn der Auslöser eine Beobachtung ist, die niemand im Chat ausspricht — etwa dass gerade eine zweite Claude-Instanz oder der Nutzer im selben Repository arbeitet, obwohl der Chat die Hoheit über Commits trägt. Für solche Fälle liegt für einen Skill ein zusätzlicher Absatz in der `CLAUDE.md` des Zielorts, der die Bedingung benennt und auf den Skill verweist. Er heißt in diesem Projekt **stiller Trigger**, weil ihn üblicherweise niemand explizit für eine Aufgabe aufruft und niemand sieht: Er wirkt aus dem Hintergrund im Denkvorgang der KI, ohne dass der Nutzer etwas davon merkt. Er soll gewährleisten, dass der Skill möglichst sehr fühzeitig wirkt, wenn ohne diesen Trigger die KI den Skill noch als zu unterschwellig gegenüber bezüglich seiner Beschreibung und der aktuellen Aufgabe behandelt.
+Die von Anthropic vorgesehene Technik löst einen Skill über seine `description` aus: Passt sie zur Anfrage, wird der Skill geladen. Das funktioniert gut, wenn der Nutzer etwas verlangt, das dem Skill offensichtlich entspricht. Es funktioniert nicht oder schlecht, wenn der Auslöser eine Beobachtung ist, die niemand im Chat ausspricht — etwa dass gerade eine zweite Claude-Instanz oder der Nutzer im selben Repository arbeitet, obwohl der Chat die Hoheit über Commits trägt. Für solche Fälle liegt für einen Skill ein zusätzlicher Absatz in der `CLAUDE.md` des Zielorts, der die Bedingung benennt und auf den Skill verweist. Er heißt in diesem Projekt **stiller Trigger**, weil ihn üblicherweise niemand explizit für eine Aufgabe aufruft und niemand sieht: Er wirkt aus dem Hintergrund im Denkvorgang der KI, ohne dass der Nutzer etwas davon merkt. Er soll gewährleisten, dass der Skill so früh wie möglich wirkt — auch dann, wenn die KI die Übereinstimmung zwischen seiner `description` und der aktuellen Aufgabe von sich aus für zu schwach hielte, um ihn zu laden.
 
-Skills, die einen solchen Trigger brauchen, bringen dafür eine Datei `CLAUDE-snippet.md` in ihrem Ordner mit. Das Snippet darin wäre der CLAUDE.md der gleichen Ebene per Hand zuzufügen.
+Skills, die einen solchen Trigger brauchen, bringen dafür eine Datei `CLAUDE-snippet.md` in ihrem Ordner mit. Ihr Inhalt wird der `CLAUDE.md` derselben Ebene per Hand zugefügt.
 
-**Skills hier liegen in der Regel in zwei Sprachfassungen vor,** einer deutschen und einer englischen. Beide liegen im selben Ordner und unterscheiden sich durch ein Sprachkürzel vor der Endung: `SKILL.de.md` und `SKILL.en.md`, ebenso `README.de.md`/`README.en.md` und `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Installiert wird genau **eine** der beiden Fassungen, und dabei entfällt das Kürzel — Claude Code erkennt ausschließlich den Namen `SKILL.md`. Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Sprachfassung ansich gegenüber allen Chat-Sprachen kompatibel sein sollte.
+**In welchen Sprachen ein Skill vorliegt, ist von Fall zu Fall verschieden.** Die meisten gibt es hier nur auf Deutsch; ihre Dateien heißen dann schlicht `SKILL.md`, `README.md` und `CLAUDE-snippet.md` und werden unverändert kopiert. Nur wo es mehrere Fassungen gibt, tragen sie ein Sprachkürzel vor der Endung — `SKILL.de.md` und `SKILL.en.md`, ebenso `README.de.md`/`README.en.md` und `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Dann wird genau **eine** Fassung installiert, und ihr Kürzel entfällt dabei: Claude Code erkennt ausschließlich den Namen `SKILL.md`. Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Fassung an sich gegenüber allen Chat-Sprachen kompatibel sein sollte.
 
-Der Ordnername ist in beiden Fassungen derselbe und trägt nie ein Kürzel; dasselbe gilt für den Skill-Namen im Frontmatter und damit für den Aufruf `/<skill-name>`.
+Der Ordnername ist in allen Fassungen derselbe und trägt nie ein Kürzel; dasselbe gilt für den Skill-Namen im Frontmatter und damit für den Aufruf `/<skill-name>`.
 
 ### Installation
 
@@ -35,11 +50,12 @@ Der Ordnername ist in beiden Fassungen derselbe und trägt nie ein Kürzel; dass
    | ----------- | ---------------------------------------- | ------------------------- |
    | Persönlich | `~/.claude/skills/<skill-name>/SKILL.md` | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/<skill-name>/SKILL.md`   | nur dieses Projekt        |
-2. **Skill-Ordner kopieren, Sprachfassung wählen.** Der Ordner hier hat bereits genau die Struktur des Zielorts. Kopiert wird er unter seinem unveränderten Namen; von jeder Datei kommt nur die gewünschte Sprachfassung mit, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`, damit Claude ihn als das akzeptiert, was es ist. Bleibt das Kürzel stehen, findet Claude Code den Skill möglicherweise nicht, da der Dateiname `SKILL.md` von Anthropic für Skills definiert wurde.
-3. **Stillen Trigger übernehmen, falls vorhanden.** Liegt im Ordner eine `CLAUDE-snippet.md`, wird ihr Inhalt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts übernommen — bei einem persönlichen Skill in `~/.claude/CLAUDE.md`, bei einem Projekt-Skill in dessen `CLAUDE.md`. Der Text oberhalb der Trennlinie ist die Anleitung dazu und wird nicht mitkopiert.
-4. **`CLAUDE-snippet.md` und `README.md` am Zielort löschen** oder gar nicht erst mit hinkopieren. Beim Snippet ist das zwingend: Bliebe es liegen, entstünde eine zweite Fassung des Triggers, die beim nächsten Anpassen auseinanderdriftet.
+2. **Skill-Ordner kopieren, gegebenenfalls Sprachfassung wählen.** Der Ordner hier hat bereits genau die Struktur des Zielorts. Kopiert wird er unter seinem unveränderten Namen. Gibt es von einer Datei mehrere Sprachfassungen, kommt nur die gewünschte mit, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`, damit Claude sie als das akzeptiert, was sie ist. Bleibt das Kürzel stehen, findet Claude Code den Skill möglicherweise nicht, da der Dateiname `SKILL.md` von Anthropic für Skills definiert wurde.
+3. **Stillen Trigger übernehmen, falls vorhanden.** Liegt im Ordner eine `CLAUDE-snippet.md`, wird ihr Inhalt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts übernommen — bei einem persönlichen Skill in `~/.claude/CLAUDE.md`, bei einem Projekt-Skill in dessen `CLAUDE.md`. Der Text oberhalb der Trennlinie ist die Anleitung dazu und wird nicht mitkopiert. Danach wird die `CLAUDE-snippet.md` am Zielort gelöscht: Bliebe sie liegen, gäbe es den Trigger zweimal, und die Fassungen driften beim nächsten Anpassen auseinander.
 
-Ohne Schritt 3 und 4 funktioniert der Skill weiterhin — aber nur, wenn er ausdrücklich mit `/<skill-name>` aufgerufen wird oder die KI an Hand der Description auf den Skill ausreichend aufmerksam geworden ist.
+Die `README.md` des Skills darf am Zielort liegen bleiben — sie ist zugleich seine Anwenderdokumentation und dort so nützlich wie hier.
+
+Ohne Schritt 3 funktioniert der Skill weiterhin — aber nur, wenn er ausdrücklich mit `/<skill-name>` aufgerufen wird oder die KI an Hand der Description auf den Skill ausreichend aufmerksam geworden ist.
 
 ### Beim Anpassen eines Triggers
 
@@ -50,69 +66,6 @@ Drei Regeln — zwei davon aus Messungen und nicht aus Geschmack, die dritte aus
 **Ein Trigger sollte an ein Ereignis oder eine Handlung gebunden sein,** nicht bloß an eine Eigenschaft der Aufgabe. „Behalte im Blick, ob diese Aufgabe komplex ist" trägt sich nicht selbst; „bevor du zum ersten Mal eine Datei änderst, prüfe …" oder „taucht eine Datei auf, die du nicht angefasst hast, dann …" lösen zuverlässig aus. Die Messreihen dazu stehen in `skill_vorgaben.md`, Kapitel 3.
 
 **Die `description` steht in der dritten Person.** Sie beschreibt den Skill — „Übersetzt Dokumente …", „Verwenden, sobald …" — und spricht niemanden an, weder Claude noch den Nutzer. Das ist keine Stilfrage: Die Beschreibung wird in den Systemprompt eingefügt, und ein wechselnder Blickwinkel stört dort die Auswahl unter vielen Skills. Anthropic sagt das ausdrücklich — *„Always write in third person […] inconsistent point-of-view can cause discovery problems"* ([Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
-
-## 3 Die Skills im Einzelnen
-
-
-| Skill                                                                | Zweck                                                                                                                                                                                                                                                            |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`common-code-generation/`](common-code-generation/README.de.md)<br>✅☑ | **Allgemeine Regeln für das Erzeugen und Ändern von Code**: englische Benennungen im Quelltext, kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher — Benennungen und Optimierungen werden vorgeschlagen, nicht entschieden. |
-| [`parallel-sessions/`](parallel-sessions/README.md)<br>🚧 | **Mehrere Claude-Instanzen gleichzeitig im selben Repository**: erst die Schreibhoheit für Git klären, dann das Worktree-Modell als saubere Trennung anbieten.                                                                                                  |
-| [`software-dev-doc-fh/`](software-dev-doc-fh/README.md)<br>🚧 | **Dokumentationsstandard für die Planung vor der Kodierung und die laufende Mitschrift des Implementierten** — was umgesetzt wird, welche Festlegungen getroffen wurden und warum so und nicht anders. Nicht gemeint: Quelltextkommentare und Anwenderdokumentation. |
-| [`softwareaufgabe-erkennen/`](softwareaufgabe-erkennen/README.md)<br>🚧 | **Erkennen, dass eine Anfrage auf zu schreibende oder zu ändernde Software hinausläuft** — auch wenn sie Wörter wie „Code" oder „programmieren" nie benutzt. Bisher eine festgehaltene Idee samt Messergebnis, noch kein Skill.                                |
-| [`temp-debug-code/`](temp-debug-code/README.md)<br>🚧 | **Eindeutige Kennzeichnung von Code, der nur für einen laufenden Debugging-Vorgang zugefügt oder geändert wird** — nicht für Debug-Code, der dauerhaft im Quelltext bleiben soll.                                                                              |
-| [`translation-task/`](translation-task/README.md)<br>🚧 | **Übersetzung software-entwicklungsnaher Dokumente** — Fachbegriffe, Codeblöcke, Datei- und Produktnamen folgen dabei je eigenen Regeln. Auf keine Sprachrichtung festgelegt.                                                                                   |
-| [`web-code-artefacts/`](web-code-artefacts/README.md)<br>🚧 | **Umgang mit Code-Artefakten im Web-Frontend**: wann Code als Artefakt entsteht und wann als Änderungsanweisung im Chat, und in welcher Form Änderungen an bereits übernommenem Code mitgeteilt werden.                                                          |
-
-(✅ deutsche Fassung fertig und nutzbar · ☑ englische Fassung fertig und nutzbar · 🚧 in Arbeit · ⚠️ mit Vorbehalt)
-
-### 3.1 `translation-task`
-
-**Wozu.** Übersetzt Dokumente mit softwareentwicklungsnahem Inhalt — README-Dateien, Konzept- und Implementierungsdokumente, Anleitungen. Nicht auf eine Sprachrichtung festgelegt.
-
-**Was er konkret tut.** Er klärt vorab Zielsprache und Fachjargon-Grad, legt vor der vollständigen Übersetzung eine Arbeitsprobe vor (höchstens ein Drittel des Dokuments und höchstens rund 1000 Wörter) und behandelt danach drei Dinge nach festen Regeln: Codeblöcke werden nur übersetzt, wenn sie erkennbar illustrativ sind und keine echte Quelle im Projekt haben; Eigennamen, Produktnamen und wörtliche Marker wie `@Claude:` bleiben immer unangetastet; Begriffsentscheidungen wandern in ein Glossar.
-
-**Besonderheiten.** Der Skill erkennt selbst, ob er lokal in Claude Code oder in claude.ai läuft, und führt das Glossar nur lokal — in claude.ai erwähnt er es gar nicht erst, statt eine Datei zu versprechen, die niemand wiederfindet.
-
-**Erweitern.** Das Glossar liegt als `glossar.md` im Skill-Ordner und ist der vorgesehene Ort für eigene Begriffsentscheidungen; es wächst im Betrieb. Wer die Regeln selbst ändert, sollte die Codeblock-Erkennung nicht vereinfachen: Die projektweite Suche nach einer echten Quelle ist der Grund, warum echter Werkzeug-Output nicht versehentlich übersetzt wird.
-
-**Installation.** Wie in Kapitel 2, kein stiller Trigger nötig — die Auslösung kommt vom Nutzer selbst.
-
-### 3.2 `parallel-sessions`
-
-**Wozu.** Klärt die Zusammenarbeit, wenn mehrere Claude-Code-Instanzen gleichzeitig im selben Repository arbeiten.
-
-**Was er konkret tut.** Zwei Schritte in fester Reihenfolge. Erstens: Er lässt klären, welche Instanz eigenständig schreibende Git-Kommandos ausführen darf, und führt bis zur Antwort selbst keine aus. Zweitens: Er bietet das Worktree-Modell als saubere Trennung an und erklärt beide Einrichtungswege — über das Werkzeug `EnterWorktree` und von Hand über `git worktree add`, samt der Unterschiede bei Ablageort und Basis-Branch.
-
-**Besonderheiten.** Der Skill entscheidet bewusst nicht, wie ein projekteigenes Branch-Namensschema mit mehreren gleichzeitigen Worktrees zusammengeht — das ist eine Projektfestlegung. Er benennt den Konflikt und überlässt die Entscheidung dem Nutzer.
-
-**Erweitern.** Wer den Skill um ein eigenes Namensschema ergänzt, sollte es im Projekt-`CLAUDE.md` verankern und hier nur darauf verweisen, statt es in den Skill zu schreiben — sonst gilt das Schema plötzlich für alle Projekte.
-
-**Installation.** Wie in Kapitel 2, **mit** stillem Trigger (`CLAUDE-snippet.md`). Ohne ihn bemerkt der Skill die Situation nicht, denn niemand sagt von sich aus „hier arbeitet eine zweite Instanz".
-
-### 3.3 `software-dev-doc-fh`
-
-**Wozu.** Ein Dokumentationsstandard für Planung vor der Kodierung und für die laufende Mitschrift des Implementierten: was umgesetzt wird, welche Festlegungen getroffen wurden und warum so und nicht anders. **Nicht** gemeint sind Quelltextkommentare und Anwenderdokumentation.
-
-**Was er konkret tut.** Er gibt vier Phasen vor (Findung, Fixierung, Segmentierung, Implementierung), eine dreigeteilte Dokumentstruktur (Zusammenhänge, Vorgaben, Einheiten), die Trennung von Fahrplan und Status sowie die Regel, dass Konzeptdokumente keinen Implementierungscode enthalten. Dazu die Arbeitsschleife, nach der Doku und Code im Wechsel entstehen, und die Behandlung von Review-Befunden im Doku-Anhang.
-
-**Besonderheiten.** Das Kürzel `-fh` ist Absicht: Das ist die Arbeitsweise eines bestimmten Entwicklers, nicht der einzige mögliche Standard. Wer anders arbeitet, kopiert den Skill und schreibt ihn um, statt diesen zu verbiegen. Die Skills `konzept-segmentierung` und `konsistenzpruefung` sind Werkzeuge innerhalb dieses Standards.
-
-**Erweitern.** Zwei Festlegungen tragen die übrigen und sollten beim Anpassen nicht fallen: die Prosa-Code-Grenze (sonst prüft man später Code gegen Code) und die Regel, dass jede Aussage genau ein normatives Zuhause hat (sonst entstehen zwei Fassungen derselben Festlegung, die auseinanderdriften). Der Aufnahmetest für Segment 2 — „man muss auf eine Datei zeigen und sagen können, das verletzt diese Vorgabe" — ist das Werkzeug, mit dem sich entscheiden lässt, wohin eine neue Aussage gehört.
-
-**Installation.** Wie in Kapitel 2, **mit** stillem Trigger (`CLAUDE-snippet.md`). Dessen Wortlaut ist an eine Handlung gebunden („bevor du zum ersten Mal …") — dieser Anker darf verschoben, aber nicht weggelassen werden, sonst löst der Trigger nicht mehr aus.
-
-### 3.4 `common-code-generation`
-
-**Wozu.** Allgemeine Regeln für das Erzeugen und Ändern von Code — die Art Festlegungen, die sonst in jeder `CLAUDE.md` wiederholt stehen müsste. **Nicht** Gegenstand: die Pflicht, vor einer Dateiänderung einen Plan vorzulegen; die bleibt in der `CLAUDE.md`, weil ein Skill nur wahrscheinlich lädt, eine Schutzregel aber sicher greifen muss.
-
-**Was er konkret tut.** Er legt fest, dass alles im Quelltext — Bezeichner, Kommentare, Docstrings — auf Englisch steht und dass selbst gewählte Namen dem Nutzer zur Entscheidung vorgelegt werden. Er verbietet ungefragte Erweiterungen des Funktionsumfangs. Er gibt eine Rangfolge der Ressourcen vor (Rechenzeit, Arbeitsspeicher, Massenspeicher) und verlangt, jeden Optimierungsvorschlag vorher gegen die Realität zu prüfen: ob er sich im tatsächlichen Anwendungsfall lohnt und ob sein Effekt über die Gesamtapplikation überhaupt messbar ist. Dazu ein Sonderfall — die Anordnung von Abbruchkriterien in Schleifen nach Vorwissen über die Daten, samt dem Hinweis, dass der Compiler die Reihenfolge im Maschinencode ohnehin ändert.
-
-**Besonderheiten.** Der Anker des Triggers liegt am frühestmöglichen Moment der Sitzung, nicht bei der ersten Benennung oder dem ersten Optimierungsvorschlag. Grund: Der Skill ist kein Ablauf, sondern ein Regelwerk, das ab der ersten Zeile Code gilt — und weil sein Körper nach dem Laden im Kontext bleibt und nicht neu gelesen wird, rettet ein später Treffer die Entscheidungen nicht mehr, die vorher gefallen sind.
-
-**Erweitern.** Der Anker darf beim Anpassen verschoben, aber nicht weggelassen werden. Und die Plan-Pflicht gehört nicht in den Skill geholt, so verlockend das aussieht: Ein Trigger ist probabilistisch, eine Schutzregel muss sicher greifen.
-
-**Installation.** Wie in Kapitel 2, **mit** stillem Trigger (`CLAUDE-snippet.md`).
 
 ## 4 Offene Punkte des Vorhabens
 

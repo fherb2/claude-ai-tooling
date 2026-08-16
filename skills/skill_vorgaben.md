@@ -2,7 +2,7 @@
 
 Diese Datei ist die einzige übergreifende Dokumentation des Vorhabens `skills/`. Sie enthält, was beim Schreiben **jedes** Skills gilt: die technischen Voraussetzungen, die Regeln für Trigger und Dateien, die Messbefunde, auf denen diese Regeln beruhen, und das Verfahren, mit dem sich beides nachprüfen lässt.
 
-Was hier **nicht** steht: der Arbeitsstand einzelner Skills. Die Skills stehen einzeln nebeneinander und werden nicht aufeinander aufbauend entwickelt — ein gemeinsamer Fahrplan und eine Protokollierung der Umsetzung würden mehr Pflege kosten, als sie einbringen. Was an einem Skill fertig und was offen ist, steht deshalb in dessen eigener `README.md` (Kapitel 6.1); was ein fertiger Skill dem Nutzer bietet, in der Gesamt-`README.md` dieses Ordners (Kapitel 6.2).
+Was hier **nicht** steht: der Arbeitsstand einzelner Skills. Die Skills stehen einzeln nebeneinander und werden nicht aufeinander aufbauend entwickelt — ein gemeinsamer Fahrplan und eine Protokollierung der Umsetzung würden mehr Pflege kosten, als sie einbringen. Was an einem Skill fertig und was offen ist und was er dem Nutzer bietet, steht deshalb in dessen eigener `README.md` (Kapitel 6.1); die Gesamt-`README.md` dieses Ordners nennt ihn nur in ihrer Übersichtstabelle (Kapitel 6.2).
 
 **Dieses Vorhaben folgt bewusst anderen Regeln als der Rest des Repositories.** Die Arbeitsweise mit Konzept- und Implementierungsdoku, dreigeteilter Segmentstruktur, Fahrplan und Statusdatei (globale `CLAUDE.md`, Abschnitt 2) ist auf Softwareentwicklung zugeschnitten: auf einen zusammenhängenden Code, dessen Teile voneinander abhängen und dessen Entstehung nachvollziehbar bleiben muss. Hier entsteht kein Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte. Jeder Skill ist für sich fertig oder unfertig, keiner baut auf einem anderen auf, und keiner wird später gegen eine Konzeptfassung geprüft. Ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen, und eine Protokollierung der Umsetzung nichts zu belegen. Was diese Datei an Vorgaben trägt, entspricht der Sache nach Segment 2 — projektweite Festlegungen, an denen sich jeder einzelne Skill messen lassen muss.
 
@@ -23,17 +23,11 @@ Der Ordner `skills/` in diesem Repository wird von Claude Code nicht erkannt. Ei
 
 (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills))
 
-Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5). Installieren ist dann ein Kopiervorgang mit genau einem Handgriff: Das Sprachkürzel entfällt aus den Dateinamen (5.1). Der automatische Transport an den Zielort ist derzeit nicht Teil dieses Vorhabens.
+Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5). Installieren ist dann ein Kopiervorgang mit genau einem Handgriff: Das Sprachkürzel entfällt aus den Dateinamen (5.1).
 
 ### 1.2 Ladeverhalten
 
-Wird ein Skill durch Trigger-Abgleich oder direkten Aufruf aktiviert, lädt **nur** der Inhalt seiner `SKILL.md`, und zwar als eine einzelne Nachricht, die für den Rest der Sitzung im Kontext bleibt. Weitere Dateien im Skill-Ordner lädt Claude nur, wenn die `SKILL.md` ausdrücklich auf sie verweist.
-
-> *„In a regular session, skill descriptions are loaded into context so Claude knows what's available, but full skill content only loads when invoked."*
->
-> *„When you or Claude invoke a skill, the rendered SKILL.md content enters the conversation as a single message and stays there for the rest of the session. […] Claude Code does not re-read the skill file on later turns."*
-
-(belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills))
+Wird ein Skill durch Trigger-Abgleich oder direkten Aufruf aktiviert, lädt **nur** der Inhalt seiner `SKILL.md`, und zwar als eine einzelne Nachricht, die für den Rest der Sitzung im Kontext bleibt; Claude liest die Datei in späteren Turns nicht erneut. Weitere Dateien im Skill-Ordner lädt Claude nur, wenn die `SKILL.md` ausdrücklich auf sie verweist. (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills))
 
 Zwei Konsequenzen, die beim Entwurf immer mitzudenken sind: Der Körper wird **nicht neu gelesen** — eine Regel, die erst spät geladen wird, rettet keine Entscheidung, die vorher gefallen ist. Und Zusatzdateien kosten nichts, solange niemand auf sie verweist.
 
@@ -69,7 +63,7 @@ Bei einem Skill, der einen **Ablauf** beschreibt, liegt der Anker am Beginn dies
 
 Für die Skill-Listung gilt eine Grenze von **1.536 Zeichen** für `description` und `when_to_use` zusammen, einstellbar über `skillListingMaxDescChars`; unabhängig davon greift ein Budget von rund einem Prozent des Kontextfensters. Wird es eng, kürzt Claude Code die Beschreibungen fortschreitend und entfernt zuerst die der selten genutzten Skills (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)).
 
-Daraus folgt eine Formulierungsregel, die nichts kostet: **Der Hauptanwendungsfall steht vorn.** Gekürzt wird von hinten — was am Ende steht, ist als Erstes weg. Trigger-Begriffe, auf die es ankommt, gehören in den ersten Satz, nicht in die abschließende Aufzählung. Die Beschreibungen der hier entwickelten Skills liegen bei 330 bis 480 Zeichen, also bei rund einem Drittel der Grenze; ein Anlass zur Kürzung besteht nicht. Die Reihenfolge ist trotzdem einzuhalten, weil das Budget von der Zahl **aller** installierten Skills abhängt, nicht von unseren.
+Daraus folgt eine Formulierungsregel, die nichts kostet: **Der Hauptanwendungsfall steht vorn.** Gekürzt wird von hinten — was am Ende steht, ist als Erstes weg. Trigger-Begriffe, auf die es ankommt, gehören in den ersten Satz, nicht in die abschließende Aufzählung. Die Reihenfolge ist auch dann einzuhalten, wenn die eigenen Beschreibungen weit unter der Grenze liegen: Das Budget hängt von der Zahl **aller** installierten Skills ab, nicht von unseren.
 
 ### 2.3 Skills erwähnen einander nicht
 
@@ -104,11 +98,12 @@ Nebenbefunde derselben Testreihe:
 - **Keine Anhäufung:** Semantischer Kontext, der sich über viele Turns aufbaut, löst für sich genommen nicht aus — es gibt keinen Mechanismus, der rückblickend bilanziert.
 - **Keine Fehlauslösung durch Wortlaut-Nähe:** Ein in der `CLAUDE.md` wiederholter Trigger-Wortlaut lud den Skill in keinem Lauf vorzeitig; bei themenfremden Prompts schwieg er durchweg.
 - **Modellabhängig ist die Schwelle, nicht der Mechanismus:** Opus und Fable feuerten schon auf eine Ein-Satz-Fehlerbeschreibung, bei der Sonnet in allen Läufen schwieg; Fable unterschied dabei zwischen passenden und unpassenden Skills, Opus feuerte pauschal alle.
-- **Konvergenz mit der Werkzeug-Doku:** Die Beschreibung des `update-config`-Skills von Claude Code nennt dieselbe Grenze als Designannahme — automatisierte „immer wenn X"-Verhalten erfordern Hooks in `settings.json`, „the harness executes these, not Claude". Wo eine Auslösung garantiert sein muss, sind Hooks der Weg; Skill-Trigger bleiben probabilistisch.
 
 ---
 
 ## 4 Wie geprüft wird
+
+**Keines der beiden Verfahren ist Voraussetzung dafür, dass ein Skill als fertig gilt.** Sie stehen hier für den Fall, dass eine Frage offen ist oder ein Befund auf ein neues Modell übertragen werden soll — nicht als Pflichtschritt vor der Freigabe. Wurde gemessen, gehört das Ergebnis in die README des Skills; wurde nicht gemessen, ist das kein Mangel und wird nirgends vermerkt.
 
 ### 4.1 Inhalt prüfen, ohne den Skill am Zielort abzulegen
 
@@ -137,23 +132,27 @@ Der Minimalaufbau ist als Messinstrument gegengeprüft: Mit der vollständigen r
 Jeder Skill liegt unter `skills/<skill-name>/`. Der Ordnername trägt **kein** Sprachkürzel; die Dateien darin tragen es (5.1). Enthalten sind:
 
 - **`SKILL.md`** — verpflichtend. Frontmatter mit `name` (gleich dem Ordnernamen), `description` (der reguläre Trigger, nach Kapitel 2 formuliert) und `license`. Letzteres ist reine Deklaration für den Leser: „Claude Code accepts the field but doesn't act on it" (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Welche Lizenz gewählt wird, gibt Anthropic nicht vor (recherchiert am 14. August 2026); hier gilt einheitlich CC0, begründet in der Gesamt-README. Für den Umfang empfiehlt dieselbe Quelle, unter 500 Zeilen zu bleiben — eine Empfehlung, keine harte Grenze.
-- **`README.md`** — verpflichtend. Arbeitsstand und offene Punkte dieses Skills, Aufbau nach 6.1.
+- **`README.md`** — verpflichtend. Die gesamte Dokumentation dieses Skills: was er leistet, wie er installiert wird, seine Feinheiten, sein Arbeitsstand und seine offenen Punkte. Aufbau nach 6.1.
 - **`CLAUDE-snippet.md`** — nur bei Skills mit stillem Trigger. Aufbau: eine kursive Kopfnotiz, die erklärt, was mit der Datei zu geschehen hat, darunter eine Trennlinie, darunter der zu übernehmende Absatz im Wortlaut. Die Trennlinie ist die maßgebliche Grenze: Was darunter steht, wird in die `CLAUDE.md` des Zielorts übernommen, was darüber steht, nicht.
 - **Weitere Dateien** — nur, wenn die `SKILL.md` ausdrücklich auf sie verweist; sonst werden sie nie geladen (1.2).
 
 **Ein Ordner darf vorübergehend nur die `README.md` enthalten.** Das ist der Zustand einer festgehaltenen Idee: Sie hat einen Namen, einen Platz und eine Stelle, an der ihr Stand nachlesbar ist, aber noch keine Anweisungen. Erst wenn entschieden ist, dass daraus ein Skill wird, kommt die `SKILL.md` dazu.
 
-**Am Zielort werden `README.md` und `CLAUDE-snippet.md` gelöscht,** sobald der Trigger in der `CLAUDE.md` steht. Für das Snippet ist der Grund zwingend: Bliebe es liegen, gäbe es den Trigger zweimal, und die Fassungen driften beim nächsten Anpassen auseinander. Für die README ist er praktischer Natur — sie beschreibt den Arbeitsstand in der Quelle, nicht das installierte Werkzeug. Im Quellverzeichnis hier bleiben beide selbstverständlich bestehen.
+**Am Zielort wird die `CLAUDE-snippet.md` gelöscht,** sobald der Trigger in der `CLAUDE.md` steht. Der Grund ist zwingend: Bliebe sie liegen, gäbe es den Trigger zweimal, und die Fassungen driften beim nächsten Anpassen auseinander. Im Quellverzeichnis hier bleibt sie selbstverständlich bestehen.
+
+**Die `README.md` darf am Zielort liegen bleiben.** Sie ist die Anwenderdokumentation des Skills (6.1) und dort so nützlich wie hier; ein zweiter Trigger entsteht durch sie nicht.
 
 **Zusatzdateien, die zur Laufzeit gelesen oder geschrieben werden,** spricht der Skill über `${CLAUDE_SKILL_DIR}` an. Der Platzhalter wird laut offizieller Doku nur in Claude Code tatsächlich ersetzt; in claude.ai bliebe ein solcher Verweis wörtlicher Text bzw. die nötigen Datei-Werkzeuge fehlen ganz (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein Skill, der in beiden Umgebungen laufen soll, kann daraus seine Umgebung erkennen: Gelingt der Zugriff auf einen echten, aufgelösten Pfad, läuft er lokal.
 
 **Zum `name`:** Kleinbuchstaben, Ziffern und Bindestriche, höchstens 64 Zeichen, keine XML-Tags, nicht die reservierten Wörter „anthropic" und „claude". Anthropic empfiehlt die Verlaufsform (`processing-pdfs`) und lässt Substantiv- und Handlungsformen ausdrücklich als Alternative zu (belegt, [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); die Skills hier folgen der Substantivform. Kodiert ein Skill die Arbeitsweise einer bestimmten Person statt einer allgemein gültigen, gehört ein Kürzel in den Namen (`software-dev-doc-fh`). Das macht im Namen sichtbar, dass es andere Arbeitsweisen gibt, und lädt dazu ein, dafür einen eigenen Skill zu schreiben, statt diesen zu verbiegen.
 
-### 5.1 Zwei Sprachfassungen
+### 5.1 Sprachfassungen
 
-**Jeder Skill dieses Vorhabens liegt in einer deutschen und einer englischen Fassung vor.** Das ist bindend und gilt für alle Skills, auch die bereits vorhandenen. Ein Skill, dem eine der beiden Fassungen fehlt, ist unfertig; der Punkt gehört dann unter „Offen" in seine README (6.1).
+**In welcher Sprache ein Skill geschrieben und in welchen Sprachen er dokumentiert wird, entscheidet der Nutzer im Einzelfall.** Es gibt keine Pflicht zu zwei Fassungen: Ein Skill, den es nur auf Deutsch gibt, ist deshalb nicht unfertig. Ist eine weitere Fassung beschlossen, aber noch nicht geschrieben, gehört sie unter „Offen" in die README des Skills (6.1) — dorthin aber erst nach der Entscheidung, nicht vorsorglich.
 
-Beide Fassungen liegen im **selben** Ordner. Unterschieden werden sie durch ein Sprachkürzel unmittelbar vor der Endung `.md`:
+**Solange es nur eine Fassung gibt, trägt sie kein Sprachkürzel.** Die Dateien heißen dann schlicht `SKILL.md`, `README.md` und `CLAUDE-snippet.md`, und beim Installieren ist an den Namen nichts zu tun.
+
+Liegen mehrere Fassungen vor, liegen sie im **selben** Ordner. Unterschieden werden sie durch ein Sprachkürzel unmittelbar vor der Endung `.md`:
 
 | Deutsch                  | Englisch                 |
 | ------------------------ | ------------------------ |
@@ -161,7 +160,7 @@ Beide Fassungen liegen im **selben** Ordner. Unterschieden werden sie durch ein 
 | `README.de.md`           | `README.en.md`           |
 | `CLAUDE-snippet.de.md`   | `CLAUDE-snippet.en.md`   |
 
-Das gilt für **alle** Dateien des Skill-Ordners, die Prosa enthalten — nicht nur für die `SKILL.md`. Wo dieses Dokument die bloßen Namen `SKILL.md`, `README.md` oder `CLAUDE-snippet.md` verwendet, ist die Datei unabhängig von ihrer Sprachfassung gemeint.
+Das Kürzel tragen dann **alle** Dateien des Skill-Ordners, die Prosa enthalten — nicht nur die `SKILL.md`. Wo dieses Dokument die bloßen Namen `SKILL.md`, `README.md` oder `CLAUDE-snippet.md` verwendet, ist die Datei unabhängig von ihrer Sprachfassung gemeint.
 
 **Beim Installieren wird das Sprachkürzel entfernt.** Kopiert wird genau eine der beiden Fassungen; sie heißt am Zielort `SKILL.md`. Claude Code erkennt keinen anderen Namen — eine `SKILL.de.md` am Zielort ist kein Skill. Der Ordnername bleibt dabei unverändert, denn er trug nie ein Kürzel.
 
@@ -169,38 +168,44 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 
 - Das Frontmatter-Feld **`name` trägt kein Sprachkürzel**. Es muss dem Ordnernamen gleichen (Kapitel 5), und der Ordner heißt in beiden Fassungen gleich. Die deutsche und die englische `SKILL` tragen also denselben `name`.
 - Der **Slash-Aufruf** heißt entsprechend `/<skill-name>`, nie `/<skill-name>-de`. Wo die `description` ihn selbst nennt, gehört er ohne Kürzel dort hinein.
-- Die beiden Fassungen sind **Übersetzungen desselben Skills**, keine zwei Skills. Sie tragen dieselben Regeln, dieselben Anker und dieselbe Struktur. Weicht eine inhaltlich ab, ist das ein Fehler, kein Sprachunterschied.
+- Mehrere Fassungen sind **Übersetzungen desselben Skills**, keine mehreren Skills. Sie tragen dieselben Regeln, dieselben Anker und dieselbe Struktur. Weicht eine inhaltlich ab, ist das ein Fehler, kein Sprachunterschied.
 
-**Warum überhaupt zwei Fassungen.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können — `skills/` unterliegt anders als `chats-export/` und `home-.claude-sharing/` keiner Weitergabebeschränkung. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
+**Was für eine weitere Fassung spricht.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können — `skills/` unterliegt anders als `chats-export/` und `home-.claude-sharing/` keiner Weitergabebeschränkung. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
 
 ---
 
 ## 6 Die beiden README-Arten
 
-Sie überschneiden sich nicht: Die README **am Skill** beschreibt den Arbeitsstand in der Quelle und ist das Arbeitsmittel der Weiterentwicklung. Die **Gesamt-README** beschreibt das fertige Ergebnis und ist die Anwenderdokumentation. Ein Skill, an dem noch gearbeitet wird, steht deshalb ausführlich in seiner eigenen README und noch gar nicht oder nur knapp in der Gesamt-README.
+Sie überschneiden sich nicht: Die README **am Skill** trägt alles, was über diesen einen Skill zu sagen ist — die Beschreibung dessen, was er leistet, seine Installation, seine Feinheiten und seinen Arbeitsstand. Sie ist damit zugleich seine Anwenderdokumentation und darf am Zielort liegen bleiben (Kapitel 5). Die **Gesamt-README** führt in das Vorhaben ein und listet die Skills, beschreibt aber keinen davon: Jeder Skill steht dort ausschließlich als Zeile der Übersichtstabelle. Damit gibt es zu einem Skill nur eine beschreibende Stelle, und sie liegt dort, wo auch gearbeitet wird.
 
 ### 6.1 README je Skill
 
-Kurz halten. Verlangt sind:
+Sie ist die vollständige Dokumentation dieses einen Skills und liest sich von „was ist das" zu „woran wird noch gearbeitet". Verlangte Reihenfolge:
 
 1. **Überschrift** — Skillname und in einem Halbsatz, wozu er da ist.
-2. **Abgrenzung**, wo sie nicht selbstverständlich ist: wofür der Skill ausdrücklich **nicht** gilt.
-3. **Status** — was fertig ist, in einem Satz.
-4. **Offen** — die noch anstehenden Punkte als Liste. Diese Liste ersetzt den früheren Gesamt-Fahrplan des Vorhabens: Sie steht dort, wo die Arbeit stattfindet, und ist damit beim Öffnen des Skills sofort sichtbar. Erledigtes fliegt raus.
-5. **Bewusst offen gelassene Entscheidungen**, sofern es welche gibt — Festlegungen, die der Skill absichtlich nicht trifft, weil sie ins Zielprojekt gehören. Das ist Vorwissen für die Weiterentwicklung, kein Versäumnis, und muss als solches erkennbar sein.
+2. **Statushinweis**, unmittelbar darunter und **ohne eigene Zwischenüberschrift**: ob der Skill benutzbar ist, mit demselben Symbol, das seine Zeile in der Übersichtstabelle der Gesamt-README trägt (6.2). Ist er es nicht uneingeschränkt, steht in einem Satz dabei, was fehlt, mit Verweis auf den Schlussabschnitt.
+3. **Überblick** — was der Skill leistet, in Prosa. Die Kernaussage steht **fett** im ersten Satz. Umfassend genug, dass der Nutzer den Skill danach einschätzen kann, aber ohne Detailflut; dazu die **Abgrenzung**, wo sie nicht selbstverständlich ist: wofür der Skill ausdrücklich **nicht** gilt.
+4. **Kapitel „Installation"** — die vollständige Anleitung, **konkretisiert auf diesen Skill**: echte Pfade statt Platzhalter, die tatsächlich vorhandenen Dateien statt des allgemeinen Falls. Nicht ein Verweis auf das Installationskapitel der Gesamt-README, sondern die Schritte selbst. Braucht der Skill **keinen** stillen Trigger, wird dieser Schritt ersatzlos weggelassen — er wird nicht als „entfällt hier" aufgeführt. Ein Schritt, die README am Zielort zu löschen, kommt nicht vor (siehe Kapitel 5).
+5. **Kapitel „Details"** — alles Weitere: Anwenderhinweise, Feinheiten des Verhaltens und die Hinweise, die dem weiteren Ausbau dienen, insbesondere die Regeln, deren Vereinfachung die Funktion zerstören würde.
+6. **Kapitel „Stand und Offenes"** — zum Schluss und in dieser Folge:
+   - **Status** — was fertig ist, in einem Satz.
+   - **Offen** — die noch anstehenden Punkte als Liste. Diese Liste ersetzt den früheren Gesamt-Fahrplan des Vorhabens: Sie steht dort, wo die Arbeit stattfindet, und ist damit beim Öffnen des Skills sofort sichtbar. Erledigtes fliegt raus.
+   - **Bewusst offen gelassene Entscheidungen**, sofern es welche gibt — Festlegungen, die der Skill absichtlich nicht trifft, weil sie ins Zielprojekt gehören. Das ist Vorwissen für die Weiterentwicklung, kein Versäumnis, und muss als solches erkennbar sein.
 
 Steht ein Plan für den nächsten Schritt an einem Skill an, steht er hier — ausdetailliert unter „Offen", höchstens einer gleichzeitig, deutlich als noch nicht ausgeführt gekennzeichnet. Nach der Ausführung wird er ersetzt, nicht ergänzt.
 
 ### 6.2 Gesamt-README
 
-Die `README.md` dieses Ordners ist die vollständige Anwenderdokumentation. Verlangter Aufbau:
+Die `README.md` dieses Ordners ist der Einstieg in das Vorhaben: Sie sagt, wozu es das gibt, wie ein Skill installiert wird und welche Skills es gibt. Was ein einzelner Skill leistet, steht nicht hier, sondern in seiner eigenen README (6.1). Verlangter Aufbau:
 
-1. **Zweck des Vorhabens** — kurz und prägnant, ohne Herleitung.
-2. **Skills beschaffen und installieren** — beginnt mit einem knappen Verweis auf die offizielle Doku zu Skills als Mechanismus, gefolgt vom Hinweis, dass die vorgesehene Trigger- und Ladetechnik hier um stille Trigger erweitert wurde (1.3). Danach die Zielorte, der Kopiervorgang und die Behandlung von `CLAUDE-snippet.md` und `README.md`: Trigger-Inhalt in die `CLAUDE.md` übernehmen, beide Dateien danach am Zielort löschen. Dazu die Regeln aus Kapitel 2 in der Kurzfassung, damit niemand einen Trigger beim Anpassen unwirksam macht.
-3. **Die Skills im Einzelnen** — je Skill: wozu er dient, was er konkret tut und bewirkt, Besonderheiten, Erweiterungsmöglichkeiten samt der Regeln, deren Verletzung die Funktion zerstört, und Installationsschritte nur dann, wenn sie vom allgemeinen Weg abweichen. Aufgenommen wird ein Skill erst, wenn er benutzbar ist — was noch entsteht, steht in seiner eigenen README, nicht hier.
+1. **Die Skills im Einzelnen** — eine Tabelle über **alle** Skills des Ordners, auch die unfertigen und die, von denen bisher nur die Idee festgehalten ist. Je Zeile: der Ordnername, verlinkt auf die README des Skills; die Statussymbole; ein Satz zum Zweck. Darunter die Legende der Symbole. Mehr steht hier nicht — jede weitere Beschreibung gehört in die README des Skills (6.1). Diese Tabelle steht **vorn**: Wer die Gesamt-README öffnet, sucht in aller Regel einen Skill, nicht eine Begründung.
+2. **Zweck des Vorhabens** — kurz und prägnant, ohne Herleitung.
+3. **Skills beschaffen und installieren** — beginnt mit einem knappen Verweis auf die offizielle Doku zu Skills als Mechanismus, gefolgt vom Hinweis, dass die vorgesehene Trigger- und Ladetechnik hier um stille Trigger erweitert wurde (1.3). Danach die Zielorte, der Kopiervorgang und die Behandlung der `CLAUDE-snippet.md`: Trigger-Inhalt in die `CLAUDE.md` übernehmen, die Datei danach am Zielort löschen. Dazu die Regeln aus Kapitel 2 dieser Vorgaben in der Kurzfassung, damit niemand einen Trigger beim Anpassen unwirksam macht. Das alles im allgemeinen Fall — die auf den einzelnen Skill heruntergebrochene Anleitung steht in dessen eigener README (6.1).
 4. **Offene Punkte des Vorhabens** — nur, was keinem einzelnen Skill zuzuordnen ist. Alles Skillbezogene steht in dessen README (6.1); eine zweite Liste hier würde sofort auseinanderdriften.
 
 Dazu ein **Lizenzabschnitt**: CC0, mit einer Aufzählung dessen, was das für den Nutzer konkret bedeutet.
+
+**Sprachfassungen.** Auch hier entscheidet der Nutzer, in welchen Sprachen die Gesamt-README vorliegt (5.1). Ihre Benennung folgt aber der Konvention der Wurzel-READMEs dieses Repositories, nicht dem Kürzel-Schema der Skill-Ordner: Die deutsche Fassung heißt `README.md`, jede weitere trägt ihr Kürzel (`README.en.md`).
 
 ---
 
@@ -208,7 +213,7 @@ Dazu ein **Lizenzabschnitt**: CC0, mit einer Aufzählung dessen, was das für de
 
 **Ein Skill definiert seine Begriffe nicht, er benutzt eindeutige.** „Nutzer" ohne Zusatz bezeichnet immer den Menschen im Chat — dieses Wort ist im Systemprompt bereits so belegt, ein Skill erbt die Bedeutung umsonst. Geht es um den Menschen vor der fertigen Software, steht dort **„Endanwender"**, ausgeschrieben an jeder Fundstelle. Ein einleitender Absatz, der die Rollen erklärt, gehört nicht in einen Skill: Er kostet Kontext für etwas, das Claude schon weiß, und widerspricht der Empfehlung, nur Kontext zu ergänzen, den Claude nicht hat — *„Does this paragraph justify its token cost?"* (belegt, [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 
-**Beobachtung am laufenden System** (16. August 2026): In 29 von 31 offiziell veröffentlichten `SKILL.md` unter `~/.claude/plugins/marketplaces/claude-plugins-official/` steht „the user" insgesamt 175 Mal, **kein einziges Mal** definiert. Die eine Datei, die über den Menschen vor der fertigen Software spricht (`frontend-design`), löst es genau so — mit dem eindeutigen Wort „end user" an der Fundstelle, ohne Vorrede.
+**Beobachtung am laufenden System** (16. August 2026): Die offiziell veröffentlichten `SKILL.md` unter `~/.claude/plugins/marketplaces/claude-plugins-official/` benutzen „the user" durchgehend, ohne ihn ein einziges Mal zu definieren; die eine Datei, die über den Menschen vor der fertigen Software spricht (`frontend-design`), setzt „end user" an die Fundstelle, ohne Vorrede.
 
 Daneben gilt die allgemeine Empfehlung derselben Quelle, einen Begriff einmal zu wählen und durchzuhalten: *„Choose one term and use it throughout the Skill."*
 
