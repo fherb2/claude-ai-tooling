@@ -581,6 +581,24 @@ Anthropic baut an Export, Werkzeugen und Plattform laufend um; nichts hiervon is
 
 Vorhandene Bausteine: `inspect_export.py` (3.3) als Schemawache des Exports, dazu die Format- und Upload-Proben in den Docstrings von 3.2 und 3.4. **Die Lücke ist die warme Seite:** Für den Export gibt es ein Werkzeug, für die Instanzschnittstellen nur Proben von Hand. Das bleibt das offene Ziel dieses Abschnitts.
 
+**Das Profil des Testprojekts.** Für die warme Seite gibt es kein Werkzeug, aber eine **Prüfvorlage**: ein eigens angelegtes claude.ai-Projekt, dessen Inhalt bewusst gewählt ist. Zwei Randbedingungen stehen dabei gegeneinander. Es muss **klein** bleiben — im Lese-Weg geht jeder Turn durch den Kontext, und ein kleiner Export ist schneller da. Und es muss trotzdem **jedes strukturelle Merkmal** tragen, auf das der Code reagiert: Ein fehlendes Merkmal lässt seinen Codeweg ungeprüft, ohne dass es auffällt — der Lauf meldet dann nicht etwa eine Lücke, sondern schlicht nichts.
+
+Das Profil steht hier und nicht im Fahrplan, weil es sich nicht verbraucht: Nach jeder Anthropic-Änderung, die eine Prüfung aus 4.2 oder 4.3 anschlagen lässt, wird dieselbe Vorlage wieder gebraucht. Es ist eine Prüf**vorlage**, kein Prüf**punkt** — die Übersicht weiter unten führt die Punkte, hier steht das Material, an dem man sie durchspielt.
+
+| Merkmal | Wie es entsteht | Was es prüft |
+| --- | --- | --- |
+| Gabelung | eine bereits gestellte Frage nachträglich bearbeiten | Baumlauf und Regel 1 (3.1.2) |
+| Sendewiederholung | dieselbe Nachricht zweimal absenden | Dublettenerkennung, Regel 2 (3.1.2) |
+| Anhang mit Inhalt | eine Textdatei hochladen | `attachments` mit `extracted_content` (3.1.1) |
+| reiner Namensverweis | eine Datei anhängen, deren Inhalt der Export nicht führt | `files` ohne Inhalt, die andere Hälfte desselben Befunds (1.6) |
+| Denkschritte | eine Frage stellen, die erkennbares Nachdenken auslöst | Denkdatei und die Schwellen aus 3.1.3 |
+| Erzeugnis | ein Artefakt oder eine Datei erstellen lassen | Creations-Datei (3.1.3) |
+| Hülle | einen Chat anlegen und wieder löschen | Erkennung gelöschter Chats (3.1.3) |
+| langer Chat | einer mit deutlich über acht Turns | Seitengrenze und Übergabe im Lese-Weg (3.2.1, 3.2.4) |
+| wachsender Chat | einer, der Tage später fortgesetzt wird | `stale`, Ersetzen (2.6) und die Fensterrechnung (2.4) |
+
+Die letzte Zeile ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports arbeitet auf Tagesebene, also muss zwischen Anlegen und Fortsetzen mindestens ein Tageswechsel liegen.
+
 **Drei Prüfarten.** Jeder Punkt trägt genau eine:
 
 - **kalt** — prüfbar mit dem, was auf der Platte liegt: die heruntergeladenen Export-ZIPs unter `tests/test_results/` und ein Arbeitsordner. Kein Netz, kein Konto, kein fremder Zustand; beliebig oft wiederholbar.
