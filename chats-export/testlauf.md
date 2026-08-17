@@ -79,6 +79,30 @@ Im Testprojekt des Pro-Kontos, aus einem frisch angelegten und danach gelöschte
 
 **Fünf Einträge — genau die erwartete Zahl:** sechs angelegte Chats minus den vor dem Export gelöschten Hüllen-Chat. `parse_chat_list` erkennt alle fünf mit UUID, `updated_at` und Titel.
 
+Die Rohausgabe steht hier mit im Dokument, damit der Lauf ohne Handübertragung auf einem anderen Rechner wiederholbar ist — `test_results/` ist gitignoriert und wandert nicht mit. Das ist für **dieses Wegwerf-Testprojekt** unbedenklich: UUIDs, Zeitstempel und Titel, kein Gesprächsinhalt. Für ein echtes Quellprojekt gehörte eine Chatliste **nicht** ins Repo — sie verriete sämtliche Chattitel.
+
+```text
+<chat url='https://claude.ai/chat/21670321-898e-413e-a6fd-9091a6bf90f8' updated_at='2026-08-17T14:30:35.984103+00:00'>
+Title: Brillenstärken verstehen
+</chat>
+
+<chat url='https://claude.ai/chat/1d322d54-0229-41b8-b336-3eb7d5573d13' updated_at='2026-08-17T14:35:58.247417+00:00'>
+Title: Erklärung eines Vorgangs
+</chat>
+
+<chat url='https://claude.ai/chat/5f8ac1bd-93cf-495d-813c-96527ffdc4a8' updated_at='2026-08-17T14:47:20.774795+00:00'>
+Title: Wanderung planen
+</chat>
+
+<chat url='https://claude.ai/chat/490dbac1-6ecd-45ef-94fc-d28ecb154a40' updated_at='2026-08-17T14:53:20.739094+00:00'>
+Title: Bildgenerierung und Grafikformate
+</chat>
+
+<chat url='https://claude.ai/chat/50bd7f40-43f2-45d7-b771-4002eaa96bdd' updated_at='2026-08-17T15:05:14.159994+00:00'>
+Title: API-Funktionen und Zeitlesen im Chat
+</chat>
+```
+
 **Befund, neu:** Ein **gelöschter** Chat erscheint nicht mehr in `recent_chats`. Im Export tauchen gelöschte Chats als Hüllen auf (3.1.3) — in der Liste gar nicht. Wer also nur die Liste kennt, erfährt von ihnen nichts; wer nur den Export kennt, sieht sie als leere Gerüste. Was der Erstlauf-Export mit diesem Chat macht, ist die offene Hälfte des Befunds (21.7).
 
 **Befund, bestätigt:** Auch der Abfragechat selbst fehlt wieder — er wurde ohnehin gelöscht, die Regel aus 1.5 hat sich also gleich beim ersten echten Einsatz bewährt.
