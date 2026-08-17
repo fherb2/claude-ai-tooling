@@ -60,6 +60,25 @@ Alle Merkmale sind am 17. August 2026 **erzeugt worden**. Erzeugt heißt hier: D
 
 **Für 21.13 vorgesehen**, und ab jetzt unangetastet: Chat 3 oder 4 als schlichter Grundfall — und **Chat 1 als Härtefall**. Er trägt Gabelung und Sendewiederholung, und beide sieht der Lese-Weg nicht: Er liefert das gerenderte Transkript. Kommen nach Abzug der erlaubten Felder trotzdem zwei identische Transkripte heraus, ist Vorgabe 2.5 an der schwierigsten Stelle bestätigt. Weichen sie ab, haben wir einen Fall gefunden, den die Vorgabe bisher nicht kennt — und das wäre kein Testfehler, sondern der wertvollste Befund des ganzen Laufs.
 
+## 21.3/21.4 Sondierungsexport — bestanden
+
+ZIP vom 17. August 2026, Fenster vor dem Anlegen des Testprojekts. `inspect_export.py` berichtet:
+
+- **Konversationen: 1**, erstellt am 2026-08-15 — aus einem anderen Projekt. **Kein einziger Chat des Testprojekts** ist enthalten; das Fenster schloss sie korrekt aus.
+- **44 Projektdateien**, darunter „Chats-Export aus Pro, Test 1" mit `created_at` **2026-08-17** — also mit einem Datum **außerhalb und nach** dem gewählten Fenster.
+
+**Damit ist die Behauptung geprüft, auf der Schritt 0 aus 1.5 ruht:** Projektdateien sind vom Zeitraumfilter ausgenommen. Und zwar gegen einen bekannten Sollwert — der Nutzer hatte das Anlegedatum unabhängig notiert, das Werkzeug liest genau dieses Datum aus einem Archiv, das den Chat des Projekts gar nicht kennt. Vorher waren es 43 Projektdateien, jetzt 44; die eine mehr ist unser Testprojekt.
+
+**Schemawache:** Konversationsschlüssel und Nachrichtenschlüssel decken sich mit 3.1.1, und `project reference: NONE` bestätigt erneut den Befund, der den ganzen Entwurf trägt. `login_history.json` ist vorhanden.
+
+**Eine Lücke in der Vergleichsgrundlage:** Die Schemawache gibt auch die **Blockschlüssel** aus — hier `citations`, `flags`, `start_timestamp`, `stop_timestamp`, `text`, `type`. Doku 3.1.1 führt nur die Block*typen*, nicht die Block*schlüssel*; 3.3 verspricht aber den Vergleich aller drei Schlüsselmengen mit 3.1.1. Für eine der drei fehlt also die Vergleichsgrundlage. Sie lässt sich aus dem Erstlauf-ZIP (21.7) gewinnen, das alle Blocktypen enthält, und gehört dann nach 3.1.1.
+
+## Verlust des kalten Prüfmaterials
+
+`tests/test_results/` ist **leer** — bis auf `.gitkeep`. Verschwunden sind die drei früheren Export-ZIPs und das gesamte FreeCAD-Archiv samt seiner `protokoll.json`. Am 14. August lagen sie noch dort und wurden für die Mengenmessung in 3.1.7 benutzt. Der Inhalt ist gitignoriert, steht also auch nicht in der Historie.
+
+Folgen: Der Fahrplan definiert **kalt** über eben diese ZIPs — die Definition trifft derzeit ins Leere, bis das Erstlauf-ZIP vorliegt. Und **Fahrplanpunkt 24**, die Gegenprobe am FreeCAD-Altbestand, braucht dessen Protokoll mit den 22 Chats; ohne das ist er nicht ausführbar.
+
 ## Beobachtungen je Schritt
 
 ### 21.2 Testprojekt anlegen und füllen
