@@ -73,11 +73,33 @@ ZIP vom 17. August 2026, Fenster vor dem Anlegen des Testprojekts. `inspect_expo
 
 **Eine Lücke in der Vergleichsgrundlage:** Die Schemawache gibt auch die **Blockschlüssel** aus — hier `citations`, `flags`, `start_timestamp`, `stop_timestamp`, `text`, `type`. Doku 3.1.1 führt nur die Block*typen*, nicht die Block*schlüssel*; 3.3 verspricht aber den Vergleich aller drei Schlüsselmengen mit 3.1.1. Für eine der drei fehlt also die Vergleichsgrundlage. Sie lässt sich aus dem Erstlauf-ZIP (21.7) gewinnen, das alle Blocktypen enthält, und gehört dann nach 3.1.1.
 
-## Verlust des kalten Prüfmaterials
+## 21.5 Chatliste — bestanden
 
-`tests/test_results/` ist **leer** — bis auf `.gitkeep`. Verschwunden sind die drei früheren Export-ZIPs und das gesamte FreeCAD-Archiv samt seiner `protokoll.json`. Am 14. August lagen sie noch dort und wurden für die Mengenmessung in 3.1.7 benutzt. Der Inhalt ist gitignoriert, steht also auch nicht in der Historie.
+Im Testprojekt des Pro-Kontos, aus einem frisch angelegten und danach gelöschten Chat. Die Rohausgabe liegt als `tests/test_results/chatliste-pro-test-1_2026-08-17.txt`.
 
-Folgen: Der Fahrplan definiert **kalt** über eben diese ZIPs — die Definition trifft derzeit ins Leere, bis das Erstlauf-ZIP vorliegt. Und **Fahrplanpunkt 24**, die Gegenprobe am FreeCAD-Altbestand, braucht dessen Protokoll mit den 22 Chats; ohne das ist er nicht ausführbar.
+**Fünf Einträge — genau die erwartete Zahl:** sechs angelegte Chats minus den vor dem Export gelöschten Hüllen-Chat. `parse_chat_list` erkennt alle fünf mit UUID, `updated_at` und Titel.
+
+**Befund, neu:** Ein **gelöschter** Chat erscheint nicht mehr in `recent_chats`. Im Export tauchen gelöschte Chats als Hüllen auf (3.1.3) — in der Liste gar nicht. Wer also nur die Liste kennt, erfährt von ihnen nichts; wer nur den Export kennt, sieht sie als leere Gerüste. Was der Erstlauf-Export mit diesem Chat macht, ist die offene Hälfte des Befunds (21.7).
+
+**Befund, bestätigt:** Auch der Abfragechat selbst fehlt wieder — er wurde ohnehin gelöscht, die Regel aus 1.5 hat sich also gleich beim ersten echten Einsatz bewährt.
+
+## 21.6 Protokoll anlegen — bestanden
+
+Zwei Läufe, absichtlich getrennt:
+
+**Ohne `--project-created`** meldet `list`: *„5 pending chat(s) have no date bound at all — give the project's start date with --project-created … or export everything."* Es rät nicht, sondern fordert an — genau das, was Vorgabe 2.4 mit `unbounded` als eigenem Ergebnis verlangt.
+
+**Mit `--project-created 2026-08-17`**, dem Datum aus dem Sondierungsexport: *„An export has to reach back to 2026-08-17 to cover everything pending (from project)."* Das ist der erwartete Wert, aus der erwarteten Quelle. Die Kette Sondierung → Projektdatum → Fenstergrenze trägt.
+
+**Nebenbei an echten Daten bestätigt:** `diff` nennt dieselbe Fenstergrenze, ohne dass eine frische Liste geholt wurde — die Änderung aus Fahrplanpunkt 14, hier zum ersten Mal im Echtbetrieb.
+
+## Was zum Rechnerwechsel gilt
+
+`tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
+
+**Folge für die Prüfarten:** *kalt* heißt ohne Konto und ohne Netz — aber nicht ohne Voraussetzung. Das Prüfmaterial ist rechnergebunden, dieselbe kalte Prüfung ist auf dem einen Rechner lauffähig und auf dem anderen nicht. Das gehört in die Definition in Doku 4.1.
+
+**Fahrplanpunkt 24** bleibt damit ausführbar — er braucht `freecad/protokoll.json` mit den 22 Chats, und die liegt auf dem Laptop. Nötig ist nur diese eine Datei, nicht das Archiv und nicht die ZIPs.
 
 ## Beobachtungen je Schritt
 
