@@ -19,7 +19,12 @@ of ``implementation_doku.md`` holds the determinations this implements, chapter
 Getting the ``--map`` input is the one step this file cannot do for you: the
 chat list only exists inside a claude.ai chat, in the *source* project, via
 the built-in ``recent_chats`` tool -- no script, no upload, nothing to run
-there. Ask for it verbatim, with the literal prompt kept as ``MAPPING_PROMPT``
+there. Ask for it **in a chat created for that purpose, and delete that chat
+afterwards**: ``recent_chats`` never lists the chat it is called from, so the
+asking chat is absent from its own listing -- and therefore from the protocol
+and the archive, with nothing reporting the gap. A throwaway chat makes that
+harmless; a working chat would silently drop out. Ask for it verbatim, with
+the literal prompt kept as ``MAPPING_PROMPT``
 below (module-level, printable): only a codeblock survives the markdown
 renderer, the ``<chat ...>`` tags outside one are silently swallowed as HTML
 (observed). Save the reply as a file and pass it as ``--map``.

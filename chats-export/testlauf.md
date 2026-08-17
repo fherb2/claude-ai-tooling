@@ -40,19 +40,25 @@ Die Wahl zwischen „Chat" und „Cowork" beim Anlegen eines Chats erscheint auc
 
 ## Profil-Checkliste (Doku 4.1)
 
-| Merkmal | Stand |
-| --- | --- |
-| Gabelung | offen |
-| Sendewiederholung | offen |
-| Anhang mit Inhalt | offen |
-| reiner Namensverweis | offen |
-| Denkschritte | offen |
-| Erzeugnis | offen |
-| Hülle | offen |
-| langer Chat | offen |
-| wachsender Chat | offen |
+Alle Merkmale sind am 17. August 2026 **erzeugt worden**. Erzeugt heißt hier: Die Handlung ist getan — ob daraus in den Daten wirklich das Merkmal geworden ist, weist erst der Export in 21.7 nach. Bei zwei Merkmalen ist der Ausgang ausdrücklich offen:
 
-Der wachsende Chat wird in 21.2 nur **angelegt**; fortgesetzt wird er in 21.9, nach einem Tageswechsel.
+| Merkmal | Chat | Stand |
+| --- | --- | --- |
+| Gabelung | 1 | erzeugt |
+| Sendewiederholung | 1 | erzeugt |
+| Anhang mit Inhalt | 2 | erzeugt |
+| reiner Namensverweis | 2 | **offen im Ausgang** — ob ein Bild als `attachments` mit Inhalt oder als `files` ohne ankommt, ist unbekannt; genau das soll der Lauf klären |
+| Denkschritte | 3 | erzeugt, dazu bewusst ein kurzer Block für die 200-Zeichen-Schwelle (3.1.3) |
+| Erzeugnis | 4 | erzeugt, mit anschließender Änderung für die `delta`-Kennzeichnung |
+| Hülle | 5 | **offen im Ausgang** — vor dem Export gelöscht; ob der Chat als Hülle erscheint oder gar nicht, entscheidet den Widerspruch aus 1.6 gegen [13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data) |
+| langer Chat | 6 | erzeugt |
+| wachsender Chat | 6 | derselbe Chat; fortgesetzt wird er in 21.9 nach einem Tageswechsel |
+
+**Beobachtung zur Gabelung:** Nach dem Bearbeiten der Frage kam eine neue Antwort, und die bisherige verschwand **im Web-Frontend**. Genau darum geht es bei Regel 2 in 3.1.2: Die Oberfläche zeigt den verworfenen Zweig nicht mehr, der Export soll ihn trotzdem führen. Damit hat 21.7 eine scharfe Erwartung — `analyse` muss für Chat 1 einen Nebenzweig ausweisen. Tut es das nicht, ist entweder die Gabelung anders entstanden als gedacht, oder der Export hält den verworfenen Zweig nicht.
+
+**Langer und wachsender Chat sind derselbe** (Chat 6). Das ist zulässig und spart einen Chat: Ein wachsender Chat, der zugleich lang ist, macht das Ersetzen beim zweiten Export sogar aussagekräftiger. Eine Bedingung gehört dazu — für den Wegegleichheits-Vergleich in 21.13 darf **nicht** dieser Chat genommen werden. Dort müssen beide Wege denselben Stand sehen; ein wachsender Chat wäre ein bewegtes Ziel, und eine Abweichung ließe sich nicht mehr von einem echten Befund unterscheiden.
+
+**Für 21.13 vorgesehen**, und ab jetzt unangetastet: Chat 3 oder 4 als schlichter Grundfall — und **Chat 1 als Härtefall**. Er trägt Gabelung und Sendewiederholung, und beide sieht der Lese-Weg nicht: Er liefert das gerenderte Transkript. Kommen nach Abzug der erlaubten Felder trotzdem zwei identische Transkripte heraus, ist Vorgabe 2.5 an der schwierigsten Stelle bestätigt. Weichen sie ab, haben wir einen Fall gefunden, den die Vorgabe bisher nicht kennt — und das wäre kein Testfehler, sondern der wertvollste Befund des ganzen Laufs.
 
 ## Beobachtungen je Schritt
 
@@ -76,7 +82,7 @@ Zweiter Versuch, gestellt in einem **zweiten** Chat: genau ein Eintrag, nämlich
 
 **Betrifft beide Wege**, denn beide bauen ihr Protokoll aus derselben Liste: `list --map` im ZIP-Weg und `map` im Lese-Weg.
 
-**Gegenmittel ohne Code:** die Liste immer aus **einem eigens dafür geführten Chat** holen, und zwar stets demselben. Dann fehlt dauerhaft genau ein Chat — der, in dem nichts steht als Listenabzüge, also der einzige, dessen Verlust nichts kostet. Wechselnde Abfragechats wären schlechter: Dann fehlt bei jedem Lauf ein anderer, und welcher, weiß hinterher niemand.
+**Gegenmittel ohne Code, vom Nutzer vorgeschlagen und übernommen:** die Liste in einem **eigens dafür angelegten Chat** holen und diesen **danach löschen**. Dann bleibt gar nichts zurück — der fehlende Chat ist der, der nichts enthielt als den Listenabzug, und im Projekt sammeln sich keine Karteileichen. Der zuerst erwogene Weg, immer denselben Abfragechat zu verwenden, ist schlechter: Er ließe die Karteileiche liegen und würde beim nächsten Lauf selbst mitarchiviert.
 
 **Gegenprobe am Altbestand möglich:** Das FreeCAD-Archiv führt 22 Chats. Zeigt die Chatliste des Projekts heute 23, ist einer stillschweigend nie mitgekommen — vermutlich der, aus dem damals die Liste geholt wurde. Das wäre die Bestätigung des Befunds an echten Daten und kostet eine Abfrage.
 
