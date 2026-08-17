@@ -48,9 +48,15 @@ Three hard limits, all worth telling the user about up front:
 *   **Cowork conversations are unreachable.**  Their ids look like
     ``cse_01Mi...`` and are rejected on format: "Invalid conversation_id:
     expected a UUID".
-*   **Enumeration matches retrieval.**  ``recent_chats`` in a project lists
-    exactly the chats you can also read there, so you can never end up
-    holding a UUID you are not allowed to fetch.
+*   **Enumeration is a subset of retrieval.**  ``recent_chats`` in a project
+    lists chats you can also read there, so you never end up holding a UUID
+    you are not allowed to fetch -- but the list is not complete: **the chat
+    you are running in never appears in its own listing** (observed, twice
+    and symmetrically).  Ask for the list from a chat created for that
+    purpose and delete it afterwards; then the one chat missing from every
+    listing is the one that holds nothing but the listing itself.  Ask from
+    a working chat instead, and that chat drops out of the archive without
+    anything reporting it.
 
 THE STORE DIRECTORY
 -------------------

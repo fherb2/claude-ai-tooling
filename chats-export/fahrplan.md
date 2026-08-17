@@ -68,6 +68,8 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
 23. **Probe: Arbeitet der Lese-Weg in einem Team-Projekt?** Fakten: Doku 1.2, 1.6, 3.2.1. Für Chats, die in einem Team-Konto liegen, ist er der einzige Weg — ob `read_conversation` dort ebenso greift wie im Pro-Konto, ist unbelegt. Ein Chat, ein `ingest`, mehr nicht; das vorhandene Testprojekt im Team-Konto bleibt dafür stehen. *Warm.*
 
+24. **Gegenprobe am FreeCAD-Altbestand.** Fakten: Doku 1.6, 1.7. Die heutige Chatliste des Projekts gegen das Protokoll halten: Fehlt dort ein Chat, der älter ist als der damalige Export, ist die Auslassung des laufenden Chats an echten Daten bestätigt und die stille Lücke einmal vorgeführt. Kostet eine Abfrage. *Warm.*
+
 7. **Forschung: Zuwachs nachladen statt ersetzen.** Fakten: Doku 3.2.5. Gültigkeitsdauer von `page_token` beobachten. *Warm, über mehrere Tage.*
 
 10. **Entscheidung: `chat_crawl_store.py` behalten oder wegräumen?** Fakten: Doku 3.4. Erst nachdem sich 3.1 und 3.2 bewährt haben; das Verhältnis zum übrigen Bestand ist derzeit nicht beurteilbar.
