@@ -66,6 +66,8 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
 22. **Erster Durchlauf in ein echtes Zielprojekt.** Fakten: Doku 1.5, Vorgabe 2.10. Zielprojekt steht bewusst noch nicht fest — das ist nicht mehr Entwicklung. Mit 21 und 22 fällt der Entwicklungshinweis am Dokumentkopf. *Warm.*
 
+23. **Probe: Arbeitet der Lese-Weg in einem Team-Projekt?** Fakten: Doku 1.2, 1.6, 3.2.1. Für Chats, die in einem Team-Konto liegen, ist er der einzige Weg — ob `read_conversation` dort ebenso greift wie im Pro-Konto, ist unbelegt. Ein Chat, ein `ingest`, mehr nicht; das vorhandene Testprojekt im Team-Konto bleibt dafür stehen. *Warm.*
+
 7. **Forschung: Zuwachs nachladen statt ersetzen.** Fakten: Doku 3.2.5. Gültigkeitsdauer von `page_token` beobachten. *Warm, über mehrere Tage.*
 
 10. **Entscheidung: `chat_crawl_store.py` behalten oder wegräumen?** Fakten: Doku 3.4. Erst nachdem sich 3.1 und 3.2 bewährt haben; das Verhältnis zum übrigen Bestand ist derzeit nicht beurteilbar.

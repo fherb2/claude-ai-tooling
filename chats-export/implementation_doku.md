@@ -42,7 +42,11 @@ Der Engpass ist nicht die Suche, sondern die **Transkription**: Chattext erreich
 
 **Der Kontoexport ist inhaltlich der reichere Weg**, und das ist keine Kleinigkeit: Denkschritte und Anhänge sind zusammen etwa so umfangreich wie der Gesprächstext selbst und im Lese-Weg **gar nicht sichtbar** — `read_conversation` liefert das gerenderte Transkript, keine Blockstruktur. Was auf diesem Weg hereinkommt, ist also dauerhaft ärmer, und ein späterer Export bringt es nicht nach, ohne den Chat zu ersetzen.
 
-Daraus die Empfehlung: **wer warten kann, nimmt den Export** — auch beim Fortschreiben, mit einem auf wenige Wochen eingeschränkten Zeitraum. Der Lese-Weg ist der Weg für sofort, für einen einzelnen Chat, oder wenn der Export den Zeitraum nicht abdeckt. Für zwei neue Chats einen Kontoexport anzufordern wäre absurd; ihn für zweihundert alte zu vermeiden genauso.
+**Die Wahl zwischen den Wegen gibt es aber nicht überall.** Sie setzt voraus, dass ein Export überhaupt zu haben ist, und das ist an den Kontotyp gebunden (1.6): Selbstbedienung nur auf Free, Pro und Max. Ein gewöhnliches Mitglied eines Team- oder Enterprise-Kontos hat **keinen** Export — dort ist der Lese-Weg nicht die schnellere Alternative, sondern der einzige Weg, und sein ärmeres Ergebnis ist dann kein Abwägungsergebnis, sondern eine Tatsache, mit der man lebt.
+
+Der Primary Owner einer Organisation kann exportieren, aber das hilft dem Einzelnen kaum: Dieses Vorhaben ist ein **wiederkehrender** Abgleich (1.1), und ein Verfahren, das bei jedem Durchgang den Administrator braucht, ist für den laufenden Betrieb untauglich. Wer regelmäßig nachpflegen will, kann nicht jedes Mal um einen Organisationsexport bitten.
+
+Daraus die Empfehlung — **für Konten, die einen Export haben**: **wer warten kann, nimmt den Export** — auch beim Fortschreiben, mit einem auf wenige Wochen eingeschränkten Zeitraum. Der Lese-Weg ist der Weg für sofort, für einen einzelnen Chat, oder wenn der Export den Zeitraum nicht abdeckt. Für zwei neue Chats einen Kontoexport anzufordern wäre absurd; ihn für zweihundert alte zu vermeiden genauso.
 
 **Verbindlich** ist die Wegegleichheit der beiden Wege — Wortlaut, erlaubte Abweichungen und ihr Wächter stehen als Vorgabe 2.5. Warum sie nicht zur Laufzeit erzwingbar ist, sagt Vorgabe 2.9.
 
@@ -80,7 +84,7 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 **Über den Kontoexport** — beim ersten Mal für alles, danach mit eingeschränktem Zeitraum fürs Nachpflegen. Der Ablauf ist derselbe, nur die Menge unterscheidet sich:
 
 0. **Sondierungsexport, wenn der nötige Zeitraum unklar ist.** Einen Export über einen möglichst kurzen Zeitraum anfordern: er enthält trotzdem **alle** Projektdateien mit ihrem `created_at` (3.1.1). `inspect_export.py` listet sie nach Datum; das Datum des betroffenen Projekts wird mit `list --project-created` ins Protokoll übernommen und begrenzt ab dann jedes Fenster (Vorgabe 2.4). Exakt statt geschätzt, und für ein paar Megabyte statt Dutzenden. Entfällt beim Nachpflegen, wenn das Protokoll die Stände schon kennt.
-1. Kontoexport anfordern, ZIP herunterladen. **Zeitraum wählbar** — fürs Nachpflegen der Zeitraum seit dem letzten Lauf mit Überlappung, für eine Erstmigration ab dem Projektbeginn aus Schritt 0. Der Zeitraum filtert `created_at`, nicht `updated_at` (4.2): ein alter Chat, der letzte Woche weiterlief, fehlt in einem kurzen Fenster **ganz**.
+1. Kontoexport anfordern, ZIP herunterladen. **Setzt voraus, dass es ihn gibt** — Free, Pro oder Max, oder Primary-Owner-Rechte in einer Organisation (1.6). Fehlt beides, führt dieser Ablauf ins Leere: Dann bleibt allein der Lese-Weg unten. **Zeitraum wählbar** — fürs Nachpflegen der Zeitraum seit dem letzten Lauf mit Überlappung, für eine Erstmigration ab dem Projektbeginn aus Schritt 0. Der Zeitraum filtert `created_at`, nicht `updated_at` (4.2): ein alter Chat, der letzte Woche weiterlief, fehlt in einem kurzen Fenster **ganz**.
 2. Je Quellprojekt dort die Chatliste anfordern, Antwort als Datei ablegen. Kein Skript nötig — `recent_chats` ist ein eingebautes Werkzeug der Instanz dort; nur der Prompt dazu ist wörtlich vorgegeben, als `MAPPING_PROMPT` in `chat_export_convert.py` (3.1.6), weil eine Freihand-Formulierung den Codeblock-Zwang leicht vergisst und die `<chat>`-Tags dann dem Markdown-Renderer zum Opfer fallen (beobachtet).
 3. Lokal mit Claude Code: Protokoll anlegen oder ergänzen, Chats des Projekts aus dem ZIP holen und an den Zielort schreiben. `list` merkt selbst, was neu und was veraltet ist; `convert` holt nur das.
 4. Protokoll ins Projektwissen des Quellprojekts zurück — sonst weiß der Lese-Weg beim nächsten Mal nicht, was schon da ist.
@@ -132,7 +136,8 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 
 | Aussage                                                                                                                                                                                     | Beleglage                                                                                                               |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Kontoexport unter Settings → Privacy, Link per E-Mail, verfällt nach 24 h, Free/Pro/Max                                                                                                   | belegt ([9450526](https://support.claude.com/en/articles/9450526-export-your-claude-data))                              |
+| Kontoexport unter Settings → Privacy, Link per E-Mail, verfällt nach 24 h — *„available to individual Claude users on Free, Pro, and Max plans"*                                          | belegt ([9450526](https://support.claude.com/en/articles/9450526-export-your-claude-data))                              |
+| **In Team und Enterprise hat ein gewöhnliches Mitglied keinen Export**: *„Individual members of Team and Enterprise organizations do not have a self-serve export option"*; nur der Primary Owner exportiert, und zwar unter *Organization settings → Data and privacy* | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                    |
 | **Der Export lässt einen Zeitraum wählen**                                                                                                                                                | **beobachtet**, in keinem Artikel erwähnt                                                                              |
 | Gelöschte Inhalte*„will not be included in data exports initiated after the deletion"*                                                                                                    | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                    |
 | `read_conversation` ist **scope-gebunden**: dieselbe UUID liest im Projekt und scheitert außerhalb                                                                                         | beobachtet (Kontrollversuch)                                                                                            |
@@ -177,6 +182,7 @@ Damit sie nicht erneut abgeleitet werden:
 | Eine Erstmigration brauche einen Vollexport | Der Zeitraumfilter wirkt nicht auf `projects/`: ein Ein-Wochen-Export liefert jedes Projekt mit `created_at` und damit die exakte Fenstergrenze (3.1.1). |
 | Der Projektbeginn sei nur im Chat selbst zu erfahren | Weder `recent_chats` noch `read_conversation` liefern ein `created_at`, und keine öffentliche API kennt claude.ai-Projekte — außer der Compliance-API für Enterprise (4.5). Das Datum steht im Export. |
 | Der Lese-Weg sei dem Export gleichwertig | Er sieht **weder Denkschritte noch Anhänge** (3.2.1) — zusammen etwa so viel wie der Gesprächstext. Nachträglich ergänzen geht nicht, nur ersetzen. |
+| Der Export-Weg stehe jedem Konto offen | Nur Free, Pro und Max; in Team und Enterprise exportiert allein der Primary Owner (1.6). Für ein gewöhnliches Mitglied ist der Lese-Weg **der einzige** Weg — der ganze Entwurf lehnte sich an diese Annahme, ausgesprochen war sie nie. |
 | `~/.claude/projects/…` scheide als Zielort aus | Die Aufbewahrungsdauer ist einstellbar (`cleanupPeriodDays`) und trifft ohnehin jede Sitzung desselben Projekts. Für Chats, die niemand mitlesen soll, ist der Ort damit sogar der bequemste — unter den drei Bedingungen aus 1.3. |
 
 ---
@@ -187,7 +193,7 @@ Festlegungen, die quer über alle Werkzeuge dieses Ordners gelten. Aufnahmetest:
 
 ## 2.1 Beleglage
 
-Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind dreizehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
+Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind vierzehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
 
 ## 2.2 Dateiformat der Chatdateien
 
@@ -485,7 +491,7 @@ Die `home`-Fassung trägt zusätzlich die Zugänglichkeitsbedingung aus 1.3 und 
 
 Zusammen ist das etwa so viel wie der Gesprächstext selbst. **Ein über diesen Weg geholter Chat bleibt dauerhaft ärmer**, und ein späterer Export ergänzt es nicht — er kann den Chat nur ersetzen, weil der Bezug zwischen Nachricht und Block nachträglich nicht herstellbar ist.
 
-Was dieser Weg dafür kann und der Export nicht: **Vollständigkeit beweisen** (3.2.2) und **sofort** liefern, ohne Antrag und Wartezeit.
+Was dieser Weg dafür kann und der Export nicht: **Vollständigkeit beweisen** (3.2.2), **sofort** liefern, ohne Antrag und Wartezeit — und, das Wichtigste, er ist **vom Kontotyp unabhängig**. Er benutzt die Werkzeuge der Instanz innerhalb des Projekts und braucht keinen Export. Damit ist er für ein gewöhnliches Mitglied eines Team- oder Enterprise-Kontos nicht der bequemere, sondern der einzige Weg (1.2, 1.6).
 
 **Was doch:**
 
@@ -605,12 +611,16 @@ Die letzte Zeile ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports
 - **warm** — nur mit Zugriff auf ein echtes Projekt: ein claude.ai-Projekt für `recent_chats`, `read_conversation`, Upload und Projektwissen, oder ein Claude-Code-Projekt als Zielort. Braucht Vorbereitung, ist nicht beliebig wiederholbar und hinterlässt Spuren an der Quelle.
 - **Beobachtung** — nicht prüfbar, nur bemerkbar, wenn es kippt: Die Sache ist undokumentiert und durch keinen Versuch auslösbar. Sie „warm" zu nennen verspräche eine Prüfung, die es nicht gibt.
 
+Ein warmer Punkt kann **mangels Rechten unerreichbar** sein, ohne deshalb eine Beobachtung zu werden: Er wäre prüfbar, nur nicht von uns. Das wird dazugeschrieben statt stillschweigend umgewidmet — sonst sieht ein späterer Leser eine Prüfung, die nie jemand vorhatte durchzuführen.
+
 **Was eine Prüfung ist.** Drei Teile: was man tut, woran man erkennt, dass die dokumentierte Aussage noch stimmt, und was folgt, wenn nicht. Der letzte Teil ist immer derselbe — betroffene Zeile in 1.6 bzw. Kapitel 3 korrigieren, prüfen, was daran hing, und wenn eine Annahme fällt, 1.7 ergänzen. Ein Punkt ohne erkennbares Kriterium ist keine Prüfung, sondern eine Beobachtung.
 
 **Übersicht.** Alle Punkte mit ihrem normativen Zuhause und ihrer Art — bewusst nur Zeiger, damit diese Tabelle nicht neben den Abschnitten herdriften kann:
 
 | Prüfpunkt | Zuhause | Art |
 | --- | --- | --- |
+| Verfügbarkeit des Exports je Kontotyp | 4.2, 1.6 | warm |
+| Aufbau des Organisationsexports (Primary Owner) | 4.2 | warm, mangels Rechten unerreichbar |
 | Zeitraumauswahl des Exports | 4.2 | warm beim Anfordern, danach kalt |
 | Zeitraumgrenze wirkt auf `created_at`, nicht `updated_at` | 4.2 | kalt |
 | Projektdateien vom Zeitraumfilter ausgenommen | 4.2 | kalt |
@@ -633,6 +643,8 @@ Die letzte Zeile ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports
 
 ## 4.2 Kontoexport — was verwendet wird und zu prüfen ist
 
+- **Wer überhaupt exportieren darf, hängt am Kontotyp** (1.6): Selbstbedienung nur auf Free, Pro und Max; in Team und Enterprise allein der Primary Owner, unter *Organization settings → Data and privacy*. Fällt das weg oder ändert es sich, ändert sich, für wen der Hauptweg überhaupt existiert. *Prüfung: in den Einstellungen des jeweiligen Kontos nachsehen — warm.*
+- **Der Organisationsexport des Primary Owner ist ungeprüft.** Ob sein ZIP denselben Aufbau trägt wie das persönliche — Mitgliederliste, `conversations.json`, Projektdateien mit `created_at` —, ist unbelegt, und der ganze Konverter hängt daran. *Prüfung: `inspect_export.py` über ein solches Archiv laufen lassen — warm, uns mangels Owner-Rechten derzeit nicht möglich. Der Rechteerwerb dafür wäre kein Prüfaufwand, sondern ein Eingriff in die Organisation, und für den laufenden Betrieb hilft er ohnehin nicht (1.2).*
 - Anforderung unter **Settings → Privacy → Export data**, Lieferung als Link per E-Mail, Link verfällt nach 24 h (belegt). **Die Zeitraumauswahl ist nirgends dokumentiert** — sie ist beobachtet und praktisch wichtig, denn auf ihr beruht das Nachpflegen (1.5). Fällt sie weg, wird jeder Lauf zum Vollexport. Zwei Läufe mit verschiedenen Grenzen haben sie inzwischen bestätigt: `created` vom 1.5. bis 6.8.2026 (211 Konversationen) und vom 1.11. bis 1.12.2025 (78). Die Grenze wirkt auf `created_at`, nicht auf `updated_at` — ein alter Chat, der letzte Woche weiterlief, ist im Kurzzeitraum also **nicht** enthalten. Wer nachpflegt, muss den Zeitraum daher weit genug zurück legen, um weitergelaufene Altchats mitzunehmen, oder sie über den Lese-Weg holen. *Prüfung: beim nächsten Antrag sehen, ob die Auswahl noch angeboten wird — warm; die tatsächlich gelieferte Spanne danach am ZIP gegenprüfen — kalt.*
 - Dateiname `data-<uuid>-…-batch-0000.zip`; die batch-Zahl war bisher immer 0 — möglicherweise stückeln größere Exporte, nie beobachtet. *Beobachtung: durch keinen Versuch auslösbar, bemerkbar erst an einem hinreichend großen Export.*
 - **Projektdateien sind vom Zeitraumfilter ausgenommen** (3.1.1) — beobachtet an zwei Exporten mit verschiedenen Zeiträumen, beide mit denselben 43 Projektdateien. Darauf beruht der Sondierungsexport aus 1.5; fällt es weg, muss der Projektbeginn anders beschafft werden. *Prüfung: die beiden vorliegenden ZIPs mit verschiedenen Zeiträumen gegeneinander halten — dieselbe Projektliste heißt, es gilt noch. Kalt.*
