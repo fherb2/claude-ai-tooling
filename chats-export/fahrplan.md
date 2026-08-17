@@ -16,6 +16,8 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
 21. **Testprojekt bauen und den mehrstufigen Test fahren.** Fakten: Doku-Kopf (Ende der Entwicklungsphase), 1.5, 2.6, 3.2.3. Ein eigenes claude.ai-Projekt statt des FreeCAD-Projekts, dazu ein Zielrepo. Stufen: Erstlauf, aktives Weiterschreiben eines Chats zwischen zwei Läufen, Sitzungsübergabe, Fortsetzung eines früheren Chats. Beantwortet nebenbei die offene Frage aus 3.1.8. *Warm.*
 
+    **Der laufende Stand steht in `testlauf.md`** — was angelegt, was beobachtet, was noch offen ist. Die Datei endet mit diesem Punkt; ihr Kopf sagt, wohin ihr Inhalt dann wandert.
+
     **Zwei Dinge geben den Takt vor.** Der Kontoexport hat Vorlaufzeit — Antrag, E-Mail, Download, Link 24 Stunden gültig; jeder Export ist eine Wartezeit, also muss der Inhalt, den er einfangen soll, vorher vollständig da sein. Und der Zeitraumfilter arbeitet auf Tagesebene: Damit „alter Chat, letzte Woche weitergelaufen" überhaupt prüfbar wird, müssen zwischen Anlegen und Fortschreiben **Tage** liegen. Das ist der einzige Schritt mit echter Vorlaufzeit und deshalb der, der zuerst passieren muss, während wir anderes tun.
 
     **Block A — sofort, weil die Uhr läuft**
