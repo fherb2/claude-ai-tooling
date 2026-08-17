@@ -108,6 +108,55 @@ Vom Nutzer benannt. Damit steht vor dem Export fest, was der Lauf zeigen **muss*
 
 **Zwischenzeitlich als Profillücke vermutet, dann ausgeräumt:** Chat 2 schien nur ein Bild zu tragen, womit `attachments_with_content` im ganzen Lauf null geblieben und der Codeweg für 9,6 Mio Zeichen des echten Exports unberührt geblieben wäre. Das Nachsehen ergab: Am ersten Prompt hängt eine Python-Datei. Beide Anhangsarten sind also gedeckt — und der Chat wird damit zum schärfsten Prüfstück für die Unterscheidung `attachments` gegen `files`, weil beide Fälle in derselben Konversation liegen.
 
+## 21.7 Erstlauf-Export — teils bestanden, mit drei Befunden
+
+Export vom 17. August, Fenster ab 2026-08-17, 7 Konversationen. `convert` schrieb 5 Chatdateien und **eine** Nebendatei.
+
+### Gegen die Erwartungstabelle
+
+| Erwartung | Ergebnis |
+| --- | --- |
+| Gabelung in „Brillenstärken" | **bestanden** — 1 Nebenzweig mit 2 Nachrichten. Die Oberfläche hatte die verworfene Antwort ausgeblendet, der Export führt sie |
+| Sendewiederholung in „Brillenstärken" | **nicht eingetreten** — 0 übersprungene Wiederholungen |
+| Anhang mit Inhalt in „Erklärung eines Vorgangs" | **bestanden** — `test_docstrings.py`, 4.481 Zeichen `extracted_content` |
+| Bild als reiner Namensverweis | **bestanden** — `Teensy4.1-oben.png` kommt nur als Name |
+| behaltene Denkblöcke in „Wanderung planen" | **nicht eingetreten** — 14 Blöcke im ganzen Export, **alle** verworfen, keiner behalten |
+| Erzeugnis in „Bildgenerierung" | **nicht eingetreten** — 0 Werke, obwohl 27 `tool_use`-Blöcke vorliegen |
+| langer Chat | **bestanden** — 28 Nachrichten |
+| Hülle | **bestanden**, s. u. |
+
+### Die drei Fehlschläge liegen an den Rezepten, nicht am Code
+
+**Sendewiederholung.** Zwei identisch abgeschickte Nachrichten stehen als Eltern und Kind hintereinander, nicht als Geschwister an einer Gabelung — der Code sucht aber Geschwister (3.1.2, Regel 2). Das Rezept „dieselbe Nachricht zweimal absenden" erzeugt das Phänomen also gar nicht. Was die 14 gleichlangen Kinder im echten Export erzeugt hat, ist damit weiterhin unbekannt und offenbar nicht auf Zuruf herstellbar.
+
+**Denkschritte.** 14 Blöcke, keiner versteckt, **alle unter 200 Zeichen** — verteilt auf „Wanderung planen" (10), „Bildgenerierung" (3) und „API-Funktionen" (1). Die Schwelle aus 3.1.3 stammt aus einem Bestand mit Medianlänge 682; die Testfragen waren dafür zu leicht. Das Rezept muss eine Aufgabe verlangen, die wirklich Abwägung erzwingt.
+
+**Erzeugnis.** 27 `tool_use`-Blöcke, aber keiner davon `artifacts`, `create_file` oder `str_replace` — der Chat drehte sich um Bildgenerierung, nicht um ein Artefakt. Das Rezept muss ausdrücklich ein **Artefakt** verlangen.
+
+Alle drei sind damit Korrekturen am Profil in Doku 4.1 — und genau dafür war der Lauf da.
+
+### Befund 1: Gelöschte Chats erscheinen als Hüllen, der Widerspruch löst sich auf
+
+Der Export enthält **zwei** Hüllen: den absichtlich gelöschten Chat 5 (8 Nachrichten) und den Abfragechat der Chatliste (2 Nachrichten). Beide wurden vor der Anforderung des Exports gelöscht, beide sind enthalten — mit Gerüst, ohne Text.
+
+Damit ist der vermeintliche Widerspruch aufgelöst: Anthropic schreibt, gelöschte **Inhalte** kämen nicht in später angeforderte Exporte — und genau so ist es. Der Inhalt fehlt (0 Zeichen), das **Gerüst** bleibt. Beide Aussagen stimmen, richtig gelesen; unsere Doku sollte das so sagen.
+
+Nebenbei: Beide Hüllen stehen **nicht** im Protokoll, weil sie in der Chatliste fehlten — `convert` hat sie folgerichtig übergangen. Ein gelöschter Chat ist über die Liste nicht mehr einem Projekt zuzuordnen.
+
+### Befund 2: `files` und `attachments` sind nicht disjunkt
+
+Am Rohmaterial nachgeprüft: Dieselbe Nachricht führt `test_docstrings.py` **zweimal** — einmal unter `attachments` mit `extracted_content` (4.481 Zeichen) und einmal unter `files` mit `file_uuid` und Namen. Das Bild dagegen steht **nur** unter `files`.
+
+Doku 1.6 sagt über die 524 `files`-Einträge des Drei-Monats-Exports: „und **die** sind wirklich verloren." Das ist so nicht haltbar — ein unbekannter Teil davon sind Zweitnennungen von Dateien, deren Inhalt sehr wohl mitkam.
+
+### Befund 3: Daraus ein Defekt im Code
+
+`file_names()` nimmt jeden `files`-Eintrag als Verlust, ohne zu prüfen, ob dieselbe Nachricht die Datei bereits mit Inhalt führt. Folge: `report` meldet `test_docstrings.py` als „mentioned by name only", obwohl der Inhalt in der Anhangsdatei liegt, und das Metadatenfeld `attachments_without_content` überzeichnet den Verlust. Zu beheben, mit Auswirkung auf 1.6 und die dortigen Zahlen.
+
+### Die Blockschlüssel liegen jetzt vor
+
+Der Export trägt alle Blocktypen außer `token_budget` (erwartbar, 1.6). Die Schlüsselmenge umfasst 37 Namen, darunter viele, die 3.1.1 nicht kennt — `structured_content`, `display_content`, `tool_origin`, `is_mcp_app`, `mcp_server_url`, `approval_options` und weitere. Damit ist die Vergleichsgrundlage vorhanden, die 3.3 verspricht und 3.1.1 bisher schuldig blieb.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
