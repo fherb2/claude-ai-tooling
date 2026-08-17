@@ -100,15 +100,13 @@ Vom Nutzer benannt. Damit steht vor dem Export fest, was der Lauf zeigen **muss*
 | Chat | UUID | Merkmal | Erwartung im Export |
 | --- | --- | --- | --- |
 | Brillenstärken verstehen | `21670321` | Gabelung, Sendewiederholung | mindestens ein Nebenzweig **und** mindestens eine übersprungene Sendewiederholung |
-| Erklärung eines Vorgangs | `1d322d54` | Anhang — **nur ein Bild** | ein Anhang, aber offen in welchem Feld: `attachments` mit Inhalt oder `files` als reiner Namensverweis |
+| Erklärung eines Vorgangs | `1d322d54` | Anhänge — eine Python-Datei (`test_docstrings.py`) **und** ein Bild | die Python-Datei als `attachments` **mit** `extracted_content`; das Bild offen — vermutlich `files` als reiner Namensverweis. Beide Anhangsarten in einem Chat, also beide Codewege in einem Lauf |
 | Wanderung planen | `5f8ac1bd` | Denkschritte | behaltene Denkblöcke **und** mindestens ein verworfener (unter 200 Zeichen) |
 | Bildgenerierung und Grafikformate | `490dbac1` | Erzeugnis | mindestens zwei Werke, davon eines als `delta` gekennzeichnet |
 | API-Funktionen und Zeitlesen im Chat | `50bd7f40` | langer und wachsender Chat | deutlich über acht Turns; in 21.9 wächst er weiter |
 | *(gelöscht)* | — | Hülle | offen: Hülle im Export oder gar nicht enthalten |
 
-**Eine Profillücke, entstanden beim Füllen:** Chat 2 trägt **nur ein Bild, keine Textdatei**. Damit ist unklar, ob das Merkmal „Anhang mit Inhalt" überhaupt vorkommt — Bilder werden vermutlich nicht textextrahiert und landen dann als reiner Namensverweis. Fällt das so aus, ist zwar ein Merkmal geprüft, das andere aber gar nicht: `attachments_with_content` bliebe im ganzen Lauf null, und der Codeweg, der 9,6 Mio Zeichen des echten Exports trägt, bliebe unberührt.
-
-**Behebbar, solange der Export nicht angefordert ist:** eine kleine Textdatei in einen beliebigen Chat hängen, am besten in Chat 2, damit beide Anhangsarten beisammen liegen. Danach ist das Merkmal wieder gedeckt und die Frage, welche Datei in welchem Feld landet, gleich mitbeantwortet.
+**Zwischenzeitlich als Profillücke vermutet, dann ausgeräumt:** Chat 2 schien nur ein Bild zu tragen, womit `attachments_with_content` im ganzen Lauf null geblieben und der Codeweg für 9,6 Mio Zeichen des echten Exports unberührt geblieben wäre. Das Nachsehen ergab: Am ersten Prompt hängt eine Python-Datei. Beide Anhangsarten sind also gedeckt — und der Chat wird damit zum schärfsten Prüfstück für die Unterscheidung `attachments` gegen `files`, weil beide Fälle in derselben Konversation liegen.
 
 ## Was zum Rechnerwechsel gilt
 
