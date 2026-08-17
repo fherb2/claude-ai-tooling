@@ -93,6 +93,23 @@ Zwei Läufe, absichtlich getrennt:
 
 **Nebenbei an echten Daten bestätigt:** `diff` nennt dieselbe Fenstergrenze, ohne dass eine frische Liste geholt wurde — die Änderung aus Fahrplanpunkt 14, hier zum ersten Mal im Echtbetrieb.
 
+## Zuordnung der Chats und die Erwartung für 21.7
+
+Vom Nutzer benannt. Damit steht vor dem Export fest, was der Lauf zeigen **muss** — das ist der Unterschied zwischen einer Prüfung und einer Beobachtung.
+
+| Chat | UUID | Merkmal | Erwartung im Export |
+| --- | --- | --- | --- |
+| Brillenstärken verstehen | `21670321` | Gabelung, Sendewiederholung | mindestens ein Nebenzweig **und** mindestens eine übersprungene Sendewiederholung |
+| Erklärung eines Vorgangs | `1d322d54` | Anhang — **nur ein Bild** | ein Anhang, aber offen in welchem Feld: `attachments` mit Inhalt oder `files` als reiner Namensverweis |
+| Wanderung planen | `5f8ac1bd` | Denkschritte | behaltene Denkblöcke **und** mindestens ein verworfener (unter 200 Zeichen) |
+| Bildgenerierung und Grafikformate | `490dbac1` | Erzeugnis | mindestens zwei Werke, davon eines als `delta` gekennzeichnet |
+| API-Funktionen und Zeitlesen im Chat | `50bd7f40` | langer und wachsender Chat | deutlich über acht Turns; in 21.9 wächst er weiter |
+| *(gelöscht)* | — | Hülle | offen: Hülle im Export oder gar nicht enthalten |
+
+**Eine Profillücke, entstanden beim Füllen:** Chat 2 trägt **nur ein Bild, keine Textdatei**. Damit ist unklar, ob das Merkmal „Anhang mit Inhalt" überhaupt vorkommt — Bilder werden vermutlich nicht textextrahiert und landen dann als reiner Namensverweis. Fällt das so aus, ist zwar ein Merkmal geprüft, das andere aber gar nicht: `attachments_with_content` bliebe im ganzen Lauf null, und der Codeweg, der 9,6 Mio Zeichen des echten Exports trägt, bliebe unberührt.
+
+**Behebbar, solange der Export nicht angefordert ist:** eine kleine Textdatei in einen beliebigen Chat hängen, am besten in Chat 2, damit beide Anhangsarten beisammen liegen. Danach ist das Merkmal wieder gedeckt und die Frage, welche Datei in welchem Feld landet, gleich mitbeantwortet.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
