@@ -25,6 +25,17 @@ Das Anlegedatum ist der **Sollwert** für 21.4: Der Sondierungsexport muss für 
 
 **Daraus eine offene Frage**, die dieser Testlauf beantworten könnte: Erscheint ein Cowork-Chat, der in einem gewöhnlichen claude.ai-Projekt geführt wird, trotzdem in dessen `recent_chats`-Liste? Wenn ja, legte `list` einen Protokolleintrag an, der nie zu holen ist — ein Chat, der dauerhaft als fehlend geführt wird. Wenn nein, fehlt er lautlos. Beides wäre wissenswert, keines ist bisher belegt.
 
+## Das Testprojekt im Pro-Konto
+
+| | |
+| --- | --- |
+| Titel | „Chats-Export aus Pro, Test 1" |
+| „Was Sie erreichen wollen" | „Das ist ein Testprojekt im Pro-Konto." |
+| Angelegt | 17. August 2026 |
+| Konto | Pro — hier liegt die echte Quellumgebung, und nur hier gibt es den Export |
+
+Dieses Projekt trägt den mehrstufigen Test. Der Sollwert für 21.4 ist der **17. August 2026**; die Uhrzeit spielt keine Rolle, weil der Export nur ein Datum führt.
+
 ## Profil-Checkliste (Doku 4.1)
 
 | Merkmal | Stand |
@@ -55,7 +66,17 @@ Zweiter Versuch, gestellt in einem **zweiten** Chat: genau ein Eintrag, nämlich
 
 **Offen bleibt, warum der jeweils laufende Chat fehlt.** Zwei Erklärungen passen auf beide Beobachtungen gleich gut: Entweder listet `recent_chats` den laufenden Chat grundsätzlich nicht mit, oder ein frisch angelegter Chat ist noch nicht indiziert. Der Unterschied ist nicht akademisch: Gilt das Erste, dann **fehlt jedem Listenlauf systematisch genau der Chat, aus dem er gestartet wurde** — eine dauerhafte Lücke im Archiv, die niemand meldet.
 
-Unterscheiden lässt es sich mit einer einzigen Abfrage: den Prompt noch einmal im **ersten** Chat stellen. Erscheint dort der zweite Chat, aber nicht der erste, ist der laufende Chat ausgeschlossen. Erscheinen beide, war es nur die Indizierung.
+**Entschieden.** Dritter Versuch, gestellt wieder im **ersten** Chat: genau ein Eintrag, nämlich der **zweite** Chat. Aus Chat 1 kommt Chat 2, aus Chat 2 kam Chat 1 — beide inzwischen indiziert, jeder sieht den anderen, keiner sich selbst.
+
+**Beobachtet, nirgends dokumentiert: `recent_chats` listet den laufenden Chat nicht mit.** Zwei symmetrische Beobachtungen, die Indizierungs-Erklärung ist damit widerlegt.
+
+**Die Folge wiegt schwer.** Jeder Listenlauf übergeht genau den Chat, aus dem er gestartet wurde. Das Protokoll erfährt nie von ihm, also fehlt er im Archiv — und `diff` kann ihn nicht als fehlend melden, weil das Protokoll ihn gar nicht kennt. Es ist ein Zuwenig, das keine der eingebauten Kontrollen bemerkt: Der Waisen-Scan meldet nur ein Zuviel, und die Vollständigkeitsrechnung des Lese-Wegs gilt je Chat, nicht für die Menge der Chats.
+
+**Betrifft beide Wege**, denn beide bauen ihr Protokoll aus derselben Liste: `list --map` im ZIP-Weg und `map` im Lese-Weg.
+
+**Gegenmittel ohne Code:** die Liste immer aus **einem eigens dafür geführten Chat** holen, und zwar stets demselben. Dann fehlt dauerhaft genau ein Chat — der, in dem nichts steht als Listenabzüge, also der einzige, dessen Verlust nichts kostet. Wechselnde Abfragechats wären schlechter: Dann fehlt bei jedem Lauf ein anderer, und welcher, weiß hinterher niemand.
+
+**Gegenprobe am Altbestand möglich:** Das FreeCAD-Archiv führt 22 Chats. Zeigt die Chatliste des Projekts heute 23, ist einer stillschweigend nie mitgekommen — vermutlich der, aus dem damals die Liste geholt wurde. Das wäre die Bestätigung des Befunds an echten Daten und kostet eine Abfrage.
 
 ### Kontolage — Befund mit Folgen über den Test hinaus
 
