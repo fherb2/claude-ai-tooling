@@ -1,6 +1,6 @@
 ---
 name: common-code-generation
-description: Regeln für das Erzeugen und Ändern von Code — englische Benennungen, kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher; Benennungen und Optimierungen werden vorgeschlagen, nicht entschieden. Verwenden, bevor in einer Sitzung zum ersten Mal Code entsteht oder geändert wird oder eine Optimierung vorgeschlagen wird, oder wenn der Nutzer /common-code-generation aufruft.
+description: Regeln für das Erzeugen und Ändern von Code — englische Benennungen, kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher; Benennungen und Optimierungen werden vorgeschlagen, nicht entschieden. Verwenden, bevor in einer Sitzung zum ersten Mal Code entsteht oder geändert wird oder eine Optimierung vorgeschlagen wird, oder wenn der Nutzer /common-code-generation aufruft.  Die Regeln gelten nicht für laufende Aktionen auf der CLI oder im Scratch.
 license: CC0-1.0
 ---
 
@@ -14,6 +14,7 @@ Nicht Gegenstand dieser Regeln:
 
 - Die Pflicht, vor einer Dateiänderung einen Plan vorzulegen und die Zustimmung abzuwarten. Sie gehört in die `CLAUDE.md` des Projekts und bleibt dort: Ein Skill wird nur wahrscheinlich geladen, eine Schutzregel muss sicher greifen.
 - Der Aufbau von Konzept- und Implementierungsdokumentation sowie der Umgang mit temporärem Debug-Code. Dafür gibt es eigene Skills.
+- Die Regeln gelten nicht für Code, der für laufende Aktionen unmittelbar an der Kommandozeile ausgeführt werden soll oder mit dem im Scratch Aufgaben erfüllt werden.
 
 ## Sprache und Benennungen im Quelltext
 
