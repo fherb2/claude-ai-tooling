@@ -17,7 +17,13 @@ Das Anlegedatum ist der **Sollwert** für 21.4: Der Sondierungsexport muss für 
 
 **Stand am 17. August 2026:** angelegt, sonst leer — keine Projektanweisung, kein Projektwissen, keine geplanten Aufgaben, kein Chat.
 
-**Offen und vor dem Füllen zu klären:** ob das Projekt für `recent_chats` und `read_conversation` erreichbar ist. Ein in Desktop angelegtes gewöhnliches Projekt sollte ein claude.ai-Projekt sein, belegt ist das nicht. Die Gegenprobe ist billig und entscheidet alles Weitere — ein Chat anlegen, darin die Chatliste abfragen lassen (Doku 1.6 zur Bereichsbindung; Cowork wäre unerreichbar).
+**Bestätigt:** Das Projekt ist in claude.ai im Browser sichtbar. Ein in Claude Desktop angelegtes gewöhnliches Projekt liegt also im Konto, nicht nur lokal.
+
+**Offen und vor dem Füllen zu klären:** ob es für `recent_chats` und `read_conversation` auch **erreichbar** ist. Sichtbarkeit und Erreichbarkeit sind zweierlei; entschieden wird es durch die Chatliste (Doku 1.6 zur Bereichsbindung).
+
+**Beobachtet, bisher nirgends dokumentiert:** Beim Anlegen eines Projekts gibt es **keine** Wahl zwischen Cowork und Nicht-Cowork. Die Unterscheidung fällt erst beim Starten des ersten Chats — dort stehen „Chat" und „Cowork" zur Wahl. Cowork gehört also nicht zum Projekt, sondern zum einzelnen Chat. Für diesen Testlauf werden **alle** Chats als gewöhnlicher Chat angelegt: Cowork-Chats sind über beide Wege unerreichbar, ihre IDs sind keine UUIDs und werden am Format abgewiesen (Doku 1.6, 4.3).
+
+**Daraus eine offene Frage**, die dieser Testlauf beantworten könnte: Erscheint ein Cowork-Chat, der in einem gewöhnlichen claude.ai-Projekt geführt wird, trotzdem in dessen `recent_chats`-Liste? Wenn ja, legte `list` einen Protokolleintrag an, der nie zu holen ist — ein Chat, der dauerhaft als fehlend geführt wird. Wenn nein, fehlt er lautlos. Beides wäre wissenswert, keines ist bisher belegt.
 
 ## Profil-Checkliste (Doku 4.1)
 
@@ -39,4 +45,4 @@ Der wachsende Chat wird in 21.2 nur **angelegt**; fortgesetzt wird er in 21.9, n
 
 ### 21.2 Testprojekt anlegen und füllen
 
-17. August 2026 — Projekt angelegt, Angaben oben. Füllen steht aus.
+Am 17. August 2026 angelegt, Angaben oben; in claude.ai sichtbar. Füllen steht aus, zuerst die Erreichbarkeitsprobe über die Chatliste.
