@@ -19,4 +19,6 @@ Before you write or change source code for the first time in a session,
 consult the skill `common-code-generation`. This applies even when nobody
 has mentioned code and the request sounds like a question — "why does the
 script abort on large files?", "could you have a look at why the list stays
-empty?" — because changed source code comes out of those too.
+empty?" — because changed source code comes out of those too. However, you
+don't need the skill for code that is to be executed directly in the session
+on the CLI or in Scratch.

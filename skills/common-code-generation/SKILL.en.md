@@ -1,6 +1,6 @@
 ---
 name: common-code-generation
-description: Rules for writing and changing code — English identifiers, no unrequested extension of the functional scope, careful use of processing time and memory; names and optimizations are proposed, not decided. Use before code is written or changed for the first time in a session, or before an optimization is proposed, or when the user calls /common-code-generation.
+description: Rules for writing and changing code — English identifiers, no unrequested extension of the functional scope, careful use of processing time and memory; names and optimizations are proposed, not decided. Use before code is written or changed for the first time in a session, or before an optimization is proposed, or when the user calls /common-code-generation. The rules do not apply to ongoing promotions on the CLI or in Scratch.
 license: CC0-1.0
 ---
 
@@ -14,6 +14,7 @@ Not covered by these rules:
 
 - The obligation to present a plan before changing a file and to wait for approval. It belongs in the project's `CLAUDE.md` and stays there: a skill is only likely to be loaded, whereas a safeguard has to take effect reliably.
 - The structure of concept and implementation documentation, and the handling of temporary debug code. There are separate skills for those.
+- These rules do not apply to code that is intended to be executed directly on the command line for ongoing actions or that is used to complete tasks in Scratch.
 
 ## Language and naming in source code
 
