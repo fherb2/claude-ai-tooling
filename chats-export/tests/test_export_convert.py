@@ -462,6 +462,37 @@ check("a carried attachment is not reported as missing",
       attach_result["attachments_without_content"] == [],
       str(attach_result["attachments_without_content"]))
 
+# ---------------------------------------------------------------------------
+# 'files' and 'attachments' are not disjoint
+# ---------------------------------------------------------------------------
+# An upload is recorded twice: as a file object under 'files' and, if its text
+# could be extracted, under 'attachments'. Found on real data, where 319 of 524
+# files entries had their content in the same message -- counting all of them
+# as lost overstated the loss by more than double.
+
+BOTH_ARRAYS = conv("dbl-1", "Doppelt gefuehrt", [
+    dict(msg("d0", ROOT, "human", "hier beides", "2026-05-16T10:00:00Z"),
+         attachments=[{"file_name": "kernel.py", "file_type": "text/x-python",
+                       "file_size": 8, "extracted_content": "print(1)"},
+                      {"file_name": "leer.txt", "file_type": "txt",
+                       "extracted_content": ""}],
+         files=[{"file_uuid": "u-1", "file_name": "kernel.py"},
+                {"file_uuid": "u-2", "file_name": "bild.png"},
+                {"file_uuid": "u-3", "file_name": "leer.txt"}]),
+    msg("d1", "d0", "assistant", "gesehen", "2026-05-16T10:01:00Z"),
+])
+both = cec.conversation_record(BOTH_ARRAYS)
+lost = both["attachments_without_content"]
+check("a file whose content is in the same message is not a loss",
+      "kernel.py" not in lost, str(lost))
+check("a file with no content anywhere is still a loss",
+      "bild.png" in lost, str(lost))
+check("a name in both arrays without content is reported once",
+      lost.count("leer.txt") == 1, str(lost))
+check("the carried attachment is still carried",
+      [f["name"] for f in both["attachments"][0]["files"]] == ["kernel.py"],
+      str(both["attachments"]))
+
 result = cec.conversation_record(THINK)
 check("thinking is not put into the message records",
       all("content" in m and LONG not in m["content"] for m in result["messages"]),
