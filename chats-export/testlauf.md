@@ -350,6 +350,34 @@ Wir haben die Instanz nach ihrem Werkzeugsatz **gefragt**, statt sie ein Werkzeu
 
 **Die dritte Fassung schließt beide Lücken:** gefragt wird nach dem **Wortlaut eines Turns mit bestimmter Nummer** aus einem Chat, den das hochgeladene Protokoll **nicht** kennt. Turn-Nummern vergibt nur `read_conversation`; ein Chat außerhalb des Protokolls entzieht die Abkürzung über das Projektwissen; und Suchschnipsel tragen weder Nummern noch ein Sollmaß.
 
+### Entschieden: Das Werkzeug war da und ist weg
+
+**Es war da.** Der Sitzungsverlauf vom **6. August 2026** enthält den Beweis, und zwar dreifach. Eine claude.ai-Instanz zitierte die Werkzeugbeschreibung wörtlich: *„Retrieve the full content of one past conversation by its UUID, paginated by turn. Reads the live conversation store (fresher than the conversation_search index). Pass a conversation_search result's page_token to open at that chunk's position, or the next_page_token / prev_page_token from a previous call to page through."* Sie erklärte, `page_token` aus einem Suchtreffer werde „consumed by a different tool: `read_conversation`, which takes `conversation_id` and `page_token`". Und sie fügte eine **echte Ausgabe** ein:
+
+```
+<chat url="https://claude.ai/chat/d64eea15-…" updated_at="2025-11-13T22:07:44.559082+00:00"
+  total_turns="58" turns="0-7" next_page_token="t8"><title>Flattening angled parts …
+<turn n="0">Human: Es geht darum, wie man aus einer Baugruppe einen Body auswählt …
+```
+
+Der Chat `d64eea15` ist echt — er liegt als `2025-11-13_flattening-angled-parts-in-techdraw-projections_d64eea15.json` im FreeCAD-Archiv. Die Rohausgabe wurde damals im Container unter `/home/claude/read_conversation_raw_d64eea15.txt` abgelegt. Der Name in unserer Doku ist also weder erfunden noch abgeleitet: Er stammt aus der Werkzeugbeschreibung selbst, und das Werkzeug hat gearbeitet.
+
+**Es ist weg.** Am **18. August 2026**, mit auf „alle laden" gestelltem Tool-Zugriffsmodus, in **vier** Anläufen: Browser mit Sonnet, Browser erneut, Desktop mit Sonnet, Desktop mit Opus bei hohem Effort. Alle vier: kein `read_conversation`. Die Opus-Instanz nennt zusätzlich den strukturellen Grund, warum kein Ersatz taugt — `conversation_search` und `recent_chats` *„nehmen auch keine Chat-ID als Parameter – ich kann damit einen bestimmten Chat also weder gezielt adressieren noch komplett auslesen"*. Und sie ordnet den früheren Zufallstreffer richtig ein: *„ein Treffer der Stichwortsuche, kein gezielter Zugriff über die ID"*.
+
+**Auch im Team-Konto nicht.** Dieselbe Frage dort, dasselbe Ergebnis.
+
+**Damit steht:** Zwölf Tage zwischen belegter Nutzung und belegter Abwesenheit, über zwei Konten, zwei Oberflächen und mehrere Modelle. Warum — entfernt, umbenannt, anders freigeschaltet — bleibt offen und ist für die Folgen gleichgültig: Aus der Sicht dieses Nutzers gibt es das Werkzeug nicht mehr.
+
+### Was daran hängt
+
+**Der Lese-Weg ist nicht lauffähig.** `chat_read_store.py` ruht vollständig auf diesem Werkzeug (3.2.1, 3.2.2). Von den zwei Wegen aus 1.2 bleibt einer.
+
+**Fahrplanpunkt 23 ist beantwortet, und zwar ungünstig.** Er sollte klären, ob der Lese-Weg in einem Team-Projekt arbeitet — für Team-Chats war er der einzige Weg, weil ein gewöhnliches Mitglied keinen Export hat (1.2, 1.6). Er arbeitet dort nicht. **Für Chats in einem Team-Konto bleibt damit kein Weg.**
+
+**21.12 ist nicht fortsetzbar, 21.13 blockiert.** Die Wegegleichheit an echten Daten — der schärfste Test dieses Vorhabens — lässt sich nicht durchführen, solange nur ein Weg läuft. Vorgabe 2.5 bleibt synthetisch geprüft.
+
+**Fahrplanpunkt 10 kippt zurück ins Offene.** Eben noch war er beantwortet: Der Crawler bleibt, weil er dort arbeitet, wo `read_conversation` fehlt. Genau dieser Fall ist jetzt eingetreten — nur zeigt die Desktop-Beobachtung, dass `conversation_search` bei einem Chat mit zehn Turns eine **Zusammenfassung** statt Blöcken lieferte. Ein Crawler, der Zusammenfassungen einliest, archiviert eine Nacherzählung und verstößt gegen Vorgabe 2.8. Ob der Rückfallweg überhaupt noch trägt, ist damit selbst fraglich.
+
 **Eine Korrektur an meiner eigenen Folgerung.** Ich hatte geschrieben, für ein Team-Mitglied bliebe damit „kein Weg". Das war ein Sprung: Geprüft wurde ein **Pro**-Konto. Richtig ist der bedingte Satz — *falls* das Werkzeug auch dort fehlt, hätte ein Team-Mitglied weder Export noch Lese-Weg. Genau das entscheidet Fahrplanpunkt 23, und der ist damit von einer Randfrage zur wichtigsten offenen Prüfung geworden.
 
 ### Zwei Umgebungsfakten nebenbei, beide neu
