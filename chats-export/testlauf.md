@@ -203,6 +203,43 @@ Am 18. August: der wachsende Chat fortgesetzt, drei neue Chats angelegt (darunte
 
 **Beobachtung am Rande:** Die Rohausgabe der Chatliste kam diesmal **ohne** schließende `</chat>`-Tags, beim ersten Mal mit. `parse_chat_list` verarbeitet beides, weil es von einem `<chat`-Beginn bis zum nächsten schneidet und die schließenden Tags gar nicht braucht. Die Formvariation der Instanz ist damit belegt — und die Unempfindlichkeit dagegen auch.
 
+## 21.11 Zweiter Export — bestanden, mit einem Befund über die Umgebung
+
+Export über das errechnete Fenster (ab 17. August), 13 Konversationen, 17. bis 18. August. Über 80 % des Archivs sind Projektdateien — 2.095 KB gepackt gegen 425 KB für die Konversationen. Ein Export hat für dieses Konto also rund 2 MB Bodensatz, unabhängig vom Fenster; das ist dieselbe Eigenschaft, auf der der Sondierungsexport beruht, hier erstmals beziffert.
+
+| Erwartung | Ergebnis |
+| --- | --- |
+| das Fenster fängt den gewachsenen Altchat ein | **bestanden** — „API-Funktionen" kam mit 32 statt 28 Turns und wurde ersetzt |
+| Waisen-Scan meldet nichts | **bestanden** — 9 Chats, alle exportiert, keine Waisen |
+| Erzeugnis kommt an | **bestanden** — 7 Werke in „Textdatei an Leerzeilen aufteilen" |
+| Gabelung kommt an | **bestanden** — der Ersatzchat trägt einen Nebenzweig |
+| Denkschritte kommen an | **nicht eingetreten** — 23 verworfen, 0 behalten |
+
+**Schwach geprüft:** Das Ersetzen lief, das **Aufräumen** nicht. Der Dateistamm blieb gleich (Datum, Slug und UUID unverändert), und die alte Fassung hatte keine Nebendateien — es gab schlicht nichts zu entfernen. Die beiden erzwingenden Fälle aus Vorgabe 2.6, Umbenennung und wegfallende Nebendatei, sind weiterhin nur synthetisch geprüft.
+
+**Nebenbei bestätigt:** Der Abfragechat der Chatliste steht im Export, aber nicht im Protokoll — `convert` hat ihn übergangen, weil die Chatliste ihn nie führte. Genau die dokumentierte Lücke, hier folgenlos, weil es ein Wegwerfchat war.
+
+### Der Befund: Denkschritte werden nicht mehr ausgeschrieben
+
+Die Denkblöcke sind nicht kurz — sie sind **leer**, und zwar alle. Gemessen über vier Exporte desselben Kontos:
+
+| Export | Denkblöcke | davon `thinking_hidden` | `summaries`-Text gesamt |
+| --- | --- | --- | --- |
+| Nov–Dez 2025 | 513 | 0 (0 %) | 82.271 |
+| Mai–Aug 2026 | 4.318 | 788 (18,2 %) | 1.137.052 |
+| Testlauf 17.8. | 14 | 14 (**100 %**) | 1.507 |
+| Testlauf 17.–18.8. | 41 | 41 (**100 %**) | 6.903 |
+
+Der Anteil versteckter Denkblöcke steigt von null über 18 auf hundert Prozent. In beiden frischen Testexporten trägt **kein einziger** Block Text; an seiner Stelle steht `summaries`, im Median 190 Zeichen je Block.
+
+**Der Code verhält sich dabei richtig:** Die Schwelle aus 3.1.3 verwirft `thinking_hidden`-Blöcke, weil sie leer sind — das war schon immer so und ist weiterhin verlustfrei. Falsch wird dadurch nichts.
+
+**Was kippt, ist eine tragende Aussage der Doku.** 1.2 begründet „der Export ist der inhaltlich reichere Weg" wesentlich mit den Denkschritten — 9,2 Mio Zeichen, etwa so viel wie der Gesprächstext. Für **neue** Chats trifft das nicht mehr zu: Es bleiben Anhänge und Erzeugnisse. Der Export bleibt reicher, aber weniger deutlich.
+
+**Und eine verworfene Entscheidung ist neu zu stellen.** 3.1.1 nennt `summaries` „für ein Archiv wertlos" — das Urteil fiel, als der volle Denktext danebenlag. Jetzt sind sie die einzige Spur. Ein Beispiel aus dem Testlauf: „Abwägung zwischen direkter Skripterstellung und vorheriger Planung." Das ist keine Verlaufsmeldung ohne Gehalt.
+
+**Grenzen des Befunds:** Zwei Testtage eines Kontos, 55 Blöcke. Warum die Blöcke versteckt sind — Modellwahl, Rollout, Kontoeinstellung — ist **nicht** ermittelt. Belegt ist allein: In beiden frischen Exporten trägt kein Denkblock Text.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
