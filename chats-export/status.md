@@ -9,6 +9,15 @@ Die Liste beginnt mit der Arbeitsphase ab dem 14. August 2026. Die davor erledig
 - **15** Prüfpunkte an einem Ort zusammengefasst und vervollständigt. Kapitel 4 trägt jetzt Verfahren, drei Prüfarten und eine Übersicht über alle Punkte; die verstreuten Punkte aus 1.6, 3.2.5 und 1.3 sind aufgenommen.
 - **16** Entscheidung gegen eine projekteigene `CLAUDE.md` für `chats-export`; die Begründung trägt die Repo-`CLAUDE.md`.
 
+## 2026-08-17 bis 18
+
+- **21.1** Prüfplan festgeschrieben; das Profil des Testprojekts steht in Doku 4.1.
+- **21.2** Testprojekt im Pro-Konto angelegt und nach Profil gefüllt; drei Merkmale kamen dabei nicht zustande, die Ursachen stehen in 4.1.
+- **21.3/21.4** Sondierungsexport ausgewertet: Projektdateien sind vom Zeitraumfilter ausgenommen, geprüft gegen ein unabhängig notiertes Datum.
+- **21.5** Chatliste geholt; `parse_chat_list` erkennt sie. Dabei belegt, dass `recent_chats` den laufenden Chat nicht mitlistet (Doku 1.6, 1.7).
+- **21.6** Protokoll angelegt; die Fenstergrenze zeigt auf den Projektbeginn, ohne Projektdatum verweigert das Werkzeug die Auskunft.
+- **21.7** Erstlauf-Export umgewandelt. Vier Erwartungen bestanden, drei nicht; daraus drei Befunde und ein behobener Defekt in `file_references()` (Doku 1.6, 1.7, 3.1.1).
+
 ## 2026-08-15
 
 - **17** Docstring von `chat_export_convert.py` mit dem Code in Übereinstimmung gebracht.

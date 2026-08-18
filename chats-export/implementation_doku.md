@@ -129,7 +129,7 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 ### Grenzen, die bleiben
 
 - **Cowork ist über beide Wege unerreichbar.** Lücke, keine Aufgabe. Die Anthropic-Entwicklung ist neu: Eventuell ein Weg Chats auch immer lokal in ~/.claude zu haben und über das eigene Konto auf verschiedenen Geräten parallel zu bekommen (Anthropic als Claude-Cloud ;-) ), wenn man zu Chatbeginn in Claude.ai und Claude Desktop "Cowork" wählt. Als Beobachtung geführt in Kapitel 4.
-- **Gelöschte Chats sind unwiederbringlich.** Der Export enthält sie als Hüllen und sagt nicht, dass es Hüllen sind (3.1).
+- **Gelöschte Chats sind unwiederbringlich.** Der Export enthält sie als Hüllen und sagt nicht, dass es Hüllen sind (3.1). Der scheinbare Widerspruch zur belegten Zusage oben löst sich beim genauen Lesen auf: Nicht enthalten sind die *Inhalte*, der *Eintrag* bleibt. Beide Aussagen stimmen. Und weil die Chatliste den gelöschten Chat nicht mehr führt, kann ihn kein Lauf mehr einem Projekt zuordnen — er kommt im Archiv also gar nicht erst vor.
 - **Hochgeladene Dateien: das meiste kommt mit.** Der Export führt sie in zwei Feldern, und die sind **nicht disjunkt** — dieselbe Datei steht oft in beiden. `attachments` tragen `extracted_content` und damit ihren Text — 341 im Drei-Monats-Export, keines leer, zusammen 9.635.919 Zeichen, überwiegend `text/x-python` (238) und Markdown (26). `files` tragen nur `file_uuid` und `file_name` — 524 Stück, aber das ist kein Verlustmaß: Ein Textupload wird **zweimal** verzeichnet, einmal als Dateiobjekt unter `files` und einmal mit seinem Text unter `attachments`. Die Beleglage abgestuft:
   - **Gemessen:** 319 der 524 `files`-Einträge haben ihren Inhalt in derselben Nachricht. Für sie ist nichts verloren.
   - **Gemessen:** 205 haben keinen Namenspartner mit Inhalt; nach Entdopplung innerhalb der Nachricht meldet das Werkzeug 200.
@@ -146,6 +146,8 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 | **In Team und Enterprise hat ein gewöhnliches Mitglied keinen Export**: *„Individual members of Team and Enterprise organizations do not have a self-serve export option"*; nur der Primary Owner exportiert, und zwar unter *Organization settings → Data and privacy* | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                    |
 | **Der Export lässt einen Zeitraum wählen**                                                                                                                                                | **beobachtet**, in keinem Artikel erwähnt                                                                              |
 | Gelöschte Inhalte*„will not be included in data exports initiated after the deletion"*                                                                                                    | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                    |
+| **Der Löschvorgang nimmt den Inhalt, nicht den Eintrag.** Zwei am 17. August gelöschte Chats standen im danach angeforderten Export als Hüllen — Gerüst da, null Zeichen Text            | beobachtet                                                                                                              |
+| **Ein gelöschter Chat verschwindet dagegen aus `recent_chats`** und ist damit keinem Projekt mehr zuzuordnen                                                                              | beobachtet                                                                                                              |
 | `read_conversation` ist **scope-gebunden**: dieselbe UUID liest im Projekt und scheitert außerhalb                                                                                         | beobachtet (Kontrollversuch)                                                                                            |
 | **`recent_chats` listet den laufenden Chat nicht mit.** Aus Chat A kommt B, aus B kommt A — jeder sieht den anderen, keiner sich selbst                                                    | beobachtet (zwei symmetrische Versuche)                                                                                 |
 | Cowork-IDs (`cse_…`) werden an der Formatprüfung abgewiesen                                                                                                                               | beobachtet                                                                                                              |
@@ -375,6 +377,20 @@ Keiner der 341 ist leer, zusammen 9.635.919 Zeichen, Median 13.265, größter 16
 
 Blocktypen in `content`: `text`, `thinking`, `tool_use`, `tool_result`, `token_budget`. Bei `token_budget` war `remaining` in allen Fällen `null`. Nichts war als `truncated` oder `cut_off` markiert.
 
+**Die Blockschlüssel, als Vergleichsgrundlage.** 3.3 verspricht, die Vereinigung aller Konversations-, Nachrichten- **und Blockschlüssel** gegen diesen Abschnitt zu halten; für die dritte Menge fehlte sie bisher. Beobachtet am Testexport vom 17. August 2026, der alle Blocktypen außer `token_budget` enthielt:
+
+```
+alternative_display_type, approval_key, approval_key_legacy, approval_options,
+citations, citations_grouping_mode, content, context, cut_off, display_content,
+flags, hidden, hidden_in_chat, icon_name, id, input, integration_icon_url,
+integration_name, is_error, is_mcp_app, mcp_server_url, message, meta, name,
+signature, start_timestamp, stop_timestamp, structured_content, summaries, text,
+thinking, thinking_hidden, tool_identifier, tool_origin, tool_use_id, truncated,
+type
+```
+
+Es ist die Vereinigung über **alle** Blocktypen, nicht die Feldliste eines einzelnen: `thinking`, `thinking_hidden` und `summaries` gehören zum Denkblock, `input`, `name` und `tool_use_id` zum Werkzeugaufruf, die `mcp_*`- und `approval_*`-Namen zu dessen neueren Spielarten. Ein **fehlender** Name ist das Warnsignal, ein hinzugekommener meist nur ein Ausbau — dieselbe Lesart wie bei den Archivmitgliedern oben.
+
 **Der Werkzeugverkehr, vermessen.** `tool_result` ist mit 28,6 Mio Zeichen der größte Einzelposten des Exports — 2,5× der Gesprächstext —, aber überwiegend fremd oder redundant: `project_knowledge_search` 9,2 Mio (Treffer aus dem eigenen Projektwissen, also Duplikate vorhandener Doku), `web_search` 8,5 Mio (fremde Snippets), `view` 4,9 Mio (Wiederanzeigen ohnehin erfasster Dateien), `bash_tool` 2,9 Mio (Kommandoausgaben). In `tool_use` (5,9 Mio input) stecken dagegen die **Erzeugnisse der KI**, das Gegenstück zu den Anhängen: `artifacts` create/rewrite/update mit 1,79 Mio Zeichen Inhalt (240 Aufrufe), `create_file.file_text` mit 2,44 Mio (218 Dateien: 88× md, 50× py, 35× json), `str_replace` mit 0,13 Mio Änderungstext — zusammen **4,4 Mio Zeichen**, bei Chats ohne begleitendes Repo die einzige Kopie dieser Werke. Messhinweis: `create_file` trägt den Inhalt im Feld `file_text`, nicht `content`.
 
 **Die Denkschritte, vermessen.** 4.318 `thinking`-Blöcke, Länge Median 682, Mittel 2.153, größter 66.488 Zeichen — keine Statusnotizen. Sie sind auch **nicht redundant**: über 1.840 Nachrichten mit substanziellem Denken *und* sichtbarer Antwort verglichen, taucht nur ein **Median von 9 %** des Denk-Vokabulars in der Antwort wieder auf; in 1.824 Fällen unter 40 %, in keinem über 80 %. **42 %** der Blöcke (1.809) enthalten Abwägungen — Diagnosen, verworfene Alternativen samt Grund, Ursachenlisten. URLs kommen dagegen kaum vor (13 Blöcke), Dateinamen in 1.067.
@@ -433,6 +449,8 @@ Deshalb mitnehmen statt zählen: Das Ziel des Archivs ist Wiederfinden, nicht di
 Das Ersetzen eines veralteten Chats samt Aufräumen der Vorgängerdateien ist Vorgabe **2.6**; beide erzwingenden Fälle — Umbenennung, wegfallende Nebendatei — sind dort benannt und hier nachgestellt worden.
 
 **Hüllen erkennen:** Nachrichten vorhanden, aber `text` und `content` leer. Das sind gelöschte Chats — im Browser gegengeprüft, sie existieren nicht mehr. Der Zeitstempel unterscheidet zwei Löschwege: bei einer Massenlöschung tragen mehrere Chats sekundengleich dasselbe `updated_at`, bei einzeln gelöschten folgt es der eigenen letzten Nachricht. Der Unterschied ist unerklärt und praktisch belanglos.
+
+**Das Löschen nimmt den Inhalt, nicht den Eintrag.** Am eigenen Testlauf nachgestellt: Zwei Chats wurden gelöscht, der Export **danach** angefordert — beide standen darin, mit Gerüst und null Zeichen Text. Anthropic sagt zu, gelöschte *Inhalte* kämen nicht in später angeforderte Exporte, und genau das trifft zu (1.6); der Eintrag selbst bleibt. In die Chatliste kommen sie dagegen nicht mehr, weshalb kein Lauf sie einem Projekt zuordnen kann — eine Hülle im Archiv entsteht also nur für einen Chat, der **zwischen** Listenabgleich und Export gelöscht wurde.
 
 ### 3.1.4 Dateiformat der Chatdateien
 
@@ -604,17 +622,23 @@ Das Profil steht hier und nicht im Fahrplan, weil es sich nicht verbraucht: Nach
 
 | Merkmal | Wie es entsteht | Was es prüft |
 | --- | --- | --- |
-| Gabelung | eine bereits gestellte Frage nachträglich bearbeiten | Baumlauf und Regel 1 (3.1.2) |
-| Sendewiederholung | dieselbe Nachricht zweimal absenden | Dublettenerkennung, Regel 2 (3.1.2) |
-| Anhang mit Inhalt | eine Textdatei hochladen | `attachments` mit `extracted_content` (3.1.1) |
-| reiner Namensverweis | eine Datei anhängen, deren Inhalt der Export nicht führt | `files` ohne Inhalt, die andere Hälfte desselben Befunds (1.6) |
-| Denkschritte | eine Frage stellen, die erkennbares Nachdenken auslöst | Denkdatei und die Schwellen aus 3.1.3 |
-| Erzeugnis | ein Artefakt oder eine Datei erstellen lassen | Creations-Datei (3.1.3) |
+| Gabelung | eine bereits gestellte Frage nachträglich bearbeiten | Baumlauf und Regel 1 (3.1.2) — **erprobt**, erzeugt zuverlässig einen Nebenzweig |
+| Anhang mit Inhalt | eine **Textdatei** hochladen (`.py`, `.md`) | `attachments` mit `extracted_content` (3.1.1) — **erprobt** |
+| reiner Namensverweis | ein **Bild** hochladen | `files` ohne Inhalt (1.6) — **erprobt**: Bilder werden nicht textextrahiert |
+| Denkschritte | eine Aufgabe, die **wirklich** Abwägung erzwingt — mehrere Ansätze unter Nebenbedingungen gegeneinander stellen und die Wahl begründen lassen; dazu eine banale Frage für den kurzen Block | Denkdatei und die Schwellen aus 3.1.3 |
+| Erzeugnis | ausdrücklich ein **Artefakt** erstellen lassen und danach ändern | Creations-Datei (3.1.3) |
+| Sendewiederholung | **kein bekanntes Rezept** — s. u. | Dublettenerkennung, Regel 2 (3.1.2) |
 | Hülle | einen Chat anlegen und wieder löschen | Erkennung gelöschter Chats (3.1.3) |
 | langer Chat | einer mit deutlich über acht Turns | Seitengrenze und Übergabe im Lese-Weg (3.2.1, 3.2.4) |
 | wachsender Chat | einer, der Tage später fortgesetzt wird | `stale`, Ersetzen (2.6) und die Fensterrechnung (2.4) |
 
-Die letzte Zeile ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports arbeitet auf Tagesebene, also muss zwischen Anlegen und Fortsetzen mindestens ein Tageswechsel liegen.
+Die Zeile zum wachsenden Chat ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports arbeitet auf Tagesebene, also muss zwischen Anlegen und Fortsetzen mindestens ein Tageswechsel liegen.
+
+**Drei Rezepte sind am ersten Lauf gescheitert; zwei davon sind repariert, eines nicht.** Der Lauf vom 17. August lieferte Gabelung, beide Anhangsarten und den langen Chat wie vorgesehen — und weder Denkschritte noch Erzeugnis noch Sendewiederholung. Ein Merkmal, das nicht entsteht, lässt seinen Codeweg ungeprüft, ohne dass etwas auffällt; deshalb stehen die Ursachen hier und nicht nur im Verlaufsprotokoll:
+
+- **Denkschritte:** Alle 14 Blöcke lagen unter 200 Zeichen und wurden nach 3.1.3 verworfen — im echten Bestand liegt der Median bei 682. Eine beiläufige Planungsfrage genügt also nicht; die Aufgabe muss echte Abwägung erzwingen.
+- **Erzeugnis:** Der Chat drehte sich um Bildgenerierung. Das erzeugt zwar 27 `tool_use`-Blöcke, aber keinen der drei Werkzeugnamen aus 3.1.3. Das Rezept muss ausdrücklich ein Artefakt verlangen.
+- **Sendewiederholung:** Zwei identisch abgeschickte Nachrichten stehen als Eltern und Kind hintereinander — der Code sucht aber **Geschwister ohne Nachfahren** an einer Gabelung. Das ist eine andere Struktur, und wir kennen keinen Handgriff, der sie herstellt. Belegt ist das Phänomen nur aus echten Daten (14 Kinder mit je 440 Zeichen, 3.1.2). Bis jemand das Rezept findet, bleibt dieser Codeweg ungeprüft — ausdrücklich vermerkt statt stillschweigend als abgedeckt geführt.
 
 **Drei Prüfarten.** Jeder Punkt trägt genau eine:
 
