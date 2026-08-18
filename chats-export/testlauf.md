@@ -299,6 +299,29 @@ Aufbau: ein Wegwerfordner `~/zielprojekt-test/` **außerhalb** dieses Repos — 
 
 **Das bestätigt eine Entwurfsentscheidung, die auch anders hätte ausfallen können.** Doku 1.4 begründet das Protokoll damit, dass eine Instanz zwar eine kleine Datei lesen, aber nicht N Chatdateien durchzählen kann. Der Versuch schärft das: Sie kann nicht einmal die Einträge **einer** kleinen Datei verlässlich zählen. Gefährlich wird das nicht, weil der Entwurf es nie verlangt — `plan`, `overview` und `map` rechnen im **Skript**, das die JSON parst; die Instanz führt es nur aus. Hätte man stattdessen darauf gesetzt, dass die Instanz das Protokoll „einfach liest und weiß, was fehlt", stünde hier jetzt ein stiller Fehler.
 
+## 21.12 erste Hälfte: die fremde Instanz allein am Docstring — bestanden
+
+Skript und Protokoll in einen neuen Chat des Quellprojekts, dazu ein Prompt ohne jede Erklärung: „Im Anhang ein Skript und eine Protokolldatei. Der Docstring des Skripts ist die Arbeitsanweisung. Fang an." Alles Weitere kam von der Instanz.
+
+| Erwartung | Ergebnis |
+| --- | --- |
+| Upload-Probe, Dateien **kopieren** statt in place arbeiten | **bestanden** — Fundort geprüft, Parsen bestätigt, ins Arbeitsverzeichnis kopiert |
+| `plan` vor jedem Lesen | **bestanden**, ausdrücklich benannt |
+| frische Chatliste selbst holen | **bestanden** — `recent_chats` mit `n=20` in einem Durchgang |
+| verschwundener Chat als Befund, nichts automatisch entfernt | **bestanden** — samt aller drei möglichen Ursachen |
+| nicht für den Nutzer entscheiden | **bestanden** — Option A und B mit Preis, dann die Frage |
+| kein Umfang erfunden, wo keiner bekannt ist | **bestanden** — „keine ehrliche Kostenschätzung vorab" |
+
+Damit ist die Zusage aus Vorgabe 2.9 belegt: Die hochgeladene Datei allein genügt. Eine Instanz, die von diesem Vorhaben nichts weiß, hat den ganzen Ablauf aus dem Docstring hergeleitet — einschließlich der Stellen, an denen er ihr Zurückhaltung vorschreibt.
+
+### Drei Befunde aus diesem einen Durchgang
+
+**Der Upload-Ort ist bestätigt.** Der Docstring nennt `/mnt/user-data/uploads` ausdrücklich als Community-Vermutung, die man nicht für gesichert nehmen soll. Die Dateien lagen dort. Nach Vorgabe 2.1 steigt die Beleglage damit von **Community** auf **beobachtet** — durch eigenes Nachstellen.
+
+**Der Prüfbestand ist von selbst gewachsen.** `plan` meldet einen neuen Chat `32b15e4f` „Protokoll-Datei analysieren" — das ist der Chat, in dem wir die erste Hälfte von 21.8 geprüft haben. Arbeit im Projekt erzeugt Chats, und der Abgleich bemerkt sie. Genau der Fall, für den das Werkzeug gebaut ist, hier ungeplant und deshalb besonders glaubwürdig.
+
+**Und eine Verfeinerung, die von der Instanz kam.** Die drei Ursachen eines verschwundenen Chats sind von außen ununterscheidbar — aber eine lässt sich einschränken: Kam die Liste mit `n=20` in einem einzigen Durchgang zurück, **ohne** die zwanzig zu erreichen, dann war sie zu Ende geblättert, und „nicht bis zum Ende paginiert" ist unwahrscheinlich. Die Instanz hat das selbst gefolgert und es trotzdem nicht als sicher gewertet. Der Gedanke steht in keinem unserer Texte und wäre dort gut aufgehoben.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
