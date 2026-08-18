@@ -57,6 +57,12 @@ Three hard limits, all worth telling the user about up front:
     listing is the one that holds nothing but the listing itself.  Ask from
     a working chat instead, and that chat drops out of the archive without
     anything reporting it.
+*   **A chat can also leave the list.**  ``plan`` and ``overview`` report the
+    ones the protocol knows and the list no longer offers, with the wording of
+    ``VANISHED_NOTE`` -- deleted at the source, moved to another project, or a
+    list that was not paged to the end.  Nothing is removed automatically; the
+    three cases are indistinguishable from here.  ``chat_export_convert.py``
+    says it word for word, guarded by ``tests/test_wegegleichheit.py``.
 
 THE STORE DIRECTORY
 -------------------
@@ -479,6 +485,16 @@ STATE_FILENAME       = "protokoll.json"
 PROTOCOL_VERSION     = 1
 FOREIGN_STATE        = "crawl-state.json"   # belongs to chat_crawl_store.py
 ACTIVE_LIMIT         = 3        # chats worked on at once (upper bound)
+
+# What both routes say when the protocol knows a chat the fresh list no longer
+# offers. Held word for word in chat_export_convert.py too and guarded by
+# tests/test_wegegleichheit.py: the two scripts cannot import from each other
+# (vorgabe 2.9), and this project has twice watched one side of such a pair
+# grow while the other stood still.
+VANISHED_NOTE = """\
+NOTE: {count} chat(s) in the protocol are not in this list.
+  Deleted at the source, moved out of the project -- or the list was not paged
+  to the end. Check before concluding anything; nothing is removed automatically."""
 
 # The shared vocabulary of Vorgabe 2.4. 'started' is this route's own --
 # partially read; the zip route always writes a chat whole. 'stale' is set by
@@ -1127,11 +1143,8 @@ def format_plan(report: dict[str, Any], state: dict[str, Any]) -> list[str]:
         """
         if not groups["vanished"]:
             return []
-        return ["", f"NOTE: {len(groups['vanished'])} chat(s) in the protocol "
-                    "are not in this list.",
-                "  Deleted at the source, moved out of the project -- or the "
-                "list was not paged", "  to the end. Check before concluding "
-                "anything; nothing is removed automatically."]
+        return [""] + VANISHED_NOTE.format(
+            count=len(groups["vanished"])).splitlines()
 
     if not todo:
         lines += ["", "Nothing to fetch -- every listed chat is exported and "

@@ -791,6 +791,41 @@ check("an older timestamp does not un-stale a chat",
 
 
 # ---------------------------------------------------------------------------
+# A chat the protocol knows and the fresh list no longer offers
+# ---------------------------------------------------------------------------
+# Deleted at the source, moved to another project -- or a list that was not
+# paged to the end. The three are indistinguishable from here, so the run says
+# so and removes nothing (vorgabe 2.4). Found missing on the zip route during
+# the warm test, while the read route had reported it all along.
+
+shrunk = os.path.join(WORK, "geschrumpft.txt")
+with open(shrunk, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/lin-1' "
+                 "updated_at='2026-06-01T09:00:00.000000Z'>Content:\n"
+                 "Title: Linear\n</chat>\n")
+
+before = set(protocol()["chats"])
+result = run("list", "--map", shrunk, "--out", PROT_DIR)
+check("a chat missing from the fresh list is counted in the summary",
+      "no longer listed" in result.stdout, result.stdout)
+check("it is named with its uuid and its status",
+      "gibt-es-nicht" in result.stdout and "[listed]" in result.stdout,
+      result.stdout)
+check("the run says that nothing is removed automatically",
+      "nothing is removed automatically" in result.stdout, result.stdout)
+check("and nothing is removed",
+      set(protocol()["chats"]) == before,
+      f"{sorted(before)} -> {sorted(protocol()['chats'])}")
+check("the chat keeps its status",
+      protocol()["chats"]["gibt-es-nicht"]["status"] == "listed",
+      protocol()["chats"]["gibt-es-nicht"]["status"])
+
+result = run("list", "--map", MAP_FILE, "--out", PROT_DIR)
+check("a complete list says nothing about vanished chats",
+      "no longer listed" not in result.stdout, result.stdout)
+
+
+# ---------------------------------------------------------------------------
 # Thinking file, references and the losses report
 # ---------------------------------------------------------------------------
 
