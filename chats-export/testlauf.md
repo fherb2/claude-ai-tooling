@@ -238,7 +238,22 @@ Der Anteil versteckter Denkblöcke steigt von null über 18 auf hundert Prozent.
 
 **Und eine verworfene Entscheidung ist neu zu stellen.** 3.1.1 nennt `summaries` „für ein Archiv wertlos" — das Urteil fiel, als der volle Denktext danebenlag. Jetzt sind sie die einzige Spur. Ein Beispiel aus dem Testlauf: „Abwägung zwischen direkter Skripterstellung und vorheriger Planung." Das ist keine Verlaufsmeldung ohne Gehalt.
 
-**Grenzen des Befunds:** Zwei Testtage eines Kontos, 55 Blöcke. Warum die Blöcke versteckt sind — Modellwahl, Rollout, Kontoeinstellung — ist **nicht** ermittelt. Belegt ist allein: In beiden frischen Exporten trägt kein Denkblock Text.
+**Die Denkschritte waren da, und für alte Chats sind sie es weiterhin.** Gegenprobe am FreeCAD-Archiv, das aus einem Export von Anfang August stammt: 38 Denkblöcke, Median 925 Zeichen, zusammen 54.707 Zeichen echter Text. Die Aussage lautet also nicht „der Export trug nie Denkschritte", sondern „er trägt sie für **neue** Chats nicht mehr".
+
+**Der Umschlag hat ein Datum.** Nach `created_at` der Nachricht ausgezählt, über drei Exporte hinweg:
+
+| Zeitraum | Anteil versteckter Denkblöcke |
+| --- | --- |
+| bis 20. Juli 2026 | **0 %** — über Wochen, tausende Blöcke, ausnahmslos |
+| ab 21. Juli 2026 | 28,8 %, danach stark schwankend |
+| 24. bis 28. Juli | 83 bis 100 % |
+| 1. August | **0 %** bei 91 Blöcken |
+| 2. bis 6. August | 88 bis 100 %, am 5. dagegen 9,1 % |
+| 17. und 18. August | 100 % |
+
+**Es ist kein globaler Umschalter.** Am 1. August waren alle 91 Blöcke sichtbar, am 5. August 40 von 44. Etwas variiert also je Chat oder je Nachricht — am ehesten das verwendete Modell. Aus dem Export ist das **nicht** zu belegen: Weder Konversation noch Nachricht führt ein Modellfeld (3.1.1).
+
+**Grenzen des Befunds:** Ein Konto. Die jüngsten Stichproben sind klein — 32 Blöcke am 17. August, 9 am 18. Dass 100 % inzwischen der Normalfall ist, ist damit **nicht** belegt; belegt ist der Umschlag am 21. Juli und die Schwankung danach.
 
 ## Was zum Rechnerwechsel gilt
 
