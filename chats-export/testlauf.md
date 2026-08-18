@@ -324,6 +324,26 @@ Damit ist die Zusage aus Vorgabe 2.9 belegt: Die hochgeladene Datei allein genü
 
 **Und eine Verfeinerung, die von der Instanz kam.** Die drei Ursachen eines verschwundenen Chats sind von außen ununterscheidbar — aber eine lässt sich einschränken: Kam die Liste mit `n=20` in einem einzigen Durchgang zurück, **ohne** die zwanzig zu erreichen, dann war sie zu Ende geblättert, und „nicht bis zum Ende paginiert" ist unwahrscheinlich. Die Instanz hat das selbst gefolgert und es trotzdem nicht als sicher gewertet. Der Gedanke steht in keinem unserer Texte und wäre dort gut aufgehoben.
 
+## 21.12 zweite Hälfte: `read_conversation` ist in dieser Umgebung nicht vorhanden
+
+Beim Übergang zum Lesen meldete die Instanz, ihr Werkzeugsatz kenne **nur** `conversation_search` und `recent_chats`. Kein `read_conversation`.
+
+**Was das für den Entwurf bedeutet, wenn es sich bestätigt.** Der ganze Lese-Weg ruht darauf: Turns mit Index, `total_turns` aus dem Envelope, seitenweises Blättern, Vollständigkeit als Rechnung (3.2.1, 3.2.2). Ohne dieses Werkzeug ist `chat_read_store.py` in dieser Umgebung nicht benutzbar — und damit fällt der **zweite von zwei Wegen** aus.
+
+Besonders unangenehm ist die Verkettung mit dem Kontobefund: Für Chats in einem Team-Konto hat ein gewöhnliches Mitglied keinen Export (1.2, 1.6), weshalb der Lese-Weg dort **der einzige** war. Fehlt er auch, bleibt für solche Chats **kein Weg**.
+
+**Es widerspricht früheren Beobachtungen desselben Kontos.** 3.2.1 führt mehrere Befunde zu `read_conversation` als *beobachtet* — wortidentische Turns, Seitengröße durch ein Zeichenbudget, Scope-Bindung im Kontrollversuch. Diese Beobachtungen stammen aus dem August 2026 und können nur von einer claude.ai-Instanz kommen; Claude Code hat dieses Werkzeug nicht. Es war also da und ist es jetzt nicht.
+
+**Was ausdrücklich noch nicht belegt ist:** ob es entfernt, umbenannt, an einen Plan gebunden oder nur in dieser einen Oberfläche unsichtbar ist. Eine Instanz berichtet über ihren eigenen Werkzeugsatz — das ist eine gute, aber einzelne Quelle. Vor jeder Doku-Änderung ist in einer **zweiten Oberfläche** gegenzuprüfen.
+
+**Wie die Instanz damit umging — der eigentliche Prüferfolg.** Bei `128aa097` lieferte `conversation_search` zufällig den ganzen Chat, weil er nur zwei Turns hat. Sie hat das erkannt und **nicht** verwendet: das sei „Glück des kurzen Chats, keine verlässliche, vollständige, paginierte Quelle", und Schnipsel zu verarbeiten hieße „genau die Sorte beschädigter/erfundener Transkripte erzeugen, vor der der Docstring ausdrücklich warnt". Sie hat stattdessen auf `chat_crawl_store.py` verwiesen — hergeleitet aus dem Docstring — und gefragt.
+
+Damit ist Vorgabe 2.8 an der schärfsten denkbaren Stelle bestätigt: Eine fremde Instanz stand vor einer Quelle, die *fast* gepasst hätte, und hat sie verworfen, statt ein plausibles Ergebnis zu erzeugen.
+
+**Und Fahrplanpunkt 10 ist damit beantwortet.** Die Frage lautete, ob `chat_crawl_store.py` bleibt oder wegkommt; 3.4 nennt es „überholt, wo `read_conversation` existiert". Genau dieser Halbsatz trägt die Antwort: Wo es nicht existiert, ist der Crawler das einzige Werkzeug, das arbeiten kann. Er bleibt.
+
+**Folge für den Testlauf:** 21.12 ist ab hier nicht fortsetzbar, und **21.13 — Wegegleichheit an echten Daten — ist blockiert**, weil dafür eine Datei aus dem Lese-Weg gebraucht wird. Beides hängt an der Gegenprüfung.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
