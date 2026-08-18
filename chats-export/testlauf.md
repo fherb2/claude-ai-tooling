@@ -281,7 +281,23 @@ Aufbau: ein Wegwerfordner `~/zielprojekt-test/` **außerhalb** dieses Repos — 
 
 **Eine Beobachtung zum Wortlaut:** Der Block schickt die Instanz zu `Grep` und `Read`. Gesucht hat sie mit `Bash`/`grep`, gelesen mit `Read` — funktional dasselbe. Werkzeugnamen im Block festzuschreiben ist demnach weder nötig noch schädlich; die Instanz wählt ihr Mittel selbst.
 
-**Offen bleibt die erste Hälfte von 21.8:** `protokoll.json` zurück ins Projektwissen des Quellprojekts. Sie wird für 21.12 gebraucht.
+## 21.8 erste Hälfte: der Rückweg ins Projektwissen — bestanden, mit einem Nebenbefund
+
+`protokoll.json` ins Projektwissen des Quellprojekts hochgeladen. Drei Fragen an eine Instanz dort, drei Antworten:
+
+| Frage | Soll | Antwort |
+| --- | --- | --- |
+| Nimmt claude.ai eine `.json` als Projektdatei an? | ja | **ja** |
+| Status von „Brillenstärken verstehen"? | `exported` | **`exported`** |
+| `project_created_at`? | 2026-08-17 | **2026-08-17** |
+| Wie viele Chats führt die Datei? | 9 | **10** |
+| `exported_updated_at` von „Brillenstärken verstehen"? | `2026-08-17T14:30:35.984103Z` | **zeichengenau richtig** |
+
+**Die Textextraktion ist verlustfrei.** Der Zeitstempel kam mit Mikrosekunden unverändert zurück — der empfindlichste Prüfstein, den die Datei hergibt, und genau der Wert, an dem die Fensterrechnung hängt. Die Annahme aus 1.7, Textextraktion sei bei JSON verlustfrei, ist damit nicht mehr nur behauptet.
+
+**Aber die Instanz hat sich verzählt: 10 statt 9.** Beide Kopien der Datei sind bitgleich, der Sollwert steht fest. Einen einzelnen Wert nachschlagen gelingt also zuverlässig, das Aufsummieren über die Datei nicht.
+
+**Das bestätigt eine Entwurfsentscheidung, die auch anders hätte ausfallen können.** Doku 1.4 begründet das Protokoll damit, dass eine Instanz zwar eine kleine Datei lesen, aber nicht N Chatdateien durchzählen kann. Der Versuch schärft das: Sie kann nicht einmal die Einträge **einer** kleinen Datei verlässlich zählen. Gefährlich wird das nicht, weil der Entwurf es nie verlangt — `plan`, `overview` und `map` rechnen im **Skript**, das die JSON parst; die Instanz führt es nur aus. Hätte man stattdessen darauf gesetzt, dass die Instanz das Protokoll „einfach liest und weiß, was fehlt", stünde hier jetzt ein stiller Fehler.
 
 ## Was zum Rechnerwechsel gilt
 
