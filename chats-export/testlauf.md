@@ -334,7 +334,17 @@ Besonders unangenehm ist die Verkettung mit dem Kontobefund: Für Chats in einem
 
 **Es widerspricht früheren Beobachtungen desselben Kontos.** 3.2.1 führt mehrere Befunde zu `read_conversation` als *beobachtet* — wortidentische Turns, Seitengröße durch ein Zeichenbudget, Scope-Bindung im Kontrollversuch. Diese Beobachtungen stammen aus dem August 2026 und können nur von einer claude.ai-Instanz kommen; Claude Code hat dieses Werkzeug nicht. Es war also da und ist es jetzt nicht.
 
-**Was ausdrücklich noch nicht belegt ist:** ob es entfernt, umbenannt, an einen Plan gebunden oder nur in dieser einen Oberfläche unsichtbar ist. Eine Instanz berichtet über ihren eigenen Werkzeugsatz — das ist eine gute, aber einzelne Quelle. Vor jeder Doku-Änderung ist in einer **zweiten Oberfläche** gegenzuprüfen.
+**Gegengeprüft in der zweiten Oberfläche: dasselbe.** Der erste Versuch lief im Browser, der zweite in Claude Desktop, beide im **Pro-Konto** am 18. August 2026. Auch dort kennt die Instanz nur `conversation_search` und `recent_chats`. Zwei Oberflächen, ein Konto, gleiches Ergebnis.
+
+**Was damit belegt ist und was nicht.** Belegt: In diesem Pro-Konto ist `read_conversation` am 18. August 2026 in beiden Oberflächen nicht verfügbar. Nicht belegt: dass es für alle Konten und Pläne fehlt. Ob entfernt, an einen Plan gebunden oder anders freigeschaltet, ist offen.
+
+**Eine Korrektur an meiner eigenen Folgerung.** Ich hatte geschrieben, für ein Team-Mitglied bliebe damit „kein Weg". Das war ein Sprung: Geprüft wurde ein **Pro**-Konto. Richtig ist der bedingte Satz — *falls* das Werkzeug auch dort fehlt, hätte ein Team-Mitglied weder Export noch Lese-Weg. Genau das entscheidet Fahrplanpunkt 23, und der ist damit von einer Randfrage zur wichtigsten offenen Prüfung geworden.
+
+### Zwei Umgebungsfakten nebenbei, beide neu
+
+**Projektwissen liegt im Container unter `/mnt/project/`.** Die Doku sagt bisher nur, Projektdateien seien im Container erreichbar, „while remaining in context" — der Pfad stand nirgends. Er ist das Gegenstück zu `/mnt/user-data/uploads` für Chat-Anhänge. Dort lag genau eine Datei: die hochgeladene `protokoll.json`. Die Chatdateien liegen erwartungsgemäß nicht dort; sie gehören ins Zielprojekt, nicht ins Quellprojekt.
+
+**`conversation_search` liefert zweierlei.** Bei „Brillenstärke und Brennweite berechnen" (2 Turns) kam ein Treffer mit `kind="conversation"` und dem **vollständigen Wortlaut**; bei „Wanderung planen" (10 Turns) nur `kind="summary"`, eine verdichtete Zusammenfassung. Doku 3.4 kennt bisher nur „feste, nicht überlappende Blöcke". Dass die Suche bei kurzen Chats faktisch den ganzen Chat zurückgibt und bei längeren auf eine KI-Zusammenfassung wechselt, ist neu — und für den Crawler-Weg von einiger Bedeutung: Eine Zusammenfassung ist kein Transkript, und wer sie einliest, archiviert eine Nacherzählung.
 
 **Wie die Instanz damit umging — der eigentliche Prüferfolg.** Bei `128aa097` lieferte `conversation_search` zufällig den ganzen Chat, weil er nur zwei Turns hat. Sie hat das erkannt und **nicht** verwendet: das sei „Glück des kurzen Chats, keine verlässliche, vollständige, paginierte Quelle", und Schnipsel zu verarbeiten hieße „genau die Sorte beschädigter/erfundener Transkripte erzeugen, vor der der Docstring ausdrücklich warnt". Sie hat stattdessen auf `chat_crawl_store.py` verwiesen — hergeleitet aus dem Docstring — und gefragt.
 
