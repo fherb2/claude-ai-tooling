@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 
+*.bundle
+
 # In case a local python venv will be needed, use this:
 .venv/
 
