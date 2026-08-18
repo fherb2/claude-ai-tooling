@@ -130,7 +130,11 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 
 - **Cowork ist über beide Wege unerreichbar.** Lücke, keine Aufgabe. Die Anthropic-Entwicklung ist neu: Eventuell ein Weg Chats auch immer lokal in ~/.claude zu haben und über das eigene Konto auf verschiedenen Geräten parallel zu bekommen (Anthropic als Claude-Cloud ;-) ), wenn man zu Chatbeginn in Claude.ai und Claude Desktop "Cowork" wählt. Als Beobachtung geführt in Kapitel 4.
 - **Gelöschte Chats sind unwiederbringlich.** Der Export enthält sie als Hüllen und sagt nicht, dass es Hüllen sind (3.1).
-- **Hochgeladene Dateien: zur Hälfte erhalten.** Der Export kennt zwei verschiedene Dinge, und die Unterscheidung ist wesentlich. `attachments` tragen ein Feld `extracted_content` und damit ihren Text — 341 im Drei-Monats-Export, keines leer, zusammen 9.635.919 Zeichen, überwiegend `text/x-python` (238) und Markdown (26). `files` dagegen tragen nur `file_uuid` und `file_name` — 524 Stück, und **die** sind wirklich verloren. Ob es für sie einen anderen Abrufweg gibt, führt Kapitel 4 als Prüfpunkt (4.3, warm).
+- **Hochgeladene Dateien: das meiste kommt mit.** Der Export führt sie in zwei Feldern, und die sind **nicht disjunkt** — dieselbe Datei steht oft in beiden. `attachments` tragen `extracted_content` und damit ihren Text — 341 im Drei-Monats-Export, keines leer, zusammen 9.635.919 Zeichen, überwiegend `text/x-python` (238) und Markdown (26). `files` tragen nur `file_uuid` und `file_name` — 524 Stück, aber das ist kein Verlustmaß: Ein Textupload wird **zweimal** verzeichnet, einmal als Dateiobjekt unter `files` und einmal mit seinem Text unter `attachments`. Die Beleglage abgestuft:
+  - **Gemessen:** 319 der 524 `files`-Einträge haben ihren Inhalt in derselben Nachricht. Für sie ist nichts verloren.
+  - **Gemessen:** 205 haben keinen Namenspartner mit Inhalt; nach Entdopplung innerhalb der Nachricht meldet das Werkzeug 200.
+  - **Unsicher:** 24 davon liegen in Nachrichten, die einen **namenlosen** Anhang mit Inhalt tragen (s. 3.1.1). Das sind vermutlich dieselben Uploads — der Name steht nur auf der `files`-Seite, der Inhalt nur auf der `attachments`-Seite —, aber über den Namen lassen sie sich nicht zusammenführen. Der Code rät hier nicht (3.1.3).
+  - **Nicht behauptet** wird, dass die restlichen rund 180 unwiederbringlich sind. Belegbar ist nur: Der Export führt für sie keinen Inhalt. Ob es einen anderen Abrufweg gibt, ist eigener Prüfpunkt (4.3, warm).
 - **Die Projektzugehörigkeit gibt es nur in claude.ai.** Der einzige Punkt, an dem die Werkzeuge dort unentbehrlich bleiben, um exportierte Chats einzelnen Projekten zuzuordnen. Ob eine Konversation im Export je einen Projektbezug bekommt, führt Kapitel 4 als Prüfpunkt (4.2, kalt).
 
 ### Umgebungsfakten, die den Gesamtentwurf tragen
@@ -181,6 +185,7 @@ Damit sie nicht erneut abgeleitet werden:
 | §1.12 der Arbeitsanweisungen müsse geändert werden      | Das dortige Schema ist ein Beispiel, Ergänzen ist erlaubt                       |
 | Der Container könne den Downloadlink holen                | Allowlist ohne`claude.ai`, und der Link ist sitzungsgebunden                     |
 | Projektdateien im Container sparten Kontext                | *„while remaining in context"*                                                  |
+| `attachments` und `files` bezeichneten verschiedene Dinge, `files` sei reiner Verlust | Sie überschneiden sich: Ein Textupload steht in **beiden**, als Dateiobjekt und als extrahierter Text. 319 der 524 `files`-Einträge des Drei-Monats-Exports tragen ihren Inhalt in derselben Nachricht (1.6, 3.1.1). Unser `report` meldete sie trotzdem als Verlust — der Fehler fiel erst am eigenen Testlauf auf, an einer einzigen hochgeladenen Datei. |
 | Dateianhänge seien im Export nur ein Name | Gilt nur für `files` (524). Die `attachments` (341) tragen `extracted_content` — 9,6 Mio Zeichen, überwiegend Python und Markdown. Ich hatte das weggeworfen und als Verlust gemeldet, den es nicht gab. |
 | Eine Erstmigration brauche einen Vollexport | Der Zeitraumfilter wirkt nicht auf `projects/`: ein Ein-Wochen-Export liefert jedes Projekt mit `created_at` und damit die exakte Fenstergrenze (3.1.1). |
 | Der Projektbeginn sei nur im Chat selbst zu erfahren | Weder `recent_chats` noch `read_conversation` liefern ein `created_at`, und keine öffentliche API kennt claude.ai-Projekte — außer der Compliance-API für Enterprise (4.5). Das Datum steht im Export. |
@@ -197,7 +202,7 @@ Festlegungen, die quer über alle Werkzeuge dieses Ordners gelten. Aufnahmetest:
 
 ## 2.1 Beleglage
 
-Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind fünfzehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
+Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind sechzehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
 
 ## 2.2 Dateiformat der Chatdateien
 
@@ -365,6 +370,8 @@ Eine Nachricht: `uuid`, `text`, `content`, `sender` (`human`/`assistant`), `crea
 | `files`       | 524  | `file_uuid`, `file_name`                                      | fehlt  |
 
 Keiner der 341 ist leer, zusammen 9.635.919 Zeichen, Median 13.265, größter 169.818. Dateitypen überwiegend `text/x-python` (238), dazu `text/markdown` (26), `txt` (22), `x-shellscript` (11). Bei **22** ist der `file_name` leer, der Inhalt aber vorhanden — mehrere Kilobyte Code; ein Fragezeichen als Name würde das verstecken.
+
+**Die beiden Felder sind nicht disjunkt.** Am Testlauf vom 17. August direkt beobachtet: Dieselbe Nachricht führt `test_docstrings.py` zweimal — unter `attachments` mit 4.481 Zeichen `extracted_content` und unter `files` mit `file_uuid` und Namen. Ein angehängtes Bild dagegen steht **nur** unter `files`. Der Export verzeichnet also jeden Upload als Dateiobjekt und legt den extrahierten Text daneben, wenn er einen gewinnen konnte. Am Drei-Monats-Export nachgemessen: 319 der 524 `files`-Einträge haben ihren Inhalt in derselben Nachricht, 205 nicht (Beleglage und Rest in 1.6). Verbindender Schlüssel ist allein der Name — `files` trägt eine `file_uuid`, `attachments` keine —, weshalb die 22 namenlosen Anhänge oben genau die Fälle sind, die sich nicht zuordnen lassen.
 
 Blocktypen in `content`: `text`, `thinking`, `tool_use`, `tool_result`, `token_budget`. Bei `token_budget` war `remaining` in allen Fällen `null`. Nichts war als `truncated` oder `cut_off` markiert.
 
@@ -656,7 +663,7 @@ Ein warmer Punkt kann **mangels Rechten unerreichbar** sein, ohne deshalb eine B
 - Archivaufbau: `users.json`, `projects/<uuid>.json`, `memories.json`, `conversations.json`, dazu wechselnd `login_history.json` (3.1.1). Projektdateien enthalten **keine** Chats. **Die Mitgliederliste wächst:** `login_history.json` kam zwischen zwei Exporten im Abstand von zwei Tagen hinzu — ein neues Mitglied ist deshalb allein kein Alarm, ein fehlendes `conversations.json` schon. *Prüfung: `inspect_export.py` laufen lassen und Mitglieder- wie Schlüsselmengen mit 3.1.1 vergleichen — kalt.*
 - Konversation: genau sieben Felder, **kein Projektbezug** — die Chatliste aus dem Projekt ist die einzige Zuordnungsquelle (1.6). *Prüfung: käme je ein Projektfeld hinzu, entfiele der ganze Umweg über die Chatliste — am nächsten ZIP ablesbar, kalt.*
 - Nachricht: `parent_message_uuid` macht die Nachrichten zum **Baum** (3.1.2); `sender` `human`/`assistant`; das flache `text` enthält die Denkschritte (3.1.1); `content`-Blocktypen `text`, `thinking`, `tool_use`, `tool_result`, `token_budget`. *Prüfung: Nachrichten- und Blocktypmengen aus `inspect_export.py` gegen 3.1.1 — ein neuer Blocktyp fiele dort sofort auf. Kalt.*
-- **`attachments` tragen `extracted_content`, `files` nur Namen** (3.1.1) — die Unterscheidung entscheidet, was das Archiv behalten kann. *Prüfung: dieselbe Schemawache, die beide getrennt ausweist — kalt. Ob es für `files` einen Abrufweg gibt, ist eigener Punkt in 4.3.*
+- **`attachments` tragen `extracted_content`, `files` nur Namen — und beide oft dieselbe Datei** (3.1.1, 1.6). Die Unterscheidung entscheidet, was das Archiv behalten kann; die Überschneidung entscheidet, wie viel Verlust überhaupt zu melden ist. *Prüfung: dieselbe Schemawache, die beide getrennt ausweist, dazu der Anteil der `files`-Einträge mit Namenspartner — kalt. Ob es für die übrigen einen Abrufweg gibt, ist eigener Punkt in 4.3.*
 - Gelöschte Chats erscheinen als Hüllen: Gerüst da, Inhalt leer (3.1.3). *Prüfung: `inspect_export.py` weist sie aus — kalt.*
 - Erste Anlaufstelle bei Verdacht: `inspect_export.py` (3.3) laufen lassen und die Schlüsselmengen mit 3.1.1 vergleichen.
 

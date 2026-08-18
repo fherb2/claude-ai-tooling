@@ -380,13 +380,28 @@ def attachment_label(entry: dict[str, Any]) -> str:
 
 
 def file_references(message: dict[str, Any]) -> list[str]:
-    """Return the names of files the export mentions but does not carry.
+    """Return the names of files this message mentions but does not carry.
 
-    ``files`` entries hold ``file_uuid`` and ``file_name`` and nothing else --
-    those really are a named loss.  Not to be confused with ``attachments``,
-    which do carry their text; see ``attachment_records``.
+    ``files`` entries hold ``file_uuid`` and ``file_name`` and nothing else, so
+    they look like a loss -- but the two arrays are **not disjoint**. A text
+    upload is recorded twice: once under ``files`` as the file object, once
+    under ``attachments`` with its extracted text. Measured on a three-month
+    export, 319 of 524 ``files`` entries have their content sitting in the same
+    message, so reporting all of them as lost overstates the loss by more than
+    double.
+
+    A name is therefore only returned when no attachment of this message
+    carries content under it. The join is by name because that is the only key
+    the two arrays share: ``files`` has a ``file_uuid``, ``attachments`` has
+    none. Where the name is missing on the attachment side -- 22 in that export
+    -- the join cannot see the pair and the file is reported anyway; doku 1.6
+    carries that residue rather than letting the code guess.
     """
-    return [attachment_label(entry) for entry in (message.get("files") or [])]
+    covered = {entry.get("file_name")
+               for entry in (message.get("attachments") or [])
+               if entry.get("extracted_content") and entry.get("file_name")}
+    return [attachment_label(entry) for entry in (message.get("files") or [])
+            if (entry.get("file_name") or "") not in covered]
 
 
 def attachment_records(message: dict[str, Any]) -> tuple[list[dict[str, Any]],
@@ -516,9 +531,12 @@ def render(messages: list[dict[str, Any]],
     for index, message in enumerate(messages):
         text, blocks = message_text(message)
         dropped.update(blocks)
-        without.extend(file_references(message))
         carried, nameless = attachment_records(message)
-        without.extend(nameless)
+        # One entry per name and message: a file that shows up as a
+        # content-less attachment *and* as a files entry is one loss, not two.
+        # Deduplicated per message, not across the chat -- the same name in two
+        # messages is two references and stays two.
+        without.extend(dict.fromkeys(file_references(message) + nameless))
         kept, discarded = message_thinking(message)
         dropped_thinking += discarded
         record = {"n": index, "role": message_role(message), "content": text}
