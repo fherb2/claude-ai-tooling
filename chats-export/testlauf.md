@@ -404,6 +404,24 @@ Damit ist Vorgabe 2.8 an der schärfsten denkbaren Stelle bestätigt: Eine fremd
 
 **Folge für den Testlauf:** 21.12 ist ab hier nicht fortsetzbar, und **21.13 — Wegegleichheit an echten Daten — ist blockiert**, weil dafür eine Datei aus dem Lese-Weg gebraucht wird. Beides hängt an der Gegenprüfung.
 
+## Ein möglicher dritter Weg: die interne Web-API von claude.ai
+
+Bei der Suche nach Spuren zu `read_conversation` aufgetaucht — nicht als Beleg dafür, sondern als **eigenständiger Zugriffsweg**, den wir bisher nicht kannten. Eine Community-Skill (`getclaudeskills.com`, „Read Claude.ai Web Conversation") liest vollständige Chattranskripte, indem sie JavaScript **in der angemeldeten Browsersitzung des Nutzers** ausführt und dort die internen Endpunkte der Weboberfläche anspricht:
+
+```
+GET /api/organizations/<org-uuid>/chat_conversations/<conversation-id>
+      ?tree=True&rendering_mode=messages&render_all_tools=true
+GET /api/chat_snapshots/<snapshot-id>?rendering_mode=messages&render_all_tools=true
+```
+
+**Warum das für dieses Vorhaben zählt.** Es ist der einzige bekannte Weg, der einen **bestimmten Chat per ID vollständig** liefert, seit `read_conversation` fehlt. Und `tree=True` deutet an, dass er den **Nachrichtenbaum** mitgibt — also das, was der Lese-Weg gerade nicht konnte und weswegen er dem Export unterlegen war (1.2). Er liefe zudem **lokal** und damit ohne Transkriptionsengpass: Die Daten kämen als JSON in eine Datei, statt durch den Kontext einer Instanz zu wandern.
+
+**Und er wäre kontounabhängig.** Er hängt an der Weboberfläche, nicht am Export — also käme er auch für Chats in einem Team-Konto in Frage, für die derzeit **kein** Weg existiert.
+
+**Die Einwände sind allerdings gewichtig.** Es ist eine undokumentierte, von Dritten rückentwickelte Schnittstelle — die schwächste Beleglage, die es gibt, und ohne Ankündigung änderbar; wir haben gerade erlebt, wie schnell so etwas verschwindet. Der Zugriff verlangt eine automatisierte, angemeldete Browsersitzung (Erweiterung, CDP oder AppleScript) und benutzt das Sitzungs-Cookie des Nutzers — eine ganz andere Abhängigkeitsklasse als „ein Skript, das eine Instanz ausführt", und eine Frage, die der Nutzer vor jeder Nutzung für sich beantworten muss.
+
+**Status: Fund, keine Entscheidung.** Aufgenommen, weil er die einzige bekannte Antwort auf die durch den Wegfall entstandene Lücke ist. Ob daraus ein Weg wird, ist eine Entwurfsentscheidung, keine Nacharbeit.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
