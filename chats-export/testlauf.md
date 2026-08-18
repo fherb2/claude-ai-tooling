@@ -255,6 +255,34 @@ Der Anteil versteckter Denkblöcke steigt von null über 18 auf hundert Prozent.
 
 **Grenzen des Befunds:** Ein Konto. Die jüngsten Stichproben sind klein — 32 Blöcke am 17. August, 9 am 18. Dass 100 % inzwischen der Normalfall ist, ist damit **nicht** belegt; belegt ist der Umschlag am 21. Juli und die Schwankung danach.
 
+## 21.8 zweite Hälfte: Wirkt der Anweisungsblock? — bestanden
+
+Aufbau: ein Wegwerfordner `~/zielprojekt-test/` **außerhalb** dieses Repos — bewusst außerhalb, weil Claude Code `CLAUDE.md`-Dateien den Verzeichnisbaum hinauf einsammelt und ein Ordner innerhalb des Repos unsere Projektanweisungen mitgeladen hätte; die Instanz hätte dann von diesem Vorhaben gewusst. Darin `.claude/imported_chats/chats-export-aus-pro-test-1/` mit den zwölf Archivdateien und eine `CLAUDE.md`, die **nur** den Anweisungsblock enthält, sonst nichts. Der Versuch lief in einer frischen Sitzung, die von diesem Vorhaben nichts weiß.
+
+**Die Frage war schärfer als die geplante.** Vorgesehen war „Welche Wanderroute hatten wir geplant?" — also eine Frage, deren Antwort im Archiv steht. Gestellt wurde stattdessen eine **neue** Frage zum selben Gebiet: ob es sinnvoll sei, von Severní nach Lobendava zu gehen oder anders herum. Das Archiv war damit nicht die Antwort, sondern der Zusammenhang, den die Instanz von sich aus hätte übersehen können.
+
+**Der Ablauf, aus dem Sitzungstranskript:**
+
+1. Vor jedem Werkzeugaufruf die Ankündigung: „Ich sehe im Chat-Archiv dieses Projekts nach, ob die Wanderung dort schon besprochen wurde." Ungefragt, ohne Hinweis des Nutzers.
+2. `ls` über das Archivverzeichnis — sie verschafft sich erst einen Überblick.
+3. `grep -ril` über mehrere Ortsnamensvarianten (`Lobendau`, `Lobendava`, `Schluckenau`, …).
+4. `wc -c` über die Treffer, bevor sie liest — sie prüft die Größe, statt blind zu öffnen.
+5. `Read` auf genau eine Datei: `2026-08-17_wanderung-planen_5f8ac1bd.json`.
+6. Antwort mit Quellenangabe: **„Im Archiv gibt es dazu einen Chat: „Wanderung planen" vom 17.08.2026"** — Datum und Titel, genau wie der Block es verlangt —, dazu die Route Oppach → Šluknov → Severní/Lobendava, die zweite Etappe über die Kapelle sv. Anny und der ausdrücklich ausgeschlossene Grenzweg.
+7. Erst danach die eigentliche neue Frage, mit Websuche beantwortet.
+
+**Damit ist die Behauptung aus 3.1.6 belegt**, der Block mache die Anweisung dauerhaft wirksam. Sie war bis hierher nie geprüft, und anders als so ist sie nicht prüfbar.
+
+**Drei Entwurfsentscheidungen haben sich dabei nebenbei bewährt:**
+
+- **Die Dateinamen (Vorgabe 2.3).** Datum, Titel-Slug und UUID im Namen erlaubten der Instanz, nach dem `ls` Kandidaten zu wählen, bevor sie eine Datei öffnete.
+- **Das flache Verzeichnis je Quellprojekt (2.10).** Ein `grep -ril` über einen Ordner genügte; es gab keine Struktur zu durchdringen.
+- **Die Auslagerung der Nebendateien (2.2).** Gelesen wurde allein die Gesprächsdatei. Denk-, Anhangs- und Erzeugnisdatei blieben ungeöffnet — genau die Mengenersparnis, mit der 2.2 begründet ist.
+
+**Eine Beobachtung zum Wortlaut:** Der Block schickt die Instanz zu `Grep` und `Read`. Gesucht hat sie mit `Bash`/`grep`, gelesen mit `Read` — funktional dasselbe. Werkzeugnamen im Block festzuschreiben ist demnach weder nötig noch schädlich; die Instanz wählt ihr Mittel selbst.
+
+**Offen bleibt die erste Hälfte von 21.8:** `protokoll.json` zurück ins Projektwissen des Quellprojekts. Sie wird für 21.12 gebraucht.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
