@@ -342,7 +342,13 @@ Wir haben die Instanz nach ihrem Werkzeugsatz **gefragt**, statt sie ein Werkzeu
 
 **Was stehen bleibt und wogegen es spricht.** Im ersten Versuch war der Kontext mit `read_conversation` gesättigt — der Docstring nennt es dutzendfach —, und ein besserer Auslöser für ein bedarfsweises Nachladen ist schwer vorstellbar. Das spricht gegen die Erklärung, ist aber kein Gegenbeweis: Ob die Chat-Werkzeuge überhaupt unter diesen Mechanismus fallen, ist unbekannt. Die Hilfeseite zur Chat-Suche nennt weder Werkzeugnamen noch den Lademechanismus, und die Einstellung spricht ausdrücklich von *Connectors*.
 
-**Der Befund ist damit offen, nicht widerlegt.** Was gilt: Mit dieser Kontoeinstellung hat eine Instanz in beiden Oberflächen kein `read_conversation` angeboten. Was nicht gilt: dass es fehlt. Zu klären mit einer **verhaltensbasierten** Probe statt einer Selbstauskunft — Einstellung auf Auto, dann die Instanz einen bestimmten Chat vollständig lesen lassen und nach `total_turns` fragen, was nur dieses Werkzeug liefert.
+**Der Befund ist damit offen, nicht widerlegt.** Was gilt: Mit dieser Kontoeinstellung hat eine Instanz in beiden Oberflächen kein `read_conversation` angeboten. Was nicht gilt: dass es fehlt.
+
+**Zweiter Probenversuch, ebenfalls untauglich — und der Fehler lag im Entwurf der Probe.** Nach Umstellen der Einstellung wurden beide Oberflächen gebeten, einen bestimmten Chat vollständig zu lesen und die Zahl seiner Turns zu nennen; die Turn-Zahl war als Prüfstein gedacht, weil sie sonst nur `read_conversation` liefert. Beide antworteten korrekt „10 Turns" — und beide entnahmen das dem **Projektwissen**: `protokoll.json` führt das Feld `turns` je Chat. Die Antwort lag also neben der Frage, und kein Leserwerkzeug wurde gebraucht. Die Desktop-Instanz prüfte zusätzlich per `conversation_search` gegen, nicht per `read_conversation`.
+
+**Die Lehre für den Prüfentwurf:** Eine Probe taugt nur, wenn **allein** das geprüfte Werkzeug die Antwort hervorbringen kann. Zweimal verfehlt — erst durch Selbstauskunft statt Verhalten, dann durch eine Antwort, die anderswo bereitlag.
+
+**Die dritte Fassung schließt beide Lücken:** gefragt wird nach dem **Wortlaut eines Turns mit bestimmter Nummer** aus einem Chat, den das hochgeladene Protokoll **nicht** kennt. Turn-Nummern vergibt nur `read_conversation`; ein Chat außerhalb des Protokolls entzieht die Abkürzung über das Projektwissen; und Suchschnipsel tragen weder Nummern noch ein Sollmaß.
 
 **Eine Korrektur an meiner eigenen Folgerung.** Ich hatte geschrieben, für ein Team-Mitglied bliebe damit „kein Weg". Das war ein Sprung: Geprüft wurde ein **Pro**-Konto. Richtig ist der bedingte Satz — *falls* das Werkzeug auch dort fehlt, hätte ein Team-Mitglied weder Export noch Lese-Weg. Genau das entscheidet Fahrplanpunkt 23, und der ist damit von einer Randfrage zur wichtigsten offenen Prüfung geworden.
 
