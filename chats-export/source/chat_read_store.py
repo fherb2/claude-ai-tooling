@@ -1193,7 +1193,7 @@ def format_plan(report: dict[str, Any], state: dict[str, Any]) -> list[str]:
                      "no known extent -- no archive has described them, so "
                      "there is no honest estimate.")
     lines += ["  Everything fetched this way lacks thinking and attachments "
-              "for good (3.2.1).", "  Only a later export can repair that, and "
+              "for good (3.2).", "  Only a later export can repair that, and "
               "only by replacing the chat."]
     lines += vanished_note()
     lines += ["", "Nothing was written. Whichever way you choose, the protocol "
