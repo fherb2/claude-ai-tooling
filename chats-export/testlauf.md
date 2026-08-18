@@ -422,6 +422,34 @@ GET /api/chat_snapshots/<snapshot-id>?rendering_mode=messages&render_all_tools=t
 
 **Status: Fund, keine Entscheidung.** Aufgenommen, weil er die einzige bekannte Antwort auf die durch den Wegfall entstandene Lücke ist. Ob daraus ein Weg wird, ist eine Entwurfsentscheidung, keine Nacharbeit.
 
+### Am eigenen Mitschnitt geprüft — und er liefert mehr als beide bisherigen Wege
+
+Ein HAR-Mitschnitt der Weboberfläche (Firefox, Netzwerkansicht) beim Öffnen der Projekt-Chatliste und eines kurzen Chats. Ausgewertet wurden nur Pfade, Parameternamen und Schlüsselnamen — keine Header, keine Inhalte.
+
+**Zwei Endpunkte tragen alles, was dieses Vorhaben braucht:**
+
+```
+GET /api/organizations/<org>/projects/<projekt>/conversations_v2 ?limit&offset
+GET /api/organizations/<org>/chat_conversations/<chat>
+      ?tree&rendering_mode&render_all_tools&consistency
+```
+
+**Der Listen-Endpunkt ist projektbezogen** und gibt je Chat: `uuid`, `name`, `summary`, `model`, **`created_at`**, `updated_at`, `settings`, **`project_uuid`**, `platform`, `effective_thinking_mode`, `current_leaf_message_uuid`, `user_uuid`.
+
+**Der Konversations-Endpunkt** gibt dieselben Kopfdaten und dazu `chat_messages` mit `uuid`, `content`-Blöcken, `sender`, `index`, `created_at`, `attachments`, `files`, **`parent_message_uuid`** — und obendrein `current_leaf_message_uuid`.
+
+**Der Baum kommt vollständig.** Der geprüfte Chat trägt in unserem Archiv 2 Turns auf dem gewählten Pfad und einen Nebenzweig mit 2 Nachrichten; die Web-API lieferte genau 4 `chat_messages`. `tree=True` gibt also den kompletten Nachrichtenbaum, im selben Umfang wie der Kontoexport — und `current_leaf_message_uuid` benennt obendrein den aktuellen Pfad, den unsere Regel 1 aus 3.1.2 mühsam über Zeitstempel errechnet.
+
+**Was daran das Bemerkenswerte ist.** Drei Dinge, die dieses Vorhaben tragen, fallen hier von selbst an:
+
+- **`project_uuid` je Chat.** Die Projektzugehörigkeit, die dem Kontoexport fehlt und derentwegen jeder Lauf in einem claude.ai-Chat beginnen muss (1.6). Hier steht sie in den Daten.
+- **`created_at` je Chat.** Weder `recent_chats` noch `read_conversation` lieferten es (1.7). Genau seinetwegen gibt es die Fensterrechnung aus Vorgabe 2.4 und den Sondierungsexport aus 1.5 Schritt 0. Beides wäre gegenstandslos.
+- **`model` und `effective_thinking_mode`, dazu `effort_level` in `settings`.** Genau die Angaben, die uns beim Denkschritte-Befund fehlten, um die Ursache zu bestimmen.
+
+**Offen und vor jeder Entscheidung zu prüfen:** ob `attachments` das Feld `extracted_content` mitbringen, ob `thinking`-Blöcke mit Text kommen und ob `tool_use`-Blöcke als Erzeugnisse ankommen. Der Prüfchat hatte nichts davon — er trug einen einzigen Textblock. Ohne diese drei Antworten ist nicht entschieden, ob der Weg den Export wirklich ersetzen könnte oder nur den Lese-Weg.
+
+**Die Einwände von oben bleiben unverändert bestehen** und wiegen bei einem Neubau schwerer als bei einer Notlösung: undokumentiert, jederzeit änderbar, Zugriff nur über eine angemeldete Browsersitzung.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
