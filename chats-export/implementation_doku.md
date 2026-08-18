@@ -75,6 +75,8 @@ Eine Datei je Quellprojekt, neben den Chatdateien. Sie wird **bei der Erstellung
 
 Warum ein Protokoll und nicht der Verzeichnisinhalt: **Innerhalb von claude.ai gibt es kein Verzeichnis zum Ablesen**, dort existiert nur Hochgeladenes. Eine kleine Datei kann eine Instanz lesen, N Chatdateien durchzählen nicht. Die `metadata` in jeder Chatdatei bleibt trotzdem, damit eine einzeln weitergegebene Datei für sich verständlich ist; bei Widerspruch gilt das Protokoll.
 
+**Gezählt wird im Skript, nicht im Kopf der Instanz** — und das ist keine Vorsicht, sondern eine Messung. Am hochgeladenen Protokoll gefragt, gab eine Instanz einen einzelnen Wert zeichengenau wieder, bis auf die Mikrosekunden eines Zeitstempels, nannte aber **zehn** Chats, wo neun eingetragen waren. Nachschlagen gelingt, Aufsummieren nicht. Deshalb rechnen `plan`, `overview` und `map` in dem Skript, das die JSON parst; die Instanz führt es aus, statt das Protokoll zu überschlagen. Hinge die Entscheidung „was fehlt noch" daran, dass sie richtig zählt, wäre der Fehler still.
+
 Das Protokoll gehört ins Projektwissen des **Quellprojekts**, weil der Fortschreibungsweg dort läuft — nur dort greift `read_conversation`. Nebeneffekt: das Quellprojekt trägt selbst die Auskunft, was von ihm exportiert wurde.
 
 Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadformat, und der einzige dokumentierte Rückweg in einen neuen Chat ist manuelles Kopieren (belegt, [9487310](https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them)).
@@ -185,7 +187,7 @@ Damit sie nicht erneut abgeleitet werden:
 | Suchschnipsel überlappten und ließen sich zusammennähen | Feste, nicht überlappende Blöcke; null Overlap zwischen 23 Segmenten           |
 | Sinkende Segmentzahl sei das Erfolgsmaß                   | Gilt nur in der Konsolidierungsphase; in der Entdeckung*muss* sie steigen        |
 | `batch-0000` bedeute Stückelung der Konversationen        | Die Zeitraumauswahl erklärt die Menge                                           |
-| Markdown sei für Durchsuchbarkeit besser                  | JSON macht die Sprecherrollen eindeutig; Textextraktion ist bei JSON verlustfrei |
+| Markdown sei für Durchsuchbarkeit besser                  | JSON macht die Sprecherrollen eindeutig; Textextraktion ist bei JSON verlustfrei — am echten Upload bestätigt: ein Zeitstempel kam mit Mikrosekunden unverändert zurück (1.4) |
 | §1.12 der Arbeitsanweisungen müsse geändert werden      | Das dortige Schema ist ein Beispiel, Ergänzen ist erlaubt                       |
 | Der Container könne den Downloadlink holen                | Allowlist ohne`claude.ai`, und der Link ist sitzungsgebunden                     |
 | Projektdateien im Container sparten Kontext                | *„while remaining in context"*                                                  |
