@@ -446,7 +446,27 @@ GET /api/organizations/<org>/chat_conversations/<chat>
 - **`created_at` je Chat.** Weder `recent_chats` noch `read_conversation` lieferten es (1.7). Genau seinetwegen gibt es die Fensterrechnung aus Vorgabe 2.4 und den Sondierungsexport aus 1.5 Schritt 0. Beides wäre gegenstandslos.
 - **`model` und `effective_thinking_mode`, dazu `effort_level` in `settings`.** Genau die Angaben, die uns beim Denkschritte-Befund fehlten, um die Ursache zu bestimmen.
 
-**Offen und vor jeder Entscheidung zu prüfen:** ob `attachments` das Feld `extracted_content` mitbringen, ob `thinking`-Blöcke mit Text kommen und ob `tool_use`-Blöcke als Erzeugnisse ankommen. Der Prüfchat hatte nichts davon — er trug einen einzigen Textblock. Ohne diese drei Antworten ist nicht entschieden, ob der Weg den Export wirklich ersetzen könnte oder nur den Lese-Weg.
+**Die drei offenen Fragen sind beantwortet** — zweiter Mitschnitt über fünf gezielt ausgewählte Chats:
+
+| Chat | Nachrichten | Blöcke | Anhänge | Denktext |
+| --- | --- | --- | --- | --- |
+| Erklärung eines Vorgangs | 4 | text 4 | **1 mit Inhalt, 1 `files`** | — |
+| Textdatei an Leerzeilen aufteilen | 10 | text 14, thinking 4, **tool_use 13**, tool_result 13 | — | 0 Zeichen |
+| Technische 2D-Zeichnung (FreeCAD) | 33 | text 51, **thinking 17**, tool_use 9, tool_result 9 | — | **33.895 Zeichen** |
+| Namensvetter dazu, leer | 0 | — | — | — |
+| Technical drawings from FreeCAD parts | **187** | text 219, tool_use 46, tool_result 46, token_budget 46 | — | — |
+
+**Anhänge kommen mit Inhalt.** `extracted_content` ist da, und `attachments` und `files` werden unterschieden wie im Export. Der Nutzer hat das unabhängig bemerkt: Die Anhänge öffneten sich in der Oberfläche **sofort**, also lag ihr Inhalt bereits vor — eine Nachforderung hätte man gesehen.
+
+**Werkzeugaufrufe kommen mit.** `tool_use` und `tool_result` sind vorhanden; die Erzeugnisse ließen sich daraus wie im ZIP-Weg gewinnen.
+
+**Denkschritte kommen mit Text** — 33.895 Zeichen in einem Chat vom Mai. Unser Archiv hält für denselben Chat 15 Denkblöcke; die API liefert 17 roh, die Differenz sind die nach 3.1.3 verworfenen. Deckungsgleich.
+
+**Und ein Nebenbefund von Gewicht:** Der Chat vom 18. August liefert auch hier 4 Denkblöcke mit **null Zeichen**. Der Wegfall des Denktextes ist also **kein Artefakt des Exports** — die Weboberfläche selbst hat ihn nicht. Der Export bildet getreu ab, was vorhanden ist.
+
+**Es gibt keine Paginierung.** Der längste Chat des Archivs kam mit **187 Nachrichten in einer einzigen Antwort**, 124 KB. `read_conversation` gab rund acht Turns je Seite; hier fällt das Blättern ersatzlos weg — und damit auch die Vollständigkeitsrechnung, denn es gibt nichts, was fehlen könnte.
+
+**Damit ist der Weg beiden bisherigen überlegen.** Gegenüber dem Export: `project_uuid`, `created_at`, `model` und `effort_level` fallen mit an, und es gibt keine Wartezeit. Gegenüber dem Lese-Weg: Baum, Anhänge, Denkschritte, Werkzeugaufrufe, kein Blättern, kein Kontextverbrauch. Übrig bleibt allein der Einwand, der von Anfang an im Raum stand — undokumentiert, jederzeit änderbar, und nur über eine angemeldete Browsersitzung erreichbar.
 
 **Die Einwände von oben bleiben unverändert bestehen** und wiegen bei einem Neubau schwerer als bei einer Notlösung: undokumentiert, jederzeit änderbar, Zugriff nur über eine angemeldete Browsersitzung.
 
