@@ -40,7 +40,9 @@ Der Engpass ist nicht die Suche, sondern die **Transkription**: Chattext erreich
 | Vollständigkeit| nicht beweisbar (kein Sollmaß)                    | **beweisbar** gegen `total_turns`      |
 | Skript         | `chat_export_convert.py` (3.1)                    | `chat_read_store.py` (3.2)             |
 
-**Der Kontoexport ist inhaltlich der reichere Weg**, und das ist keine Kleinigkeit: Denkschritte und Anhänge sind zusammen etwa so umfangreich wie der Gesprächstext selbst und im Lese-Weg **gar nicht sichtbar** — `read_conversation` liefert das gerenderte Transkript, keine Blockstruktur. Was auf diesem Weg hereinkommt, ist also dauerhaft ärmer, und ein späterer Export bringt es nicht nach, ohne den Chat zu ersetzen.
+**Der Kontoexport ist inhaltlich der reichere Weg**, und das ist keine Kleinigkeit: Denkschritte und Anhänge sind zusammen etwa so umfangreich wie der Gesprächstext selbst und im Lese-Weg **gar nicht sichtbar** — `read_conversation` liefert das gerenderte Transkript, keine Blockstruktur.
+
+Bei den Denkschritten ist die Ausbeute allerdings ungewiss: Sie **können** im Export enthalten sein, müssen es aber nicht (3.1.1). Anhänge und Erzeugnisse sind davon unberührt, und der Export bleibt auch ohne Denken der reichere Weg — nur mit geringerem Abstand. Was auf diesem Weg hereinkommt, ist also dauerhaft ärmer, und ein späterer Export bringt es nicht nach, ohne den Chat zu ersetzen.
 
 **Die Wahl zwischen den Wegen gibt es aber nicht überall.** Sie setzt voraus, dass ein Export überhaupt zu haben ist, und das ist an den Kontotyp gebunden (1.6): Selbstbedienung nur auf Free, Pro und Max. Ein gewöhnliches Mitglied eines Team- oder Enterprise-Kontos hat **keinen** Export — dort ist der Lese-Weg nicht die schnellere Alternative, sondern der einzige Weg, und sein ärmeres Ergebnis ist dann kein Abwägungsergebnis, sondern eine Tatsache, mit der man lebt.
 
@@ -187,6 +189,7 @@ Damit sie nicht erneut abgeleitet werden:
 | §1.12 der Arbeitsanweisungen müsse geändert werden      | Das dortige Schema ist ein Beispiel, Ergänzen ist erlaubt                       |
 | Der Container könne den Downloadlink holen                | Allowlist ohne`claude.ai`, und der Link ist sitzungsgebunden                     |
 | Projektdateien im Container sparten Kontext                | *„while remaining in context"*                                                  |
+| Der Export trage die Denkschritte verlässlich | Er kann sie tragen, muss aber nicht: Ein Denkblock ist entweder mit Text da oder als `thinking_hidden` leer, und das Verhältnis schwankt bis hin zu „ausschließlich leer" (3.1.1). Ein Archiv ohne Denkdatei ist deshalb eine Stichprobe, kein Formatbefund. |
 | `attachments` und `files` bezeichneten verschiedene Dinge, `files` sei reiner Verlust | Sie überschneiden sich: Ein Textupload steht in **beiden**, als Dateiobjekt und als extrahierter Text. 319 der 524 `files`-Einträge des Drei-Monats-Exports tragen ihren Inhalt in derselben Nachricht (1.6, 3.1.1). Unser `report` meldete sie trotzdem als Verlust — der Fehler fiel erst am eigenen Testlauf auf, an einer einzigen hochgeladenen Datei. |
 | Dateianhänge seien im Export nur ein Name | Gilt nur für `files` (524). Die `attachments` (341) tragen `extracted_content` — 9,6 Mio Zeichen, überwiegend Python und Markdown. Ich hatte das weggeworfen und als Verlust gemeldet, den es nicht gab. |
 | Eine Erstmigration brauche einen Vollexport | Der Zeitraumfilter wirkt nicht auf `projects/`: ein Ein-Wochen-Export liefert jedes Projekt mit `created_at` und damit die exakte Fenstergrenze (3.1.1). |
@@ -204,7 +207,7 @@ Festlegungen, die quer über alle Werkzeuge dieses Ordners gelten. Aufnahmetest:
 
 ## 2.1 Beleglage
 
-Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind sechzehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
+Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind siebzehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
 
 ## 2.2 Dateiformat der Chatdateien
 
@@ -398,6 +401,10 @@ Es ist die Vereinigung über **alle** Blocktypen, nicht die Feldliste eines einz
 **Die Denkschritte, vermessen.** 4.318 `thinking`-Blöcke, Länge Median 682, Mittel 2.153, größter 66.488 Zeichen — keine Statusnotizen. Sie sind auch **nicht redundant**: über 1.840 Nachrichten mit substanziellem Denken *und* sichtbarer Antwort verglichen, taucht nur ein **Median von 9 %** des Denk-Vokabulars in der Antwort wieder auf; in 1.824 Fällen unter 40 %, in keinem über 80 %. **42 %** der Blöcke (1.809) enthalten Abwägungen — Diagnosen, verworfene Alternativen samt Grund, Ursachenlisten. URLs kommen dagegen kaum vor (13 Blöcke), Dateinamen in 1.067.
 
 Das Feld `summaries` (in 3.788 Blöcken, Median 241 Zeichen) ist **keine Zusammenfassung der Schlüsse**, sondern eine Verlaufsmeldung dessen, was gerade durchdacht wird — für ein Archiv wertlos.
+
+**Denken kann dabei sein, muss aber nicht.** Ein Denkblock kommt in zwei Ausprägungen: mit Text, oder als `thinking_hidden` mit null Zeichen. Beide stehen nebeneinander, und das Verhältnis schwankt erheblich — im Drei-Monats-Export 788 versteckte unter 4.318, in den Testexporten vom 17. und 18. August 2026 ausschließlich versteckte, und innerhalb **eines einzigen** Chats wechselte es von Tag zu Tag. Woran es hängt, ist nicht ermittelt und wird hier auch nicht vermutet.
+
+**Ein Export ohne Denktext ist deshalb kein Befund über das Format.** Wer in einem frischen Archiv keine Denkdatei findet, hat eine Stichprobe gezogen, mehr nicht; der Schluss „der Export führt keine Denkschritte" wäre falsch und ist hier schon einmal beinahe gezogen worden. Ist Denktext vorhanden, wird er unverändert genutzt; fehlt er, ist nichts zu holen, und das Verwerfen leerer Blöcke nach 3.1.3 bleibt verlustfrei.
 
 Drei strukturelle Befunde, die die Auswahl tragen (Details der Ableitung in 3.1.3):
 
@@ -691,6 +698,7 @@ Ein warmer Punkt kann **mangels Rechten unerreichbar** sein, ohne deshalb eine B
 - Nachricht: `parent_message_uuid` macht die Nachrichten zum **Baum** (3.1.2); `sender` `human`/`assistant`; das flache `text` enthält die Denkschritte (3.1.1); `content`-Blocktypen `text`, `thinking`, `tool_use`, `tool_result`, `token_budget`. *Prüfung: Nachrichten- und Blocktypmengen aus `inspect_export.py` gegen 3.1.1 — ein neuer Blocktyp fiele dort sofort auf. Kalt.*
 - **`attachments` tragen `extracted_content`, `files` nur Namen — und beide oft dieselbe Datei** (3.1.1, 1.6). Die Unterscheidung entscheidet, was das Archiv behalten kann; die Überschneidung entscheidet, wie viel Verlust überhaupt zu melden ist. *Prüfung: dieselbe Schemawache, die beide getrennt ausweist, dazu der Anteil der `files`-Einträge mit Namenspartner — kalt. Ob es für die übrigen einen Abrufweg gibt, ist eigener Punkt in 4.3.*
 - Gelöschte Chats erscheinen als Hüllen: Gerüst da, Inhalt leer (3.1.3). *Prüfung: `inspect_export.py` weist sie aus — kalt.*
+- **Denkschritte können enthalten sein oder fehlen** (3.1.1); der Anteil leerer `thinking_hidden`-Blöcke schwankt bis hin zu „alle". *Prüfung: den Anteil in jedem vorliegenden Archiv auszählen — kalt. Ein Nullbefund ist dabei kein Formatbefund, sondern eine Stichprobe; nicht daraus schließen, der Export führe keine Denkschritte mehr.*
 - Erste Anlaufstelle bei Verdacht: `inspect_export.py` (3.3) laufen lassen und die Schlüsselmengen mit 3.1.1 vergleichen.
 
 ## 4.3 Werkzeuge der Claude-Instanz — was verwendet wird und zu prüfen ist
