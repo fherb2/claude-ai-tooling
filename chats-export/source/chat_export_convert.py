@@ -34,6 +34,14 @@ the only place the project a chat belongs to can be learned. ``convert`` then
 writes the chats the protocol is waiting for. ``diff`` reports the standing from
 the protocol alone -- no archive, no chat file, not one character of chat text
 -- including how far back the next export has to reach.
+
+``list`` also looks the other way round: a chat the protocol knows and the
+fresh list no longer offers is counted, named and explained by
+``VANISHED_NOTE`` -- deleted at the source, moved to another project, or a
+list that was not paged to the end. The three cannot be told apart from here,
+so **nothing is removed**; the protocol keeps the chat and its files. The same
+sentence stands in ``chat_read_store.py`` and is guarded against drift by
+``tests/test_wegegleichheit.py``.
 ``report`` says what could not be carried over. ``analyse`` describes what the
 reader makes of an archive without writing anything, which is a different
 question than ``inspect_export.py`` answers: that one describes the raw export,
@@ -166,6 +174,17 @@ CREATION_SUFFIX    = ".creations.json"
 # tool_use, and all of tool_result, is counted but not stored: 28.6 million
 # characters of mostly foreign or duplicated material.
 CREATION_TOOLS = ("artifacts", "create_file", "str_replace")
+
+# What both routes say when the protocol knows a chat the fresh list no longer
+# offers. Held word for word in chat_read_store.py too and guarded by
+# tests/test_wegegleichheit.py: the two scripts cannot import from each other
+# (vorgabe 2.9), and this project has twice watched one side of such a pair
+# grow while the other stood still.
+VANISHED_NOTE = """\
+NOTE: {count} chat(s) in the protocol are not in this list.
+  Deleted at the source, moved out of the project -- or the list was not paged
+  to the end. Check before concluding anything; nothing is removed automatically."""
+
 
 # untouched -> listed by 'list', exported/deleted by 'convert', stale when the
 # chat list shows a newer timestamp than the export rests on.
@@ -1146,10 +1165,23 @@ def cmd_list(args: argparse.Namespace) -> int:
     counts = update_from_list(protocol, records, now)
     save_protocol(args.out, protocol)
 
+    # The comparison in the other direction: chats the protocol knows and this
+    # list no longer offers. Reported, never removed -- vorgabe 2.4.
+    listed_now = {record["uuid"] for record in records}
+    vanished = [uuid for uuid in protocol["chats"] if uuid not in listed_now]
+
     print(f"{len(records)} chat(s) listed: {counts.get('new', 0)} new, "
           f"{counts.get('stale', 0)} now stale, "
-          f"{counts.get('unchanged', 0)} unchanged.")
+          f"{counts.get('unchanged', 0)} unchanged"
+          + (f", {len(vanished)} no longer listed." if vanished else "."))
     print(f"{len(protocol['chats'])} chat(s) in {protocol_path(args.out)}")
+    if vanished:
+        print()
+        print(VANISHED_NOTE.format(count=len(vanished)))
+        for uuid in vanished:
+            entry = protocol["chats"][uuid]
+            print(f"  {uuid}  {entry.get('title', '')[:44]!r}"
+                  f"  [{entry.get('status', '')}]")
     pending = [uuid for uuid, entry in protocol["chats"].items()
                if entry["status"] in (STATUS_LISTED, STATUS_STALE)]
     print(f"{len(pending)} chat(s) waiting to be converted." if pending

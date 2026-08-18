@@ -444,6 +444,24 @@ for name, module in (("zip", cec), ("read", crs)):
               prot("", {"a": chat("listed", "2025-06-01")})) == [])
 
 
+# ---------------------------------------------------------------------------
+# Wording both routes have to share
+# ---------------------------------------------------------------------------
+# The scripts cannot import from each other -- the uploadable one has to stand
+# alone (vorgabe 2.9) -- so a shared sentence exists twice and can drift. It
+# has happened twice in this project already: analyse against report, and list
+# against plan. Whatever both are meant to say word for word is guarded here.
+
+check("both routes word the vanished note identically",
+      cec.VANISHED_NOTE == crs.VANISHED_NOTE,
+      f"export:\n{cec.VANISHED_NOTE}\n\nread:\n{crs.VANISHED_NOTE}")
+check("the vanished note takes the count as a placeholder",
+      "{count}" in cec.VANISHED_NOTE, cec.VANISHED_NOTE)
+check("it says that nothing is removed automatically",
+      "nothing is removed automatically" in cec.VANISHED_NOTE,
+      cec.VANISHED_NOTE)
+
+
 shutil.rmtree(WORK, ignore_errors=True)
 
 print()
