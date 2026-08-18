@@ -470,6 +470,26 @@ GET /api/organizations/<org>/chat_conversations/<chat>
 
 **Die Einwände von oben bleiben unverändert bestehen** und wiegen bei einem Neubau schwerer als bei einer Notlösung: undokumentiert, jederzeit änderbar, Zugriff nur über eine angemeldete Browsersitzung.
 
+## Vom Nutzer vorgeschlagene Richtung — noch nicht in der Doku
+
+Festgehalten, damit es beim Doku-Durchgang nicht neu erarbeitet werden muss. Es ist eine **Richtungsentscheidung**, keine Beobachtung, und gehört bei der Umsetzung nach Kapitel 1 und in den Fahrplan.
+
+**Der Kontoexport bleibt.** Begründung des Nutzers, und sie trägt: Er existiert, weil die Datenschutz-Grundverordnung ihn erzwingt — sein Format kann sich ändern, aber er verschwindet nicht. Das lässt sich von einer internen Web-Schnittstelle nicht sagen. Kurze Zeitbereiche kommen fast sofort, große dauern beim Packen; der Download ist in beiden Fällen schnell.
+
+**Die Web-API ergänzt, sie ersetzt nicht.** Sie ist optimal, wenn die Chats **eines Projekts** gelesen werden sollen: Liste holen, die noch nicht gespeicherten Chats öffnen, auslesen.
+
+**Der Grund für die Begrenzung ist die Last.** Ein Massenabruf über die Weboberfläche fällt serverseitig auf und kann Captcha- oder Cloudflare-Prüfungen auslösen. Deshalb nur zum **Nachreichen neu hinzugekommener Chats**, nicht für die Erstmigration.
+
+**Das fügt sich in den vorhandenen Bau, statt ihn zu ersetzen.** Das Protokoll bleibt der geteilte Zustand (1.4) und entscheidet wie bisher, was zu holen ist — `listed` und `stale`. Ein täglicher Lauf wäre ein Listenaufruf plus eine Handvoll Konversationsaufrufe; die Erstmigration bleibt beim Export. Damit ist die Lastfrage durch dieselbe Mechanik erledigt, die es ohnehin gibt.
+
+**Drei technische Punkte für eine spätere Umsetzung:**
+
+- Der Listen-Endpunkt nimmt `limit` und `offset`; das Blättern ist deterministisch nachbaubar. Zu Ende ist es, wenn eine Seite weniger als `limit` liefert. Sortiert sich die Liste während des Blätterns um, kann ein Eintrag doppelt oder gar nicht kommen — über die UUID zu entdoppeln.
+- Je Chat gibt es **keine** Paginierung, 187 Nachrichten kamen in einem Stück. Ein Fragment kann also nicht fehlen; die Vollständigkeitsrechnung des Lese-Wegs wird gegenstandslos.
+- Der Zugriff muss vermutlich **innerhalb der angemeldeten Browsersitzung** laufen. Die gefundene Skill berichtet, dass `curl` und einfache HTTP-Aufrufe an Cloudflare-Prüfungen scheitern und allein JavaScript in der geöffneten Seite verlässlich sei.
+
+**Und eine Möglichkeit, die dadurch zurückkehrt:** Die Wegegleichheit (Vorgabe 2.5) war mit dem Wegfall des Lese-Wegs blockiert. Mit einem zweiten funktionierenden Weg ließe sie sich wieder prüfen — und leichter als zuvor, weil beide Wege dieselben Strukturen liefern: Baum, Blöcke, Anhänge. Der Lese-Weg gab nur ein gerendertes Transkript und machte den Vergleich schwer.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
