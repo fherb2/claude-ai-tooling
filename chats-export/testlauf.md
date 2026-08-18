@@ -314,6 +314,8 @@ Skript und Protokoll in einen neuen Chat des Quellprojekts, dazu ein Prompt ohne
 
 Damit ist die Zusage aus Vorgabe 2.9 belegt: Die hochgeladene Datei allein genügt. Eine Instanz, die von diesem Vorhaben nichts weiß, hat den ganzen Ablauf aus dem Docstring hergeleitet — einschließlich der Stellen, an denen er ihr Zurückhaltung vorschreibt.
 
+**Und ein siebtes, ungeplantes Bestehen:** Auf die Bitte, zwei bestimmte Chats zu lesen, hat die Instanz **nicht** gehorcht, sondern nachgefragt — beide seien laut Protokoll vollständig `exported` und laut `plan` unverändert, ein erneutes Lesen also unnötig; ob wirklich diese gemeint seien oder zwei andere. Sie prüft eine Anweisung gegen das Protokoll, statt sie auszuführen. Das steht in keiner Erwartungstabelle und ist trotzdem genau die Haltung, die der Docstring an anderen Stellen verlangt.
+
 ### Drei Befunde aus diesem einen Durchgang
 
 **Der Upload-Ort ist bestätigt.** Der Docstring nennt `/mnt/user-data/uploads` ausdrücklich als Community-Vermutung, die man nicht für gesichert nehmen soll. Die Dateien lagen dort. Nach Vorgabe 2.1 steigt die Beleglage damit von **Community** auf **beobachtet** — durch eigenes Nachstellen.
