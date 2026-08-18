@@ -336,7 +336,13 @@ Besonders unangenehm ist die Verkettung mit dem Kontobefund: Für Chats in einem
 
 **Gegengeprüft in der zweiten Oberfläche: dasselbe.** Der erste Versuch lief im Browser, der zweite in Claude Desktop, beide im **Pro-Konto** am 18. August 2026. Auch dort kennt die Instanz nur `conversation_search` und `recent_chats`. Zwei Oberflächen, ein Konto, gleiches Ergebnis.
 
-**Was damit belegt ist und was nicht.** Belegt: In diesem Pro-Konto ist `read_conversation` am 18. August 2026 in beiden Oberflächen nicht verfügbar. Nicht belegt: dass es für alle Konten und Pläne fehlt. Ob entfernt, an einen Plan gebunden oder anders freigeschaltet, ist offen.
+**Zurückgenommen: Die Probe taugt nicht.** Im Konto steht der **Tool-Zugriffsmodus** auf „Tools bei Bedarf laden". Belegt dazu: *„On demand: Connectors aren't loaded until Claude searches for the right one based on your request. Claude finds the most relevant connectors and loads only those"* ([13730515](https://support.claude.com/en/articles/13730515-manage-claude-s-tool-access)); die Alternativen sind **Auto** (Vorgabe) und je Connector „Always available".
+
+Wir haben die Instanz nach ihrem Werkzeugsatz **gefragt**, statt sie ein Werkzeug **benutzen** zu lassen. Bei bedarfsweisem Laden beschreibt eine solche Antwort nur, was gerade geladen ist — nicht, was erreichbar wäre. Beide Versuche, Browser wie Desktop, hängen an diesem Fehler; die Übereinstimmung beweist nichts, weil beide dieselbe Einstellung trafen.
+
+**Was stehen bleibt und wogegen es spricht.** Im ersten Versuch war der Kontext mit `read_conversation` gesättigt — der Docstring nennt es dutzendfach —, und ein besserer Auslöser für ein bedarfsweises Nachladen ist schwer vorstellbar. Das spricht gegen die Erklärung, ist aber kein Gegenbeweis: Ob die Chat-Werkzeuge überhaupt unter diesen Mechanismus fallen, ist unbekannt. Die Hilfeseite zur Chat-Suche nennt weder Werkzeugnamen noch den Lademechanismus, und die Einstellung spricht ausdrücklich von *Connectors*.
+
+**Der Befund ist damit offen, nicht widerlegt.** Was gilt: Mit dieser Kontoeinstellung hat eine Instanz in beiden Oberflächen kein `read_conversation` angeboten. Was nicht gilt: dass es fehlt. Zu klären mit einer **verhaltensbasierten** Probe statt einer Selbstauskunft — Einstellung auf Auto, dann die Instanz einen bestimmten Chat vollständig lesen lassen und nach `total_turns` fragen, was nur dieses Werkzeug liefert.
 
 **Eine Korrektur an meiner eigenen Folgerung.** Ich hatte geschrieben, für ein Team-Mitglied bliebe damit „kein Weg". Das war ein Sprung: Geprüft wurde ein **Pro**-Konto. Richtig ist der bedingte Satz — *falls* das Werkzeug auch dort fehlt, hätte ein Team-Mitglied weder Export noch Lese-Weg. Genau das entscheidet Fahrplanpunkt 23, und der ist damit von einer Randfrage zur wichtigsten offenen Prüfung geworden.
 
