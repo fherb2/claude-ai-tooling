@@ -181,6 +181,28 @@ Doku 1.6 sagt über die 524 `files`-Einträge des Drei-Monats-Exports: „und **
 
 Der Export trägt alle Blocktypen außer `token_budget` (erwartbar, 1.6). Die Schlüsselmenge umfasst 37 Namen, darunter viele, die 3.1.1 nicht kennt — `structured_content`, `display_content`, `tool_origin`, `is_mcp_app`, `mcp_server_url`, `approval_options` und weitere. Damit ist die Vergleichsgrundlage vorhanden, die 3.3 verspricht und 3.1.1 bisher schuldig blieb.
 
+## 21.9/21.10 Zweiter Abgleich — bestanden, mit einem Befund
+
+Am 18. August: der wachsende Chat fortgesetzt, drei neue Chats angelegt (darunter die Ersatz-Gabelung „Brillenstärke und Brennweite berechnen" sowie die Nacherzeugung von Denkschritten und Erzeugnis), und „Brillenstärken verstehen" gelöscht.
+
+**Vorbereitung, die nötig war:** Das Protokoll trug ein `listed_at` vom heutigen Neuaufbau statt vom echten ersten Abgleich. Diesmal wäre die Schranke zufällig gültig gewesen, aber das Protokoll hätte eine falsche Geschichte erzählt. Neu aufgebaut mit `--now` auf den wahren Zeiten — erster Abgleich 2026-08-17T15:40, Umwandlung 17:47.
+
+**Das Ergebnis des zweiten Abgleichs:**
+
+| Erwartung | Ergebnis |
+| --- | --- |
+| der fortgesetzte Chat wird `stale` | **bestanden** — „API-Funktionen", gelistet 2026-08-18T09:15 gegen exportiert 2026-08-17T15:05 |
+| die neuen sind `listed` mit `created_after` | **bestanden** — vier neue, `created_after` = 2026-08-17T15:40, also der Stand des vorherigen Abgleichs |
+| der gelöschte wird nicht entfernt | **bestanden** — das Protokoll führt weiter 9 Chats |
+| der gelöschte wird gemeldet | **nicht eingetreten** — s. u. |
+| daraus eine neue Fenstergrenze | **bestanden** — 2026-08-17, Quelle jetzt `created_at` statt `project` |
+
+**Der Kern der Konstruktion ist damit vorgeführt:** Der wachsende Chat entstand am 17., wuchs am 18. Das Fenster muss deshalb bis zum **17.** zurückreichen — wer naiv „seit dem letzten Lauf", also ab dem 18., exportiert hätte, hätte ihn verloren, und nichts hätte es gemeldet. Genau dafür gibt es die Tabelle in Vorgabe 2.4, und sie greift: Die Quelle der Grenze wechselte von `project` auf das exakte `created_at` des veralteten Chats.
+
+**Befund: Der Export-Weg meldet verschwundene Chats nicht.** `chat_read_store.py` kennt dafür die Gruppe `vanished` — „a chat the protocol knows and the list no longer offers, which means deleted at the source or moved out of the project" — und `plan` gibt sie aus, ausdrücklich auch dann, wenn sonst nichts ansteht (3.2.3). `chat_export_convert.py` hat davon **nichts**: Weder `list` noch `diff` erwähnt, dass „Brillenstärken verstehen" aus der Quelle verschwunden ist. `diff` zählt ihn unter „4 exported", als wäre alles in Ordnung. Dieselbe Sorte Asymmetrie wie zuvor bei `analyse` gegen `report` — ein Konzept, das nur auf einer Seite gepflegt wurde.
+
+**Beobachtung am Rande:** Die Rohausgabe der Chatliste kam diesmal **ohne** schließende `</chat>`-Tags, beim ersten Mal mit. `parse_chat_list` verarbeitet beides, weil es von einem `<chat`-Beginn bis zum nächsten schneidet und die schließenden Tags gar nicht braucht. Die Formvariation der Instanz ist damit belegt — und die Unempfindlichkeit dagegen auch.
+
 ## Was zum Rechnerwechsel gilt
 
 `tests/test_results/` ist auf diesem Rechner (fwfe41) leer gewesen, weil sein Inhalt gitignoriert ist und **nicht mit dem Repo wandert**. Die älteren ZIPs und das FreeCAD-Archiv liegen auf dem Laptop und sind nicht verloren; eine frühere Notiz hier sprach von Verlust, das war falsch.
