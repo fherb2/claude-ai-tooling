@@ -58,6 +58,8 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
 13. **README neu schreiben und die Anwenderdokumentation daraus aufbauen, sobald der Warnhinweis fällt.** Fakten: Doku 1.1, 1.2, 1.5. Einschließlich der Nutzerpflicht, die Aufbewahrungsdauer hochzusetzen, bevor nach `~/.claude/projects/` abgelegt wird (1.3).
 
+    **Zwei Sätze zur Wegewahl gehören hinein**, Wortlaut und Begründung stehen in `testlauf.md`: Der Web-Weg ist der Weg für kleine Nach-Exporte; sonst bereitet er nur die Protokolldatei vor, und die Inhalte kommen als Kontoexport-ZIP. Dazu die Nutzerpflicht, in Chrome das Nachfragen nach dem Speicherort abzuschalten.
+
 ## Dauerhaft
 
 - Kapitel 4 der Doku ist die Prüfliste gegen Anthropic-Änderungen; die Belege dazu tragen 1.6 und Kapitel 3. Ändert sich etwas: Zeile korrigieren, prüfen, was daran hing, gekippte Annahmen nach 1.7.

@@ -494,6 +494,15 @@ Festgehalten, damit es beim Doku-Durchgang nicht neu erarbeitet werden muss. Es 
 - **Abrufbremse: ein Chat je acht Sekunden, der Abstand gleichverteilt gewürfelt zwischen 4 und 12 Sekunden.** Der Zweck ist, den Server nicht zu belasten und nicht als Massenabruf aufzufallen; die Streuung vermeidet das regelmäßige Muster, das ein fester Takt erzeugt. Das ergänzt die Begrenzung auf das Nachreichen neuer Chats — beides zusammen hält die Last dort, wo eine Handvoll Abrufe je Lauf anfällt.
 - **Nutzerpflicht: In Chrome muss „Speicherort für jede Datei vor dem Download abfragen" ausgeschaltet sein.** Sonst öffnet jeder Download einen Dateidialog, und ein Dialog blockiert die Browser-Anbindung vollständig — sie empfängt dann keine Kommandos mehr. Das gehört in die Anwenderdokumentation, an dieselbe Stelle wie die Pflicht, die Aufbewahrungsdauer hochzusetzen (Doku 1.3).
 
+**Für die Anwenderdokumentation, zwei Sätze, die zusammengehören** (Fahrplanpunkt 13). Sie schärfen die Arbeitsteilung, statt sie nur zu wiederholen:
+
+1. **Der Web-Weg funktioniert, ist aber der Weg für kleine Nach-Exporte aus einem Projekt** — ein paar hinzugekommene oder weitergelaufene Chats. Nicht für mehr.
+2. **Andernfalls wird der Web-Weg nur zum Vorbereiten der Protokolldatei benutzt**, und die Inhalte kommen als Kontoexport-ZIP, das ein Skript hinzufügt. Das ist ausdrücklich zu empfehlen, sobald nicht bloß einzelne Aktualisierungen offen sind, sondern ganze Chats mit reichlich angehängten Daten.
+
+Der zweite Satz ist mehr als eine Mengenempfehlung: Er teilt die Rollen entlang dessen, was jeder Weg gut kann. Der Web-Weg löst das **Zuordnungsproblem** — Chatliste, `project_uuid`, `created_at`, `updated_at` je Chat —, und genau dafür brauchte es bisher eine claude.ai-Instanz mit `recent_chats` samt der Lücke des laufenden Chats. Der Kontoexport löst das **Mengenproblem**: Er trägt Anhänge, Erzeugnisse und Denkschritte in einem Zug, ohne Abrufbremse und ohne Serverlast je Chat. Beides zusammen ergibt einen Lauf, in dem kein Schritt mehr auf einer Instanz ruht, die im Kopf zählen müsste.
+
+Die Entscheidungsgrenze zwischen 1 und 2 zieht der Nutzer, nicht das Werkzeug — Anhaltspunkt sind die Zahl der offenen Chats und der Umfang ihrer Anhänge.
+
 **Und eine Möglichkeit, die dadurch zurückkehrt:** Die Wegegleichheit (Vorgabe 2.5) war mit dem Wegfall des Lese-Wegs blockiert. Mit einem zweiten funktionierenden Weg ließe sie sich wieder prüfen — und leichter als zuvor, weil beide Wege dieselben Strukturen liefern: Baum, Blöcke, Anhänge. Der Lese-Weg gab nur ein gerendertes Transkript und machte den Vergleich schwer.
 
 ## Fahrplanpunkt 26: die Probe über Chrome — bestanden, in allen drei Schritten
