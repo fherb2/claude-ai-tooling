@@ -19,6 +19,7 @@ Die Liste beginnt mit der Arbeitsphase ab dem 14. August 2026. Die davor erledig
 - **21.7** Erstlauf-Export umgewandelt. Vier Erwartungen bestanden, drei nicht; daraus drei Befunde und ein behobener Defekt in `file_references()` (Doku 1.6, 1.7, 3.1.1).
 - **25** Doku-Durchgang, Schritt 1: die Schnittstellenbeschreibung des entfallenen Lese-Wegs herausgenommen, 1.2 neu gefasst, 3.2 von 67 auf 12 Zeilen gekürzt, Kapitel 4 nachgezogen. Die Doku ist von 734 auf 658 Zeilen gefallen.
 - **26** Probe über die Chrome-Anbindung bestanden: beide Endpunkte erreichbar, 593 KB in einer Antwort, Sollwerte zeichengenau getroffen. Dabei ein dritter Endpunkt gefunden, der jedes Projekt mit `created_at` führt.
+- **26 (Fortsetzung)** Der Weg auf die Platte geprüft: fetch je Chat, ein Blob, ein Download. Härtefall 607.083 Zeichen in 953 ms; die Nachrichten-UUIDs der Web-API und des Export-ZIP sind für denselben Chat deckungsgleich.
 
 ## 2026-08-15
 
