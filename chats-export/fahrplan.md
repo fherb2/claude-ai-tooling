@@ -10,7 +10,25 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
 ## Als nächstes
 
-*(derzeit nichts — Schritt 25 ist ausgeführt; der nächste Doku-Schritt ist noch nicht geplant.)*
+26. **Probe: Erreicht Claude Code über Chrome die beiden Endpunkte von claude.ai?** *Warm.* — **Plan, noch nicht ausgeführt.**
+
+    **Warum diese Probe vor allem anderen kommt.** Seit dem Wegfall des Lese-Wegs (Doku 1.2) gibt es genau einen benutzbaren Weg. Der Mitschnitt in `testlauf.md` hat einen möglichen zweiten gezeigt, aber unter einer Bedingung, die schwer wog: Zugriff nur aus einer angemeldeten Browsersitzung, also Erweiterungsbau oder eingespritztes JavaScript. Die Chrome-Anbindung von Claude Code könnte genau diese Bedingung erfüllen, ohne dass wir etwas bauen — sie teilt den Anmeldezustand des Browsers (belegt, [chrome](https://code.claude.com/docs/en/chrome)). Trifft das zu, sieht der ganze Entwurf des zweiten Wegs anders aus; trifft es nicht zu, ist eine halbe Stunde verloren statt einer Erweiterung.
+
+    **Voraussetzungen, zuerst und einzeln zu prüfen** — jede kann die Probe schon beenden: Erweiterung „Claude in Chrome" ab 1.0.36; Anmeldung per `/login`, denn mit API-Key oder Setup-Token bleibt die Integration aus; Start mit `claude --chrome`; `/chrome` meldet „Status: Enabled" und „Extension: Installed".
+
+    **Schritt A — die beiden UUIDs beschaffen, ohne Mitschnitt.** Das Projekt im Browser öffnen und die **Netzwerk-Requests** lesen; das ist eine als *read-only* geführte Fähigkeit der Anbindung. Erwartet werden Organisations- und Projekt-UUID sowie die Pfade, die `testlauf.md` nennt. Damit ersetzt Schritt A den HAR-Mitschnitt dauerhaft.
+
+    **Schritt B — der Listen-Endpunkt.** Einen Tab direkt auf `conversations_v2` mit `limit`/`offset` navigieren und den Seitentext abholen. *Erwartung:* gültiges JSON mit `uuid`, `name`, `updated_at`, `created_at`, `project_uuid` je Chat. *Erfolgskriterium:* Die Zahl der Einträge und mindestens ein `created_at` decken sich mit dem, was Archiv und Protokoll für dieses Projekt führen.
+
+    **Schritt C — der Konversations-Endpunkt.** Denselben Weg für einen Chat, den unser Archiv kennt, mit `tree`, `rendering_mode` und `render_all_tools`. *Erwartung:* `chat_messages` mit `parent_message_uuid`, `attachments` mit `extracted_content`, Denkblöcke. *Erfolgskriterium:* Nachrichtenzahl und Nebenzweig decken sich mit der Archivdatei — genau die Gegenprobe, die der Mitschnitt schon einmal bestanden hat.
+
+    **Der wahrscheinlichste Fehlschlag ist nicht der Zugriff, sondern die Menge.** Der längste geprüfte Chat kam mit 187 Nachrichten und 124 KB in einer Antwort. Ob ein Werkzeug, das Seitentext liefert, das ungekürzt durchreicht, ist offen. Deshalb wird in Schritt C **ausdrücklich auf Vollständigkeit geprüft** und nicht auf Plausibilität: erst ein kurzer Chat, dann der längste. Kommt er gekürzt an, ist die Probe nicht gescheitert, sondern beantwortet — dann braucht es doch den Umweg über ein Skript in der Seite, und das ist dann eine eigene Entscheidung.
+
+    **Zweiter möglicher Fehlschlag:** eine Cloudflare- oder Captcha-Prüfung. Die Anbindung hält dann an und fragt (belegt, ebd.). Das ist keine Umgehung und soll auch keine werden; tritt es auf, wird es notiert und die Probe endet.
+
+    **Was dabei nicht entsteht:** kein Chatinhalt im Repo (Vorgabe 2.11). Festgehalten werden Pfade, Feldnamen, Zahlen und Längen — dieselbe Beschränkung, unter der der Mitschnitt ausgewertet wurde.
+
+    **Danach, und erst danach, die Bauentscheidung.** Der Nutzer hat die Richtung schon gesetzt: der Kontoexport bleibt der Anker, der Web-Weg ergänzt ihn für neu hinzugekommene Chats eines Projekts, und Skript [3] holt **JSON vom Endpunkt**, nicht die angezeigte Seite — damit ist es keine Transkription und Vorgabe 2.8 greift dort nicht. Offen bleibt allein, wie viele Bausteine es dann noch braucht: Besteht die Probe, entfallen der Aufruf-Teil von [2] und [3] ganz, und der Rest ist ein lokaler Abgleich gegen das Protokoll. Diese Entscheidung und ihre Aufnahme in Kapitel 1 sind ein eigener Punkt.
 
 ## Danach
 
