@@ -488,6 +488,12 @@ Festgehalten, damit es beim Doku-Durchgang nicht neu erarbeitet werden muss. Es 
 - Je Chat gibt es **keine** Paginierung, 187 Nachrichten kamen in einem Stück. Ein Fragment kann also nicht fehlen; die Vollständigkeitsrechnung des Lese-Wegs wird gegenstandslos.
 - Der Zugriff muss vermutlich **innerhalb der angemeldeten Browsersitzung** laufen. Die gefundene Skill berichtet, dass `curl` und einfache HTTP-Aufrufe an Cloudflare-Prüfungen scheitern und allein JavaScript in der geöffneten Seite verlässlich sei.
 
+**Drei weitere Festlegungen des Nutzers, nach der Probe vom 19. August:**
+
+- **Eine Datei, ein Download.** Je Chat ein `fetch`, alles in ein Objekt, und genau ein Download am Ende. Grund: Mehrere Downloads aus derselben Seite lösen in Chrome eine Nachfrage aus, und jede Nachfrage ist eine Gelegenheit für einen blockierenden Dialog. Ein lokales Skript nimmt die eine Datei auf.
+- **Abrufbremse: ein Chat je acht Sekunden, der Abstand gleichverteilt gewürfelt zwischen 4 und 12 Sekunden.** Der Zweck ist, den Server nicht zu belasten und nicht als Massenabruf aufzufallen; die Streuung vermeidet das regelmäßige Muster, das ein fester Takt erzeugt. Das ergänzt die Begrenzung auf das Nachreichen neuer Chats — beides zusammen hält die Last dort, wo eine Handvoll Abrufe je Lauf anfällt.
+- **Nutzerpflicht: In Chrome muss „Speicherort für jede Datei vor dem Download abfragen" ausgeschaltet sein.** Sonst öffnet jeder Download einen Dateidialog, und ein Dialog blockiert die Browser-Anbindung vollständig — sie empfängt dann keine Kommandos mehr. Das gehört in die Anwenderdokumentation, an dieselbe Stelle wie die Pflicht, die Aufbewahrungsdauer hochzusetzen (Doku 1.3).
+
 **Und eine Möglichkeit, die dadurch zurückkehrt:** Die Wegegleichheit (Vorgabe 2.5) war mit dem Wegfall des Lese-Wegs blockiert. Mit einem zweiten funktionierenden Weg ließe sie sich wieder prüfen — und leichter als zuvor, weil beide Wege dieselben Strukturen liefern: Baum, Blöcke, Anhänge. Der Lese-Weg gab nur ein gerendertes Transkript und machte den Vergleich schwer.
 
 ## Fahrplanpunkt 26: die Probe über Chrome — bestanden, in allen drei Schritten
@@ -547,7 +553,28 @@ Drei unabhängige Quellen, dieselbe Zahl. Die Regeln aus 3.1.2 greifen also an e
 
 ### Was offen bleibt
 
-**Wie kommen 593 KB auf die Platte, ohne durch den Kontext zu gehen?** Die Auswertung lief bewusst *in der Seite* — gezählt und zusammengefasst wurde dort, herausgereicht wurden nur Zahlen. Für ein Archiv muss aber der volle JSON-Text in eine Datei. Naheliegend ist ein Download aus der Seite heraus in den Download-Ordner, den ein lokales Skript aufnimmt; geprüft ist das nicht.
+*(Die Frage, wie die Daten auf die Platte kommen, ist inzwischen beantwortet — siehe unten.)*
+
+### Der Weg auf die Platte — geprüft, einschließlich des Härtefalls
+
+Noch am selben Tag nachgezogen. Das Verfahren: Ein Tab auf `claude.ai`, von dort `fetch` je Chat, alles in **ein** Objekt, daraus ein Blob, eine Objekt-URL und ein angeklickter Link mit `download`-Attribut. Chrome legt die Datei im Download-Ordner ab, ein lokales Skript nimmt sie auf. Weder Erweiterung noch eingespritztes Fremdskript nötig — `javascript_tool` der Chrome-Anbindung genügt.
+
+**Zwei kurze Chats, ein Download:** 12.051 Zeichen erzeugt, 12.199 Bytes auf der Platte, gültiges JSON, beide Chats vollständig mit gesetztem `parent_message_uuid`. Die Abrufbremse lief mit, gemessene Wartezeit 5,4 s. **Kein Dialog** — die Anbindung blieb ansprechbar.
+
+**Der Härtefall, derselbe Weg:** `2bb99eef` mit 607.083 Zeichen Antwort, Abrufdauer **953 ms**, 619.023 Bytes auf der Platte. Vollständig.
+
+**Und daraus die schärfste Gegenprobe des ganzen Vorhabens.** Die heruntergeladene Datei gegen dasselbe Gespräch im Export-ZIP gehalten:
+
+| | Nachrichten | human / assistant | Gabelungen |
+| --- | --- | --- | --- |
+| Web-API-Download | 187 | 95 / 92 | 2 und 4 Kinder |
+| Export-ZIP | 187 | 95 / 92 | 2 und 4 Kinder |
+
+**Die Mengen der Nachrichten-UUIDs sind identisch** — null Nachrichten nur in der einen, null nur in der anderen Quelle. Nicht bloß gleiche Zahlen, sondern dieselben Nachrichten. Die Wegegleichheit (Vorgabe 2.5) ist damit an der Quelle belegt, bevor überhaupt ein Konverter läuft.
+
+**Nebenbefund zum kurzen Chat:** `128aa097` liefert 4 Nachrichten (2 human), unser Archiv führt 2. Der Unterschied ist der Nebenzweig aus der nachträglich geänderten Frage — genau das, was beim Anlegen des Prüfstücks vermerkt wurde. Kein Fehler, sondern der Baum.
+
+**Was damit offen bleibt:** nichts Technisches mehr an diesem Weg. Offen sind allein Entwurfsfragen — wie das lokale Skript die Datei aufnimmt, wo sie zwischenlandet, und wie der Abgleich gegen das Protokoll eingehängt wird.
 
 ## Aufgeräumt
 
