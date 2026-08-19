@@ -10,7 +10,31 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
 ## Als nächstes
 
-*(derzeit nichts — Punkt 26 ist ausgeführt und bestanden; die Bauentscheidung daraus ist noch nicht formuliert.)*
+27. **Ein Skill, der beide Wege anbietet, die Lage feststellt und den passenden vorschlägt.** *Warm für den Lauf, kalt für den Bau.* — **Plan, noch nicht ausgeführt.**
+
+    **Der Zuschnitt.** Der Skill erklärt, stellt den Abgleich her, empfiehlt und führt aus, was ausführbar ist. Er **entscheidet nicht**: Die Wahl zwischen den Wegen bleibt beim Nutzer, wie sie es seit 1.2 ist. Und er **rechnet nicht selbst** — jeder Vergleich läuft durch ein Skript, das die JSON parst; die Instanz trägt nur vor. Das ist die Lehre aus den zehn statt neun Einträgen (1.4).
+
+    **Erste Entscheidung, vor allem anderen: wo der Skill lebt.** Zwei Möglichkeiten, und sie schließen sich aus.
+
+    - *In `chats-export/`.* Der Skill ist ohne die Skripte dieses Ordners wertlos, und er teilt deren Weitergabebeschränkung („Nicht benutzen!"). Er würde nach der Struktur aus `skills/skill_vorgaben.md` Kapitel 5 gebaut, aber hier liegen — verschiebbar, falls er je eigenständig wird. **Empfohlen.**
+    - *In `skills/`.* Dort gelten fertige Vorgaben und keine Weitergabebeschränkung — aber ein Skill, der ein Werkzeug aus einem gesperrten Ordner voraussetzt, wäre für Fremde eine Sackgasse, und `skills/` hinge an einem beschränkten Vorhaben.
+
+    **Zweite Entscheidung: wie weit der Skill handelt, bevor er fragt.** Vorschlag: Lesen und Abgleichen ohne Rückfrage; jeder Abruf, der Last erzeugt, und jedes Schreiben in den Bestand erst nach Zustimmung.
+
+    **Was am Code dazukommt** — bewusst wenig, weil die Struktur beider Quellen sich als gleich erwiesen hat (Nachrichten-UUIDs deckungsgleich, dieselben Felder `uuid`, `sender`, `content`, `parent_message_uuid`, `attachments`, `files`):
+
+    - `chat_export_convert.py` bekommt eine **zweite Eingangsart**: `convert --bundle <datei>` neben `--zip`. Baumlauf, Blockauswahl, Nebendateien und Protokollführung bleiben unverändert — nur der Behälter ist ein anderer. Damit ist die Wegegleichheit hier **baulich** gegeben statt bloß geprüft.
+    - `list` bekommt `--web <datei>` als Gegenstück zu `--map <dump>`: Protokoll anlegen oder ergänzen aus der Liste des Web-Wegs. Diese Liste trägt `created_at` und `project_uuid` je Chat — beides kannte der bisherige Weg nicht.
+    - Zu prüfen, ob `diff` die UUIDs der zu holenden Chats schon nennt. Falls nicht, kommt eine Ausgabeform dazu, die der Skill an den Abruf weiterreicht.
+    - Ob das flache Feld `text` im Web-Behälter fehlt, ist zu prüfen; der Konverter benutzt es nicht (3.1.3), aber die Annahme gehört bestätigt.
+
+    **Was der Skill vom Nutzer braucht und in seiner README nennt:** angehängte Browser-Werkzeuge (in VS Code `@browser` je Nachricht, im CLI `claude --chrome`), und in Chrome ausgeschaltetes Nachfragen nach dem Speicherort — ein Dialog blockiert die Anbindung vollständig.
+
+    **Was die Organisations-UUID liefert, ist noch offen.** Sie steht im Dateinamen jedes Export-ZIP und ließe sich von dort nehmen; ob claude.ai sie auch ohne Vorwissen hergibt, etwa über einen Endpunkt ohne Organisationsangabe, ist ungeprüft und der erste kleine Handgriff dieses Punktes.
+
+    **Zwei Vereinfachungen, die dabei anfallen** und in die Doku gehören: Der Rückweg des Protokolls ins Projektwissen des Quellprojekts (1.4, 1.5 Schritt 4) wird **entbehrlich** — er trug den Lese-Weg, den es nicht mehr gibt; als Selbstauskunft des Quellprojekts bleibt er nützlich, als Pflicht entfällt er. Und der Wegwerfchat für die Chatliste samt der Regel, ihn zu löschen (1.5), entfällt vollständig: Der Web-Weg listet ohne Chat und übergeht nichts.
+
+    **Nicht Teil dieses Punktes:** das Anfordern des Exports über das Formular. Das ist ein eigener, kleiner Schritt, sobald der Skill steht — und er endet ohnehin an der E-Mail.
 
 ## Danach
 
