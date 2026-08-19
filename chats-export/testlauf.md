@@ -490,6 +490,65 @@ Festgehalten, damit es beim Doku-Durchgang nicht neu erarbeitet werden muss. Es 
 
 **Und eine Möglichkeit, die dadurch zurückkehrt:** Die Wegegleichheit (Vorgabe 2.5) war mit dem Wegfall des Lese-Wegs blockiert. Mit einem zweiten funktionierenden Weg ließe sie sich wieder prüfen — und leichter als zuvor, weil beide Wege dieselben Strukturen liefern: Baum, Blöcke, Anhänge. Der Lese-Weg gab nur ein gerendertes Transkript und machte den Vergleich schwer.
 
+## Fahrplanpunkt 26: die Probe über Chrome — bestanden, in allen drei Schritten
+
+Am 19. August 2026 auf dem Rechner `xps`, im Pro-Konto, über die Chrome-Anbindung von Claude Code. In VS Code heißt der Schalter **`@browser`** im Eingabefeld, nicht `/chrome`; das Kommando gibt es dort nicht. Der Nutzer stößt damit jeden Schritt an, die Werkzeuge kommen pro Nachricht dazu.
+
+**Der Zugriff funktioniert, und zwar auf zwei Wegen.** Ein Tab, den man direkt auf einen API-Pfad navigiert, liefert das JSON als Seitentext. Und aus einer geöffneten claude.ai-Seite heraus arbeitet `fetch` gleichursprünglich gegen dieselben Pfade — Status 200, ohne Navigation. Der zweite Weg ist der, den ein Skript ginge.
+
+**Die Mengenfrage ist beantwortet, und großzügiger als erwartet.** Der längste Chat des Archivs kam mit **607.083 Zeichen in einer einzigen Antwort** und ließ sich vollständig parsen — nicht 124 KB, sondern rund 593. Keine Paginierung, keine Kürzung. Die Sorge, ein Werkzeug für Seitentext könne die Antwort abschneiden, hat sich nicht bestätigt.
+
+**Kein Captcha, keine Cloudflare-Prüfung** bei diesen wenigen Abrufen.
+
+### Was die Endpunkte liefern
+
+Drei statt der zwei bekannten. Die Organisations-UUID braucht dafür **keinen Mitschnitt**: Sie steht im Dateinamen jedes Export-ZIP (`data-<org>-…-batch-0000.zip`) und ließ sich gegen die Netzwerkansicht bestätigen.
+
+| Endpunkt | liefert |
+| --- | --- |
+| `/api/organizations/<org>/projects` | alle Projekte mit `uuid`, `name`, `description`, **`created_at`**, `updated_at`, `is_private` |
+| `…/projects/<projekt>/conversations_v2?limit&offset` | je Chat `uuid`, `name`, `summary`, **`model`**, **`created_at`**, `updated_at`, **`project_uuid`**, `effective_thinking_mode`, `current_leaf_message_uuid`; Hülle aus `data` und `pagination` |
+| `…/chat_conversations/<chat>?tree&rendering_mode&render_all_tools` | Kopfdaten plus `chat_messages` mit `content`-Blöcken, `sender`, `parent_message_uuid`, `attachments`, `files` |
+
+**Die Paginierung muss nicht geraten werden.** Der Listen-Endpunkt gibt ein `pagination`-Objekt mit `has_more`, `limit`, `offset` und `total` zurück. Die Vermutung im Fahrplan, man erkenne das Ende daran, dass eine Seite weniger als `limit` liefert, ist damit überholt — es steht ausdrücklich da.
+
+### Gegen bekannte Werte geprüft
+
+Nicht auf Plausibilität, sondern gegen Sollwerte, die vorher feststanden:
+
+| Prüfung | Sollwert | Ergebnis |
+| --- | --- | --- |
+| `created_at` des FreeCAD-Projekts | 2025-11-10 (Doku 3.1.1) | **2025-11-10T18:46:28** |
+| `created_at` des Testprojekts | 2026-08-17 | **2026-08-17T14:07:28** |
+| `updated_at` von `d64eea15` | 2025-11-13T22:07:44.559082 aus dem `read_conversation`-Envelope vom 6. August | **2025-11-13T22:07** |
+| Anhang in `1d322d54` | `test_docstrings.py`, 4.481 Zeichen `extracted_content` | **zeichengenau gleich** |
+| das Bild im selben Chat | nur `files`, ohne Inhalt | **bestätigt** |
+| ältester Chat des FreeCAD-Projekts | nicht älter als das Projekt | 2025-11-10, **gleich dem Projektbeginn** |
+
+**Der Denktext fehlt auch hier**, wo er im Export fehlt, und ist da, wo er im Export da ist — der Wegfall ist also keine Eigenschaft des Exports, sondern der Plattform. Das bestätigt den Befund aus 21.11 an einer zweiten Quelle.
+
+### Die Dreifachprobe am längsten Chat
+
+Sie war als Mengentest gedacht und wurde nebenbei zur schärfsten Übereinstimmungsprüfung des ganzen Vorhabens. Für `2bb99eef` „Technical drawings from FreeCAD parts":
+
+- **Web-API:** 187 Nachrichten, 95 human, 92 assistant, alle mit `parent_message_uuid`.
+- **Export-ZIP, roh nachgezählt:** 187 Nachrichten, 95 human, 92 assistant, 2 Gabelungen mit 2 und 4 Kindern.
+- **Unser heutiger Konverter:** 142 auf dem gewählten Pfad **plus 45 in 4 Nebenzweigen** — zusammen 187.
+
+Drei unabhängige Quellen, dieselbe Zahl. Die Regeln aus 3.1.2 greifen also an echten Daten, und die Integritätszusage aus 3.1.7 hält auch hier.
+
+**Ein Nebenbefund daraus:** Das auf der Platte liegende FreeCAD-Archiv führt für diesen Chat nur die 142 und meldet **keine** Nebenzweige. Es stammt aus der Zeit vor der Nebenzweig-Funktion. Kein Defekt, aber ein veralteter Bestand — wer ihn als Sollwert nimmt, vergleicht gegen einen alten Stand.
+
+### Zwei Funde, die über die Probe hinausreichen
+
+**Der Sondierungsexport wird gegenstandslos.** Der Projekt-Endpunkt liefert jedes Projekt mit `created_at` — genau das, wofür 1.5 Schritt 0 einen eigenen Export anfordert. Zusammen mit `created_at` und `project_uuid` je Chat entfallen damit auch die Fensterrechnung als Notbehelf und die Chatliste als einzige Zuordnungsquelle.
+
+**Fahrplanpunkt 24 ist faktisch beantwortet.** Der Listen-Endpunkt zeigt für das FreeCAD-Projekt **23** Chats, unser Protokoll führt **22**. Genau die stille Lücke, die der Befund zum laufenden Chat vorhergesagt hat. Welcher Chat es ist, steht noch aus und kostet einen lokalen Vergleich.
+
+### Was offen bleibt
+
+**Wie kommen 593 KB auf die Platte, ohne durch den Kontext zu gehen?** Die Auswertung lief bewusst *in der Seite* — gezählt und zusammengefasst wurde dort, herausgereicht wurden nur Zahlen. Für ein Archiv muss aber der volle JSON-Text in eine Datei. Naheliegend ist ein Download aus der Seite heraus in den Download-Ordner, den ein lokales Skript aufnimmt; geprüft ist das nicht.
+
 ## Aufgeräumt
 
 Der Wegwerf-Ordner `~/zielprojekt-test/` ist nach bestandener Prüfung gelöscht; alle zwölf Dateien darin waren inhaltsgleiche Kopien aus `tests/test_results/pro-test-1/` und wurden vor dem Löschen einzeln dagegen verglichen. Wer 21.8 wiederholen will, baut ihn in zwei Minuten neu auf — Ordner, `.claude/imported_chats/<quellprojekt>/`, und die `CLAUDE.md` mit dem Block aus `convert --target repo`.
