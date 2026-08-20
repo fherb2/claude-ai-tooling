@@ -14,12 +14,23 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
     **Der Zuschnitt.** Der Skill erklärt, stellt den Abgleich her, empfiehlt und führt aus, was ausführbar ist. Er **entscheidet nicht**: Die Wahl zwischen den Wegen bleibt beim Nutzer, wie sie es seit 1.2 ist. Und er **rechnet nicht selbst** — jeder Vergleich läuft durch ein Skript, das die JSON parst; die Instanz trägt nur vor. Das ist die Lehre aus den zehn statt neun Einträgen (1.4).
 
-    **Erste Entscheidung, vor allem anderen: wo der Skill lebt.** Zwei Möglichkeiten, und sie schließen sich aus.
+    **Name, Aufruf, Ablage — entschieden.** Der Skill heißt `chats-export`, Ordner und Frontmatter-`name` gleichlautend, Aufruf also `/chats-export`. Gepflegt wird er **ausschließlich in `chats-export/`** — das ist der Entwicklerordner und die Stelle, aus der der Nutzer sich seine Fassung holt. Am Zielort liegen `SKILL.md`, `README.md` und `chat_export_convert.py` **flach in einem Ordner**; das Skript spricht der Skill über `${CLAUDE_SKILL_DIR}` an, der in Claude Code aufgelöst wird und damit beide Ablageorte ohne Textänderung trägt. Ein stiller Trigger entfällt: Der Auslöser ist eine ausgesprochene Anfrage, also ereignisförmig — damit gibt es keine `CLAUDE-snippet.md` und in der README keinen Schritt dafür.
 
-    - *In `chats-export/`.* Der Skill ist ohne die Skripte dieses Ordners wertlos, und er teilt deren Weitergabebeschränkung („Nicht benutzen!"). Er würde nach der Struktur aus `skills/skill_vorgaben.md` Kapitel 5 gebaut, aber hier liegen — verschiebbar, falls er je eigenständig wird. **Empfohlen.**
-    - *In `skills/`.* Dort gelten fertige Vorgaben und keine Weitergabebeschränkung — aber ein Skill, der ein Werkzeug aus einem gesperrten Ordner voraussetzt, wäre für Fremde eine Sackgasse, und `skills/` hinge an einem beschränkten Vorhaben.
+    **Zum Testen** wird eine Kopie in `.claude/skills/chats-export/` dieses Repos abgelegt und **nach dem Test wieder entfernt**. Sie ist Prüfaufbau, nicht Ablage. Im Projekt liegt der Ordner innerhalb der Wurzel, Lesen und Ausführen sind normale Handgriffe; erst die spätere Variante unter `~/.claude/skills/` liegt außerhalb des Arbeitsverzeichnisses und braucht die Freigabe als zusätzliches Verzeichnis — dieselbe Bedingung wie beim dritten Zielort (1.3).
 
-    **Zweite Entscheidung: wie weit der Skill handelt, bevor er fragt.** Vorschlag: Lesen und Abgleichen ohne Rückfrage; jeder Abruf, der Last erzeugt, und jedes Schreiben in den Bestand erst nach Zustimmung.
+    **Keine zweite gepflegte Fassung, also keine Drift-Sicherung.** Das Skript existiert im Repo genau einmal, in `source/`. Die Kopie am Zielort ist Sache des Nutzers, der sich die jeweils aktuelle Fassung selbst holt; die README sagt, woher. Eine Prüfsumme oder ein Versionsabgleich wäre Maschinerie für ein Problem, das diese Anordnung nicht hat.
+
+    **Die Arbeitsteilung, in einem Satz:** Die Instanz **deutet und ordnet zu**, das Skript **zählt und vergleicht**. Das Deuten ist die Stärke der Instanz — eine Aufzählung von Projektnamen mit Tippfehlern auf die echte Liste abbilden, oder auf „zeig mir einfach alle" sinnvoll reagieren; ein Skript kann das schlechter. Das Zählen ist ihre Schwäche, belegt mit zehn statt neun (1.4). Beides bleibt dort, wo es hingehört.
+
+    **Genau zwei Haltepunkte, sonst keine.**
+
+    - **Erster:** Der Skill erklärt kurz, was er tut, und fragt, ob er beginnen kann. Ein Ja ist die Zustimmung für alles Lesende — Kontoauskunft, Projektliste, Chatlisten, Abgleich.
+    - **Dazwischen** nennt er das **Konto**, mit dem Chrome bei claude.ai angemeldet ist, und dass dort gesucht wird. Das ersetzt jede vorherige Anweisung, sich anzumelden: Der Nutzer kann sich besinnen, und ein fehlendes Login fällt an derselben Stelle auf. Nur wenn die Projektwahl unklar bleibt, fragt er hier nach — hat der Nutzer die Projekte schon genannt, fragt er nicht.
+    - **Zweiter:** Nach der Statistik wählt der Nutzer je Projekt den Weg. Darauf folgt **ein** Hinweis, was nun geschieht — und der **nennt die Zahl der zu ersetzenden Chats und ihrer zu entfernenden Dateien**, denn das ist Löschen und darf nicht in einem allgemeinen Satz untergehen.
+
+    Der Anweisungsblock für die `CLAUDE.md` des Zielprojekts wird deshalb **Schlussbemerkung, nicht Frage** — sonst entstünde ein dritter Haltepunkt.
+
+    **Mehrere Quellprojekte in einem Lauf sind vorgesehen.** Der Nutzer zählt sie auf, oder er sagt nur, dass er aus dem Konto importieren will, und bekommt alle angezeigt — dann hat er eine Vorlage vor sich. Damit die Haltepunkte bei zwei bleiben, steht die Statistik als **eine** Tabelle mit einer Zeile je Projekt samt eigener Empfehlung, und der Nutzer antwortet **einmal** für alle.
 
     **Was am Code dazukommt** — bewusst wenig, weil die Struktur beider Quellen sich als gleich erwiesen hat (Nachrichten-UUIDs deckungsgleich, dieselben Felder `uuid`, `sender`, `content`, `parent_message_uuid`, `attachments`, `files`):
 
@@ -28,9 +39,9 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
     - Zu prüfen, ob `diff` die UUIDs der zu holenden Chats schon nennt. Falls nicht, kommt eine Ausgabeform dazu, die der Skill an den Abruf weiterreicht.
     - Ob das flache Feld `text` im Web-Behälter fehlt, ist zu prüfen; der Konverter benutzt es nicht (3.1.3), aber die Annahme gehört bestätigt.
 
-    **Was der Skill vom Nutzer braucht und in seiner README nennt:** angehängte Browser-Werkzeuge (in VS Code `@browser` je Nachricht, im CLI `claude --chrome`), und in Chrome ausgeschaltetes Nachfragen nach dem Speicherort — ein Dialog blockiert die Anbindung vollständig.
+    **Was der Skill vom Nutzer braucht und in seiner README nennt:** angehängte Browser-Werkzeuge (in VS Code `@browser` je Nachricht, im CLI `claude --chrome`), und in Chrome ausgeschaltetes Nachfragen nach dem Speicherort — ein Dialog blockiert die Anbindung vollständig. **Nicht** dazu gehört die Anweisung, sich anzumelden: Das nennt der Skill zur Laufzeit.
 
-    **Was die Organisations-UUID liefert, ist noch offen.** Sie steht im Dateinamen jedes Export-ZIP und ließe sich von dort nehmen; ob claude.ai sie auch ohne Vorwissen hergibt, etwa über einen Endpunkt ohne Organisationsangabe, ist ungeprüft und der erste kleine Handgriff dieses Punktes.
+    **Der erste kleine Handgriff, und er entscheidet über den ersten Haltepunkt:** Gibt claude.ai ohne Vorwissen Auskunft über das angemeldete Konto und seine Organisations-UUID? Gebraucht wird beides — der Kontoname für die Nennung, die UUID für jeden weiteren Aufruf. Die UUID steht ersatzweise im Dateinamen jedes Export-ZIP, der Kontoname dort nicht. Ein Endpunkt ohne Organisationsangabe müsste beides liefern; ungeprüft, eine Probe von Minuten.
 
     **Zwei Vereinfachungen, die dabei anfallen** und in die Doku gehören: Der Rückweg des Protokolls ins Projektwissen des Quellprojekts (1.4, 1.5 Schritt 4) wird **entbehrlich** — er trug den Lese-Weg, den es nicht mehr gibt; als Selbstauskunft des Quellprojekts bleibt er nützlich, als Pflicht entfällt er. Und der Wegwerfchat für die Chatliste samt der Regel, ihn zu löschen (1.5), entfällt vollständig: Der Web-Weg listet ohne Chat und übergeht nichts.
 
