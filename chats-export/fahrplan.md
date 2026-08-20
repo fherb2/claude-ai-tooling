@@ -34,6 +34,8 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
     **Zwei Vereinfachungen, die dabei anfallen** und in die Doku gehören: Der Rückweg des Protokolls ins Projektwissen des Quellprojekts (1.4, 1.5 Schritt 4) wird **entbehrlich** — er trug den Lese-Weg, den es nicht mehr gibt; als Selbstauskunft des Quellprojekts bleibt er nützlich, als Pflicht entfällt er. Und der Wegwerfchat für die Chatliste samt der Regel, ihn zu löschen (1.5), entfällt vollständig: Der Web-Weg listet ohne Chat und übergeht nichts.
 
+    **Das angestrebte Verhalten aus Nutzersicht** steht als Durchgang in `Zielvorlage.md` — Beurteilungsgrundlage und spätere Vorlage der Anwenderdokumentation, ausdrücklich kein zweiter Plan.
+
     **Nicht Teil dieses Punktes:** das Anfordern des Exports über das Formular. Das ist ein eigener, kleiner Schritt, sobald der Skill steht — und er endet ohnehin an der E-Mail.
 
 ## Danach
