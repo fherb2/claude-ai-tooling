@@ -257,7 +257,7 @@ Der Anteil versteckter Denkblöcke steigt von null über 18 auf hundert Prozent.
 
 ## 21.8 zweite Hälfte: Wirkt der Anweisungsblock? — bestanden
 
-Aufbau: ein Wegwerfordner `~/zielprojekt-test/` **außerhalb** dieses Repos — bewusst außerhalb, weil Claude Code `CLAUDE.md`-Dateien den Verzeichnisbaum hinauf einsammelt und ein Ordner innerhalb des Repos unsere Projektanweisungen mitgeladen hätte; die Instanz hätte dann von diesem Vorhaben gewusst. Darin `.claude/imported_chats/chats-export-aus-pro-test-1/` mit den zwölf Archivdateien und eine `CLAUDE.md`, die **nur** den Anweisungsblock enthält, sonst nichts. Der Versuch lief in einer frischen Sitzung, die von diesem Vorhaben nichts weiß.
+Aufbau: ein Wegwerfordner `~/zielprojekt-test/` **außerhalb** dieses Repos — bewusst außerhalb, weil Claude Code `CLAUDE.md`-Dateien den Verzeichnisbaum hinauf einsammelt und ein Ordner innerhalb des Repos unsere Projektanweisungen mitgeladen hätte; die Instanz hätte dann von diesem Vorhaben gewusst. Darin `.claude/imported_chats/chat-export-aus-pro-test-1/` mit den zwölf Archivdateien und eine `CLAUDE.md`, die **nur** den Anweisungsblock enthält, sonst nichts. Der Versuch lief in einer frischen Sitzung, die von diesem Vorhaben nichts weiß.
 
 **Die Frage war schärfer als die geplante.** Vorgesehen war „Welche Wanderroute hatten wir geplant?" — also eine Frage, deren Antwort im Archiv steht. Gestellt wurde stattdessen eine **neue** Frage zum selben Gebiet: ob es sinnvoll sei, von Severní nach Lobendava zu gehen oder anders herum. Das Archiv war damit nicht die Antwort, sondern der Zusammenhang, den die Instanz von sich aus hätte übersehen können.
 

@@ -7,7 +7,7 @@ Die Liste beginnt mit der Arbeitsphase ab dem 14. August 2026. Die davor erledig
 ## 2026-08-14
 
 - **15** Prüfpunkte an einem Ort zusammengefasst und vervollständigt. Kapitel 4 trägt jetzt Verfahren, drei Prüfarten und eine Übersicht über alle Punkte; die verstreuten Punkte aus 1.6, 3.2.5 und 1.3 sind aufgenommen.
-- **16** Entscheidung gegen eine projekteigene `CLAUDE.md` für `chats-export`; die Begründung trägt die Repo-`CLAUDE.md`.
+- **16** Entscheidung gegen eine projekteigene `CLAUDE.md` für `chat-export`; die Begründung trägt die Repo-`CLAUDE.md`.
 
 ## 2026-08-17 bis 18
 

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(python3)",
+      "Bash(python3 -)",
+      "Bash(cd /)",
+      "Bash(cd chat-export *)",
+      "Bash(python3 tests/test_crawl_store.py)",
+      "Bash(PYTHONPATH=source python3 tests/test_crawl_store.py)",
+      "Bash(python3 chat-export/tests/test_crawl_store.py)",
+      "Bash(python3 -O /home/herbrand/git/claude-ai-tooling/chat-export/tests/test_crawl_store.py)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(timeout 90 git push)",
+      "Bash(ssh-add -l)"
+    ]
+  }
+}

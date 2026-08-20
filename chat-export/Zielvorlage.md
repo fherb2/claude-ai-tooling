@@ -1,4 +1,4 @@
-# Zielvorlage: der Skill `chats-export` aus Sicht des Nutzers
+# Zielvorlage: der Skill `chat-export` aus Sicht des Nutzers
 
 **Was diese Datei ist.** Eine Beschreibung des angestrebten Verhaltens, geschrieben als Durchgang aus der Sicht dessen, der das Werkzeug benutzt. Sie dient dazu, den Entwurf zu beurteilen, bevor er gebaut wird, und ist später die Vorlage für die Anwenderdokumentation (Fahrplanpunkt 13).
 
@@ -10,13 +10,14 @@
 
 ---
 
-## 1 Einmalig, bevor es losgeht
+## 1 Voraussetzungen
 
-Zwei Einstellungen und eine Datei, danach nie wieder:
+Drei Punkte, davon zwei einmalig und einer bei jedem Lauf:
 
 1. **Claude in Chrome** ist installiert.
-2. **In Chrome unter *Einstellungen → Downloads*: „Speicherort für jede Datei vor dem Download abfragen" ausschalten.** Sonst öffnet der erste Download einen Dateidialog, und ein Dialog legt die Browser-Anbindung vollständig lahm — sie empfängt dann keine Kommandos mehr, und der Dialog muss von Hand weggeklickt werden.
-3. Der Skill liegt im Zielprojekt unter `.claude/skills/chats-export/`, zusammen mit `chat_export_convert.py` und seiner `README.md`. Die jeweils aktuelle Fassung holt der Nutzer sich aus `chats-export/` des Repositories; dort und nur dort wird sie gepflegt.
+2. **Chrome läuft.** Das ist die einzige Bedingung, die bei **jedem** Lauf neu gilt: Die Verbindung geht über die Erweiterung, und die lebt nur in einem geöffneten Browser. Fehlt er, meldet die Anbindung „Browser extension is not connected" — unabhängig davon, wie richtig alles andere eingestellt ist. Ein Fenster genügt; claude.ai selbst muss nicht offen sein, weil der Skill sich seinen eigenen Tab anlegt. Die Anmeldung bleibt im Chrome-Profil erhalten und muss nicht wiederholt werden.
+3. **In Chrome unter *Einstellungen → Downloads*: „Speicherort für jede Datei vor dem Download abfragen" ausschalten.** Sonst öffnet der erste Download einen Dateidialog, und ein Dialog legt die Browser-Anbindung vollständig lahm — sie empfängt dann keine Kommandos mehr, und der Dialog muss von Hand weggeklickt werden.
+4. Der Skill liegt im Zielprojekt unter `.claude/skills/chat-export/`, zusammen mit `chat_export_convert.py` und seiner `README.md`. Die jeweils aktuelle Fassung holt der Nutzer sich aus `chat-export/` des Repositories; dort und nur dort wird sie gepflegt.
 
 **Was hier ausdrücklich nicht steht:** die Anweisung, sich vorher bei claude.ai anzumelden. Der Skill nennt zur Laufzeit, mit welchem Konto Chrome angemeldet ist (Abschnitt 2.3) — das ist verlässlicher als eine Zusicherung, die niemand prüft, und es fängt auch den Fall auf, dass gar keine Anmeldung besteht.
 
@@ -31,14 +32,14 @@ Ausgangslage: Eine Claude-Code-Sitzung im Zielprojekt, etwa `modellbahn-fahrpult
 ### 2.1 Der Aufruf
 
 ```
-@browser /chats-export
+@browser /chat-export
 ```
 
 Das `@browser` ist in der VS-Code-Erweiterung Pflicht: Ohne es hängen die Browser-Werkzeuge nicht an der Nachricht, und der Skill steht ohne Browser da. Im CLI genügt einmal `claude --chrome` beim Start.
 
 Fehlen die Werkzeuge, bricht der Skill sofort ab und sagt genau das — er versucht nicht, sich anders zu behelfen:
 
-> Die Browser-Werkzeuge sind dieser Nachricht nicht angehängt. Ruf mich mit `@browser /chats-export` auf, oder starte Claude Code mit `claude --chrome`.
+> Die Browser-Werkzeuge sind dieser Nachricht nicht angehängt. Ruf mich mit `@browser /chat-export` auf, oder starte Claude Code mit `claude --chrome`.
 
 Der Aufruf muss kein Slash-Kommando sein. „Hol die neuen Chats aus dem Modellbahn-Projekt" oder „ich will Projekte aus meinem Claude-Konto importieren" trifft ihn genauso.
 
@@ -226,7 +227,7 @@ Sobald die Datei da ist, läuft alles Weitere automatisch — mit derselben Ausg
 
 **Cloudflare oder ein Captcha.** Die Anbindung hält an und fragt. Der Skill umgeht das nicht und soll es nicht — er merkt sich, welche Chats schon geholt sind, und setzt nach dem Wegklicken fort.
 
-**Der Download öffnet einen Dialog.** Dann war die Einstellung aus Abschnitt 1 nicht gesetzt. Der Skill kann das dann nicht mehr melden, weil die Anbindung blockiert ist — deshalb steht die Einstellung ganz vorn und wird beim Aufruf einmal geprüft, solange das noch möglich ist.
+**Der Download öffnet einen Dialog.** Dann war die Einstellung aus Abschnitt 1, Punkt 3 nicht gesetzt. Der Skill kann das dann nicht mehr melden, weil die Anbindung blockiert ist — deshalb steht die Einstellung ganz vorn und wird beim Aufruf einmal geprüft, solange das noch möglich ist.
 
 **Ein Chat ohne Datumsgrenze.** Bei einer Erstmigration ohne Protokoll kennt niemand den Projektbeginn. Dann rät der Skill nicht, sondern fordert an: *„4 wartende Chats haben keinerlei Datumsgrenze. Ich kann nicht sagen, wie weit ein Export zurückreichen muss."* Über den Web-Weg ist das erledigt, denn dort steht `created_at` je Chat in der Liste — genau deshalb wird der Sondierungsexport aus Doku 1.5 Schritt 0 überflüssig.
 
