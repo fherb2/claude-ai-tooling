@@ -20,7 +20,7 @@
     // dass das Verketten der Dokumentdateien in Dateireihenfolge ein gültiges
     // Gesamtdokument ergibt. MD025 verlangt genau eine Überschrift erster
     // Ordnung und würde jede Segmentüberschrift als Fehler melden -- in
-    // home-.claude-sharing dreimal, in chats-export fünfmal.
+    // home-.claude-sharing dreimal, in chat-export fünfmal.
     "MD025": false,
 
     // Arbeitsanweisungen §2.4: Segment 1 beschreibt den Zusammenhang, Segment 3

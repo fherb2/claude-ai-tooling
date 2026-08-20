@@ -51,18 +51,18 @@ nachfragen.
 Alle sind eigenständig. Die Unterschiede sind gewachsen und Absicht, keine
 Nachlässigkeit:
 
-|               | `chats-export/`                        | `home-.claude-sharing/`                   | `pack-source-to-txt/`                  | `skills/`                              |
+|               | `chat-export/`                        | `home-.claude-sharing/`                   | `pack-source-to-txt/`                  | `skills/`                              |
 | ------------- | -------------------------------------- | ------------------------------------------ | --------------------------------------- | --------------------------------------- |
 | Doku          | `implementation_doku.md`, vier Kapitel | `implementierungs_doku.md`, drei Segmente | keine — nur `README.md`/`README.de.md` | `skill_vorgaben.md`, keine Segmente     |
 | Status        | `status.md`                            | `status.md`                                | —                                        | —                                       |
 | Fahrplan      | eigener, mit Abschnitt „Dauerhaft“     | eigener, mit Abschnitt „Dauerhaft“         | —                                        | — (README je Skill)                     |
 | Eigenes Wort  | kalt / warm / Beobachtung              | —                                           | —                                        | —                                        |
 
-Dazu, was aus der Tabelle nicht hervorgeht: Kapitel 4 von `chats-export` ist
+Dazu, was aus der Tabelle nicht hervorgeht: Kapitel 4 von `chat-export` ist
 die Prüfliste gegen Änderungen bei Anthropic, ein viertes Segment über §2.4
 hinaus. Die drei Prüfarten von
-`chats-export` — **kalt**, **warm** und **Beobachtung** — sind normativ in
-`chats-export/implementation_doku.md` 4.1 festgelegt; hier steht bewusst
+`chat-export` — **kalt**, **warm** und **Beobachtung** — sind normativ in
+`chat-export/implementation_doku.md` 4.1 festgelegt; hier steht bewusst
 keine zweite Definition. `pack-source-to-txt` ist kein über Konzept- und
 Implementierungsdoku entwickeltes eigenes Vorhaben, sondern ein von extern
 übernommenes und angepasstes Werkzeug — daher keine Segment-Doku, kein
@@ -75,7 +75,7 @@ seither in `skills/skill_vorgaben.md`, der Arbeitsstand jedes einzelnen
 Skills in der `README.md` seines Ordners. Die Begründung im Wortlaut steht
 im Kopf von `skill_vorgaben.md`.
 
-Die READMEs von `chats-export` und `home-.claude-sharing` tragen den
+Die READMEs von `chat-export` und `home-.claude-sharing` tragen den
 Hinweis „Nicht benutzen!“; beide sind nicht zur Weitergabe freigegeben.
 `pack-source-to-txt` und `skills` unterliegen dieser Einschränkung nicht.
 
@@ -225,7 +225,7 @@ den eigenen Ordner. Die Befehle, die das leisten:
 
 ## Aufbewahren gehört ins Projekt
 
-`/tmp` als Arbeitsfläche ist richtig und in `chats-export` sogar Teil des
+`/tmp` als Arbeitsfläche ist richtig und in `chat-export` sogar Teil des
 Prüfverfahrens („kalt"). Der Sitzungsordner dort ist aber
 sitzungsgebunden und beim nächsten Neustart weg. Was über die Sitzung
 hinaus gebraucht wird, kommt deshalb **sofort** ins Repo. Was dort abgelegt

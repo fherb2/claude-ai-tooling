@@ -170,7 +170,7 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 - Der **Slash-Aufruf** heißt entsprechend `/<skill-name>`, nie `/<skill-name>-de`. Wo die `description` ihn selbst nennt, gehört er ohne Kürzel dort hinein.
 - Mehrere Fassungen sind **Übersetzungen desselben Skills**, keine mehreren Skills. Sie tragen dieselben Regeln, dieselben Anker und dieselbe Struktur. Weicht eine inhaltlich ab, ist das ein Fehler, kein Sprachunterschied.
 
-**Was für eine weitere Fassung spricht.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können — `skills/` unterliegt anders als `chats-export/` und `home-.claude-sharing/` keiner Weitergabebeschränkung. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
+**Was für eine weitere Fassung spricht.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können — `skills/` unterliegt anders als `chat-export/` und `home-.claude-sharing/` keiner Weitergabebeschränkung. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
 
 ---
 

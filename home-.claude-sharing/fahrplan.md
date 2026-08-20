@@ -24,4 +24,4 @@ Wie Befundlisten abgearbeitet werden, wo ein Plan steht und wie ein Review nachb
 
 ## Dauerhaft
 
-- Die README trägt den Hinweis „Nicht benutzen!", solange das Werkzeug nicht zur Weitergabe freigegeben ist. **Widersprüche zwischen ihr und der Doku sind bis dahin erlaubt** und kein Befund — dieselbe Erlaubnis, die `chats-export` unter „Dauerhaft" führt. Sie gilt bis auf Widerruf und wird in jedem Vorhaben getrennt aufgehoben, nicht zentral; sie steht deshalb bewusst nicht in `.claude/CLAUDE.md`.
+- Die README trägt den Hinweis „Nicht benutzen!", solange das Werkzeug nicht zur Weitergabe freigegeben ist. **Widersprüche zwischen ihr und der Doku sind bis dahin erlaubt** und kein Befund — dieselbe Erlaubnis, die `chat-export` unter „Dauerhaft" führt. Sie gilt bis auf Widerruf und wird in jedem Vorhaben getrennt aufgehoben, nicht zentral; sie steht deshalb bewusst nicht in `.claude/CLAUDE.md`.

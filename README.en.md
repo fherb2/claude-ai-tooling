@@ -10,7 +10,7 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 | Component                                                                 | What it addresses                                                                                                                                                                                                                  |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.en.md)<br>✅ | **The whole project codebase as a single file**: precise, up-to-date project context for an AI without access to the machine.                                                                                                      |
-| [`chats-export/`](chats-export/README.md) (in German)<br>🚧 | **Transferring chats from Claude.ai between different user accounts, or sorted by project, into local Claude instances** (Claude Code) — which Anthropic does not offer so far.                                                   |
+| [`chat-export/`](chat-export/README.md) (in German)<br>🚧 | **Transferring chats from Claude.ai between different user accounts, or sorted by project, into local Claude instances** (Claude Code) — which Anthropic does not offer so far.                                                   |
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md) (in German)<br>⚠️ | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
 | [`skills/`](skills/README.en.md)<br>☑ | Instead of many CLAUDE.md instructions:**have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger**.                                                |
 
@@ -30,13 +30,13 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 
 **Status:** in production use — more in the [component's README](pack-source-to-txt/README.en.md).
 
-## chats-export
+## chat-export
 
 **Purpose:** **importing chats from Claude.ai between different user accounts, or sorted by project, into local Claude instances (Claude Code)** is something Anthropic does not support at present (08/2026). – With this tooling it works anyway.
 
 The existing data export interface is not directly suited to this and is used by this tooling only indirectly. The tool supports importing project by project and also allows the "reloading" of chats that had already been begun at the time of the last import. Not a simple one-click solution. – Instead, a solution at all, for a start.
 
-**Status:** in progress, not quite finished yet. — More in the [component's README](chats-export/README.md) (in German).
+**Status:** in progress, not quite finished yet. — More in the [component's README](chat-export/README.md) (in German).
 
 ## home-.claude-sharing
 
