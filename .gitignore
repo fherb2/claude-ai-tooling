@@ -13,6 +13,13 @@ __pycache__/
 
 # Wegwerf-Testkopie des Skills; die gepflegte Fassung liegt in chat-export/skills/
 /.claude/skills/chat-export/
+/.claude/test_chat_imports/
+
+# Zielordner fuer Skill-Testimporte mit echtem Chat-Inhalt aus dem eigenen
+# Konto -- nie versionieren. Anlass: Der Lauf vom 21. August 2026 legte
+# .claude/imported_chats/ an, das dafuer noch nicht ausgeschlossen war
+# (chat-export/testlauf.md, Abschnitt "27c").
+/.claude/test_chat_imports/
 
 # Ablage fuer Untersuchungsmaterial (echte Chatinhalte, Exportdumps): die
 # Inhalte werden nie versioniert, der Ordner selbst schon -- er ist der
