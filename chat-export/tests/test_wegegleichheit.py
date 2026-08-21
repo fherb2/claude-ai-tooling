@@ -21,9 +21,10 @@ import zipfile
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 # Two scripts, two homes: the converter ships with the skill, the read path
-# stays under source/ (it is not runnable, but it holds the second
-# implementation vorgabe 2.5 is measured against).
-SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "source")
+# sits here beside the tests -- it is not runnable since read_conversation
+# disappeared, and the only thing still exercising it is this test, which
+# measures vorgabe 2.5 against it.
+SOURCE_DIR = _HERE
 CONVERT_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
 sys.path.insert(0, SOURCE_DIR)
 sys.path.insert(0, CONVERT_DIR)

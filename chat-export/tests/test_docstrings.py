@@ -32,7 +32,8 @@ import re
 import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "source")
+TESTS_DIR = _HERE
+PROJECT_DIR = os.path.dirname(_HERE)
 SKILL_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
 
 FAILURES = []
@@ -94,13 +95,15 @@ REQUIRED_CONCEPTS = {
 # Run both layers over every script this guard covers
 # ---------------------------------------------------------------------------
 
-# Script name -> the directory it lives in. The converter ships with the skill
-# and therefore sits in the skill folder; the rest stays under source/.
+# Script name -> the directory it lives in. Three homes, by what each script is
+# for: the converter ships with the skill; inspect_export is a maintenance tool
+# of this project and sits in its root; the two uploadable scripts are only
+# exercised by tests now and sit beside them.
 SCRIPTS = {
-    "chat_read_store.py":      SOURCE_DIR,
+    "chat_read_store.py":      TESTS_DIR,
     "chat_export_convert.py":  SKILL_DIR,
-    "inspect_export.py":       SOURCE_DIR,
-    "chat_crawl_store.py":     SOURCE_DIR,
+    "inspect_export.py":       PROJECT_DIR,
+    "chat_crawl_store.py":     TESTS_DIR,
 }
 
 for name, directory in SCRIPTS.items():

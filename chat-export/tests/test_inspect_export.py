@@ -19,7 +19,7 @@ import tempfile
 import zipfile
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "source")
+SOURCE_DIR = os.path.dirname(_HERE)
 sys.path.insert(0, SOURCE_DIR)
 
 import inspect_export as ie
