@@ -1,6 +1,6 @@
 # Chrome-Zugriff — systematischer Test der Bridge
 
-Eigene Datei, getrennt von `testlauf.md`, weil es hier nicht um Fahrplanpunkt 21 geht, sondern um die technische Voraussetzung für Fahrplanpunkt 27 (Skill über den Web-Weg): wie die Chrome-Anbindung von Claude Code (VS-Code-Erweiterung) tatsächlich zustande kommt und woran sie hängt. Vorarbeiten dazu stehen auch in `testlauf.md` unter „Wie die Chrome-Brücke gebaut ist" und im Abschnitt „21. August" — diese Datei führt den systematischen Teil fort, der dort begonnen wurde.
+Eigene Datei, getrennt von `testlauf.md`, weil es hier nicht um Fahrplanpunkt 21 geht, sondern um die technische Voraussetzung für Fahrplanpunkt 27 (Skill über den Web-Weg): wie die Chrome-Anbindung von Claude Code (VS-Code-Erweiterung) tatsächlich zustande kommt und woran sie hängt. Die Vorarbeiten vom 20./21. August stehen als Ergebnis in `testlauf.md` unter „Wie die Chrome-Brücke funktioniert" — diese Datei führt den systematischen Teil fort, der dort begonnen wurde, und trägt den vollständigen Testweg.
 
 **Rechner:** derselbe wie in `testlauf.md` beschrieben (Chrome, VS-Code-Erweiterung, `@browser`-Mechanik).
 
