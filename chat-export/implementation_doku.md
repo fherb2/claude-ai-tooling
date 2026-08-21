@@ -208,7 +208,7 @@ Zusätzliche Metadatenfelder, in dieser Reihenfolge:
 | Feld | Wozu |
 | --- | --- |
 | `chat_uuid`, `url`, `title` | Identität und Auffindbarkeit |
-| `source` | `account-export` oder `read_conversation` |
+| `source` | `account-export`, `web-api` oder `read_conversation` — der Behälter, aus dem der Chat kam |
 | `last_updated_at` | Stand der Quelle beim Import — macht Veralten erkennbar; **die** für Historie/Sortierung entscheidende Angabe (2.5) |
 | `turns` | Anzahl importierter Redebeiträge |
 | `total_turns`, `complete`, `turns_missing` | Vollständigkeit samt Beleg; nur der Lese-Weg kann sie füllen (2.5) |
@@ -247,7 +247,7 @@ Eine `protokoll.json` je Quellprojekt, neben den Chatdateien. Sie wird mit der C
 
 | Feld | Wozu |
 | --- | --- |
-| `title`, `created_at` | Auffindbarkeit; `created_at` kennt nur der ZIP-Weg |
+| `title`, `created_at` | Auffindbarkeit; `created_at` liefern der ZIP-Weg und die Chatliste des Web-Wegs, ein `recent_chats`-Abzug nicht |
 | `created_after` | Untergrenze für Chats ohne `created_at`: der Stand des **vorherigen** Abgleichs beim ersten Sehen — damals war das Projekt gelistet und der Chat nicht dabei, also entstand er später. Wird nur beim ersten Sehen gesetzt und danach nie überschrieben |
 | `listed_updated_at` | `updated_at` aus der zuletzt geholten Chatliste |
 | `exported_updated_at` | Stand, auf dem der vorliegende Export beruht |
@@ -271,6 +271,7 @@ Auf oberster Ebene trägt das Protokoll `protocol_version`, `project`, `project_
 | schon exportiert, aber gewachsen | sein `created_at` aus dem Protokoll | exakt |
 | erst beim letzten Abgleich hinzugekommen | sein `created_after` | exakt — vorher existierte er nicht |
 | gelistet, aber nie in einem Archiv, ohne `created_after` | `created_at` des Projekts aus einem Sondierungsexport (3.1.1) | exakt, aber projektweit statt chatweise |
+| über den Web-Weg gelistet | sein eigenes `created_at` aus der Chatliste | exakt — deshalb braucht dieser Weg keinen Sondierungsexport |
 | kein Protokoll (Erstmigration) | ebenso der Projektbeginn | dito |
 
 Der Projektbeginn ist dabei die Untergrenze über alles: kein Chat eines Projekts kann älter sein als das Projekt. Ein zu großzügiges Fenster kostet nur Downloadgröße, ein zu knappes kostet Inhalt — deshalb im Zweifel aufrunden, nach unten.
@@ -324,11 +325,17 @@ Prüfstücke werden synthetisch gebaut; echter Chatinhalt gehört nie in Tests o
 
 # 3 Skripte
 
-## 3.1 `chat_export_convert.py` — der Weg über den Kontoexport
+## 3.1 `chat_export_convert.py` — der Weg über den Kontoexport und über die Web-Endpunkte
 
 **Status: gebaut, geprüft durch `tests/test_export_convert.py`, auch unter `-O`. Am Drei-Monats-Export mit 211 Chats gelaufen.**
 
-Wandelt ein Kontoexport-ZIP in Chatdateien je Quellprojekt um und führt das Protokoll. Läuft lokal, wird nie hochgeladen.
+Wandelt Chats in Dateien je Quellprojekt um und führt das Protokoll. Läuft lokal, wird nie hochgeladen.
+
+**Zwei Quellen, ein Konverter.** Die Chats kommen entweder aus einem Kontoexport-ZIP (`--zip`) oder aus einem **Web-Behälter** (`--bundle`) — der Datei, die ein Browserschritt aus den claude.ai-Endpunkten schreibt. Beide führen dieselben Feldnamen je Konversation, weshalb sich der Unterschied auf das Auspacken beschränkt: Ab `conversation_record()` ist der Code geteilt. Am 19. August 2026 am echten Fall bestätigt — für denselben Chat nannten Web-API und Export-ZIP nicht nur dieselben Zahlen, sondern **dieselben Nachrichten-UUIDs** (Protokoll in `testlauf.md`).
+
+Damit ist die Wegegleichheit (Vorgabe 2.5) hier **baulich** gegeben statt bloß geprüft. Abweichen darf genau ein Feld: Die Chatdatei nennt als Herkunft `web-api` statt `account-export`, und `source` ist eines der fünf erlaubten. Dass sonst nichts abweicht, vergleicht `tests/test_export_convert.py` Datei für Datei — an einem Prüfbestand, der alle drei Nebendateiarten und einen Nebenzweig trägt, damit der Vergleich etwas aussagt.
+
+Die Chatliste des Web-Behälters trägt außerdem `created_at` je Chat. Das ist der Grund, warum `list --web` ohne Sondierungsexport auskommt: Die Fenstergrenze steht exakt in den Daten, statt über den Projektbeginn genähert zu werden (Vorgabe 2.4).
 
 ### 3.1.1 Aufbau des Export-ZIP
 
@@ -460,10 +467,12 @@ Das Protokoll ist Vorgabe **2.4**. Dieser Weg füllt weder `end_token` (das kenn
 
 ### 3.1.6 Kommandos
 
-- `list --map <dump> --out <verzeichnis>` — Protokoll anlegen oder ergänzen aus einer Chatliste. Neue Chats `listed`, vorhandene gegen `exported_updated_at` geprüft und ggf. `stale`. Meldet die Fenstergrenze (Vorgabe 2.4) und warnt vor einem unplausiblen Projektdatum. Meldet außerdem den umgekehrten Fall — Chats, die das Protokoll kennt und die Liste nicht mehr führt (Vorgabe 2.4); entfernt wird dabei nichts. **Der erste Schritt jedes Laufs**, vor jedem Chattext.
+- `list --map <dump> | --web <behälter> --out <verzeichnis>` — Protokoll anlegen oder ergänzen aus einer Chatliste. `--map` nimmt den rohen `recent_chats`-Abzug, `--web` die Liste aus dem Web-Behälter; letztere bringt `created_at` je Chat mit und macht damit den Sondierungsexport entbehrlich. Fehlt beides, bricht der Aufruf ab. Neue Chats `listed`, vorhandene gegen `exported_updated_at` geprüft und ggf. `stale`. Meldet die Fenstergrenze (Vorgabe 2.4) und warnt vor einem unplausiblen Projektdatum. Meldet außerdem den umgekehrten Fall — Chats, die das Protokoll kennt und die Liste nicht mehr führt (Vorgabe 2.4); entfernt wird dabei nichts. **Der erste Schritt jedes Laufs**, vor jedem Chattext.
 
   Der Rohtext für `--map` kommt nicht von hier: er entsteht in einem Chat des Quellprojekts über das dort eingebaute `recent_chats` — und zwar in einem eigens dafür angelegten, danach gelöschten Chat, weil der laufende Chat in seiner eigenen Liste fehlt (Begründung in 1.5). `MAPPING_PROMPT` (Modulkonstante, siehe Docstring) ist der dafür wörtlich vorgegebene Prompt — nur im Codeblock ausgegeben bleibt er intakt, sonst verschluckt der Markdown-Renderer die `<chat>`-Tags als HTML (beobachtet).
-- `convert --zip <datei> --out <verzeichnis>` — die als `listed` oder `stale` geführten Chats aus dem ZIP holen, Baum ablaufen, Dateien schreiben, Protokoll fortschreiben.
+- `convert --zip <datei> | --bundle <datei> --out <verzeichnis>` — die als `listed` oder `stale` geführten Chats aus der angegebenen Quelle holen, Baum ablaufen, Dateien schreiben, Protokoll fortschreiben. **Genau eine** Quelle, nie beide: Zwei Angaben oder keine bricht mit einer Meldung ab, statt sich eine auszusuchen.
+
+  Der **Web-Behälter** ist eine JSON-Datei mit zwei je nach Schritt gefüllten Teilen — `conversations` mit den Kopfdaten je Chat für `list --web`, `chats` mit den vollständigen Konversationen für `convert --bundle`; dazu `fetched_at` und `organization` als Herkunftsvermerk. Gelesen von `load_bundle()`, ausgepackt von `bundle_records()` und `bundle_conversations()`. Ein Behälter ohne den gebrauchten Teil bricht mit einer Meldung ab und rät nicht.
 - `diff --out <verzeichnis>` — Stand aus dem Protokoll: fehlend, veraltet, gelöscht, unbekannt. Braucht weder ZIP noch Chatdateien. Dazu **die Fenstergrenze** (Vorgabe 2.4) samt der Warnung vor einem unplausiblen Projektdatum — dieselben Sätze, die `list` ausgibt, hier aber ohne frische Chatliste: „was fehlt noch" und „wie weit muss der nächste Export zurückreichen" sind eine Frage, zweimal gestellt. Dazu der Waisen-Scan nach Vorgabe 2.6 — das Einzige, was ein Zuviel statt eines Zuwenig meldet.
 - `report --out <verzeichnis>` — was ein bestehender Bestand an Verlusten trägt: Hüllen, übersprungene Dubletten, weggelassene Blocktypen, verworfene Denkblöcke, `files`-Verweise ohne Inhalt. Was mitkam, steht als Gegengewicht daneben — Nebenzweige, Denkblöcke, Anhänge mit Inhalt, Erzeugnisse —, damit sichtbar ist, dass ein Chat nicht linear verlief bzw. wie viel an ihm hing. Die behaltenen Denkblöcke werden dabei aus den Nebendateien gezählt: die Gesprächsdatei führt nur die verworfenen, und ein zusätzliches Metadatenfeld dafür würde das Dateiformat beider Wege ändern (Vorgaben 2.2 und 2.5) — zu viel für eine Berichtszeile.
 

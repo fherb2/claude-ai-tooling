@@ -9,12 +9,25 @@ implementation doc, and ``tests/test_docstrings.py`` guards that.  Chapter 3.1
 of ``implementation_doku.md`` holds the determinations this implements, chapter
 2 the repo-wide ones; the numbers quoted below come from there.
 
-    python3 chat_export_convert.py list    --map <dump> --out <dir> \
+    python3 chat_export_convert.py list    --map <dump> | --web <bundle> --out <dir> \
                                             [--project N] [--project-created DATE]
-    python3 chat_export_convert.py convert --zip <export.zip> --out <dir>
+    python3 chat_export_convert.py convert --zip <export.zip> | --bundle <file> --out <dir>
     python3 chat_export_convert.py diff    --out <dir>
     python3 chat_export_convert.py report  --out <dir>
     python3 chat_export_convert.py analyse --zip <export.zip> [--map <dump>]
+
+**Two sources, one converter.** Chats reach this script either from an account
+export archive (``--zip``) or from a *web bundle* (``--bundle``): the file a
+browser step writes after reading claude.ai's own endpoints. Both carry the
+same conversation fields, so only the container differs -- ``load_bundle``,
+``bundle_records`` and ``bundle_conversations`` unwrap it, and from
+``conversation_record`` on the code is shared. The bundle's chat list also
+brings ``created_at`` per chat, which ``--map`` never had; that is why
+``list --web`` needs no sounding export to bound its window. What differs in
+the *output* is one field: the chat file declares its provenance as
+``SOURCE_WEB`` instead of ``SOURCE_EXPORT``, which vorgabe 2.5 lists among the
+five metadata fields allowed to differ. Everything else matches file for file,
+and ``tests/test_export_convert.py`` compares the two ways to make sure.
 
 Getting the ``--map`` input is the one step this file cannot do for you: the
 chat list only exists inside a claude.ai chat, in the *source* project, via
@@ -277,6 +290,76 @@ def load_projects(archive: zipfile.ZipFile) -> list[dict[str, Any]]:
     """
     return [load_member(archive, name) for name in sorted(archive.namelist())
             if name.startswith(PROJECTS_PREFIX) and name.endswith(".json")]
+
+
+# ---------------------------------------------------------------------------
+# The web bundle -- the second way in
+# ---------------------------------------------------------------------------
+
+BUNDLE_CONVERSATIONS = "conversations"
+BUNDLE_CHATS = "chats"
+
+# What a chat file declares as its provenance (vorgabe 2.2). The value has to
+# follow the container it came out of: a chat fetched from the web endpoints is
+# not an export, and an archive that claimed otherwise would misstate where its
+# content is from.
+SOURCE_EXPORT = "account-export"
+SOURCE_WEB = "web-api"
+
+
+def load_bundle(path: str) -> dict[str, Any]:
+    """Read a web bundle: the file the browser step writes.
+
+    Layout -- both payload keys optional, so one fetch writes one file::
+
+        {"fetched_at": "...", "organization": "...",
+         "conversations": [{"uuid": ..., "name": ..., "created_at": ...,
+                            "updated_at": ...}, ...],
+         "chats":         [<conversation carrying chat_messages>, ...]}
+
+    ``conversations`` feeds ``list --web``, ``chats`` feeds
+    ``convert --bundle``.  The chat objects carry the same field names as the
+    archive's, so everything below ``conversation_record`` is shared with the
+    zip way: the two ways are equal *by construction* here, not merely by test
+    (vorgabe 2.5).
+    """
+    with open(path, "r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if not isinstance(payload, dict):
+        raise ValueError(f"{path} does not hold a JSON object")
+    return payload
+
+
+def bundle_records(bundle: dict[str, Any]) -> list[dict[str, str]]:
+    """Turn a bundle's chat list into the records ``update_from_list`` takes.
+
+    Unlike a ``recent_chats`` dump this list carries ``created_at`` per chat --
+    the one bound the older way never had, and the reason the sounding export
+    of doku 1.5 step 0 becomes unnecessary.
+    """
+    entries = bundle.get(BUNDLE_CONVERSATIONS)
+    if not isinstance(entries, list):
+        raise ValueError(f"the bundle carries no {BUNDLE_CONVERSATIONS!r} list")
+    records = []
+    for entry in entries:
+        uuid = (entry.get("uuid") or "").strip()
+        if not uuid:
+            continue
+        records.append({
+            "uuid":       uuid,
+            "title":      clean_title(entry.get("name") or ""),
+            "updated_at": entry.get("updated_at") or "",
+            "created_at": entry.get("created_at") or "",
+        })
+    return records
+
+
+def bundle_conversations(bundle: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return a bundle's full conversations, shaped like the archive's."""
+    chats = bundle.get(BUNDLE_CHATS)
+    if not isinstance(chats, list):
+        raise ValueError(f"the bundle carries no {BUNDLE_CHATS!r} list")
+    return chats
 
 
 # ---------------------------------------------------------------------------
@@ -862,9 +945,12 @@ def update_from_list(protocol: dict[str, Any],
 
     *now* stamps the reconciliation. A chat seen here for the first time gets
     the **previous** reconciliation as ``created_after``: the source was listed
-    then and did not contain this chat, so it was created later. That is the
-    only lower bound available for a chat that has never been in an archive --
-    the chat list carries no ``created_at`` (doku 2.4).
+    then and did not contain this chat, so it was created later. For a
+    ``recent_chats`` dump that is the only lower bound to be had, because such
+    a list carries no ``created_at`` (doku 2.4). A record that *does* carry one
+    -- the web list does (``bundle_records``) -- sets it outright, and an entry
+    still missing it gets it filled in on a later pass; ``created_after`` then
+    only remains as the weaker fallback it always was.
     """
     previous_listed = protocol.get("listed_at", "")
     counts = collections.Counter()
@@ -873,7 +959,7 @@ def update_from_list(protocol: dict[str, Any],
         if entry is None:
             protocol["chats"][record["uuid"]] = {
                 "title":       record.get("title", ""),
-                "created_at":  "",
+                "created_at":  record.get("created_at", ""),
                 "created_after": previous_listed,
                 "listed_updated_at": record.get("updated_at", ""),
                 "exported_updated_at": "",
@@ -891,6 +977,8 @@ def update_from_list(protocol: dict[str, Any],
                                       or entry.get("listed_updated_at", ""))
         if record.get("title") and not entry.get("title"):
             entry["title"] = record["title"]
+        if record.get("created_at") and not entry.get("created_at"):
+            entry["created_at"] = record["created_at"]
         exported = entry.get("exported_updated_at") or ""
         listed = entry.get("listed_updated_at") or ""
         if entry["status"] == STATUS_EXPORTED and listed and listed > exported:
@@ -1147,13 +1235,20 @@ def instruction_block(target: str, out_dir: str, protocol: dict[str, Any]) -> st
 
 def cmd_list(args: argparse.Namespace) -> int:
     """Create or update the protocol from one or more chat lists."""
+    if not args.map and not args.web:
+        print("Give a chat list: --map <recent_chats dump> or --web <bundle>.",
+              file=sys.stderr)
+        return 1
     records: list[dict[str, str]] = []
     for path in args.map:
         with open(path, "r", encoding="utf-8") as handle:
             records.extend(parse_chat_list(handle.read()))
-    if not records:
-        print("No <chat ...> blocks found in the given dump(s).", file=sys.stderr)
-        return 1
+    for path in args.web:
+        records.extend(bundle_records(load_bundle(path)))
+    # An empty result here is not an error: a project can genuinely hold no
+    # chats yet, and that has to write a protocol too, not abort -- the
+    # source being unreachable or misspelled would already have failed above,
+    # in open() or in bundle_records()/load_bundle().
 
     protocol = load_protocol(args.out)
     if args.project:
@@ -1209,8 +1304,17 @@ def cmd_convert(args: argparse.Namespace) -> int:
               "project.", file=sys.stderr)
         return 1
 
-    archive = zipfile.ZipFile(args.zip)
-    conversations = {c.get("uuid"): c for c in load_conversations(archive)}
+    if bool(args.zip) == bool(args.bundle):
+        print("Give exactly one source: --zip <export.zip> or --bundle <file>.",
+              file=sys.stderr)
+        return 1
+    if args.zip:
+        source, declared = "archive", SOURCE_EXPORT
+        found = load_conversations(zipfile.ZipFile(args.zip))
+    else:
+        source, declared = "bundle", SOURCE_WEB
+        found = bundle_conversations(load_bundle(args.bundle))
+    conversations = {c.get("uuid"): c for c in found}
     now = args.now or datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     wanted = [uuid for uuid, entry in protocol["chats"].items()
@@ -1232,7 +1336,8 @@ def cmd_convert(args: argparse.Namespace) -> int:
         removed = remove_previous(args.out, entry)
 
         side_files = []
-        write_json(chat_document(record, now), os.path.join(args.out, chat_name))
+        write_json(chat_document(record, now, declared),
+                   os.path.join(args.out, chat_name))
         if record["thinking"]:
             side_files.append(stem + THINKING_SUFFIX)
             write_json(thinking_document(record, chat_name),
@@ -1281,10 +1386,11 @@ def cmd_convert(args: argparse.Namespace) -> int:
     print()
     print(f"{written} chat(s) written to {args.out}")
     if missing:
-        print(f"{len(missing)} chat(s) are listed but not in this archive:")
+        print(f"{len(missing)} chat(s) are listed but not in this {source}:")
         for uuid in missing:
             print(f"  {uuid}  {protocol['chats'][uuid].get('title', '')!r}")
-        print("  Either the export predates them, or a uuid was mistyped. They "
+        print("  Either this source does not reach them -- an export predating "
+              "them, a fetch that left them out -- or a uuid was mistyped. They "
               "stay pending; do not guess.")
     if written:
         print()
@@ -1543,7 +1649,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_list = sub.add_parser("list", help="create or update the protocol from a "
                                          "chat list")
-    p_list.add_argument("--map", action="append", required=True,
+    p_list.add_argument("--web", action="append", default=[],
+                        help="web bundle carrying a chat list; alternative to "
+                             "--map, and it brings created_at per chat")
+    p_list.add_argument("--map", action="append", default=[],
                         help="raw recent_chats dump; repeatable")
     p_list.add_argument("--out", required=True, help="output directory")
     p_list.add_argument("--project", default="", help="name of the source project")
@@ -1555,7 +1664,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_list.set_defaults(func=cmd_list)
 
     p_convert = sub.add_parser("convert", help="convert the pending chats")
-    p_convert.add_argument("--zip", required=True, help="export archive")
+    p_convert.add_argument("--zip", default="", help="export archive")
+    p_convert.add_argument("--bundle", default="",
+                           help="web bundle carrying full chats; alternative "
+                                "to --zip")
     p_convert.add_argument("--out", required=True, help="output directory")
     p_convert.add_argument("--target", default="repo",
                            choices=sorted(INSTRUCTION_BLOCKS),

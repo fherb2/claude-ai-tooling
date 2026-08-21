@@ -585,6 +585,22 @@ Noch am selben Tag nachgezogen. Das Verfahren: Ein Tab auf `claude.ai`, von dort
 
 **Was damit offen bleibt:** nichts Technisches mehr an diesem Weg. Offen sind allein Entwurfsfragen — wie das lokale Skript die Datei aufnimmt, wo sie zwischenlandet, und wie der Abgleich gegen das Protokoll eingehängt wird.
 
+## Wie die Chrome-Brücke funktioniert — Gesamtergebnis
+
+Über zwei Tage (20./21. August 2026) systematisch geprüft, mit vielen Anläufen und Fehlversuchen, die hier nicht mehr im Einzelnen stehen — sie waren zeitweise selbst von Verbindungsproblemen zwischen dieser Sitzung und der Erweiterung überlagert, deren Ursache nicht gefunden wurde. Der vollständige Testweg liegt in `chrome-zugriff.md`; hier nur das Ergebnis.
+
+**Der Aufbau, belegt** ([chrome](https://code.claude.com/docs/en/chrome)). Claude Code spricht nicht selbst mit Chrome, sondern über die **Erweiterung** „Claude in Chrome" und einen **Native-Messaging-Host** — eine Konfigurationsdatei, über die Chrome einem lokalen Programm erlaubt, mit einer Erweiterung zu reden. Claude Code bietet die Browserwerkzeuge als MCP-Server `claude-in-chrome` an. Die Erweiterung öffnet eigene Tabs und *„shares your browser's login state"*.
+
+**Was tatsächlich zählt, am Ende auf drei Punkte reduziert:**
+
+1. **Jede Nachricht, die den Browser braucht, beginnt mit `@browser`.** In der VS-Code-Erweiterung gibt es `/chrome` nicht; die Werkzeuge stehen zwar auch ohne `@browser` in der Liste, antworten dann aber „Browser extension is not connected" — das klingt nach kaputtem Aufbau, heißt aber nur, dass diese eine Nachricht die Anbindung nicht angefordert hat.
+2. **Chrome muss laufen und bei claude.ai angemeldet sein**, mit eingeschaltetem Connector-Schalter für das jeweilige Konto (Einstellungen → Connectors → „Claude in Chrome"). Ohne das: `"Claude in Chrome is turned off in your settings"`. Die Einstellung wirkt nicht rückwirkend auf schon offene Tabs.
+3. **Die Erweiterung selbst muss angemeldet sein** — das ist von der claude.ai-Websitzung im Tab getrennt. Erkennbar am funktionierenden Chat-Turn direkt in der Erweiterung.
+
+**Ist das erfüllt, funktioniert `@browser` zuverlässig — und zwar unabhängig vom Konto.** Zwei Ebenen sind dabei sauber getrennt und geprüft: Die **Bridge** (Chrome ↔ Claude Code) blieb auch nach Abmelden von claude.ai voll funktionsfähig auf fremden Domains (gmx.de, example.com); nur der claude.ai-eigene API-Aufruf braucht dafür zusätzlich eine gültige **Websitzung** im Tab. Und die **Kontofrage ist geklärt**: Ein sauberer Test nach vollständigem Rechner-Neustart zeigte, dass die Bridge sich auch aufbaut, wenn Chrome von Anfang an mit einem *anderen* Konto bei claude.ai angemeldet ist (Team) als die Claude-Code-Sitzung selbst (Pro) — eine Kontoübereinstimmung ist **nicht** erforderlich.
+
+**Folge für den Skill:** Er darf sich nicht darauf verlassen, dass Chrome dasselbe Konto verwendet wie die Claude-Code-Sitzung — er muss das erkannte Konto nennen, nicht voraussetzen (so schon in der Zielvorlage, Abschnitt 2.3). Und seine Voraussetzungen sind die drei Punkte oben, nicht „Erweiterung installiert" allein — das gehört in seine README.
+
 ## Aufgeräumt
 
 Der Wegwerf-Ordner `~/zielprojekt-test/` ist nach bestandener Prüfung gelöscht; alle zwölf Dateien darin waren inhaltsgleiche Kopien aus `tests/test_results/pro-test-1/` und wurden vor dem Löschen einzeln dagegen verglichen. Wer 21.8 wiederholen will, baut ihn in zwei Minuten neu auf — Ordner, `.claude/imported_chats/<quellprojekt>/`, und die `CLAUDE.md` mit dem Block aus `convert --target repo`.

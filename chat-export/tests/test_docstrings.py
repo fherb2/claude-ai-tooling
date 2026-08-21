@@ -80,6 +80,8 @@ REQUIRED_CONCEPTS = {
         "attachments", "creations", "thinking", "protokoll.json",
         "window_start", "MAPPING_PROMPT", "INSTRUCTION_BLOCKS",
         "VANISHED_NOTE",
+        "load_bundle", "bundle_records", "bundle_conversations",
+        "SOURCE_WEB",
     ],
     "inspect_export.py": [
         "created_at", "project",

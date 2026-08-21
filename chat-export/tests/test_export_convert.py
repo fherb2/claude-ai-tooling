@@ -1292,6 +1292,216 @@ check("a dump shaped the way the prompt asks for parses correctly",
       and cec.parse_chat_list(SAMPLE_DUMP)[0]["title"] == "Testchat")
 
 
+# ---------------------------------------------------------------------------
+# The second way in: the web bundle
+# ---------------------------------------------------------------------------
+
+def web_shape(conversation):
+    """Reshape a fixture conversation the way the web endpoint returns it.
+
+    Observed on 19 August 2026: no ``account``, extra head fields, and the
+    messages carry an ``index`` but **no flat ``text``** -- the field the
+    converter only ever used as a fallback. Handing the archive's own objects
+    to the bundle would prove nothing but that unwrapping works; this makes
+    the comparison below a statement about the real shape.
+    """
+    head = {k: v for k, v in conversation.items()
+            if k not in ("account", "chat_messages")}
+    head.update({"model": "claude-sonnet-4-6", "project_uuid": "p-1",
+                 "settings": {}, "current_leaf_message_uuid": None})
+    messages = []
+    for number, message in enumerate(conversation["chat_messages"]):
+        shaped = {k: v for k, v in message.items() if k != "text"}
+        shaped["index"] = number
+        messages.append(shaped)
+    head["chat_messages"] = messages
+    return head
+
+
+# Same conversations, other container and other shape. The web list
+# additionally carries created_at per chat -- the field a dump never has.
+BUNDLE = {
+    "fetched_at": "2026-08-19T20:00:00Z",
+    "organization": "org-1",
+    "conversations": [
+        {"uuid": "lin-1", "name": "Linear",
+         "created_at": "2026-05-01T10:00:00.000000Z",
+         "updated_at": "2026-05-01T12:00:00Z"},
+        {"uuid": "old-1", "name": "Aelteres Kind traegt",
+         "created_at": "2026-05-01T10:00:00.000000Z",
+         "updated_at": "2026-05-02T12:00:00Z"},
+    ],
+    "chats": [web_shape(c) for c in CONVERSATIONS],
+}
+BUNDLE_FILE = os.path.join(WORK, "bundle.json")
+with open(BUNDLE_FILE, "w", encoding="utf-8") as handle:
+    json.dump(BUNDLE, handle)
+
+check("load_bundle reads the file as an object",
+      cec.load_bundle(BUNDLE_FILE)["organization"] == "org-1")
+
+BAD_FILE = os.path.join(WORK, "bad.json")
+with open(BAD_FILE, "w", encoding="utf-8") as handle:
+    json.dump([1, 2, 3], handle)
+try:
+    cec.load_bundle(BAD_FILE)
+    check("load_bundle rejects a bundle that is not an object", False)
+except ValueError:
+    check("load_bundle rejects a bundle that is not an object", True)
+
+for name, call in (("bundle_records", cec.bundle_records),
+                  ("bundle_conversations", cec.bundle_conversations)):
+    try:
+        call({"fetched_at": "x"})
+        check(f"{name} refuses a bundle without its payload", False)
+    except ValueError:
+        check(f"{name} refuses a bundle without its payload", True)
+
+WEB_RECORDS = cec.bundle_records(BUNDLE)
+check("bundle_records keeps uuid, title and both timestamps",
+      len(WEB_RECORDS) == 2
+      and WEB_RECORDS[0]["uuid"] == "lin-1"
+      and WEB_RECORDS[0]["title"] == "Linear"
+      and WEB_RECORDS[0]["created_at"].startswith("2026-05-01")
+      and WEB_RECORDS[0]["updated_at"].startswith("2026-05-01"))
+
+check("bundle_conversations hands back the full conversations",
+      len(cec.bundle_conversations(BUNDLE)) == len(CONVERSATIONS))
+
+# --- created_at: the contrast that keeps this from being vacuous -----------
+
+WEB_OUT = os.path.join(WORK, "via-web")
+run("list", "--web", BUNDLE_FILE, "--out", WEB_OUT,
+    "--now", "2026-08-19T20:00:00Z")
+MAP_OUT_CMP = os.path.join(WORK, "via-map")
+run("list", "--map", MAP_FILE, "--out", MAP_OUT_CMP,
+    "--now", "2026-08-19T20:00:00Z")
+
+with open(os.path.join(WEB_OUT, "protokoll.json"), encoding="utf-8") as handle:
+    WEB_PROTO = json.load(handle)
+with open(os.path.join(MAP_OUT_CMP, "protokoll.json"), encoding="utf-8") as handle:
+    MAP_PROTO = json.load(handle)
+
+check("list --web fills created_at from the web list",
+      WEB_PROTO["chats"]["lin-1"]["created_at"].startswith("2026-05-01"))
+check("list --map leaves created_at empty -- so the check above means something",
+      MAP_PROTO["chats"]["lin-1"]["created_at"] == "")
+
+# --- the same conversation through both sources ----------------------------
+#
+# Both runs start from the *same* chat list, so the only difference is the
+# container the chats arrive in and its field shape. Whatever comes out has to
+# match file for file: that is vorgabe 2.5 held structurally instead of by
+# comparison.
+#
+# The set deliberately includes ALL_KINDS, which is the only fixture that
+# yields all three side files -- without it the comparison would cover chat
+# files and the protocol only, and would read far stronger than it is. It also
+# includes a fork, so the branch machinery is in the comparison too.
+
+CMP_SET = [LINEAR, OLD_WINS, ALL_KINDS]
+CMP_LISTING = "".join(
+    f"<chat url='https://claude.ai/chat/{c['uuid']}' "
+    f"updated_at='{c['updated_at']}'>Title: {c['name']}\n</chat>\n"
+    for c in CMP_SET)
+CMP_MAP = os.path.join(WORK, "cmp-liste.txt")
+with open(CMP_MAP, "w", encoding="utf-8") as handle:
+    handle.write(CMP_LISTING)
+CMP_ZIP = os.path.join(WORK, "cmp.zip")
+with zipfile.ZipFile(CMP_ZIP, "w") as handle:
+    handle.writestr("conversations.json", json.dumps(CMP_SET))
+CMP_BUNDLE = os.path.join(WORK, "cmp-bundle.json")
+with open(CMP_BUNDLE, "w", encoding="utf-8") as handle:
+    json.dump({"fetched_at": "2026-08-19T20:00:00Z",
+               "chats": [web_shape(c) for c in CMP_SET]}, handle)
+
+ZIP_RUN = os.path.join(WORK, "src-zip")
+BUN_RUN = os.path.join(WORK, "src-bundle")
+for out in (ZIP_RUN, BUN_RUN):
+    run("list", "--map", CMP_MAP, "--out", out, "--now", "2026-08-19T20:00:00Z")
+run("convert", "--zip", CMP_ZIP, "--out", ZIP_RUN, "--now", "2026-08-19T21:00:00Z")
+run("convert", "--bundle", CMP_BUNDLE, "--out", BUN_RUN,
+    "--now", "2026-08-19T21:00:00Z")
+
+ZIP_FILES = sorted(os.listdir(ZIP_RUN))
+BUN_FILES = sorted(os.listdir(BUN_RUN))
+check("both sources write the same set of files",
+      ZIP_FILES == BUN_FILES, f"zip={ZIP_FILES} bundle={BUN_FILES}")
+check("the compared set really produces all three side file kinds -- "
+      "otherwise the identity check below says little",
+      all(any(name.endswith(suffix) for name in ZIP_FILES)
+          for suffix in (".thinking.json", ".attachments.json",
+                         ".creations.json")),
+      f"files={ZIP_FILES}")
+check("and it carries a side branch",
+      any("aelteres" in name for name in ZIP_FILES), f"files={ZIP_FILES}")
+
+# `source` has to differ -- a chat fetched from the web is not an export, and
+# vorgabe 2.5 lists that field as one of the five allowed to. Everything else
+# has to match, so the comparison normalises exactly that one field and then
+# demands equality; and it checks separately that the field really carries the
+# two different values, so a converter that forgot to pass provenance through
+# could not pass by accident.
+def normalise_source(text):
+    """Replace the declared provenance so only the rest is compared."""
+    return text.replace(f'"{cec.SOURCE_WEB}"', f'"{cec.SOURCE_EXPORT}"')
+
+
+DIFFERING = []
+for name in ZIP_FILES:
+    with open(os.path.join(ZIP_RUN, name), encoding="utf-8") as handle:
+        left = handle.read()
+    with open(os.path.join(BUN_RUN, name), encoding="utf-8") as handle:
+        right = handle.read()
+    if left != normalise_source(right):
+        DIFFERING.append(name)
+check("apart from the declared source, every file is identical between "
+      "the zip way and the bundle way",
+      not DIFFERING, f"differing: {DIFFERING}")
+
+CHAT_FILE = next(n for n in ZIP_FILES if n.endswith("_all-1.json"))
+with open(os.path.join(ZIP_RUN, CHAT_FILE), encoding="utf-8") as handle:
+    FROM_ZIP = json.load(handle)
+with open(os.path.join(BUN_RUN, CHAT_FILE), encoding="utf-8") as handle:
+    FROM_BUNDLE = json.load(handle)
+check("and the source field states where each chat actually came from",
+      FROM_ZIP["metadata"]["source"] == cec.SOURCE_EXPORT
+      and FROM_BUNDLE["metadata"]["source"] == cec.SOURCE_WEB,
+      f'{FROM_ZIP["metadata"]["source"]} / {FROM_BUNDLE["metadata"]["source"]}')
+
+# --- exactly one source, and a list at all ---------------------------------
+
+BOTH = run("convert", "--zip", ARCHIVE, "--bundle", BUNDLE_FILE,
+           "--out", ZIP_RUN)
+check("convert refuses two sources at once",
+      BOTH.returncode == 1 and "exactly one source" in BOTH.stderr)
+
+NEITHER = run("convert", "--out", ZIP_RUN)
+check("convert refuses no source at all",
+      NEITHER.returncode == 1 and "exactly one source" in NEITHER.stderr)
+
+NO_LIST = run("list", "--out", os.path.join(WORK, "leer"))
+check("list refuses to run without --map or --web",
+      NO_LIST.returncode == 1 and "--web" in NO_LIST.stderr)
+
+# A genuinely empty project -- a source was given, it just carries no chats --
+# has to write a protocol, not abort. Found live against a real team account
+# with a project that had a chat count of zero (chrome-zugriff.md, Stufe 7).
+EMPTY_BUNDLE = os.path.join(WORK, "leer-bundle.json")
+with open(EMPTY_BUNDLE, "w", encoding="utf-8") as handle:
+    json.dump({"fetched_at": "2026-08-21T00:00:00Z", "organization": "org-1",
+              "conversations": []}, handle)
+EMPTY_OUT = os.path.join(WORK, "leeres-projekt")
+EMPTY_RUN = run("list", "--web", EMPTY_BUNDLE, "--out", EMPTY_OUT,
+               "--project", "Leertest")
+check("list writes a protocol for a project with zero chats instead of "
+      "aborting", EMPTY_RUN.returncode == 0, EMPTY_RUN.stderr)
+with open(os.path.join(EMPTY_OUT, "protokoll.json"), encoding="utf-8") as handle:
+    EMPTY_PROTO = json.load(handle)
+check("that protocol is well-formed, just empty",
+      EMPTY_PROTO["project"] == "Leertest" and EMPTY_PROTO["chats"] == {})
+
+
 shutil.rmtree(WORK, ignore_errors=True)
 
 print()
