@@ -20,8 +20,13 @@ import sys
 import zipfile
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
+# Two scripts, two homes: the converter ships with the skill, the read path
+# stays under source/ (it is not runnable, but it holds the second
+# implementation vorgabe 2.5 is measured against).
 SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "source")
+CONVERT_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
 sys.path.insert(0, SOURCE_DIR)
+sys.path.insert(0, CONVERT_DIR)
 
 import chat_export_convert as cec
 import chat_read_store as crs
@@ -259,7 +264,7 @@ with open(page_file, "w", encoding="utf-8") as handle:
 
 out_export = os.path.join(WORK, "aus-zip")
 out_read = os.path.join(WORK, "aus-read")
-convert = os.path.join(SOURCE_DIR, "chat_export_convert.py")
+convert = os.path.join(CONVERT_DIR, "chat_export_convert.py")
 read = os.path.join(SOURCE_DIR, "chat_read_store.py")
 
 

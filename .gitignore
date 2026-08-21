@@ -11,6 +11,9 @@ __pycache__/
 *.tmp.*
 *.tmp
 
+# Wegwerf-Testkopie des Skills; die gepflegte Fassung liegt in chat-export/skills/
+/.claude/skills/chat-export/
+
 # Ablage fuer Untersuchungsmaterial (echte Chatinhalte, Exportdumps): die
 # Inhalte werden nie versioniert, der Ordner selbst schon -- er ist der
 # verabredete Platz dafuer. Gilt fuer jeden so benannten Ordner, egal wie
