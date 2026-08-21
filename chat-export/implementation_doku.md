@@ -563,7 +563,7 @@ Erhaltenswerte Einzelbefunde: Suchtreffer tragen `H: `/`A: `-Label und HTML-Enti
 
 ## 3.5 Der Skill `chat-export` — das Frontend
 
-**Status: `SKILL.md` geschrieben, noch nicht am echten Lauf erprobt.** Die README steht aus.
+**Status: Am echten Lauf erprobt, über eine zweite, unabhängige Sitzung mit kaum Zutun des Nutzers.** Die README steht als einziges noch aus (Testlauf, Abschnitt „27c").
 
 Der Skill ist die Klammer um das Skript: Er führt den Nutzer durch beide Wege, ohne ihm die Entscheidung abzunehmen. Er liegt in `skills/chat-export/` und enthält genau zwei Dateien — `SKILL.md` und `chat_export_convert.py`. **Das ist alles, was ein Nutzer kopiert**; die übrigen Skripte dieses Ordners gehören zur Entwicklung und kommen in der `SKILL.md` nicht vor.
 

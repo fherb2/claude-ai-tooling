@@ -10,17 +10,13 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
 ## Als nächstes
 
-27. **Den Skill fertigstellen und erproben.** *Kalt für den Rest des Baus, warm für den Lauf.* — **Plan, noch nicht ausgeführt.**
+27. **Den Skill fertigstellen.** *Kalt.* — **Plan, noch nicht ausgeführt.**
 
-    Gebaut und erledigt ist das meiste (Einzelnes in `status.md`): die zweite Eingangsart `convert --bundle` und `list --web`, die Ablage in `skills/chat-export/`, die `SKILL.md`, und die Doku dazu in 3.5. Offen sind drei Dinge.
+    Gebaut, erprobt und in `status.md` verbucht ist alles außer der README: die zweite Eingangsart, die Ablage in `skills/chat-export/`, die `SKILL.md`, der echte Lauf über eine zweite, unabhängige Sitzung mit zwei Team-Projekten (Testlauf, Abschnitt „27c"), und die Bestätigung, dass `diff` die UUIDs der zu holenden Chats schon nennt.
 
-    **a) Die `README.md` des Skills.** Aufbau nach `skills/skill_vorgaben.md` 6.1, in dieser Reihenfolge: Überschrift mit Halbsatz zum Zweck; Statushinweis ohne eigene Zwischenüberschrift; Überblick in Prosa mit der Kernaussage fett im ersten Satz und der Abgrenzung, wofür der Skill **nicht** gilt; Kapitel „Installation" mit echten Pfaden statt Platzhaltern — der Schritt für einen stillen Trigger wird **ersatzlos weggelassen**, nicht als „entfällt hier" aufgeführt; Kapitel „Details"; Kapitel „Stand und Offenes". Hinein gehören die Voraussetzungen aus `chrome-zugriff.md` — `@browser` je Nachricht, Connector-Schalter auf claude.ai, angemeldete Erweiterung, ausgeschaltetes Nachfragen nach dem Speicherort — und der Anweisungsblock für die `CLAUDE.md` des Zielprojekts, auf den die `SKILL.md` verweist.
+    **Offen ist allein die `README.md` des Skills.** Aufbau nach `skills/skill_vorgaben.md` 6.1, in dieser Reihenfolge: Überschrift mit Halbsatz zum Zweck; Statushinweis ohne eigene Zwischenüberschrift; Überblick in Prosa mit der Kernaussage fett im ersten Satz und der Abgrenzung, wofür der Skill **nicht** gilt; Kapitel „Installation" mit echten Pfaden statt Platzhaltern — der Schritt für einen stillen Trigger wird **ersatzlos weggelassen**, nicht als „entfällt hier" aufgeführt; Kapitel „Details"; Kapitel „Stand und Offenes". Hinein gehören die Voraussetzungen aus `chrome-zugriff.md` — `@browser` je Nachricht, Connector-Schalter auf claude.ai, angemeldete Erweiterung, ausgeschaltetes Nachfragen nach dem Speicherort — und der Anweisungsblock für die `CLAUDE.md` des Zielprojekts, auf den die `SKILL.md` verweist.
 
-    **b) Nennt `diff` die UUIDs der zu holenden Chats?** Der Skill muss sie an den Abruf weiterreichen. Nennt `diff` sie schon, ist nichts zu tun; sonst kommt eine Ausgabeform dazu. Am Code nachzusehen, nicht zu vermuten. *Kalt.*
-
-    **c) Der Lauf.** Der erste Anlauf am 22. August brach an der Stelle ab, an der `list` ein Projekt ohne Chats abwies; das ist behoben und mit einem Regressionstest versehen. Zu prüfen ist jetzt der Durchgang über beide Projekte des Team-Kontos — „Chats-Export, Test 1" mit drei Chats und „Dresdyn-Kamerasystem-Überarbeitung" mit keinem, letzteres ausdrücklich, damit der leere Fall einmal echt läuft. Der Zustand vor dem Abbruch steht in `chrome-zugriff.md`, Stufe 7. *Warm.*
-
-    **Was dabei zu beobachten ist**, weil es die `SKILL.md` gegen die Wirklichkeit hält: Bleiben es wirklich zwei Haltepunkte? Nennt der Skill das Konto, ohne dass man ihn erinnern muss? Hält er die Abrufbremse ein? Und trägt der Hinweis vor dem Lauf die Zahl der zu ersetzenden Dateien? Jede Abweichung gehört in die `SKILL.md`, nicht in eine Notiz.
+    **Ein Nebenbefund aus dem Lauf, vor dem nächsten Commit zu klären:** `.claude/imported_chats/` ist bislang nicht in der `.gitignore` dieses Repos ausgeschlossen — nur die Wegwerf-Testkopie des Skripts selbst ist es. Ein Testlauf, der (wie am 21. August) dieses Repo statt eines externen Wegwerfordners als Ziel nimmt, legt damit echten Chat-Inhalt ungeschützt in den Arbeitsbaum. Zu entscheiden: `.gitignore`-Eintrag ergänzen, oder künftige Läufe grundsätzlich außerhalb des Repos.
 
 ## Danach
 
