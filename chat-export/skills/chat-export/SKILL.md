@@ -53,7 +53,7 @@ Hier arbeitest du, nicht das Skript. Drei Fälle:
 
 ### Statistik holen
 
-Je gewähltes Projekt die Chatliste über **alle** Seiten holen, dann `list --web` und `diff` laufen lassen. Bei mehreren Projekten steht **eine** Tabelle mit einer Zeile je Projekt, damit die Haltepunkte bei zwei bleiben:
+Je gewähltes Projekt die Chatliste über **alle** Seiten holen, dann `list --web --project "<Projektname>"` und `diff` laufen lassen. Gib **immer** `--project` mit — sonst bleibt das Feld im Protokoll leer, obwohl der Ordnername den Projektnamen längst trägt. Bei mehreren Projekten steht **eine** Tabelle mit einer Zeile je Projekt, damit die Haltepunkte bei zwei bleiben:
 
 ```
 Projekt                 Archiv  Quelle   neu  gewachsen  verschw.  Umfang   Empfehlung
@@ -90,6 +90,8 @@ Zeig den Fortschritt je Chat. Danach prüfst du lokal, dass die Datei angekommen
 ### Export-Weg ausführen
 
 Nenne die Fenstergrenze aus dem Skriptlauf **mit Begründung** — der Zeitraumfilter greift auf das Erstelldatum, nicht auf die letzte Änderung; ein zu kurzes Fenster ließe einen gewachsenen Altchat ganz aus, und nichts würde das melden. Biete an, den Antrag im Browser auszufüllen und den Absenden-Knopf vorzulegen.
+
+**Zur Exportseite führt kein Deep-Link.** Eine direkte Navigation auf `claude.ai/settings/data-privacy-controls` (oder ähnliche Einstellungs-URLs) landet auf der gewöhnlichen Chat-Oberfläche, nicht im Einstellungsdialog — die Seite rendert Einstellungen client-seitig, nur ein echter Klick öffnet sie. Geh über die Oberfläche: das Konto-/Einstellungsmenü öffnen, „Datenschutz" anklicken, darin zu „Daten exportieren" scrollen. Ein Element-Suchwerkzeug für „Datenschutz" bzw. „Daten exportieren" findet beide Buttons zuverlässig.
 
 Dann reißt die Kette, und du sagst es geradeheraus: Der Link kommt per E-Mail und gilt 24 Stunden. **In das Postfach gehst du nicht.** Sobald der Nutzer Bescheid gibt, findest du die ZIP im Download-Ordner und lässt `convert --zip` laufen.
 
@@ -140,7 +142,7 @@ python3 ${CLAUDE_SKILL_DIR}/chat_export_convert.py report  --out <verzeichnis>
 
 `list` kommt immer zuerst — es baut das Protokoll, und nur daraus ergibt sich, was zu holen ist. Ein Projekt ohne Chats ist kein Fehler: Es entsteht ein leeres, gültiges Protokoll. Der vollständige Docstring des Skripts ist seine Betriebsanleitung; lies ihn, wenn ein Kommando anders reagiert als erwartet.
 
-Zielverzeichnis ist `<projekt>/.claude/imported_chats/<quellprojekt>/`, ein flaches Verzeichnis je Quellprojekt.
+Zielverzeichnis ist `<projekt>/.claude/imported_chats/<quellprojekt>/`, ein flaches Verzeichnis je Quellprojekt. **Bündelt das laufende Repo mehrere eigenständige Vorhaben** (erkennbar an dessen eigener `CLAUDE.md`) und passt keines davon zum gewählten claude.ai-Projekt, frag einmal nach dem Zielordner, bevor du anlegst — das zählt nicht gegen die zwei Haltepunkte, weil es kein Lese- oder Wegentscheid ist, sondern eine Vorbedingung, die die Struktur des Repos vorgibt, nicht der Skill.
 
 ## Was du nie tust
 

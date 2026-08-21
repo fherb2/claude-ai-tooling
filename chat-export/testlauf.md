@@ -437,6 +437,32 @@ Am 21. August 2026, über eine **zweite, unabhängige Claude-Code-Sitzung** in d
 
 **Damit sind 27b und 27c beide erledigt.** 27b war am Code zu prüfen: `cmd_diff` nennt UUIDs bereits — unter `STALE` und `WAITING` steht die UUID vor jedem Titel. Nichts zu ergänzen. Offen bleibt an Fahrplanpunkt 27 allein noch die `README.md` (27a).
 
+## Großimport aus dem Pro-Konto: vier reale Projekte, 171 Chats — bestanden
+
+Am 21. August 2026, erneut über eine zweite, unabhängige Claude-Code-Sitzung (Session `claude-ai-tooling-75`), diesmal aus dem realen Skill-Ort `~/.claude/skills/chat-export/` statt einer Wegwerf-Kopie — die erste Prüfung an der Stelle, wo ein Nutzer den Skill tatsächlich installiert. Chrome war jetzt am **Pro**-Konto angemeldet, mit vier **echten** Projekten des Nutzers (nicht eigens angelegten Testprojekten): Karlin Netzwerk, Chats-Export aus Pro Test 1, FreeCAD-Bedienung, Scheludko-Zelle Bildverarbeitung. Auf Weisung des Nutzers ging der Import nach `.claude/test_chat_imports/<projekt>/` statt an den Standardort — ein bewusst abweichendes, gitignoriertes Ziel für diesen Testlauf.
+
+**Weg: einheitlich Export**, auf Wunsch des Nutzers, obwohl die Statistik für drei der vier Projekte den Web-Weg empfohlen hätte. Die Instanz berechnete das Fenster korrekt aus dem frühesten `created_at` über alle vier Projekte (2025-11-10, wegen FreeCAD-Bedienung) — kontoweiter Export, nicht projektbezogen, richtig als solcher erklärt.
+
+**Ergebnis:**
+
+| Projekt | Chats |
+| --- | --- |
+| Karlin Netzwerk | 1 |
+| Chats-Export aus Pro, Test 1 | 12 |
+| FreeCAD-Bedienung | 23 |
+| Scheludko-Zelle Bildverarbeitung | 135 |
+| **Summe** | **171** |
+
+**Unabhängig gegengeprüft, nicht nur den Angaben der Instanz geglaubt.** Die entwickelnde Sitzung öffnete die tatsächliche Export-ZIP (118 MB, kontoweit 1079 Konversationen) selbst und hielt alle 171 Protokoll-UUIDs der vier Ordner dagegen: **171 von 171 im Export enthalten**, keine Abweichung. Dateizahl, Protokoll und Exportinhalt decken sich lückenlos. Stichprobe an einer Chatdatei (Karlin Netzwerk) geöffnet: plausibler Text, korrekte Metadaten, `source: "account-export"`.
+
+**Drei Befunde, keiner davon ein Fehler am Ergebnis:**
+
+1. **`protokoll.json` → Feld `project` blieb leer**, weil `list --web` ohne `--project <Name>` lief. Der Ordnername trägt den Projektnamen weiterhin, im Protokoll selbst fehlte er. `SKILL.md` verlangt `--project` jetzt ausdrücklich.
+2. **Die Export-Seite ließ sich nicht per Deep-Link ansteuern.** Direkte Navigation auf `claude.ai/settings/data-privacy-controls` landete zweimal auf der bloßen Chat-Oberfläche — die Einstellungen rendern client-seitig, nur ein echter Klick öffnet sie. Erst der Weg über die Seitenleiste („Datenschutz" anklicken, zu „Daten exportieren" scrollen) funktionierte. In `SKILL.md` ergänzt.
+3. **Eine dritte Rückfrage war nötig**, obwohl die `SKILL.md` „genau zwei Haltepunkte" verlangt: Keines der vier Repo-Vorhaben passte zu den vier gewählten claude.ai-Projekten, also fragte die Instanz nach dem Zielordner, statt den Standardpfad zu erzwingen — richtig entschieden, aber vom bisherigen Wortlaut nicht gedeckt. `SKILL.md` benennt diese Ausnahme jetzt: Sie zählt nicht als dritter Haltepunkt, weil sie kein Lese- oder Wegentscheid ist, sondern eine Vorbedingung, die aus der Repo-Struktur folgt, nicht aus dem Ablauf des Skills.
+
+**Ein Vorfall ohne Bezug zur Bridge:** Einmal `API Error: Connection lost mid-response` mitten im Gespräch — die Modellverbindung dieser Sitzung, nicht `claude-in-chrome`. Nach Angabe des Nutzers liegt es an zeitweise stark eingeschränktem Internet auf seiner Seite; die Bridge blieb unbeeinflusst, der Ablauf lief sauber weiter (Abgrenzung dazu in `chrome-zugriff.md`).
+
 ## Aufgeräumt und was zum Rechnerwechsel gilt
 
 Der Wegwerf-Ordner `~/zielprojekt-test/` ist nach bestandener Prüfung gelöscht; alle zwölf Dateien darin waren inhaltsgleiche Kopien aus `tests/test_results/pro-test-1/` und wurden vor dem Löschen einzeln dagegen verglichen. Wer 21.8 wiederholen will, baut ihn in zwei Minuten neu auf — Ordner, `.claude/imported_chats/<quellprojekt>/`, und die `CLAUDE.md` mit dem Block aus `convert --target repo`.
