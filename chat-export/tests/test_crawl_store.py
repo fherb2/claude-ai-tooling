@@ -22,7 +22,7 @@ import tempfile
 # derived from the *imported* module, so the unit tests and the CLI
 # subprocesses are guaranteed to exercise the same file.
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_CANDIDATES = [os.path.join(os.path.dirname(_HERE), "source"), _HERE]
+_CANDIDATES = [_HERE]
 for _candidate in _CANDIDATES:
     if os.path.exists(os.path.join(_candidate, "chat_crawl_store.py")):
         sys.path.insert(0, _candidate)
