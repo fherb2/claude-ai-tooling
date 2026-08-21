@@ -16,7 +16,7 @@ Die Prüfarten in Kurzfassung; normativ stehen sie in **Doku 4.1**, dort auch di
 
     **Offen ist allein die `README.md` des Skills.** Aufbau nach `skills/skill_vorgaben.md` 6.1, in dieser Reihenfolge: Überschrift mit Halbsatz zum Zweck; Statushinweis ohne eigene Zwischenüberschrift; Überblick in Prosa mit der Kernaussage fett im ersten Satz und der Abgrenzung, wofür der Skill **nicht** gilt; Kapitel „Installation" mit echten Pfaden statt Platzhaltern — der Schritt für einen stillen Trigger wird **ersatzlos weggelassen**, nicht als „entfällt hier" aufgeführt; Kapitel „Details"; Kapitel „Stand und Offenes". Hinein gehören die Voraussetzungen aus `chrome-zugriff.md` — `@browser` je Nachricht, Connector-Schalter auf claude.ai, angemeldete Erweiterung, ausgeschaltetes Nachfragen nach dem Speicherort, der Weg zur Exportseite nur per Klick — und der Anweisungsblock für die `CLAUDE.md` des Zielprojekts, auf den die `SKILL.md` verweist.
 
-    **Nächster Testschritt, vom Nutzer vorgeschlagen:** einen bereits importierten Chat verlängern und dann den Nachfüll-Lauf (Web-Weg, `stale`-Erkennung, Ersetzen) gegen die vier Projekte aus dem Großimport durchspielen. *Warm.*
+    Der Nachfüll-Lauf ist inzwischen ebenfalls durchgespielt (Testlauf, Abschnitt „Nachfüll-Lauf") — `stale`-Erkennung und Ersetzen funktionieren an echten Daten, zwei Befunde daraus (Org-Filterung, Abschlusssatz) sind in `SKILL.md` eingearbeitet.
 
 ## Danach
 
