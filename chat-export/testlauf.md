@@ -463,6 +463,16 @@ Am 21. August 2026, erneut über eine zweite, unabhängige Claude-Code-Sitzung (
 
 **Ein Vorfall ohne Bezug zur Bridge:** Einmal `API Error: Connection lost mid-response` mitten im Gespräch — die Modellverbindung dieser Sitzung, nicht `claude-in-chrome`. Nach Angabe des Nutzers liegt es an zeitweise stark eingeschränktem Internet auf seiner Seite; die Bridge blieb unbeeinflusst, der Ablauf lief sauber weiter (Abgrenzung dazu in `chrome-zugriff.md`).
 
+## Nachfüll-Lauf gegen den Großimport — bestanden, mit zwei Befunden
+
+Am 21. August 2026, dritte unabhängige Sitzung (`0b240b6d-…`), gegen die vier Projekte des Großimports. Zwei Chats waren zuvor gezielt verändert worden (einer verlängert, einer neu angelegt).
+
+**Ergebnis exakt wie erwartet:** Drei Projekte unverändert (`nichts zu tun`), FreeCAD-Bedienung mit **1 neuem** und **1 gewachsenem** Chat erkannt, beide über den Web-Weg nachgeholt. Am Dateisystem nachgeprüft: 24 Hauptdateien = 24 Protokolleinträge, der ersetzte Chat trägt jetzt 8 statt vorher weniger Nachrichten, der neue 2 — beides deckt sich mit den von der API vor dem Abruf genannten Zahlen. Kein Datei-Rest der alten Fassung.
+
+**Befund 1: Unnötige dritte Rückfrage wegen zweier Organisationen.** Die Instanz rief `/api/organizations` diesmal ohne `capabilities` ab (nur `uuid`/`name`) und musste deshalb fragen, in welcher der beiden Organisationen die Projekte liegen — obwohl sie die Antwort direkt danach selbst durch Durchsuchen beider Organisationen fand. Die zweite Organisation (`Frank's Individual Org`) ist eine reine API-/Console-Organisation ohne `"chat"` in `capabilities` — nach Anthropics eigener Erklärung eine bewusst getrennte Organisation für API-Zugriff, kein Fehler und keine fremde Organisation (belegt, [9876003](https://support.claude.com/en/articles/9876003-i-have-a-paid-claude-subscription-pro-max-team-or-enterprise-plans-why-do-i-have-to-pay-separately-to-use-the-claude-api-and-console)). `SKILL.md` verlangt jetzt das volle Organisationsobjekt und automatische Filterung nach `capabilities`, bevor gefragt wird.
+
+**Befund 2: Telegrammstil am Ende.** Nach dem letzten `diff`-Aufruf kam nur „Erledigt.“ und ein Nebensatz, danach Schweigen — der Nutzer musste mit „Bist Du fertig, oder was?“ nachhaken. `SKILL.md` verlangt jetzt einen ausdrücklichen Abschlusssatz sowie generell einen freundlicheren, informativeren Ton bei den Zwischenschritten.
+
 ## Aufgeräumt und was zum Rechnerwechsel gilt
 
 Der Wegwerf-Ordner `~/zielprojekt-test/` ist nach bestandener Prüfung gelöscht; alle zwölf Dateien darin waren inhaltsgleiche Kopien aus `tests/test_results/pro-test-1/` und wurden vor dem Löschen einzeln dagegen verglichen. Wer 21.8 wiederholen will, baut ihn in zwei Minuten neu auf — Ordner, `.claude/imported_chats/<quellprojekt>/`, und die `CLAUDE.md` mit dem Block aus `convert --target repo`.

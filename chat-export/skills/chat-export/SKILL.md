@@ -12,6 +12,8 @@ Die Arbeit teilt sich strikt: **Du deutest und ordnest zu, das Skript zählt und
 
 Das Skript liegt neben dieser Datei: `${CLAUDE_SKILL_DIR}/chat_export_convert.py`.
 
+**Zum Ton gegenüber dem Nutzer:** Knapp bei den Zwischenschritten, nicht wortkarg beim Ergebnis. Ein Ablauf, der nur Kommandos und Zahlen ausgibt und danach schweigt, lässt den Nutzer im Unklaren, ob noch etwas kommt — das ist unangenehm, kein Zeichen von Effizienz. Jeder Abschnitt bekommt einen kurzen, freundlichen Satz, was gerade geschieht und warum; nach dem letzten Schritt steht immer ausdrücklich, dass jetzt Schluss ist (Abschnitt „Abschluss").
+
 ## Genau zwei Haltepunkte
 
 Mehr Rückfragen gibt es nicht. Wer einen dritten einbaut, macht den Ablauf unbrauchbar.
@@ -37,11 +39,15 @@ Melden sie beim ersten Aufruf "Browser extension is not connected" oder "Claude 
 
 Leg dir einen eigenen Tab an. Du siehst ausschließlich deine eigenen Tabs, nie die des Nutzers — ein vorab geöffneter claude.ai-Tab ist weder nötig noch erreichbar.
 
-Hol `/api/organizations` und **nenne das Ergebnis unverlangt**:
+Hol `/api/organizations` **mit vollem Objekt, nicht nur `uuid`/`name`** — das Feld `capabilities` filtert automatisch. Eine Organisation ohne `"chat"` in `capabilities` ist eine reine API-/Console-Organisation (typischerweise `"Frank's Individual Org"`-artig benannt); Anthropic trennt Chat-Abo und API-Zugriff bewusst in getrennte Organisationen (belegt, [9876003](https://support.claude.com/en/articles/9876003-i-have-a-paid-claude-subscription-pro-max-team-or-enterprise-plans-why-do-i-have-to-pay-separately-to-use-the-claude-api-and-console)) — **das ist normal, keine Störung.** Nimm sie aus der Auswahl, ohne zu fragen.
+
+Bleibt danach mehr als eine Organisation mit Chat-Fähigkeit übrig, prüfe **zuerst selbst**, in welcher die genannten oder gewünschten Projekte liegen (`/projects` je Kandidat), bevor du fragst — das kostet nur einen zusätzlichen Aufruf und erspart dem Nutzer eine Frage, die du dir selbst beantworten kannst. Nur wenn das Ergebnis mehrdeutig bleibt (Treffer in mehreren, oder in keiner), frag nach.
+
+Nenne das erkannte Ergebnis **unverlangt**:
 
 > Chrome ist bei claude.ai angemeldet als: *Name der Organisation*. Dort suche ich die Projekte.
 
-Das ersetzt jede vorherige Anweisung, sich anzumelden. Es ist verlässlicher als eine Zusicherung: Denselben Projektnamen kann es in einem zweiten Konto geben. Das Konto in Chrome muss **nicht** mit dem übereinstimmen, mit dem Claude Code selbst arbeitet — das ist geprüft und in Ordnung. Kommen mehrere Organisationen zurück, frag, welche gemeint ist.
+Das ersetzt jede vorherige Anweisung, sich anzumelden. Es ist verlässlicher als eine Zusicherung: Denselben Projektnamen kann es in einem zweiten Konto geben. Das Konto in Chrome muss **nicht** mit dem übereinstimmen, mit dem Claude Code selbst arbeitet — das ist geprüft und in Ordnung.
 
 ### Projekte bestimmen
 
@@ -102,6 +108,10 @@ Berichte, was geschrieben, ersetzt und aufgeräumt wurde — die entfernten Date
 Steht in der `CLAUDE.md` des Zielprojekts noch kein Verweis auf das Archiv, sag das als **Bemerkung, nicht als Frage** — sonst entsteht ein dritter Haltepunkt:
 
 > Hinweis: In der CLAUDE.md dieses Projekts steht kein Verweis auf das Archiv. Ohne ihn liegt es hier und wird nie gelesen. Sag Bescheid, wenn ich den Block einsetzen soll.
+
+**Schließe immer ausdrücklich ab.** Der letzte Satz sagt klar, dass alle angekündigten Schritte erledigt sind und nichts weiter von dir aussteht — nicht nur eine Liste, was passiert ist. Ein Nutzer, der nach der letzten Werkzeugausgabe nichts mehr von dir hört, weiß sonst nicht, ob du noch arbeitest oder fertig bist; genau das nachzufragen ist ihm unangenehm. Etwa:
+
+> Damit bin ich fertig — alle vier Projekte geprüft, FreeCAD-Bedienung aktualisiert, sonst nichts offen. Sag Bescheid, wenn noch etwas dazukommen soll.
 
 ## Die Endpunkte
 
