@@ -1,12 +1,12 @@
 # Chrome-Zugriff — systematischer Test der Bridge
 
-Eigene Datei, getrennt von `testlauf.md`, weil es hier nicht um Fahrplanpunkt 21 geht, sondern um die technische Voraussetzung für Fahrplanpunkt 27 (Skill über den Web-Weg): wie die Chrome-Anbindung von Claude Code (VS-Code-Erweiterung) tatsächlich zustande kommt und woran sie hängt. Die Vorarbeiten vom 20./21. August stehen als Ergebnis in `testlauf.md` unter „Wie die Chrome-Brücke funktioniert" — diese Datei führt den systematischen Teil fort, der dort begonnen wurde, und trägt den vollständigen Testweg.
+Diese Datei trägt den vollständigen, systematischen Testweg zur Chrome-Anbindung von Claude Code (VS-Code-Erweiterung) — wie sie tatsächlich zustande kommt und woran sie hängt. Sie wurde für den Skill `chat-export` (Web-Weg) angelegt, ist aber unabhängig von dessen übriger Doku lesbar.
 
-**Rechner:** derselbe wie in `testlauf.md` beschrieben (Chrome, VS-Code-Erweiterung, `@browser`-Mechanik).
+**Rechner:** durchgehend derselbe (Chrome, VS-Code-Erweiterung, `@browser`-Mechanik).
 
 ## Stufe 0 (Vortag, 20./21. August): Vorbefunde
 
-Kurz zusammengefasst, Details in `testlauf.md`:
+Kurz zusammengefasst:
 
 - Eine Nachricht ohne `@browser` liefert keinen Browserkontext — die Werkzeuge sind zwar in der Liste, antworten aber „Browser extension is not connected".
 - Der Connector-Schalter auf claude.ai (Einstellungen → Connectors → „Claude in Chrome") muss für das jeweils aktive Konto eingeschaltet sein, sonst kommt „Claude in Chrome is turned off in your settings". Wirkt nicht rückwirkend auf schon offene Tabs.
@@ -129,7 +129,7 @@ Auf Wunsch des Nutzers geprüft: die linke Seitenleiste der claude.ai-Oberfläch
 
 ## Stufe 7: Erster echter Testlauf des Skill-Ablaufs — Team-Konto ohne Selbstbedienungs-Export, abgebrochen an einer Code-Lücke
 
-**Ausgangslage.** Auf Wunsch des Nutzers wurde der in `Zielvorlage.md` beschriebene Ablauf erstmals real durchgespielt — nicht nur simuliert —, mit `chat_export_convert.py` aus `chat-export/source/` als ausführendem Werkzeug, gegen das Team-Konto (`HZDR - FWF`), das in Chrome aktiv angemeldet war.
+**Ausgangslage.** Auf Wunsch des Nutzers wurde der geplante Skill-Ablauf erstmals real durchgespielt — nicht nur simuliert —, mit `chat_export_convert.py` aus `chat-export/source/` als ausführendem Werkzeug, gegen das Team-Konto (`HZDR - FWF`), das in Chrome aktiv angemeldet war.
 
 **Wichtiger Nebenbefund, der so noch nirgends stand:** Das Team-Konto hat **keinen Selbstbedienungs-Export** — anders als bisher in der Zielvorlage/im Fahrplan formuliert („Web-Weg für kleine Nachträge, sonst Kontoexport"), ist der Web-Weg hier **die einzige Möglichkeit überhaupt**, nicht nur die bequemere. Deckt sich mit der bereits dokumentierten Kontotyp-Einschränkung (Doku 1.2/1.6: Team-/Enterprise-Mitglieder ohne Primary-Owner-Rechte haben keinen Export). **Folge für den Skill:** Er muss erkennen (oder sich sagen lassen) können, dass für ein Konto kein Export existiert, und darf dann den Export-Weg gar nicht erst als Alternative anbieten.
 
@@ -166,4 +166,4 @@ Der Befund aus Stufe 2 — ein Kontowechsel im Tab bricht eine bereits bestehend
 
 ## Abgrenzung: nicht jeder Verbindungsabbruch ist ein Bridge-Befund
 
-Beim Großimport vom 21. August (Testlauf, Abschnitt „Großimport") kam mitten im Gespräch einmal `API Error: Connection lost mid-response`. Das ist die **Modellverbindung** dieser Claude-Code-Sitzung, nicht `claude-in-chrome` — die Bridge selbst war davon nicht betroffen, der Ablauf lief danach ohne erneuten Zugriffsverlust weiter. Nach Angabe des Nutzers hat sein Internetzugang zeitweise mehrminütige Einbrüche; das ist die plausiblere Erklärung als ein Bridge-Fehler. Festgehalten, damit ein künftiger Fund dieser Meldung nicht vorschnell zu den MCP-Server-Aussetzern von Stufe 8 gezählt wird — beides sieht ähnlich aus, sind aber verschiedene Schichten.
+Beim Großimport vom 21. August — vier reale Projekte, 171 Chats über den Export-Weg (3.1.7 der Implementierungsdoku) — kam mitten im Gespräch einmal `API Error: Connection lost mid-response`. Das ist die **Modellverbindung** dieser Claude-Code-Sitzung, nicht `claude-in-chrome` — die Bridge selbst war davon nicht betroffen, der Ablauf lief danach ohne erneuten Zugriffsverlust weiter. Nach Angabe des Nutzers hat sein Internetzugang zeitweise mehrminütige Einbrüche; das ist die plausiblere Erklärung als ein Bridge-Fehler. Festgehalten, damit ein künftiger Fund dieser Meldung nicht vorschnell zu den MCP-Server-Aussetzern von Stufe 8 gezählt wird — beides sieht ähnlich aus, sind aber verschiedene Schichten.
