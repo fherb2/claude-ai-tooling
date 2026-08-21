@@ -418,6 +418,25 @@ Noch am selben Tag nachgezogen. Das Verfahren: Ein Tab auf `claude.ai`, von dort
 
 **Folge für den Skill:** Er darf sich nicht darauf verlassen, dass Chrome dasselbe Konto verwendet wie die Claude-Code-Sitzung — er muss das erkannte Konto nennen, nicht voraussetzen (so schon in der Zielvorlage, Abschnitt 2.3). Und seine Voraussetzungen sind die drei Punkte oben, nicht „Erweiterung installiert" allein — das gehört in seine README.
 
+## Fahrplanpunkt 27c: der echte Lauf — bestanden
+
+Am 21. August 2026, über eine **zweite, unabhängige Claude-Code-Sitzung** in diesem Repo, gestartet mit `@browser` und ohne weiteres Vorwissen — genau der Nutzungsfall, für den der Skill gebaut ist, nicht diese entwickelnde Sitzung. Chrome war am **Team**-Konto angemeldet, diese begleitende Sitzung selbst am Pro-Konto; die Kontounabhängigkeit aus `chrome-zugriff.md` trug auch hier.
+
+**Der Nutzer griff kaum ein.** Die andere Sitzung durchlief beide Haltepunkte, nannte das Konto unverlangt und führte den Web-Weg über zwei Projekte des Team-Kontos.
+
+| Quellprojekt | Chats | Ergebnis |
+| --- | --- | --- |
+| „Chats-Export, Test 1" | 3 | alle drei exportiert, `protokoll.json` korrekt, Titel und Turns stimmen mit der Chatliste überein |
+| „Testprojekt" | 1 | exportiert samt allen drei Nebendateien (`.thinking.json`, `.attachments.json`, `.creations.json`) |
+
+**Stichprobe an einer Chatdatei bestanden:** `metadata`/`messages`/`warnings`, alle erwarteten Felder (`source: "web-api"`, `turns`, `dropped_*`, `attachments_with_content` …) — Struktur deckt sich mit der Doku.
+
+**Abgelegt wurde am dokumentierten Ort.** `<projekt>/.claude/imported_chats/<quellprojekt>/`, hier `<projekt>` = dieses Repo selbst, weil die zweite Sitzung darin gestartet wurde — die `SKILL.md` sagt diesen Pfad ausdrücklich voraus, kein Abweichen.
+
+**Ein Befund über den Testaufbau, kein Mangel am Skill:** Dieser Ort liegt anders als beim bisherigen Wegwerf-Testordner (`~/zielprojekt-test/`, außerhalb des Repos) **innerhalb** des Entwicklungs-Repos, und `.claude/imported_chats/` steht bislang **nicht** in dessen `.gitignore` — nur die Wegwerf-Testkopie des Skripts selbst ist dort ausgeschlossen. Echter, persönlicher Chat-Inhalt hätte damit ungeschützt committet werden können. Der Ordner wurde nach der Prüfung gelöscht, bevor etwas committet wurde; ob `.gitignore` das für künftige Läufe dauerhaft ausschließen soll, ist offen.
+
+**Damit sind 27b und 27c beide erledigt.** 27b war am Code zu prüfen: `cmd_diff` nennt UUIDs bereits — unter `STALE` und `WAITING` steht die UUID vor jedem Titel. Nichts zu ergänzen. Offen bleibt an Fahrplanpunkt 27 allein noch die `README.md` (27a).
+
 ## Aufgeräumt und was zum Rechnerwechsel gilt
 
 Der Wegwerf-Ordner `~/zielprojekt-test/` ist nach bestandener Prüfung gelöscht; alle zwölf Dateien darin waren inhaltsgleiche Kopien aus `tests/test_results/pro-test-1/` und wurden vor dem Löschen einzeln dagegen verglichen. Wer 21.8 wiederholen will, baut ihn in zwei Minuten neu auf — Ordner, `.claude/imported_chats/<quellprojekt>/`, und die `CLAUDE.md` mit dem Block aus `convert --target repo`.
