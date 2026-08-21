@@ -1,11 +1,42 @@
 #!/usr/bin/env python3
 """Self-test for chat_read_store: unit checks plus an end-to-end CLI run.
 
-Runnable from anywhere; the script under test is located relative to this
-file, not to the working directory:
+**The script under test is not runnable in practice.** ``read_conversation``
+disappeared from claude.ai on 18 August 2026 (``implementation_doku.md`` 1.2),
+so no instance can feed it real pages any more. This test still passes and is
+still worth running: it works on synthetic pages built here, and it keeps the
+second implementation of the file format honest -- the one
+``test_wegegleichheit.py`` measures Vorgabe 2.5 against. Both files sit in
+``tests/`` for that reason.
+
+Runnable from anywhere; the script under test sits beside this file, located
+relative to it and not to the working directory:
 
     python tests/test_read_store.py
     python -O tests/test_read_store.py
+
+WHAT IS COVERED
+---------------
+* **Parsing the envelope** -- the observed ``<chat …><turn n="…">`` shape:
+  ``total_turns``, the turn range, the page token, and that ``Human:`` /
+  ``Assistant:`` labels are written out in full (unlike search snippets).
+* **Ranges and completeness** -- completeness is a calculation, not a claim:
+  the turn indices held against ``total_turns``, with missing ones named
+  individually. This is the one thing this route could do that the export
+  cannot.
+* **Merging** -- a turn has identity, so reading the same page twice is
+  harmless. The only case that earns a warning is the same index arriving
+  twice with *different* text: either the chat changed between calls or a
+  transcription was not verbatim.
+* **Status transitions** -- ``ingest`` marks a chat ``started`` because
+  reading one page *is* taking up the work; ``export`` claims ``done`` only on
+  proven completeness, and a partial export stays ``started`` and says so.
+* **The shared protocol** -- the same ``protokoll.json`` as the zip route, one
+  schema for both, including stale detection and the reconciliation bound
+  (``created_after``) for chats with no ``created_at``.
+* **``plan`` answers and changes nothing** -- it reports what is new, refuses
+  to invent a turn count where none is known, and never removes a chat the
+  fresh list no longer offers.
 """
 
 import json

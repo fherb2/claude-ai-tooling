@@ -10,8 +10,39 @@ Nothing enforces that at runtime -- the two scripts are deliberately separate,
 because ``chat_read_store.py`` has to stay uploadable as a single file.  This
 test is the only thing standing between the two shapes and silent drift.
 
+**One of the two routes is no longer runnable.** ``read_conversation``
+disappeared from claude.ai on 18 August 2026, so nobody can fetch a chat that
+way today. That does not retire this test -- it makes it the whole reason
+``chat_read_store.py`` is still kept: it is the second implementation the
+promise is measured against. Delete it and the converter becomes the only
+yardstick of itself. Both files therefore live in ``tests/``.
+
     python3 tests/test_wegegleichheit.py
     python3 -O tests/test_wegegleichheit.py
+
+WHAT IS COVERED
+---------------
+The same conversation is described twice -- once the way the export writes it,
+once the way ``read_conversation`` handed it over -- and then compared:
+
+* **Same top-level keys**, with ``branches`` the single permitted exception:
+  only the zip route can observe a branch at all, so an empty list on the read
+  side would claim a finding it cannot make.
+* **Same metadata keys in the same order**, and ``warnings`` present on both
+  even when empty.
+* **Identical transcripts.** Where the zip route sees material the read route
+  cannot -- thinking, attachments, tool calls -- it adds a reference field.
+  Those three references are the only additions allowed, and stripping them
+  must leave two identical message lists.
+* **Exactly five metadata fields may differ** (``source``, ``created_at``,
+  ``total_turns``, ``complete``, ``turns_missing``) -- and no more. Where a
+  route cannot know something it writes ``null`` rather than a guess.
+* **The protocols too**, not just the chat files: same key sets, same core
+  fields, and the window calculation run through one shared table of cases so
+  the two implementations cannot drift apart on it.
+* **``VANISHED_NOTE`` is identical in both scripts** -- the same sentence about
+  a chat the fresh list no longer offers, which they cannot share as code
+  (Vorgabe 2.9) and therefore have to hold twice.
 """
 
 import json

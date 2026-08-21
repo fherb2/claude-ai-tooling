@@ -2,6 +2,36 @@
 """Complete, ordered export of past chats via ``read_conversation``.
 
 ===========================================================================
+NOT RUNNABLE -- the tool this rests on is gone. Read this before starting.
+===========================================================================
+
+``read_conversation`` was a built-in tool of the claude.ai instance. On
+**18 August 2026** it was no longer offered in four attempts across two
+accounts, two surfaces and several models; twelve days earlier it had
+demonstrably worked. Details and the evidence are in
+``implementation_doku.md`` 1.2 and 3.2. Without that tool nothing below can
+run: this script never reads anything itself, it processes what an instance
+hands it.
+
+**Why the file is still here, and why in ``tests/``.** It holds the *second
+implementation* of the chat file format. ``tests/test_wegegleichheit.py``
+measures Vorgabe 2.5 against it -- the promise that both ways produce the
+same document. Drop this file and that promise becomes unprovable, leaving
+the converter as the only yardstick of itself. Nothing but that test
+exercises it now, which is why it sits beside the tests rather than in the
+project root.
+
+Should the tool ever return, this becomes a working script again -- but check
+its behaviour against 3.2 first rather than trusting the description below;
+the earlier interface description was deliberately deleted from the doc and
+is not kept as a specification.
+
+The operating instructions below are preserved verbatim from when the tool
+existed. They are the manual Vorgabe 2.9 requires an uploadable script to
+carry, and the docstring guard in ``tests/test_docstrings.py`` still checks
+them -- but do not act on them expecting them to work today.
+
+===========================================================================
 @Claude: OPERATING INSTRUCTIONS -- read this part, then start working.
 ===========================================================================
 

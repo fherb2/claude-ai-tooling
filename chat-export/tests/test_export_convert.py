@@ -1,11 +1,65 @@
 #!/usr/bin/env python3
-"""Self-test for chat_export_convert: unit checks plus an end-to-end CLI run.
+"""Self-test for chat_export_convert: unit checks plus end-to-end CLI runs.
 
-The fixture archive is built here from scratch. **No real chat content**: every
-conversation is synthetic and models one situation observed in a real export.
+The script under test lives in ``skills/chat-export/`` -- it is the one script
+the skill ships, and the only one a user ever copies. This is therefore the
+guard on the actual product, not on a helper.
+
+The fixture archive is built here from scratch. **No real chat content**
+(Vorgabe 2.11): every conversation is synthetic and models one situation that
+was observed in a real export, which is why the fixtures have names like
+"Sendesturm" or "Aelteres Kind traegt" rather than numbers.
 
     python3 tests/test_export_convert.py
-    python3 -O tests/test_export_convert.py
+    python3 -O tests/test_export_convert.py    # the __debug__ guards must compile out
+
+WHAT IS COVERED
+---------------
+Roughly in the order the checks appear:
+
+* **Reading the archive** -- members, project files, the seven conversation
+  fields, and that a missing ``conversations.json`` fails loudly.
+* **Message content** -- text is assembled from ``content`` blocks, never from
+  the flat ``text`` field, which carries the thinking in a real export. One
+  fixture makes ``text`` deliberately disagree so a regression shows up.
+* **The tree and its decisive rule** -- the path to the newest message in the
+  whole tree, not the youngest child at a fork. A fixture reproduces the real
+  case where the *older* child carries 29 messages and the younger is a dead
+  end; getting this wrong loses content silently.
+* **Branches and duplicates** -- discarded siblings are carried into their own
+  field, identical childless siblings are counted and dropped (the observed
+  send storm of 14 messages at 440 characters each).
+* **Hollow, empty, losses** -- a deleted chat arrives as a shell with structure
+  but no text and must be marked ``deleted``, not written as a blank
+  transcript.
+* **Thinking blocks** -- selection is structural (hidden, or under 200
+  characters), never by content words (Vorgabe 2.7).
+* **``files`` against ``attachments``** -- the two are not disjoint. An upload
+  appears twice: as a file object and, if text could be extracted, with its
+  content. Counting both as loss overstated it on real data (319 of 524
+  entries had their content in the same message); this checks the
+  de-duplication.
+* **File names and the protocol** -- slug rules, the uuid always in the name,
+  window calculation, an implausible project date, growth detection from a
+  fresh list alone.
+* **A chat the fresh list no longer offers** -- reported, never removed, and
+  the wording is shared with the read path (Vorgabe 2.4).
+* **Replacing cleans up** -- previous files are removed *before* writing,
+  because the file stem can have changed, and they are named in the output.
+* **``analyse`` against ``report``** -- the same material from opposite sides:
+  one reads the archive, the other the files written from it. Agreement is a
+  real statement, so the fixtures deliberately include all side file kinds --
+  an earlier version compared zero against zero and proved nothing.
+* **The instruction block** -- one wording per target, with path and file kinds
+  taken from the actual run rather than a fixed list.
+* **Both sources, one converter** -- the zip way and the web bundle are
+  compared file for file. Only the declared ``source`` may differ; the
+  comparison normalises exactly that field and then demands equality. The
+  bundle fixture is reshaped into the *observed* web form (no ``account``, no
+  flat ``text``, an ``index`` per message), because handing it the archive's
+  own objects would prove nothing but that unwrapping works.
+* **A project with zero chats** -- writes a protocol instead of aborting.
+  Found live against a real team account (``chrome-zugriff.md``, Stufe 7).
 """
 
 import io

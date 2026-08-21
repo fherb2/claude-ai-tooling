@@ -1,11 +1,44 @@
 #!/usr/bin/env python3
 """Self-test for chat_crawl_store: unit checks plus an end-to-end CLI run.
 
-Runnable from anywhere; the script under test is located relative to this
-file, not to the working directory:
+**The script under test has an undecided future** (Fahrplanpunkt 10). It
+rebuilds transcripts from overlapping search snippets, and two findings have
+undercut it: ``read_conversation`` -- the tool it was declared superseded by --
+is gone, while ``conversation_search`` was observed returning a *summary*
+rather than snippets for a chat of ten turns. Ingesting a summary would
+archive a retelling, which Vorgabe 2.8 forbids. The file and this test are
+kept untouched until that decision is made, and both sit in ``tests/``
+because nothing else touches them.
+
+The test itself is unaffected by all that: it works on synthetic snippets
+built here, and it still documents what the overlap machinery actually does.
+
+Runnable from anywhere; the script under test sits beside this file, located
+relative to it and not to the working directory:
 
     python tests/test_crawl_store.py
     python -O tests/test_crawl_store.py   # verifies the __debug__ guards compile out
+
+WHAT IS COVERED
+---------------
+* **Overlap and normalisation** -- the heart of the file: finding the join
+  between two snippets, with a naive reference implementation checked against
+  the real one. Worth knowing when reading the results: on real data the
+  snippets turned out to be fixed and *non-overlapping*, so this machinery had
+  almost nothing to join. The unit tests pass regardless; they test the
+  mechanism, not its usefulness.
+* **Speaker labels** -- both observed spellings (``H:``/``A:`` from search
+  hits, written out elsewhere), with the blank after the colon mandatory.
+* **Code fences and gap markers** -- an ellipsis counts as a gap only when
+  wedged between two non-blanks; ``abc ... def`` and a lone ``...`` line are
+  prose and must pass through unflagged. Both were real traps.
+* **Header stripping** -- both real formats observed in returned snippets.
+* **Merging and edge bookkeeping** -- which piece joins which, and the
+  bookkeeping that keeps the order reconstructable.
+* **Contradictory chat-start observations** -- recorded, never swallowed. The
+  point of the file is that it may not claim completeness; a contradiction has
+  to survive into the output rather than be resolved by guessing.
+* **Schema upgrade** -- an older state file is migrated, not rejected.
 """
 
 import json

@@ -24,6 +24,13 @@ Two layers, because they catch different kinds of drift:
 
     python3 tests/test_docstrings.py
     python3 -O tests/test_docstrings.py
+
+The four scripts it covers live in three places, by what each one is for, and
+the ``SCRIPTS`` mapping below records which is where: the converter with the
+skill it ships in, ``inspect_export.py`` in the project root as a maintenance
+tool, and the two uploadable scripts beside the tests -- nothing but tests
+exercises those two any more. Moving a script therefore means editing that
+mapping, and this test failing to find a file is the reminder.
 """
 
 import ast
