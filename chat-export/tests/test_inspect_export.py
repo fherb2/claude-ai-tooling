@@ -6,8 +6,36 @@ strings that must NEVER appear in the tool's output -- that guarantee is what
 makes the output safe to paste into a conversation, and it is the most
 important check here.
 
+The script under test lives in ``chat-export/`` itself, not with the skill: it
+is a maintenance tool of this project, run by hand when there is reason to
+think Anthropic changed the export format. No user ever needs it.
+
     python3 tests/test_inspect_export.py
     python3 -O tests/test_inspect_export.py
+
+WHAT IS COVERED
+---------------
+* **No chat content in the output** -- the marker strings planted in the
+  fixture must never appear. This is the most important check: it is what
+  makes the tool's output safe to paste into a conversation. Titles do appear,
+  deliberately, because they identify the chats.
+* **Archive contents and the member list** -- and that a growing member list is
+  not an alarm while a missing ``conversations.json`` is.
+* **Projects by creation date** -- the tool reports them because they are the
+  supplier for ``--project-created``. Project files are exempt from the export
+  window, which is what made a short "sounding" export useful; the web
+  endpoint has since made that step unnecessary, but the report stays because
+  the schema watch needs it.
+* **Counts, span and size of the conversations**, hollow (deleted) chats, forks
+  per chat, block types and truth flags.
+* **The flat ``text`` discrepancy** -- the tool reports it, because that field
+  carries the thinking and using it would flood an archive with internal
+  deliberation.
+* **``attachments`` with content, reported separately from name-only ``files``
+  references** -- the distinction that decides how much an archive can keep.
+* **The union of all conversation, message and block keys** -- this is the
+  schema watch proper, to be held against ``implementation_doku.md`` 3.1.1. A
+  *missing* name is the warning sign; a new one is usually just an extension.
 """
 
 import json

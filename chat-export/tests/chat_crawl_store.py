@@ -2,6 +2,28 @@
 """Incremental store for reconstructing chat transcripts from search snippets.
 
 ===========================================================================
+STATUS UNDECIDED -- the sentence this file was retired by has expired.
+===========================================================================
+
+This header used to read "superseded where ``read_conversation`` exists".
+That condition is void: on **18 August 2026** ``read_conversation`` was gone
+from claude.ai altogether (``implementation_doku.md`` 1.2). By the old logic
+this script would therefore be the only one left that can work -- but a
+second finding from the same day cuts the other way: ``conversation_search``
+returned a **summary** instead of snippets for a chat of ten turns. A crawler
+that ingests summaries archives a retelling, which Vorgabe 2.8 forbids
+outright. So its own foundation is in question, not just its necessity.
+
+Whether the file stays at all is the open decision in Fahrplanpunkt 10. Until
+that is made nothing here is to be relied on. It lives in ``tests/`` because
+nothing but ``tests/test_crawl_store.py`` touches it.
+
+Everything below is preserved from when the file was in service -- including
+the pointer to ``chat_read_store.py``, which is itself no longer runnable.
+Read it as history, not as advice.
+
+===========================================================================
+Original header, kept verbatim:
 SUPERSEDED WHERE ``read_conversation`` EXISTS -- check that first.
 ===========================================================================
 
