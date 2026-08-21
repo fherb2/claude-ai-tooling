@@ -4,7 +4,9 @@
 
 **Widersprüche zur `README.md` sind ausdrücklich erlaubt** und werden nicht nachgeführt. Sie hält bewusst einen älteren Stand samt Warnhinweis für fremde Leser und wird erst am Ende dieser Phase neu geschrieben (aus 1.1, 1.2 und 1.5). Widersprüche **innerhalb dieser Doku** und zwischen **Doku und Code** sind dagegen Defekte: Sie werden benannt und bekommen einen Fahrplanpunkt, keine Ausnahme.
 
-**Die Phase endet**, wenn zwei Dinge vorliegen — ein bestandener mehrstufiger Test an einem eigens dafür gebauten Testprojekt (aktives Weiterschreiben eines Chats zwischen zwei Läufen, Sitzungsübergabe, Fortsetzung eines früheren Chats) und ein erster Durchlauf in ein echtes Zielprojekt einschließlich Rückweg des Protokolls und wirksamer Projektanweisung. Dann fällt dieser Hinweis, und mit ihm der Warnhinweis der README.
+**Die Phase endet**, wenn zwei Dinge vorliegen — ein mehrstufiger Test an einem eigens gebauten Testprojekt, der die tragenden Behauptungen abdeckt (aktives Weiterschreiben eines Chats zwischen zwei Läufen samt Fensterrechnung, Ersetzen, wirksamer Anweisungsblock), und ein erster vollständiger Durchlauf in ein echtes Zielprojekt. Dann fällt dieser Hinweis, und mit ihm der Warnhinweis der README.
+
+Der Vergleich beider Wege an echten Daten war ursprünglich als dritte Bedingung gedacht und ist **keine mehr**: Er sollte Export gegen `read_conversation` halten, und dieses Werkzeug gibt es nicht mehr (1.2). Zwischen ZIP-Weg und Web-Weg ist die Wegegleichheit stattdessen baulich erfüllt und im Test Datei für Datei belegt (3.1) — an echten Daten sogar schärfer, als der geplante Vergleich es gewesen wäre: Für denselben Chat liefern Web-API und Export-ZIP dieselben Nachrichten-UUIDs.
 
 ---
 
@@ -28,19 +30,26 @@ Je Chat entstehen bis zu vier Dateien — Gespräch, Denkschritte, Anhänge, Erz
 
 ## 1.2 Die Wege
 
-Der Engpass ist nicht die Suche, sondern die **Transkription**: Chattext erreicht ein Dateisystem nur, indem eine Instanz ihn ausschreibt. Der Kontoexport umgeht diesen Engpass — er liefert die Chats als Datei, ohne dass ein Wort durch einen Kontext läuft — und taugt für Altbestand wie fürs Fortschreiben: Sein Zeitraum ist wählbar, also lässt er sich auf die letzten Wochen einschränken und daraus nachpflegen. Sein Skript ist `chat_export_convert.py` (3.1).
+Der Engpass ist nicht die Suche, sondern die **Transkription**: Chattext erreicht ein Dateisystem nur, wenn er irgendwie dorthin gelangt, ohne durch den Kontext einer Instanz zu laufen — sonst wird aus Kopieren unweigerlich Nacherzählen (Vorgabe 2.8). Beide benutzbaren Wege umgehen diesen Engpass, und beide bedient dasselbe Skript, `chat_export_convert.py` (3.1).
 
-**Der zweite Weg ist entfallen.** Er lief über `read_conversation`, ein eingebautes Werkzeug der claude.ai-Instanz. Am **18. August 2026** wurde es in vier Anläufen im Pro-Konto — Browser und Desktop, mehrere Modelle, Tool-Zugriff auf „alles laden" — von keiner Instanz mehr angeboten; im Team-Konto ebenso. Dass es zwölf Tage zuvor gearbeitet hat, ist belegt und nicht bloß erinnert: Der Sitzungsverlauf vom 6. August trägt die wörtlich zitierte Werkzeugbeschreibung, eine echte Ausgabe und zwei Werte — Turn-Summe und mikrosekundengenauer Zeitstempel —, die ein Stunden später eingetroffener Export unabhängig bestätigt hat. Der Nachweis im Einzelnen steht in `testlauf.md`; warum es verschwunden ist, bleibt offen und ist für die Folgen gleichgültig. **Damit ist der Kontoexport der einzige benutzbare Weg.** Warum das Skript des zweiten trotzdem liegen bleibt, sagt 3.2.
+| | Kontoexport | Web-Weg |
+| --- | --- | --- |
+| Quelle | ZIP per E-Mail, Zeitraum wählbar | die internen Endpunkte der claude.ai-Weboberfläche |
+| Zugang | Konto mit Selbstbedienungs-Export | angemeldeter Chrome plus Browser-Anbindung |
+| Wartezeit | Antrag, E-Mail, Download | keine |
+| Menge | alles in einem Zug, keine Last je Chat | je Chat ein Abruf, deshalb gebremst |
+| Projektbezug | fehlt — braucht eine Chatliste aus claude.ai | `project_uuid` und `created_at` stehen in den Daten |
+| Aufruf | `convert --zip` | `list --web`, `convert --bundle` |
 
-Bei den Denkschritten ist die Ausbeute des Exports ungewiss: Sie **können** enthalten sein, müssen es aber nicht (3.1.1). Anhänge und Erzeugnisse sind davon unberührt.
+**Wann welcher.** Der Kontoexport ist der Anker: Er existiert, weil die Datenschutz-Grundverordnung ihn erzwingt — sein Format kann sich ändern, aber er verschwindet nicht. Der Web-Weg ist die bessere Wahl für **kleine Nachträge** eines Projekts, und für eine Erstmigration oder ganze Chats mit reichlich Anhängen bleibt der Export vorzuziehen: Ein Massenabruf über die Weboberfläche fällt serverseitig auf und kann Captcha- oder Cloudflare-Prüfungen auslösen. Deshalb die Abrufbremse von 4 bis 12 Sekunden je Chat.
 
-**Der Export ist allerdings nicht überall zu haben.** Er ist an den Kontotyp gebunden (1.6): Selbstbedienung nur auf Free, Pro und Max. Ein gewöhnliches Mitglied eines Team- oder Enterprise-Kontos hat **keinen** Export — dort war der Lese-Weg nicht die bequemere Alternative, sondern der einzige. Mit seinem Wegfall bleibt für Chats, die in einem solchen Konto liegen, **derzeit kein Weg**.
+**Für Team- und Enterprise-Konten ist der Web-Weg der einzige.** Dort hat ein gewöhnliches Mitglied keinen Selbstbedienungs-Export (1.6); der Primary Owner kann exportieren, aber ein Verfahren, das bei jedem Durchgang den Administrator braucht, ist für einen **wiederkehrenden** Abgleich (1.1) untauglich. Am 22. August 2026 wurde der Web-Weg in einem Team-Konto durchgespielt: Projektliste und Chatlisten kamen vollständig.
 
-Der Primary Owner einer Organisation kann exportieren, aber das hilft dem Einzelnen kaum: Dieses Vorhaben ist ein **wiederkehrender** Abgleich (1.1), und ein Verfahren, das bei jedem Durchgang den Administrator braucht, ist für den laufenden Betrieb untauglich. Wer regelmäßig nachpflegen will, kann nicht jedes Mal um einen Organisationsexport bitten.
+Bei den Denkschritten ist die Ausbeute ungewiss — sie **können** enthalten sein, müssen es aber nicht (3.1.1), und zwar in beiden Wegen gleichermaßen, weil die Plattform sie nicht mehr ausschreibt. Anhänge und Erzeugnisse sind davon unberührt.
 
-**Verbindlich bleibt die Wegegleichheit** — Wortlaut, erlaubte Abweichungen und ihr Wächter stehen als Vorgabe 2.5. Sie behält ihren Sinn, obwohl derzeit nur ein Weg läuft: Sie bindet das Dateiformat an eine zweite Umsetzung, und ein künftiger zweiter Weg erbt damit Format und Protokollmechanik, statt sie neu zu erfinden. Warum sie zur Laufzeit nichts erzwingt, sagt Vorgabe 2.9.
+**Ein dritter Weg ist entfallen:** `read_conversation`, ein eingebautes Werkzeug der claude.ai-Instanz, wurde am 18. August 2026 nicht mehr angeboten — zwölf Tage nach belegter Nutzung, ohne erkennbaren Grund. Er lieferte nur das gerenderte Transkript, also weder Denkschritte noch Anhänge, und wäre dem Web-Weg heute in jeder Hinsicht unterlegen. Der Nachweis der Abwesenheit steht in `testlauf.md`; warum das Skript trotzdem liegen bleibt, sagt 3.2.
 
-**Ob ein zweiter Weg wiederkommt, ist offen.** Ein Fund dazu — eine interne Schnittstelle der claude.ai-Weboberfläche — liegt in `testlauf.md`. Er ist bisher Beobachtung, keine Entwurfsentscheidung, und steht deshalb noch nicht in diesem Kapitel.
+**Verbindlich ist die Wegegleichheit** — Wortlaut, erlaubte Abweichungen und ihr Wächter stehen als Vorgabe 2.5. Zwischen ZIP-Weg und Web-Weg ist sie **baulich** erfüllt, weil beide durch denselben Konverter laufen (3.1); geprüft wird sie zusätzlich gegen die zweite Umsetzung in 3.2.
 
 ## 1.3 Richtungen und Zielorte
 
@@ -73,17 +82,26 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 
 ## 1.5 Ablauf aus Nutzersicht
 
-**Die Instanz ist das Frontend.** Kein Parametrierungswerkzeug: sie fragt, ob eine vollständige Migration oder eine Aktualisierung auf Basis eines vorhandenen Protokolls gemeint ist, welche Projekte betroffen sind und wohin geschrieben wird — und ruft das Skript entsprechend auf.
+**Claude Code ist das Frontend**, angeleitet durch den Skill `chat-export` (3.5). Kein Parametrierungswerkzeug: Er stellt fest, welche Projekte betroffen sind und was schon da ist, legt die Lage vor und ruft das Skript auf. Zwei Haltepunkte sind vorgesehen — vor dem ersten Abruf und nach der Statistik; die Wahl des Wegs trifft der Nutzer, nicht der Skill.
 
-Der Ablauf ist beim ersten Mal und beim Nachpflegen derselbe, nur die Menge unterscheidet sich:
+**Über den Web-Weg**, der Regelfall für Nachträge:
 
-0. **Sondierungsexport, wenn der nötige Zeitraum unklar ist.** Einen Export über einen möglichst kurzen Zeitraum anfordern: er enthält trotzdem **alle** Projektdateien mit ihrem `created_at` (3.1.1). `inspect_export.py` listet sie nach Datum; das Datum des betroffenen Projekts wird mit `list --project-created` ins Protokoll übernommen und begrenzt ab dann jedes Fenster (Vorgabe 2.4). Exakt statt geschätzt, und für ein paar Megabyte statt Dutzenden. Entfällt beim Nachpflegen, wenn das Protokoll die Stände schon kennt.
-1. Kontoexport anfordern, ZIP herunterladen. **Setzt voraus, dass es ihn gibt** — Free, Pro oder Max, oder Primary-Owner-Rechte in einer Organisation (1.6). Fehlt beides, führt dieser Ablauf ins Leere — und einen anderen gibt es derzeit nicht (1.2). **Zeitraum wählbar** — fürs Nachpflegen der Zeitraum seit dem letzten Lauf mit Überlappung, für eine Erstmigration ab dem Projektbeginn aus Schritt 0. Der Zeitraum filtert `created_at`, nicht `updated_at` (4.2): ein alter Chat, der letzte Woche weiterlief, fehlt in einem kurzen Fenster **ganz**.
-2. Je Quellprojekt dort die Chatliste anfordern, Antwort als Datei ablegen. Kein Skript nötig — `recent_chats` ist ein eingebautes Werkzeug der Instanz dort; nur der Prompt dazu ist wörtlich vorgegeben, als `MAPPING_PROMPT` in `chat_export_convert.py` (3.1.6), weil eine Freihand-Formulierung den Codeblock-Zwang leicht vergisst und die `<chat>`-Tags dann dem Markdown-Renderer zum Opfer fallen (beobachtet).
+1. Projektliste holen, Projekt bestimmen, Chatliste über alle Seiten holen. Alles aus einem Tab auf claude.ai heraus, ohne Chat und ohne dass ein Zeichen durch einen Kontext läuft.
+2. `list --web` gegen das Protokoll: Was ist neu, was gewachsen, was verschwunden. Die Fenstergrenze braucht hier nichts geschätzt zu werden, denn `created_at` steht je Chat in der Liste.
+3. Die fehlenden Chats abrufen, gebremst, alles in **einen** Behälter, **ein** Download.
+4. `convert --bundle`: Dateien schreiben, Protokoll fortschreiben, Ersetztes benennen.
 
-   **Die Abfrage gehört in einen eigens dafür angelegten Chat, der danach gelöscht wird.** Grund: `recent_chats` listet den laufenden Chat nicht mit (1.6), also fehlt der Abfragechat in seiner eigenen Liste — und damit im Protokoll und im Archiv, ohne dass irgendetwas es meldet. Ein frischer, hinterher gelöschter Chat macht diese Lücke harmlos: Was nie archiviert werden musste, fehlt auch nicht, und im Projekt bleibt keine Karteileiche liegen. Fragt man dagegen in einem Arbeitschat, verschwindet ausgerechnet dieser lautlos aus dem Archiv. Die Regel gilt für **beide** Wege, denn beide bauen ihr Protokoll aus dieser Liste (3.1.6, 3.2).
-3. Lokal mit Claude Code: Protokoll anlegen oder ergänzen, Chats des Projekts aus dem ZIP holen und an den Zielort schreiben. `list` merkt selbst, was neu und was veraltet ist; `convert` holt nur das.
-4. Protokoll ins Projektwissen des Quellprojekts zurück — sonst steht beim nächsten Lauf dort nicht, was schon da ist (1.4).
+**Über den Kontoexport**, für Erstmigration und große Mengen:
+
+1. Zeitraum aus dem Protokoll errechnen lassen (`diff` nennt ihn samt Begründung), Export anfordern, ZIP herunterladen. **Setzt voraus, dass es ihn gibt** — Free, Pro oder Max (1.6); in einem Team-Konto führt dieser Ablauf ins Leere und der Web-Weg ist der einzige. Der Zeitraum filtert `created_at`, nicht `updated_at` (4.2): ein alter Chat, der letzte Woche weiterlief, fehlt in einem kurzen Fenster **ganz**.
+2. Die Projektzuordnung fehlt dem Export. Sie kommt entweder aus der Chatliste des Web-Wegs (`list --web`) oder, wo der nicht zur Verfügung steht, aus einem `recent_chats`-Abzug in claude.ai (`list --map`) — dann gilt die Regel unten.
+3. `convert --zip`: dieselben Dateien, derselbe Protokollstand wie im Web-Weg.
+
+**Nur wenn die Chatliste aus einem claude.ai-Chat kommt:** Die Abfrage gehört in einen eigens dafür angelegten Chat, der danach gelöscht wird. Grund: `recent_chats` listet den laufenden Chat nicht mit (1.6), also fehlt der Abfragechat in seiner eigenen Liste — und damit im Protokoll und im Archiv, ohne dass irgendetwas es meldet. Ein frischer, hinterher gelöschter Chat macht die Lücke harmlos. Der Web-Weg hat dieses Problem nicht: Er listet ohne Chat und übergeht nichts.
+
+**Der Rückweg des Protokolls** ins Projektwissen des Quellprojekts ist **kein Pflichtschritt mehr**. Er trug den entfallenen Lese-Weg, der dort arbeitete. Als Selbstauskunft bleibt er nützlich — das Quellprojekt sagt dann selbst, was von ihm archiviert wurde —, aber der Abgleich braucht ihn nicht: Das Protokoll liegt beim Archiv (1.4).
+
+**Der Sondierungsexport ist entfallen.** Er diente allein dazu, das `created_at` des Projekts zu erfahren, weil keine andere Quelle es hergab. Der Projekt-Endpunkt des Web-Wegs liefert es direkt (2.4). Wer nur den Export-Weg hat, kann ihn weiter benutzen — ein Kurzzeitraum-Export enthält alle Projektdateien mit ihrem Datum (3.1.1) —, braucht ihn aber nicht mehr als Regelschritt.
 
 **Wie Zuwachs erkannt wird:** Eine frische Chatliste liefert je Chat ein `updated_at`. Ist es neuer als der Stand im Protokoll, wurde weitergechattet. Der Vergleich braucht nichts als das Protokoll und die neue Liste — kein Chatarchiv, kein ZIP, kein Zeichen Chattext (Mechanik in Vorgabe 2.4). Ein veralteter Chat wird **als Ganzes ersetzt**, nicht fortgeschrieben, und das Ersetzen räumt auf — Vorgabe 2.6.
 
@@ -95,12 +113,11 @@ Der Ablauf ist beim ersten Mal und beim Nachpflegen derselbe, nur die Menge unte
 | Quelle                    | Weg                                 | Format                        | Haken                                                                           |
 | ------------------------- | ----------------------------------- | ----------------------------- | ------------------------------------------------------------------------------- |
 | claude.ai, alle Chats     | Kontoexport                         | ZIP,`conversations.json`      | kein Projektbezug; Gelöschtes als Hülle; `files` nur als Name; Momentaufnahme |
-| claude.ai, ein Projekt    | `recent_chats`                      | UUID, Zeit, Titel             | **einzige Quelle für die Projektzugehörigkeit**                               |
-| Claude Code CLI           | `/export [datei]`                   | Plain Text                    | kein JSON                                                                       |
-| Claude Code CLI           | `<id>.jsonl`                        | JSONL                         | Format ausdrücklich instabil; 30 Tage                                          |
-| Cowork, Cloud             | Sitzungsexport →`transcript.jsonl` | JSONL                         | Auslöser nirgends dokumentiert                                                 |
-| Cowork, Cloud, Enterprise | Compliance API                      | JSON                          | nur Enterprise + Compliance-Key                                                 |
-| Cowork, lokal             | Dateisystem                         | `local_<uuid>.json`           | offiziell nur für die 3P-Variante dokumentiert                                 |
+| claude.ai, ein Projekt    | **interne Web-Endpunkte**           | JSON, Baum vollständig        | undokumentiert, jederzeit änderbar; braucht angemeldeten Browser                |
+| claude.ai, ein Projekt    | `recent_chats`                      | UUID, Zeit, Titel             | nur Metadaten, ohne `created_at`; übergeht den laufenden Chat                   |
+| Claude Code CLI           | `/export`, `<id>.jsonl`             | Text bzw. JSONL               | geprüft und verworfen: kein JSON bzw. Format instabil und 30 Tage Frist         |
+| Cowork                    | Sitzungsexport, Dateisystem         | JSONL, `local_<uuid>.json`    | geprüft und verworfen: Auslöser bzw. Ablage nicht dokumentiert                   |
+| Cowork, Cloud, Enterprise | Compliance API                      | JSON                          | könnte alles, nur Enterprise (4.5)                                              |
 
 ### Migrationsmatrix, hinein
 
@@ -117,7 +134,7 @@ Der Ablauf ist beim ersten Mal und beim Nachpflegen derselbe, nur die Menge unte
 
 ### Grenzen, die bleiben
 
-- **Cowork ist über beide Wege unerreichbar.** Lücke, keine Aufgabe. Die Anthropic-Entwicklung ist neu: Eventuell ein Weg Chats auch immer lokal in ~/.claude zu haben und über das eigene Konto auf verschiedenen Geräten parallel zu bekommen (Anthropic als Claude-Cloud ;-) ), wenn man zu Chatbeginn in Claude.ai und Claude Desktop "Cowork" wählt. Als Beobachtung geführt in Kapitel 4.
+- **Cowork ist über keinen Weg erreichbar.** Eigene ID-Welt, kein Export, kein Projektbezug; Lücke, keine Aufgabe. Anthropic baut daran, und ein künftiger Cowork-Weg könnte dieses Vorhaben ganz ablösen — als Beobachtung geführt in Kapitel 4.
 - **Gelöschte Chats sind unwiederbringlich.** Der Export enthält sie als Hüllen und sagt nicht, dass es Hüllen sind (3.1). Der scheinbare Widerspruch zur belegten Zusage oben löst sich beim genauen Lesen auf: Nicht enthalten sind die *Inhalte*, der *Eintrag* bleibt. Beide Aussagen stimmen. Und weil die Chatliste den gelöschten Chat nicht mehr führt, kann ihn kein Lauf mehr einem Projekt zuordnen — er kommt im Archiv also gar nicht erst vor.
 - **Hochgeladene Dateien: das meiste kommt mit.** Der Export führt sie in zwei Feldern, und die sind **nicht disjunkt** — dieselbe Datei steht oft in beiden. `attachments` tragen `extracted_content` und damit ihren Text — 341 im Drei-Monats-Export, keines leer, zusammen 9.635.919 Zeichen, überwiegend `text/x-python` (238) und Markdown (26). `files` tragen nur `file_uuid` und `file_name` — 524 Stück, aber das ist kein Verlustmaß: Ein Textupload wird **zweimal** verzeichnet, einmal als Dateiobjekt unter `files` und einmal mit seinem Text unter `attachments`. Die Beleglage abgestuft:
   - **Gemessen:** 319 der 524 `files`-Einträge haben ihren Inhalt in derselben Nachricht. Für sie ist nichts verloren.
@@ -166,9 +183,8 @@ Damit sie nicht erneut abgeleitet werden:
 
 | Angenommen                                                 | Tatsächlich                                                                     |
 | ---------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Chats seien nur über Suchschnipsel erreichbar             | `read_conversation` liefert sie vollständig und geordnet                        |
-| Suchschnipsel überlappten und ließen sich zusammennähen | Feste, nicht überlappende Blöcke; null Overlap zwischen 23 Segmenten           |
-| Sinkende Segmentzahl sei das Erfolgsmaß                   | Gilt nur in der Konsolidierungsphase; in der Entdeckung*muss* sie steigen        |
+| Chats seien nur über Suchschnipsel erreichbar             | Die internen Web-Endpunkte liefern einen Chat vollständig samt Baum, Anhängen und Werkzeugaufrufen (1.2). Zwischenzeitlich tat das auch `read_conversation`, das aber wieder verschwand — die Annahme fiel also zweimal, aus verschiedenen Gründen |
+| Suchschnipsel überlappten und ließen sich zusammennähen | Feste, nicht überlappende Blöcke — womit die Overlap-Mechanik des Crawlers nichts zu verbinden hatte (3.4) |
 | `batch-0000` bedeute Stückelung der Konversationen        | Die Zeitraumauswahl erklärt die Menge                                           |
 | Markdown sei für Durchsuchbarkeit besser                  | JSON macht die Sprecherrollen eindeutig; Textextraktion ist bei JSON verlustfrei — am echten Upload bestätigt: ein Zeitstempel kam mit Mikrosekunden unverändert zurück (1.4) |
 | §1.12 der Arbeitsanweisungen müsse geändert werden      | Das dortige Schema ist ein Beispiel, Ergänzen ist erlaubt                       |
@@ -178,10 +194,9 @@ Damit sie nicht erneut abgeleitet werden:
 | `attachments` und `files` bezeichneten verschiedene Dinge, `files` sei reiner Verlust | Sie überschneiden sich: Ein Textupload steht in **beiden**, als Dateiobjekt und als extrahierter Text. 319 der 524 `files`-Einträge des Drei-Monats-Exports tragen ihren Inhalt in derselben Nachricht (1.6, 3.1.1). Unser `report` meldete sie trotzdem als Verlust — der Fehler fiel erst am eigenen Testlauf auf, an einer einzigen hochgeladenen Datei. |
 | Dateianhänge seien im Export nur ein Name | Gilt nur für `files` (524). Die `attachments` (341) tragen `extracted_content` — 9,6 Mio Zeichen, überwiegend Python und Markdown. Ich hatte das weggeworfen und als Verlust gemeldet, den es nicht gab. |
 | Eine Erstmigration brauche einen Vollexport | Der Zeitraumfilter wirkt nicht auf `projects/`: ein Ein-Wochen-Export liefert jedes Projekt mit `created_at` und damit die exakte Fenstergrenze (3.1.1). |
-| Der Projektbeginn sei nur im Chat selbst zu erfahren | Weder `recent_chats` noch `read_conversation` liefern ein `created_at`, und keine öffentliche API kennt claude.ai-Projekte — außer der Compliance-API für Enterprise (4.5). Das Datum steht im Export. |
-| Der Lese-Weg sei dem Export gleichwertig | Er sah **weder Denkschritte noch Anhänge** (3.2) — zusammen etwa so viel wie der Gesprächstext. Nachträglich ergänzen geht nicht, nur ersetzen. |
+| Der Projektbeginn sei nur im Chat selbst zu erfahren | Er steht im Export bei den Projektdateien — und seit dem Web-Weg direkt am Projekt-Endpunkt, weshalb der Sondierungsexport entfiel (1.5, 2.4). |
 | Aufzählung und Lesbarkeit deckten sich — `recent_chats` liste genau die Chats, die dort lesbar sind | Der **laufende** Chat fehlt: Er ist lesbar, erscheint aber nie in seiner eigenen Liste (1.6). Jeder Listenlauf übergeht damit den Chat, aus dem er gestartet wurde, und keine der eingebauten Kontrollen bemerkt es. |
-| Der Export-Weg stehe jedem Konto offen | Nur Free, Pro und Max; in Team und Enterprise exportiert allein der Primary Owner (1.6). Für ein gewöhnliches Mitglied ist der Lese-Weg **der einzige** Weg — der ganze Entwurf lehnte sich an diese Annahme, ausgesprochen war sie nie. |
+| Der Export-Weg stehe jedem Konto offen | Nur Free, Pro und Max; in Team und Enterprise exportiert allein der Primary Owner (1.6). Der ganze Entwurf lehnte sich an diese Annahme, ausgesprochen war sie nie. Für solche Konten trägt heute der Web-Weg (1.2). |
 | `~/.claude/projects/…` scheide als Zielort aus | Die Aufbewahrungsdauer ist einstellbar (`cleanupPeriodDays`) und trifft ohnehin jede Sitzung desselben Projekts. Für Chats, die niemand mitlesen soll, ist der Ort damit sogar der bequemste — unter den drei Bedingungen aus 1.3. |
 
 ---
@@ -192,7 +207,7 @@ Festlegungen, die quer über alle Werkzeuge dieses Ordners gelten. Aufnahmetest:
 
 ## 2.1 Beleglage
 
-Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind siebzehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
+Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. In dieser Arbeit sind fünfzehn Annahmen gekippt (1.7); der Unterschied entschied jedes Mal.
 
 ## 2.2 Dateiformat der Chatdateien
 
@@ -258,11 +273,11 @@ Eine `protokoll.json` je Quellprojekt, neben den Chatdateien. Sie wird mit der C
 | `status` | s. u. |
 | `exported_at` | Zeitpunkt |
 
-Statuswerte: `listed` (aus der Chatliste bekannt), `started` (teilweise gelesen — setzt nur der Lese-Weg, der ZIP-Weg schreibt einen Chat immer ganz), `exported`, `stale` (die Quelle ist neuer als der Export), `deleted` (Hülle an der Quelle). `stale` entsteht durch den Vergleich `listed_updated_at` gegen `exported_updated_at`; `updated_at` trägt diese Erkennung, und zwar beobachtet: es liegt in allen drei Quellen vor — Export, `recent_chats`, `read_conversation`-Envelope — und sprang bei gelöschten Chats auf den Löschzeitpunkt.
+Statuswerte: `listed` (aus der Chatliste bekannt), `started` (teilweise gelesen — setzt nur der Lese-Weg, der ZIP-Weg schreibt einen Chat immer ganz), `exported`, `stale` (die Quelle ist neuer als der Export), `deleted` (Hülle an der Quelle). `stale` entsteht durch den Vergleich `listed_updated_at` gegen `exported_updated_at`; `updated_at` trägt diese Erkennung, und zwar beobachtet: es liegt in allen Quellen vor — Export, Web-Chatliste, `recent_chats` — und sprang bei gelöschten Chats auf den Löschzeitpunkt.
 
 **Ein Chat, den die frische Liste nicht mehr führt, wird gemeldet und nie automatisch entfernt.** Die Meldung nennt ihn samt Status; das Protokoll behält ihn, und seine Dateien bleiben liegen. Der Grund ist, dass drei sehr verschiedene Fälle von hier aus ununterscheidbar sind: Löschung an der Quelle, Verschieben in ein anderes Projekt — oder eine Chatliste, die der Nutzer nicht bis zum Ende geblättert hat. Beim letzten Fall wäre jede Entfernung ein Datenverlust aus einem Bedienfehler. Die Regel bindet **beide** Wege; sie sagen es im selben Wortlaut, gehalten als Konstante `VANISHED_NOTE` in beiden Skripten und gegen Auseinanderdriften gesichert durch `tests/test_wegegleichheit.py`, denn teilen können die Skripte sich nichts (Vorgabe 2.9).
 
-Auf oberster Ebene trägt das Protokoll `protocol_version`, `project`, `project_created_at` (Beginn des Quellprojekts, von Hand aus einem Sondierungsexport eingetragen — `list`/`map --project-created`), `listed_at` (Zeitpunkt des letzten Listenabgleichs, gesetzt von `list` bzw. `map`) und `order` — die Bearbeitungsrichtung schreibt nur der Lese-Weg, der ZIP-Weg erhält sie unangetastet: ein Protokoll, ein Schema.
+Auf oberster Ebene trägt das Protokoll `protocol_version`, `project`, `project_created_at` (Beginn des Quellprojekts — aus dem Projekt-Endpunkt des Web-Wegs oder aus den Projektdateien eines Exports, eingetragen über `list --project-created`), `listed_at` (Zeitpunkt des letzten Listenabgleichs, gesetzt von `list` bzw. `map`) und `order` — die Bearbeitungsrichtung schreibt nur der Lese-Weg, der ZIP-Weg erhält sie unangetastet: ein Protokoll, ein Schema.
 
 **Die Fenstergrenze, in einer Tabelle.** Wie weit ein Export zurückreichen muss, damit er einen Chat erfasst, ergibt sich aus drei Quellen unterschiedlicher Güte — genommen wird das Minimum über alle zu holenden Chats:
 
@@ -276,7 +291,7 @@ Auf oberster Ebene trägt das Protokoll `protocol_version`, `project`, `project_
 
 Der Projektbeginn ist dabei die Untergrenze über alles: kein Chat eines Projekts kann älter sein als das Projekt. Ein zu großzügiges Fenster kostet nur Downloadgröße, ein zu knappes kostet Inhalt — deshalb im Zweifel aufrunden, nach unten.
 
-Umgesetzt als `window_start()` in beiden Skripten, mit `unbounded` als eigenem Ergebnis: hat ein wartender Chat keine der drei Quellen, wird das **gemeldet statt geschätzt**. Im ZIP-Weg tragen `list` und `diff` das Ergebnis vor, beide über dieselbe Funktion `window_lines()` — zwei Kommandos, die dieselbe Rechnung in eigenen Worten ausgeben, driften auseinander (3.1.6). Der Projektbeginn kommt von Hand herein (`--project-created`), weil ihn kein Werkzeug ableiten kann — eine Konversation im Archiv trägt keinen Projektbezug, die Zuordnung Projekt→Datum existiert nur beim Nutzer. Gegen den Tippfehler dabei steht `project_start_warnings()`: ein Chat, der älter ist als sein Projekt, kann nicht zu ihm gehören, also stimmt entweder das Datum oder die Chatliste nicht. Ohne diese Prüfung würde ein falsch getipptes Datum jedes künftige Fenster still verkürzen. Beide Funktionen laufen in `tests/test_wegegleichheit.py` über dieselbe Falltabelle, damit die zwei Implementierungen nicht auseinanderdriften.
+Umgesetzt als `window_start()` in beiden Skripten, mit `unbounded` als eigenem Ergebnis: hat ein wartender Chat keine der drei Quellen, wird das **gemeldet statt geschätzt**. Im ZIP-Weg tragen `list` und `diff` das Ergebnis vor, beide über dieselbe Funktion `window_lines()` — zwei Kommandos, die dieselbe Rechnung in eigenen Worten ausgeben, driften auseinander (3.1.6). Der Projektbeginn kommt von außen herein (`--project-created`), weil eine Konversation im Archiv keinen Projektbezug trägt: Im Web-Weg liefert ihn der Projekt-Endpunkt, im reinen Export-Weg liest ihn `inspect_export.py` aus den Projektdateien, sonst kennt ihn nur der Nutzer. Gegen den Tippfehler dabei steht `project_start_warnings()`: ein Chat, der älter ist als sein Projekt, kann nicht zu ihm gehören, also stimmt entweder das Datum oder die Chatliste nicht. Ohne diese Prüfung würde ein falsch getipptes Datum jedes künftige Fenster still verkürzen. Beide Funktionen laufen in `tests/test_wegegleichheit.py` über dieselbe Falltabelle, damit die zwei Implementierungen nicht auseinanderdriften.
 
 Erfüllt von beiden Wegen und geprüft: `tests/test_wegegleichheit.py` vergleicht auch die Protokolle — gleiche Schlüsselmengen, gleiche Kernfelder, und genau drei Felder dürfen sich unterscheiden, weil ein Weg sie nicht wissen kann: `created_at` (kennt nur der ZIP-Weg), `total_turns` (beweist nur der Lese-Weg), `file` (das Datumssegment fehlt dem Lese-Weg — 2.3).
 
@@ -329,7 +344,7 @@ Prüfstücke werden synthetisch gebaut; echter Chatinhalt gehört nie in Tests o
 
 **Status: gebaut, geprüft durch `tests/test_export_convert.py`, auch unter `-O`. Am Drei-Monats-Export mit 211 Chats gelaufen.**
 
-Wandelt Chats in Dateien je Quellprojekt um und führt das Protokoll. Läuft lokal, wird nie hochgeladen.
+Wandelt Chats in Dateien je Quellprojekt um und führt das Protokoll. Läuft lokal, wird nie hochgeladen. Es liegt in `skills/chat-export/` — es ist das eine Skript, das der Skill mitbringt (3.5), und der Ordner trägt genau die Struktur, die er am Zielort haben wird.
 
 **Zwei Quellen, ein Konverter.** Die Chats kommen entweder aus einem Kontoexport-ZIP (`--zip`) oder aus einem **Web-Behälter** (`--bundle`) — der Datei, die ein Browserschritt aus den claude.ai-Endpunkten schreibt. Beide führen dieselben Feldnamen je Konversation, weshalb sich der Unterschied auf das Auspacken beschränkt: Ab `conversation_record()` ist der Code geteilt. Am 19. August 2026 am echten Fall bestätigt — für denselben Chat nannten Web-API und Export-ZIP nicht nur dieselben Zahlen, sondern **dieselben Nachrichten-UUIDs** (Protokoll in `testlauf.md`).
 
@@ -534,7 +549,7 @@ Es beantwortet eine andere Frage als `analyse` (3.1.6): dieses beschreibt den Ro
 
 ## 3.4 `chat_crawl_store.py` — Rekonstruktion aus Suchschnipseln
 
-**Status: gebaut, geprüft durch `tests/test_crawl_store.py`. Überholt, wo `read_conversation` existiert.**
+**Status: gebaut, geprüft durch `tests/test_crawl_store.py`. Zukunft offen — Fahrplan 10.**
 
 Rekonstruiert Chats aus überlappenden Suchschnipseln, für Umgebungen ohne `read_conversation`.
 
@@ -544,10 +559,22 @@ Rekonstruiert Chats aus überlappenden Suchschnipseln, für Umgebungen ohne `rea
 
 Erhaltenswerte Einzelbefunde: Suchtreffer tragen `H: `/`A: `-Label und HTML-Entities; ein Auslassungszeichen wird nur als Lückenmarke erkannt, wenn es zwischen zwei Nicht-Leerzeichen klemmt — `abc ... def` und eine einzelne `...`-Zeile landen ohne jede Warnung im Transkript.
 
-Ob das Skript bleibt, ist zu entscheiden, sobald sich 3.1 und 3.2 bewährt haben.
+**Zwei Befunde haben seine Grundlage weiter untergraben.** Der Satz, der es einst außer Dienst stellte — „überholt, wo `read_conversation` existiert" — ist gegenstandslos, weil es dieses Werkzeug nirgends mehr gibt. Nach dieser Logik wäre der Crawler das einzige verbliebene Werkzeug; dagegen steht aber die Beobachtung vom 18. August, dass `conversation_search` bei einem Chat mit zehn Turns eine **Zusammenfassung** statt Schnipsel lieferte. Wer eine Zusammenfassung einliest, archiviert eine Nacherzählung und verstößt gegen Vorgabe 2.8. Ob das Skript bleibt, Ersatzteillager an Befunden wird oder ersatzlos entfällt, entscheidet Fahrplan 10; bis dahin bleibt es unangetastet und liegt bei den Tests, die es allein noch anfassen.
 
-**Offen und derzeit nicht beurteilbar** ist, in welchem Verhältnis es zum übrigen Bestand steht: ob es Rückfallweg für Umgebungen ohne `read_conversation` bleibt, nur noch Ersatzteillager an Befunden ist oder ersatzlos entfällt. Die Entscheidung braucht Kontext, den wir noch nicht haben; bis dahin bleibt es unangetastet (Fahrplan 10).
+## 3.5 Der Skill `chat-export` — das Frontend
 
+**Status: `SKILL.md` geschrieben, noch nicht am echten Lauf erprobt.** Die README steht aus.
+
+Der Skill ist die Klammer um das Skript: Er führt den Nutzer durch beide Wege, ohne ihm die Entscheidung abzunehmen. Er liegt in `skills/chat-export/` und enthält genau zwei Dateien — `SKILL.md` und `chat_export_convert.py`. **Das ist alles, was ein Nutzer kopiert**; die übrigen Skripte dieses Ordners gehören zur Entwicklung und kommen in der `SKILL.md` nicht vor.
+
+Zwei Festlegungen tragen den Entwurf, und beide stehen dort normativ:
+
+- **Die Instanz deutet und ordnet zu, das Skript zählt und vergleicht.** Projektnamen mit Tippfehlern auf die echte Liste abbilden oder auf „zeig mir einfach alle" sinnvoll reagieren — das kann eine Instanz besser als jedes Skript. Aufsummieren kann sie nicht verlässlich (1.4). Der Ablauf folgt dieser Trennung durchgehend.
+- **Genau zwei Haltepunkte.** Einer vor dem ersten Abruf, der alles Lesende abdeckt; einer nach der Statistik für die Wahl des Wegs. Der Hinweis danach nennt die Zahl der zu ersetzenden Chats und zu entfernenden Dateien, weil das Löschen ist. Der Anweisungsblock für die `CLAUDE.md` wird deshalb Schlussbemerkung statt Frage — sonst entstünde ein dritter.
+
+**Voraussetzungen, die der Nutzer herstellen muss** und die der Skill nicht umgehen kann: angehängte Browser-Werkzeuge (in der VS-Code-Erweiterung `@browser` je Nachricht), ein laufender und bei claude.ai angemeldeter Chrome mit eingeschalteter Erweiterung, und in Chrome ausgeschaltetes Nachfragen nach dem Speicherort — ein Dateidialog blockiert die Anbindung vollständig. Die Kontobindung ist dabei **keine** Bedingung: Chrome und Claude Code dürfen an verschiedenen Konten hängen (belegt, `chrome-zugriff.md`). Was der Skill sieht, ist immer die Sitzung, die im Tab gerade aktiv ist — deshalb **nennt** er das erkannte Konto, statt eines vorauszusetzen.
+
+Das angestrebte Verhalten ist als Nutzerdurchgang in `Zielvorlage.md` beschrieben; die Mechanik der Browser-Anbindung samt ihrer Fallstricke in `chrome-zugriff.md`. Beide sind befristet und gehen in die Anwenderdokumentation über, sobald der Skill erprobt ist.
 
 ---
 
@@ -559,7 +586,7 @@ Anthropic baut an Export, Werkzeugen und Plattform laufend um; nichts hiervon is
 
 ## 4.1 Verfahren und Übersicht
 
-**Ziel:** Ein Satz kleiner Prüfwerkzeuge, mit denen sich vor einem Lauf schnell feststellen lässt, ob **(a)** das Kontoexport-Format und **(b)** die Werkzeugschnittstellen der Claude-Instanz (`recent_chats`, `conversation_search`) noch den hier dokumentierten Beobachtungen entsprechen — als Frühwarnung, bevor eine Änderung still Falsches produziert.
+**Ziel:** Ein Satz kleiner Prüfwerkzeuge, mit denen sich vor einem Lauf schnell feststellen lässt, ob **(a)** das Kontoexport-Format, **(b)** die internen Web-Endpunkte und **(c)** die Werkzeugschnittstellen der Claude-Instanz (`recent_chats`, `conversation_search`) noch den hier dokumentierten Beobachtungen entsprechen — als Frühwarnung, bevor eine Änderung still Falsches produziert. Der Web-Weg ist dabei der empfindlichste: undokumentiert und ohne Ankündigung änderbar.
 
 Vorhandene Bausteine: `inspect_export.py` (3.3) als Schemawache des Exports, dazu die Format- und Upload-Proben in den Docstrings von 3.2 und 3.4. **Die Lücke ist die warme Seite:** Für den Export gibt es ein Werkzeug, für die Instanzschnittstellen nur Proben von Hand. Das bleibt das offene Ziel dieses Abschnitts.
 
@@ -581,11 +608,9 @@ Das Profil steht hier und nicht im Fahrplan, weil es sich nicht verbraucht: Nach
 
 Die Zeile zum wachsenden Chat ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports arbeitet auf Tagesebene, also muss zwischen Anlegen und Fortsetzen mindestens ein Tageswechsel liegen.
 
-**Drei Rezepte sind am ersten Lauf gescheitert; zwei davon sind repariert, eines nicht.** Der Lauf vom 17. August lieferte Gabelung, beide Anhangsarten und den langen Chat wie vorgesehen — und weder Denkschritte noch Erzeugnis noch Sendewiederholung. Ein Merkmal, das nicht entsteht, lässt seinen Codeweg ungeprüft, ohne dass etwas auffällt; deshalb stehen die Ursachen hier und nicht nur im Verlaufsprotokoll:
+**Die Rezepte für Denkschritte und Erzeugnis sind bereits einmal fehlgeschlagen** — zu leichte Fragen, und ein Chat über Bildgenerierung, der keinen der drei Werkzeugnamen aus 3.1.3 erzeugt. Beide Lehren stehen oben in der Tabelle; deshalb ist sie dort so ausführlich formuliert.
 
-- **Denkschritte:** Alle 14 Blöcke lagen unter 200 Zeichen und wurden nach 3.1.3 verworfen — im echten Bestand liegt der Median bei 682. Eine beiläufige Planungsfrage genügt also nicht; die Aufgabe muss echte Abwägung erzwingen.
-- **Erzeugnis:** Der Chat drehte sich um Bildgenerierung. Das erzeugt zwar 27 `tool_use`-Blöcke, aber keinen der drei Werkzeugnamen aus 3.1.3. Das Rezept muss ausdrücklich ein Artefakt verlangen.
-- **Sendewiederholung:** Zwei identisch abgeschickte Nachrichten stehen als Eltern und Kind hintereinander — der Code sucht aber **Geschwister ohne Nachfahren** an einer Gabelung. Das ist eine andere Struktur, und wir kennen keinen Handgriff, der sie herstellt. Belegt ist das Phänomen nur aus echten Daten (14 Kinder mit je 440 Zeichen, 3.1.2). Bis jemand das Rezept findet, bleibt dieser Codeweg ungeprüft — ausdrücklich vermerkt statt stillschweigend als abgedeckt geführt.
+**Für die Sendewiederholung gibt es kein Rezept.** Zwei identisch abgeschickte Nachrichten stehen als Eltern und Kind hintereinander, der Code sucht aber **Geschwister ohne Nachfahren** an einer Gabelung. Belegt ist das Phänomen nur aus echten Daten (14 Kinder mit je 440 Zeichen, 3.1.2); herstellen konnten wir es nicht. Dieser Codeweg bleibt damit ungeprüft — ausdrücklich vermerkt statt stillschweigend als abgedeckt geführt.
 
 **Drei Prüfarten.** Jeder Punkt trägt genau eine:
 
@@ -611,6 +636,8 @@ Ein warmer Punkt kann **mangels Rechten unerreichbar** sein, ohne deshalb eine B
 | Hüllen gelöschter Chats | 4.2, 3.1.3 | kalt |
 | Bekommt eine Konversation je einen Projektbezug? | 4.2, 1.6 | kalt |
 | Stückelung großer Exporte (`batch-0000`) | 4.2 | Beobachtung |
+| Web-Endpunkte: Pfade, Felder, Paginierung | 4.3, 1.2 | warm |
+| Bleibt der Browser-Zugriff ohne Captcha-Prüfung möglich? | 4.3 | warm |
 | Chatliste über `recent_chats` | 4.3 | warm |
 | Übergeht `recent_chats` weiterhin den laufenden Chat? | 4.3, 1.6 | warm |
 | Wird `read_conversation` wieder angeboten? | 4.3, 3.2, 1.2 | Beobachtung |
@@ -628,7 +655,7 @@ Ein warmer Punkt kann **mangels Rechten unerreichbar** sein, ohne deshalb eine B
 - **Der Organisationsexport des Primary Owner ist ungeprüft.** Ob sein ZIP denselben Aufbau trägt wie das persönliche — Mitgliederliste, `conversations.json`, Projektdateien mit `created_at` —, ist unbelegt, und der ganze Konverter hängt daran. *Prüfung: `inspect_export.py` über ein solches Archiv laufen lassen — warm, uns mangels Owner-Rechten derzeit nicht möglich. Der Rechteerwerb dafür wäre kein Prüfaufwand, sondern ein Eingriff in die Organisation, und für den laufenden Betrieb hilft er ohnehin nicht (1.2).*
 - Anforderung unter **Settings → Privacy → Export data**, Lieferung als Link per E-Mail, Link verfällt nach 24 h (belegt). **Die Zeitraumauswahl ist nirgends dokumentiert** — sie ist beobachtet und praktisch wichtig, denn auf ihr beruht das Nachpflegen (1.5). Fällt sie weg, wird jeder Lauf zum Vollexport. Zwei Läufe mit verschiedenen Grenzen haben sie inzwischen bestätigt: `created` vom 1.5. bis 6.8.2026 (211 Konversationen) und vom 1.11. bis 1.12.2025 (78). Die Grenze wirkt auf `created_at`, nicht auf `updated_at` — ein alter Chat, der letzte Woche weiterlief, ist im Kurzzeitraum also **nicht** enthalten. Wer nachpflegt, muss den Zeitraum daher weit genug zurück legen, um weitergelaufene Altchats mitzunehmen — einen zweiten Weg, sie einzeln zu holen, gibt es derzeit nicht (1.2). *Prüfung: beim nächsten Antrag sehen, ob die Auswahl noch angeboten wird — warm; die tatsächlich gelieferte Spanne danach am ZIP gegenprüfen — kalt.*
 - Dateiname `data-<uuid>-…-batch-0000.zip`; die batch-Zahl war bisher immer 0 — möglicherweise stückeln größere Exporte, nie beobachtet. *Beobachtung: durch keinen Versuch auslösbar, bemerkbar erst an einem hinreichend großen Export.*
-- **Projektdateien sind vom Zeitraumfilter ausgenommen** (3.1.1) — beobachtet an zwei Exporten mit verschiedenen Zeiträumen, beide mit denselben 43 Projektdateien. Darauf beruht der Sondierungsexport aus 1.5; fällt es weg, muss der Projektbeginn anders beschafft werden. *Prüfung: die beiden vorliegenden ZIPs mit verschiedenen Zeiträumen gegeneinander halten — dieselbe Projektliste heißt, es gilt noch. Kalt.*
+- **Projektdateien sind vom Zeitraumfilter ausgenommen** (3.1.1) — beobachtet an zwei Exporten mit verschiedenen Zeiträumen, beide mit denselben 43 Projektdateien. Darauf beruht der Sondierungsexport (1.5), der nur noch gebraucht wird, wo der Web-Weg nicht zur Verfügung steht; fällt es weg, muss der Projektbeginn dort anders beschafft werden. *Prüfung: die beiden vorliegenden ZIPs mit verschiedenen Zeiträumen gegeneinander halten — dieselbe Projektliste heißt, es gilt noch. Kalt.*
 - Archivaufbau: `users.json`, `projects/<uuid>.json`, `memories.json`, `conversations.json`, dazu wechselnd `login_history.json` (3.1.1). Projektdateien enthalten **keine** Chats. **Die Mitgliederliste wächst:** `login_history.json` kam zwischen zwei Exporten im Abstand von zwei Tagen hinzu — ein neues Mitglied ist deshalb allein kein Alarm, ein fehlendes `conversations.json` schon. *Prüfung: `inspect_export.py` laufen lassen und Mitglieder- wie Schlüsselmengen mit 3.1.1 vergleichen — kalt.*
 - Konversation: genau sieben Felder, **kein Projektbezug** — die Chatliste aus dem Projekt ist die einzige Zuordnungsquelle (1.6). *Prüfung: käme je ein Projektfeld hinzu, entfiele der ganze Umweg über die Chatliste — am nächsten ZIP ablesbar, kalt.*
 - Nachricht: `parent_message_uuid` macht die Nachrichten zum **Baum** (3.1.2); `sender` `human`/`assistant`; das flache `text` enthält die Denkschritte (3.1.1); `content`-Blocktypen `text`, `thinking`, `tool_use`, `tool_result`, `token_budget`. *Prüfung: Nachrichten- und Blocktypmengen aus `inspect_export.py` gegen 3.1.1 — ein neuer Blocktyp fiele dort sofort auf. Kalt.*
@@ -639,9 +666,11 @@ Ein warmer Punkt kann **mangels Rechten unerreichbar** sein, ohne deshalb eine B
 
 ## 4.3 Werkzeuge der Claude-Instanz — was verwendet wird und zu prüfen ist
 
+- **Die internen Web-Endpunkte** (1.2) sind die empfindlichste Stelle des ganzen Entwurfs: undokumentiert, von Dritten rückentwickelt, ohne Ankündigung änderbar. Gebraucht werden `/api/organizations` (Konto und Organisations-UUID ohne Vorwissen), `…/projects` (Projekte mit `created_at`), `…/projects/<p>/conversations_v2` (Chatliste mit `pagination`) und `…/chat_conversations/<c>?tree=True&rendering_mode=messages&render_all_tools=true` (vollständiger Baum, keine Paginierung). *Prüfung: die vier Pfade aus einem angemeldeten Tab aufrufen und Feldnamen sowie Antwortgröße gegen 1.2 halten — warm. Fällt einer weg, trägt nur noch der Kontoexport, und in Team-Konten gar nichts mehr.*
+- **Captcha- und Cloudflare-Prüfungen** sind der zweite Grund, warum der Web-Weg gebremst ist. Bisher trat keine auf; die Anbindung würde anhalten und fragen. *Prüfung: nicht auslösbar ohne genau das zu provozieren, was vermieden werden soll — bemerkbar allein am Anhalten während eines Laufs. Warm.*
 - `recent_chats(n≤20, sort_order, before, after)` — Zeit-Cursor, liefert die Chatliste; einzige Quelle der Projektzugehörigkeit; **listet den laufenden Chat nicht mit** (1.6). *Prüfung: Liste in einem Projekt abrufen und die Form des Rohblocks gegen das halten, was `MAPPING_PROMPT` verlangt (3.1.6) — warm. Die Auslassung des laufenden Chats gegenprüfen, indem dieselbe Liste aus zwei verschiedenen Chats geholt wird: Fällt sie weg, kann der Abfragechat wieder ein beliebiger sein und die Regel aus 1.5 entfällt — warm.*
 - **`read_conversation` wird nicht mehr angeboten** (1.2, 3.2). Damit entfallen alle Prüfungen an seiner Schnittstelle; sie stünden für ein Werkzeug, das keine Instanz mehr hat. *Beobachtung: eine Rückkehr ist durch keinen Versuch auslösbar und fällt allein dem auf, der Werkzeuge aufzählt. Käme es wieder, ist zuerst 3.2 gegen das tatsächliche Verhalten zu halten, bevor der Weg als benutzbar gilt — die frühere Beschreibung ist gelöscht und nicht als Sollwert aufgehoben.*
-- `conversation_search(query, max_results≤10)` — liefert feste, **nicht überlappende** Blöcke; `H: `/`A: `-Labels; HTML-Entities kodiert (3.4). *Prüfung: nur nötig, solange 3.4 in Betrieb bleibt (Fahrplan 10) — warm.*
+- `conversation_search(query, max_results≤10)` — liefert feste, **nicht überlappende** Blöcke; `H: `/`A: `-Labels; HTML-Entities kodiert (3.4). **Und nicht immer Blöcke:** Am 18. August kam für einen Chat mit zehn Turns eine **Zusammenfassung** zurück, für einen mit zwei Turns der vollständige Wortlaut. Was die Umschaltung auslöst, ist unbekannt. Für den Crawler ist das entscheidend — eine Zusammenfassung einzulesen verstößt gegen Vorgabe 2.8. *Prüfung: einen kurzen und einen langen Chat suchen und die Trefferart vergleichen — warm; nur nötig, solange 3.4 in Betrieb bleibt (Fahrplan 10).*
 - **Gibt es für `files` einen Abrufweg?** Der Export trägt zu ihnen nur `file_uuid` und `file_name`, ihr Inhalt fehlt (1.6). *Prüfung: Werkzeugbeschreibungen und Doku sichten, dann in einer Instanz einen Abruf versuchen — warm.*
 - Prüfweg: die Format-/Upload-Proben in den Docstrings von 3.2/3.4 einmal je Umgebung durchgehen; weicht das Verhalten ab, zuerst die betroffene Sektion in Kapitel 3 nachziehen.
 
