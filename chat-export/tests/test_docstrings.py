@@ -33,6 +33,7 @@ import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "source")
+SKILL_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
 
 FAILURES = []
 
@@ -93,11 +94,17 @@ REQUIRED_CONCEPTS = {
 # Run both layers over every script this guard covers
 # ---------------------------------------------------------------------------
 
-SCRIPTS = ["chat_read_store.py", "chat_export_convert.py", "inspect_export.py",
-          "chat_crawl_store.py"]
+# Script name -> the directory it lives in. The converter ships with the skill
+# and therefore sits in the skill folder; the rest stays under source/.
+SCRIPTS = {
+    "chat_read_store.py":      SOURCE_DIR,
+    "chat_export_convert.py":  SKILL_DIR,
+    "inspect_export.py":       SOURCE_DIR,
+    "chat_crawl_store.py":     SOURCE_DIR,
+}
 
-for name in SCRIPTS:
-    path = os.path.join(SOURCE_DIR, name)
+for name, directory in SCRIPTS.items():
+    path = os.path.join(directory, name)
     doc = load_docstring(path)
     check(f"{name} has a non-trivial module docstring", len(doc) > 200)
 
