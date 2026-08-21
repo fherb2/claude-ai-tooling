@@ -21,6 +21,19 @@ Die Liste beginnt mit der Arbeitsphase ab dem 14. August 2026. Die davor erledig
 - **26** Probe über die Chrome-Anbindung bestanden: beide Endpunkte erreichbar, 593 KB in einer Antwort, Sollwerte zeichengenau getroffen. Dabei ein dritter Endpunkt gefunden, der jedes Projekt mit `created_at` führt.
 - **26 (Fortsetzung)** Der Weg auf die Platte geprüft: fetch je Chat, ein Blob, ein Download. Härtefall 607.083 Zeichen in 953 ms; die Nachrichten-UUIDs der Web-API und des Export-ZIP sind für denselben Chat deckungsgleich.
 
+## 2026-08-19 bis 21
+
+- **21.8** Beide Hälften bestanden: `protokoll.json` als Projektdatei angenommen und zeichengenau lesbar, und der Anweisungsblock wirkt — eine fremde Instanz sah von selbst im Archiv nach, mit Quellenangabe.
+- **21.9/21.10/21.11** Bewegung erzeugt, zweiter Abgleich und zweiter Export über das errechnete Fenster. Der Kern der Konstruktion ist damit vorgeführt: Das Fenster fing den gewachsenen Altchat ein. Dabei zwei Befunde — der Export-Weg meldete verschwundene Chats nicht (behoben), und der Denktext wird plattformseitig nicht mehr ausgeschrieben (Doku 3.1.1).
+- **21.12 erste Hälfte** Eine fremde Instanz arbeitete allein aus dem Docstring, einschließlich der Stellen, die ihr Zurückhaltung vorschreiben. Vorgabe 2.9 damit belegt.
+- **21 im Ganzen abgeschlossen.** Was von den geplanten Stufen offen blieb, hing am entfallenen Lese-Weg und ist gegenstandslos: 21.12 zweite Hälfte (nicht fortsetzbar) und 21.13 (Wegegleichheit gegen `read_conversation`). Letztere ist durch den Vergleich ZIP gegen Web-Behälter ersetzt und dort schärfer belegt — dieselben Nachrichten-UUIDs für denselben Chat.
+- **23 gestrichen** — die Frage war, ob der Lese-Weg in einem Team-Projekt arbeitet. Das Werkzeug gibt es nirgends mehr; für Team-Konten trägt jetzt der Web-Weg, am 22. August dort durchgespielt.
+- **7 gestrichen** — die Frage galt der Gültigkeitsdauer eines `page_token`. Der Web-Weg kennt keine Paginierung, ein Chat kommt immer ganz; damit ist „Zuwachs nachladen statt ersetzen" gegenstandslos.
+- **27 (Teil)** Zweite Eingangsart gebaut: `convert --bundle` und `list --web`. Wegegleichheit zwischen beiden Wegen baulich gegeben und Datei für Datei geprüft. Dabei behoben: `list` brach bei einem Projekt ohne Chats ab, statt ein leeres Protokoll zu schreiben. `SKILL.md` geschrieben.
+- **27 (Teil)** Ablage geordnet: `source/` entfallen, der Konverter zum Skill, die übrigen Skripte dorthin, wo ihre Aufgabe sie hinstellt. Alle Docstrings in `tests/` so ergänzt, dass sie ohne die Doku verständlich sind.
+- **28** Chrome-Anbindung systematisch vermessen; Ergebnis in `chrome-zugriff.md`. Geklärt: `@browser` je Nachricht, Connector-Schalter, angemeldete Erweiterung — und dass die Konten von Chrome und Claude Code **nicht** übereinstimmen müssen.
+- **29** Doku-Durchgang, Schritt 2: acht sachliche Fehler berichtigt, drei Lücken gefüllt (3.5 zum Skill, Web-Endpunkte in der Prüfliste, 1.5 über beide Wege), mehrere Stellen entfasert. Zähler in 2.1 von siebzehn auf fünfzehn.
+
 ## 2026-08-15
 
 - **17** Docstring von `chat_export_convert.py` mit dem Code in Übereinstimmung gebracht.
