@@ -25,7 +25,7 @@ Dieses Vorhaben entwickelt und pflegt Skills zur allgemeinen Verwendung mit Clau
 
 Eingeführt und umgesetzt wird dabei ein Konzept der **stillen Trigger**, das auch schwächeren Modellen erlaubt, einen Skill sehr früh aus dem Kontext heraus zu starten.
 
-Vorgaben für diesen Bereich `skills/` und Erkenntnisse aus den zugehörigen Messreihen stehen in `skill_vorgaben.md`. Diese README beschreibt nur das Ergebnis: Was es gibt und wie man es benutzt. Jedes Skill hat dazu noch ein eigenes README-File mit speziellen Hinweisen und dem jeweiligen Entwicklungszustand des Skills.
+Vorgaben für diesen Bereich `skills/` und Erkenntnisse aus den zugehörigen Messreihen stehen in `implementation_doku.md`. Diese README beschreibt nur das Ergebnis: Was es gibt und wie man es benutzt. Jedes Skill hat dazu noch ein eigenes README-File mit speziellen Hinweisen und dem jeweiligen Entwicklungszustand des Skills.
 
 ## 3 Skills beschaffen und installieren
 
@@ -63,7 +63,7 @@ Drei Regeln — zwei davon aus Messungen und nicht aus Geschmack, die dritte aus
 
 **Die `description` des Skills entscheidet zuerst.** Sie beginnt mit dem Hauptanwendungsfall und benutzt die Wörter, die ein Nutzer von sich aus sagen würde. Wer dort eine Einordnung voranstellt („Testskill…", „Interne Fassung…") oder projektinterne Fachbegriffe verwendet, die in keiner Anfrage vorkommen, kann den Trigger unwirksam machen — gemessen: derselbe Trigger-Text feuerte mit guter Beschreibung, mit schwacher nicht.
 
-**Ein Trigger sollte an ein Ereignis oder eine Handlung gebunden sein,** nicht bloß an eine Eigenschaft der Aufgabe. „Behalte im Blick, ob diese Aufgabe komplex ist" trägt sich nicht selbst; „bevor du zum ersten Mal eine Datei änderst, prüfe …" oder „taucht eine Datei auf, die du nicht angefasst hast, dann …" lösen zuverlässig aus. Die Messreihen dazu stehen in `skill_vorgaben.md`, Kapitel 3.
+**Ein Trigger sollte an ein Ereignis oder eine Handlung gebunden sein,** nicht bloß an eine Eigenschaft der Aufgabe. „Behalte im Blick, ob diese Aufgabe komplex ist" trägt sich nicht selbst; „bevor du zum ersten Mal eine Datei änderst, prüfe …" oder „taucht eine Datei auf, die du nicht angefasst hast, dann …" lösen zuverlässig aus. Die Messreihen dazu stehen in `implementation_doku.md`, Kapitel 3.
 
 **Die `description` steht in der dritten Person.** Sie beschreibt den Skill — „Übersetzt Dokumente …", „Verwenden, sobald …" — und spricht niemanden an, weder Claude noch den Nutzer. Das ist keine Stilfrage: Die Beschreibung wird in den Systemprompt eingefügt, und ein wechselnder Blickwinkel stört dort die Auswahl unter vielen Skills. Anthropic sagt das ausdrücklich — *„Always write in third person […] inconsistent point-of-view can cause discovery problems"* ([Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 
