@@ -19,4 +19,6 @@ Only the folder `skills/chat-export/` is meant to be copied — everything else 
 
 What this version does **not** do is set out in [`implementation_doku.md`](implementation_doku.md), chapter 1.8 (German) — the practical consequences for day-to-day use are in the "If you want to top up with more chats later" section of the skill README. In short: one folder per source project, and that folder together with its protocol is the state.
 
+What follows from that as the next stage is outlined in [`version2_fahrplan.md`](version2_fahrplan.md) (German) — two complexes, no steps yet.
+
 All facts, evidence, and check points for this project are in [`implementation_doku.md`](implementation_doku.md) (German); the mechanics of the Chrome connection, including its pitfalls, are in [`chrome-zugriff.de.md`](chrome-zugriff.de.md) / [`chrome-access.en.md`](chrome-access.en.md).
