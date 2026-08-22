@@ -203,7 +203,7 @@ Festlegungen, die quer über alle Werkzeuge dieses Ordners gelten. Aufnahmetest:
 
 ## 2.1 Beleglage
 
-Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg. Im Lauf dieser Arbeit sind wiederholt Annahmen über die Umgebung gekippt; der Unterschied zwischen den drei Stufen entschied jedes Mal, wie teuer das wurde.
+Jede Aussage über die Umgebung trägt ihre Beleglage: **belegt** (Anthropic-Dokument, mit Quelle), **beobachtet** (am laufenden System gesehen, nirgends dokumentiert), **Community** (von Dritten berichtet, unbestätigt). Die drei werden nie vermischt, und eine Aufstufung verlangt den jeweiligen Nachweis — eine Community-Aussage wird durch eigenes Nachstellen zur Beobachtung, eine Beobachtung nur durch eine Anthropic-Quelle zum Beleg.
 
 ## 2.2 Dateiformat der Chatdateien
 
@@ -312,7 +312,7 @@ Zwischen Kontoexport und Web-Weg ist das **baulich** erfüllt: Beide laufen durc
 
 In den Nachrichten sind `thinking_ref`, `attachments_ref` und `creations_ref` die einzigen erlaubten Zusatzfelder; nach ihrem Entfernen müssen zwei identische Transkripte übrig bleiben. `branches` ist das einzige optionale Feld auf oberster Ebene — eine leere Liste würde einen Befund behaupten, den eine Quelle ohne Baumzugriff nicht treffen kann.
 
-Zur Laufzeit erzwingt das nichts. Der Wächter ist `tests/test_wegegleichheit.py`, und er hat sich bewährt: Er fiel durch, als ein neu hinzugekommenes Feld nur auf einer Seite ankam.
+Zur Laufzeit erzwingt das nichts; der Wächter ist `tests/test_wegegleichheit.py`.
 
 ## 2.6 Ersetzen
 
@@ -336,10 +336,10 @@ Beide heutigen Wege umgehen diese Gefahr baulich, weil der Chattext als Datei am
 
 Jedes Skript dieses Ordners trägt seine vollständige Betriebsanleitung im eigenen Docstring. Der Grund: Claude Code liest den Docstring, nicht zwangsläufig diese Doku — und die zweite Umsetzung unter `tests/` (2.5) darf nichts aus diesem Repo importieren, weil sie als einzelne Datei für sich stehen muss. Die Folge ist der Preis von 2.5: Formatgleichheit ist nicht erzwingbar, nur per Test gesichert.
 
-Zweimal ist die Zusage stillschweigend gebrochen worden — ein Feature kam hinzu, der Docstring blieb beim alten Stand. `tests/test_docstrings.py` ist der Wächter dagegen: mechanisch für jedes Kommando und jedes `--Flag` (per Regex aus dem Quelltext gezogen, gegen den eigenen Docstring geprüft), von Hand für Begriffe, die kein Parser findet (Feldnamen, Dateiendungen, Funktionsnamen) — diese Liste muss bei jedem neuen Feature nachgezogen werden, das ist kein Testversehen, sondern der Punkt.
-**Dasselbe gilt für diese Doku, und zwar in beiden Richtungen.** Kommandonamen, Flags und Feldnamen sind hier genauso gegen den Code zu halten wie Kapitelverweise — ein Kommandoname ist kein Verweis, deshalb fällt er bei einer Verweisprüfung durch. Am 22. August 2026 hat eine Prüfung 198 Kapitelverweise und 72 Code-Verweise inhaltlich abgearbeitet und dabei übersehen, dass 1.4 zwei Kommandos des entfallenen Lese-Wegs als rechnende Kommandos des Konverters führte.
+`tests/test_docstrings.py` ist der Wächter der Zusage: mechanisch für jedes Kommando und jedes `--Flag` (per Regex aus dem Quelltext gezogen, gegen den eigenen Docstring geprüft), von Hand für Begriffe, die kein Parser findet (Feldnamen, Dateiendungen, Funktionsnamen) — diese Liste muss bei jedem neuen Feature nachgezogen werden, das ist kein Testversehen, sondern der Punkt.
+**Dasselbe gilt für diese Doku, und zwar in beiden Richtungen.** Kommandonamen, Flags und Feldnamen sind hier genauso gegen den Code zu halten wie Kapitelverweise — ein Kommandoname ist kein Verweis, deshalb fällt er bei einer Verweisprüfung durch.
 
-**Die Gegenrichtung ist die ergiebigere:** Nennt die Doku etwas, das es nicht gibt, stolpert ein Leser darüber. Schreibt der Code ein Feld, das die Doku nicht nennt, hinterlässt das keine Spur im Text und fällt beim Lesen nie auf — so war `imported_at` durchgerutscht, in jeder Chatdatei vorhanden und nirgends dokumentiert. Beide Feldmengen holt man deshalb aus dem **laufenden Code** (`chat_document()` für die Chatdatei, `load_protocol()` und der Eintragsaufbau in `update_from_list()` für das Protokoll) und hält sie gegen die Backtick-Begriffe in 2.2 bzw. 2.4, statt die Doku abzuschreiben.
+**Die Gegenrichtung ist die ergiebigere:** Nennt die Doku etwas, das es nicht gibt, stolpert ein Leser darüber. Schreibt der Code ein Feld, das die Doku nicht nennt, hinterlässt das keine Spur im Text und fällt beim Lesen nie auf. Beide Feldmengen holt man deshalb aus dem **laufenden Code** (`chat_document()` für die Chatdatei, `load_protocol()` und der Eintragsaufbau in `update_from_list()` für das Protokoll) und hält sie gegen die Backtick-Begriffe in 2.2 bzw. 2.4, statt die Doku abzuschreiben.
 
 **Drei Sorten Falsch-Positive** treten dabei zuverlässig auf und sind keine Befunde: Flags fremder Werkzeuge (`--chrome`, `--add-dir`, `--dry-run`, `--teleport`), Feldnamen der claude.ai-Weboberfläche und des Rohexports (`capabilities`, `pagination`, `is_private`, `extracted_content`) und Werkzeugnamen aus den Messungen in 3.1.1 (`bash_tool`, `web_search`, `project_knowledge_search`). Wer sie erneut meldet, hat die Herkunft nicht geprüft.
 
@@ -427,7 +427,7 @@ Das Feld `summaries` (in 3.788 Blöcken, Median 241 Zeichen) ist **keine Zusamme
 
 **Denken kann dabei sein, muss aber nicht.** Ein Denkblock kommt in zwei Ausprägungen: mit Text, oder als `thinking_hidden` mit null Zeichen. Beide stehen nebeneinander, und das Verhältnis schwankt erheblich — im Drei-Monats-Export 788 versteckte unter 4.318, in den Testexporten vom 17. und 18. August 2026 ausschließlich versteckte, und innerhalb **eines einzigen** Chats wechselte es von Tag zu Tag. Woran es hängt, ist nicht ermittelt und wird hier auch nicht vermutet.
 
-**Ein Export ohne Denktext ist deshalb kein Befund über das Format.** Wer in einem frischen Archiv keine Denkdatei findet, hat eine Stichprobe gezogen, mehr nicht; der Schluss „der Export führt keine Denkschritte" wäre falsch und ist hier schon einmal beinahe gezogen worden. Ist Denktext vorhanden, wird er unverändert genutzt; fehlt er, ist nichts zu holen, und das Verwerfen leerer Blöcke nach 3.1.3 bleibt verlustfrei.
+**Ein Export ohne Denktext ist deshalb kein Befund über das Format.** Wer in einem frischen Archiv keine Denkdatei findet, hat eine Stichprobe gezogen, mehr nicht; der Schluss „der Export führt keine Denkschritte" wäre falsch. Ist Denktext vorhanden, wird er unverändert genutzt; fehlt er, ist nichts zu holen, und das Verwerfen leerer Blöcke nach 3.1.3 bleibt verlustfrei.
 
 Drei strukturelle Befunde, die die Auswahl tragen; die Festlegung, die daraus folgt, steht in 3.1.3:
 
@@ -517,7 +517,7 @@ Das Protokoll ist Vorgabe **2.4**. Weder `end_token` noch `total_turns` werden g
 
 - `analyse --zip <datei> [--map <dump>]` — beschreibt, was der Leser aus einem Archiv macht, ohne etwas zu schreiben: gewählter Pfad, Nebenzweige, Umfang, und bei gegebener Zuordnung die UUIDs, die das Archiv nicht kennt. Es nennt **beide Seiten** — was mitkäme (Denkblöcke, Anhänge mit Inhalt, Erzeugnisse) und was wegfiele (verworfene Denkblöcke, Blocktypen, Hüllen, Sendewiederholungen, Namensverweise). Beantwortet eine andere Frage als 3.2 — das beschreibt den Rohexport, dieses die *Deutung*.
 
-Der Unterschied zu `report` ist die Blickrichtung, nicht der Inhalt: `report` läuft über einen **fertigen Bestand**, `analyse` über das **ZIP** und schreibt nichts — es ist die Vorschau vor dem Lauf. Beide nennen deshalb dieselben Posten, und dass sie dieselben Zahlen liefern, sichert `tests/test_export_convert.py` über drei Prüfbestände ab. Der Grund für die Absicherung ist eine erlebte Drift: Anhänge kamen zuerst, Denkschritte und Erzeugnisse später, `report` wurde nachgezogen und `analyse` nicht — die Vorschau verschwieg damit zwei der drei Nebendateiarten und mit ihnen den größten mitgenommenen Posten überhaupt (Denkschritte, 9,2 Mio Zeichen gegen 9,6 der Anhänge und 4,4 der Erzeugnisse, Messung in 3.1.1).
+Der Unterschied zu `report` ist die Blickrichtung, nicht der Inhalt: `report` läuft über einen **fertigen Bestand**, `analyse` über das **ZIP** und schreibt nichts — es ist die Vorschau vor dem Lauf. Beide nennen deshalb dieselben Posten, und dass sie dieselben Zahlen liefern, sichert `tests/test_export_convert.py` über drei Prüfbestände ab. Diese Absicherung ist keine Förmlichkeit: Nennt eine der beiden eine Nebendateiart nicht, verschweigt sie mit ihr einen der größten mitgenommenen Posten — Denkschritte 9,2 Mio Zeichen, Anhänge 9,6, Erzeugnisse 4,4 (Messung in 3.1.1).
 
 Dazu ein fertig einfügbarer Textblock für das **Zielprojekt**: dass ein Chatarchiv vorliegt, wo es liegt, und dass es vor einer Rückfrage zu älterem Zusammenhang zu konsultieren ist. Damit wirkt die Anweisung dauerhaft — er ist die einzige Stelle, an der dieses Werkzeug im Zielprojekt fortwirkt; ohne ihn liegt das Archiv da und wird nie gelesen.
 
@@ -552,7 +552,7 @@ Die `home`-Fassung trägt zusätzlich die Zugänglichkeitsbedingung aus 1.3 und 
 
 ## 3.2 `inspect_export.py` — Diagnose eines Export-ZIP
 
-**Status: gebaut, eigener Selbsttest, auch unter `-O`.** Die Scratchpad-Fassung ging beim Sitzungswechsel verloren und wurde aus dem Verlauf rekonstruiert — der Beleg, dass flüchtige Ablagen keine Werkzeuge halten.
+**Status: gebaut, eigener Selbsttest, auch unter `-O`.**
 
 Liest ein Kontoexport-ZIP ohne zu entpacken und berichtet Struktur und Zahlen, **nie Chatinhalt** (Vorgabe 2.11 — der Selbsttest weist mit Markertexten nach, dass nichts davon in der Ausgabe erscheint; Titel erscheinen bewusst, sie identifizieren die Chats). Aufruf: `inspect_export.py <export.zip>`.
 
@@ -564,9 +564,9 @@ Es beantwortet eine andere Frage als `analyse` (3.1.6): dieses beschreibt den Ro
 
 ## 3.3 Der Skill `chat-export` — das Frontend
 
-**Status: Am echten Lauf erprobt** — über drei unabhängige Sitzungen mit kaum Zutun des Nutzers, zuletzt an vier realen Projekten mit 171 Chats, gegen die tatsächliche Export-ZIP gegengeprüft (Testlauf, Abschnitte „27c", „Großimport", „Nachfüll-Lauf"). Die `README.md` ist geschrieben, reine Anwenderdokumentation ohne Statushinweis und ohne Entwicklungsangaben — bewusst abweichend von `skills/skill_vorgaben.md` 6.1, begründet in Fahrplan 27.
+**Status: Am echten Lauf erprobt** — über drei unabhängige Sitzungen mit kaum Zutun des Nutzers, zuletzt an vier realen Projekten mit 171 Chats, gegen die tatsächliche Export-ZIP gegengeprüft. `README.de.md` und `README.en.md` sind geschrieben, reine Anwenderdokumentation ohne Statushinweis und ohne Entwicklungsangaben — bewusst abweichend von `skills/skill_vorgaben.md` 6.1. Der Grund: Was ein Nutzer kopiert, soll ihm die Bedienung sagen und nicht den Entwicklungsstand; der gehört in die Bereichs-README, wo er auch gepflegt wird.
 
-Der Skill ist die Klammer um das Skript: Er führt den Nutzer durch beide Wege, ohne ihm die Entscheidung abzunehmen. Er liegt in `skills/chat-export/` und enthält `chat_export_convert.py`, die Anwenderdokumentation `README.md` sowie die Anweisungsdatei in zwei Sprachfassungen, `SKILL.de.md` und `SKILL.en.md` — am Zielort wird genau eine davon zu `SKILL.md` (Konvention aus `skills/skill_vorgaben.md` 5.1). **Das ist alles, was ein Nutzer kopiert**; die übrigen Skripte dieses Ordners gehören zur Entwicklung und kommen in der Anweisungsdatei nicht vor.
+Der Skill ist die Klammer um das Skript: Er führt den Nutzer durch beide Wege, ohne ihm die Entscheidung abzunehmen. Er liegt in `skills/chat-export/` und enthält `chat_export_convert.py`, die Anwenderdokumentation in zwei Sprachfassungen (`README.de.md`, `README.en.md`) sowie die Anweisungsdatei ebenso zweisprachig, `SKILL.de.md` und `SKILL.en.md` — am Zielort wird genau eine davon zu `SKILL.md` (Konvention aus `skills/skill_vorgaben.md` 5.1). **Das ist alles, was ein Nutzer kopiert**; die übrigen Skripte dieses Ordners gehören zur Entwicklung und kommen in der Anweisungsdatei nicht vor.
 
 Drei Festlegungen tragen den Entwurf, und alle drei stehen dort normativ:
 
@@ -596,7 +596,7 @@ Vorhandener Baustein ist `inspect_export.py` (3.2) als Schemawache des Exports. 
 
 **Das Profil des Testprojekts.** Für die warme Seite gibt es kein Werkzeug, aber eine **Prüfvorlage**: ein eigens angelegtes claude.ai-Projekt, dessen Inhalt bewusst gewählt ist. Zwei Randbedingungen stehen dabei gegeneinander. Es muss **klein** bleiben — ein kleiner Export ist schneller da, und jedes Merkmal muss von Hand erzeugt werden. Und es muss trotzdem **jedes strukturelle Merkmal** tragen, auf das der Code reagiert: Ein fehlendes Merkmal lässt seinen Codeweg ungeprüft, ohne dass es auffällt — der Lauf meldet dann nicht etwa eine Lücke, sondern schlicht nichts.
 
-Das Profil steht hier und nicht bei den erledigten Schritten, weil es sich nicht verbraucht: Nach jeder Anthropic-Änderung, die eine Prüfung aus 4.2 oder 4.3 anschlagen lässt, wird dieselbe Vorlage wieder gebraucht. Es ist eine Prüf**vorlage**, kein Prüf**punkt** — die Übersicht weiter unten führt die Punkte, hier steht das Material, an dem man sie durchspielt.
+Das Profil verbraucht sich nicht: Nach jeder Anthropic-Änderung, die eine Prüfung aus 4.2 oder 4.3 anschlagen lässt, wird dieselbe Vorlage wieder gebraucht. Es ist eine Prüf**vorlage**, kein Prüf**punkt** — die Übersicht weiter unten führt die Punkte, hier steht das Material, an dem man sie durchspielt.
 
 | Merkmal | Wie es entsteht | Was es prüft |
 | --- | --- | --- |
@@ -613,7 +613,7 @@ Das Profil steht hier und nicht bei den erledigten Schritten, weil es sich nicht
 
 Die Zeile zum wachsenden Chat ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports arbeitet auf Tagesebene, also muss zwischen Anlegen und Fortsetzen mindestens ein Tageswechsel liegen.
 
-**Die Rezepte für Denkschritte und Erzeugnis sind bereits einmal fehlgeschlagen** — zu leichte Fragen, und ein Chat über Bildgenerierung, der keinen der drei Werkzeugnamen aus 3.1.3 erzeugt. Beide Lehren stehen oben in der Tabelle; deshalb ist sie dort so ausführlich formuliert.
+**Die Rezepte für Denkschritte und Erzeugnis sind die zwei heiklen** — eine zu leichte Frage erzeugt keinen Abwägungsblock, und ein Chat über Bildgenerierung keinen der drei Werkzeugnamen aus 3.1.3. Deshalb sind sie in der Tabelle so ausführlich formuliert.
 
 **Für die Sendewiederholung gibt es kein Rezept.** Zwei identisch abgeschickte Nachrichten stehen als Eltern und Kind hintereinander, der Code sucht aber **Geschwister ohne Nachfahren** an einer Gabelung. Belegt ist das Phänomen nur aus echten Daten (14 Kinder mit je 440 Zeichen, 3.1.2); herstellen konnten wir es nicht. Dieser Codeweg bleibt damit ungeprüft — ausdrücklich vermerkt statt stillschweigend als abgedeckt geführt. Betroffen ist allerdings nur die Hälfte, die *verwirft*: Dass zwei textlose Geschwister eben **keine** Dublette sind, lässt sich mit dem Rezept eine Zeile darunter sehr wohl live erzeugen, weil dafür nur eine Gabelung nötig ist — und die ist erprobt.
 
