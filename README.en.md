@@ -38,7 +38,7 @@ The existing data export interface is not directly suited to this and is used by
 
 It is operated through the Claude Code skill `chat-export`, which guides you through both routes — the account export and Claude.ai's internal web endpoints via the logged-in Chrome browser.
 
-**Status:** ready to use. Tested against real data across several independent sessions, most recently on four real projects with 171 chats — the result verified against the actual export ZIP. More in the [component's README](chat-export/README.en.md).
+**Status:** ready to use. Tested against real data across several independent sessions, most recently on four real projects with 171 chats — the result verified against the actual export ZIP. On 22 August 2026 it additionally went through a code review by an independent instance (Fable 5): 13 findings and 2 side notes, all resolved, none deferred. More in the [component's README](chat-export/README.en.md).
 
 ## home-.claude-sharing
 

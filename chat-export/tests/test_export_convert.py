@@ -409,6 +409,33 @@ check("an unknown sender is warned about",
       any("unknown sender" in w for w in result["warnings"]),
       str(result["warnings"]))
 
+# Two identical labels mean opposite things. A real name is a key: the same name
+# under 'files' and under a content-less 'attachments' entry is one file listed
+# twice, and counting it twice would overstate the loss. The stand-in for a
+# missing name is no key: it says "a PNG without a name", not which one. On the
+# archives at hand, collapsing those cost exactly 10 references in 4 messages.
+LOSS_LABELS = conv("los-1", "Verlustverweise", [
+    msg("g0", ROOT, "human", "Bilder und ein Plan", "2026-05-09T10:00:00Z",
+        attachments=[{"file_name": "plan.py", "file_type": "text/x-python",
+                      "extracted_content": ""}],
+        files=[{"file_uuid": "f1", "file_name": "plan.py"},
+               {"file_uuid": "f2", "file_name": "", "file_type": "image/png"},
+               {"file_uuid": "f3", "file_name": "", "file_type": "image/png"},
+               {"file_uuid": "f4", "file_name": "bild.jpg"},
+               {"file_uuid": "f5", "file_name": "bild.jpg"}]),
+])
+result = cec.conversation_record(LOSS_LABELS)
+losses = result["attachments_without_content"]
+check("a name shared by both arrays is one loss, not two",
+      losses.count("plan.py") == 1, str(losses))
+check("and so is the same name twice under files",
+      losses.count("bild.jpg") == 1, str(losses))
+check("but two nameless references of one type stay two",
+      sum(1 for entry in losses
+          if entry.startswith(cec.NAMELESS_LABEL)) == 2, str(losses))
+check("so four files entries and one attachment come to four losses",
+      len(losses) == 4, str(losses))
+
 # These two used to be one check joined by 'or', which let either outcome pass
 # -- so nobody noticed that only the first one ever happened and the warning was
 # never reached. Split, because they are different claims about different

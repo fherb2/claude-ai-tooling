@@ -204,6 +204,12 @@ THINKING_MIN_CHARS = 200
 
 PROTOCOL_FILENAME  = "protokoll.json"
 PROTOCOL_VERSION   = 1
+
+# What ``attachment_label`` puts in front of a stand-in built from the file type
+# when a reference has no name. Kept as a constant because ``dedupe_losses``
+# recognises the stand-in by it: a name is a key, a stand-in is not, and if the
+# two ever drifted apart the loss count would quietly go wrong again.
+NAMELESS_LABEL     = "(ohne Namen, "
 THINKING_SUFFIX    = ".thinking.json"
 ATTACHMENT_SUFFIX  = ".attachments.json"
 CREATION_SUFFIX    = ".creations.json"
@@ -544,7 +550,39 @@ def attachment_label(entry: dict[str, Any]) -> str:
     if name:
         return name
     kind = entry.get("file_type") or "unbekannt"
-    return f"(ohne Namen, {kind})"
+    return f"{NAMELESS_LABEL}{kind})"
+
+
+def dedupe_losses(labels: list[str]) -> list[str]:
+    """Drop the repeats a shared file name proves, and keep every other one.
+
+    Two identical labels can mean opposite things. Where the label is a real
+    name, it is a key: the same name from the ``files`` array and from a
+    content-less ``attachments`` entry is one file listed twice, and counting it
+    twice would overstate the loss -- that is the join ``file_references``
+    builds on. Where the label is the stand-in from ``NAMELESS_LABEL``, it is no
+    key at all: it says "a PNG without a name", not *which* one, so three
+    different nameless PNGs in one message collapse into one and the loss count
+    comes out short. Measured across the archives at hand, this recovers exactly
+    10 references in 4 messages -- 14 nameless labels sat in those messages
+    where 4 were reported. All of them come from the ``files`` side; a nameless
+    ``attachments`` entry cannot cause one, because all 49 of them in that data
+    carry content and so never reach this list at all.
+
+    Callers pass the references of *one* message. Deduplicating across the chat
+    would be wrong: the same name in two messages is two references.
+    """
+    seen: set[str] = set()
+    kept = []
+    for label in labels:
+        if label.startswith(NAMELESS_LABEL):
+            kept.append(label)
+            continue
+        if label in seen:
+            continue
+        seen.add(label)
+        kept.append(label)
+    return kept
 
 
 def file_references(message: dict[str, Any]) -> list[str]:
@@ -727,9 +765,10 @@ def render(messages: list[dict[str, Any]],
         carried, nameless = attachment_records(message)
         # One entry per name and message: a file that shows up as a
         # content-less attachment *and* as a files entry is one loss, not two.
-        # Deduplicated per message, not across the chat -- the same name in two
-        # messages is two references and stays two.
-        without.extend(dict.fromkeys(file_references(message) + nameless))
+        # A missing name is not a key, though, so nameless references are each
+        # counted -- see dedupe_losses. Deduplicated per message, not across the
+        # chat: the same name in two messages is two references and stays two.
+        without.extend(dedupe_losses(file_references(message) + nameless))
         kept, discarded = message_thinking(message)
         dropped_thinking += discarded
         record = {"n": index, "role": message_role(message), "content": text}

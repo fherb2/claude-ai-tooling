@@ -38,7 +38,7 @@ Die vorhandene Datenexport-Schnittstelle ist dazu nicht unmittelbar geeignet und
 
 Bedient wird es über den Claude-Code-Skill `chat-export`, der durch beide Wege führt — den Kontoexport und die internen Web-Endpunkte von Claude.ai über den angemeldeten Chrome.
 
-**Stand:** Einsatzbereit. An echten Daten in mehreren unabhängigen Sitzungen erprobt, zuletzt an vier realen Projekten mit 171 Chats — Ergebnis gegen die tatsächliche Export-ZIP verifiziert. Näheres in der [README des Bausteins](chat-export/README.de.md).
+**Stand:** Einsatzbereit. An echten Daten in mehreren unabhängigen Sitzungen erprobt, zuletzt an vier realen Projekten mit 171 Chats — Ergebnis gegen die tatsächliche Export-ZIP verifiziert. Am 22. August 2026 zusätzlich einem Code-Review durch eine unabhängige Instanz (Fable 5) unterzogen: 13 Befunde und 2 Randnotizen, alle abgearbeitet, keiner zurückgestellt. Näheres in der [README des Bausteins](chat-export/README.de.md).
 
 ## home-.claude-sharing
 
