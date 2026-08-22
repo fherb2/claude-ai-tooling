@@ -409,18 +409,60 @@ check("an unknown sender is warned about",
       any("unknown sender" in w for w in result["warnings"]),
       str(result["warnings"]))
 
-# A message whose parent is missing entirely must be reported, not lost.
-ORPHAN = conv("orp-1", "Waise", [
+# These two used to be one check joined by 'or', which let either outcome pass
+# -- so nobody noticed that only the first one ever happened and the warning was
+# never reached. Split, because they are different claims about different
+# structures.
+
+# A parent that is not in this conversation at all: the message becomes a branch
+# head and is placed in full. Nothing to warn about.
+FOREIGN_PARENT = conv("orp-1", "Fremder Elternteil", [
     msg("p0", ROOT, "human", "regulaer", "2026-05-08T10:00:00Z"),
     msg("p9", "gibt-es-nicht", "human", "haengt im Nichts",
         "2026-05-08T09:00:00Z"),
 ])
-result = cec.conversation_record(ORPHAN)
-check("an orphan is either placed or reported",
-      result["turns"] + sum(len(b["messages"]) for b in result["branches"]) == 2
-      or any("not in this conversation" in w for w in result["warnings"]),
-      f"turns={result['turns']} branches={result['branches']} "
-      f"warnings={result['warnings']}")
+result = cec.conversation_record(FOREIGN_PARENT)
+placed = result["turns"] + sum(len(b["messages"]) for b in result["branches"])
+check("a message with a parent outside the conversation is placed, not lost",
+      placed == 2, f"placed={placed} branches={result['branches']}")
+check("and nothing is reported as unplaceable",
+      not any("could not be placed" in w for w in result["warnings"]),
+      str(result["warnings"]))
+
+# The one structure that does reach the warning: a parent cycle OFF the chosen
+# path. Every member points at another member, so none is ever a branch head
+# and none is reachable from one. Off the path matters -- a cycle on it gets
+# absorbed by main_path's seen guard and everything is placed. A corrupt export;
+# this is the guard on the integrity promise in doku 3.1.7.
+CYCLE_OFF_PATH = conv("orp-2", "Zyklus abseits", [
+    msg("c0", ROOT, "human", "regulaer", "2026-05-08T10:00:00Z"),
+    msg("c1", "c0", "assistant", "die neueste", "2026-05-08T12:00:00Z"),
+    msg("y0", "y1", "human", "zeigt auf y1", "2026-05-08T09:00:00Z"),
+    msg("y1", "y0", "human", "zeigt zurueck", "2026-05-08T09:00:30Z"),
+])
+result = cec.conversation_record(CYCLE_OFF_PATH)
+placed = result["turns"] + sum(len(b["messages"]) for b in result["branches"])
+check("a cycle off the path leaves messages unplaced",
+      placed == 2, f"placed={placed} of 4")
+check("and those are reported as unplaceable",
+      any("could not be placed" in w for w in result["warnings"]),
+      str(result["warnings"]))
+check("the warning names how many were lost",
+      any("2 message(s)" in w for w in result["warnings"]),
+      str(result["warnings"]))
+
+# A cycle ON the path is not a loss: main_path walks it once and stops.
+CYCLE_ON_PATH = conv("orp-3", "Zyklus auf dem Pfad", [
+    msg("k0", ROOT, "human", "regulaer", "2026-05-08T09:00:00Z"),
+    msg("z0", "z1", "human", "zeigt auf z1", "2026-05-08T12:00:00Z"),
+    msg("z1", "z0", "human", "zeigt zurueck", "2026-05-08T12:00:30Z"),
+])
+result = cec.conversation_record(CYCLE_ON_PATH)
+placed = result["turns"] + sum(len(b["messages"]) for b in result["branches"])
+check("a cycle on the chosen path is absorbed, nothing is lost",
+      placed == 3 and not any("could not be placed" in w
+                             for w in result["warnings"]),
+      f"placed={placed} warnings={result['warnings']}")
 
 
 # ---------------------------------------------------------------------------
@@ -446,17 +488,29 @@ check("a uuid the archive does not know is reported",
 # ---------------------------------------------------------------------------
 
 # The invariant that guarantees nothing is silently lost: every message of a
-# conversation ends up either on the chosen path, in a branch, or counted as a
-# skipped resend. Verified against the real three-month export, where
-# 7338 + 26 + 29 came to exactly 7393.
-for fixture in CONVERSATIONS + [DUP_WITH_KIDS, ORPHAN]:
+# conversation ends up on the chosen path, in a branch, counted as a skipped
+# resend, or -- for a corrupt export only -- reported as unplaceable. Verified
+# against the real three-month export, where 7338 + 26 + 29 came to exactly
+# 7393 with no fourth term. The fourth term is counted here through the same
+# functions the converter uses, so the sum stays total even for the cycle
+# fixture, where it is the whole point that two messages do NOT arrive.
+for fixture in CONVERSATIONS + [DUP_WITH_KIDS, FOREIGN_PARENT,
+                                CYCLE_OFF_PATH, CYCLE_ON_PATH]:
     result = cec.conversation_record(fixture)
+    messages = fixture["chat_messages"]
+    _, _, unplaced = cec.split_branches(messages, cec.main_path(messages))
     placed = (result["turns"]
               + sum(len(b["messages"]) for b in result["branches"])
               + result["dropped_duplicates"])
     check(f"every message is accounted for in {fixture['uuid']}",
-          placed == len(fixture["chat_messages"]),
-          f"{placed} placed of {len(fixture['chat_messages'])}")
+          placed + len(unplaced) == len(messages),
+          f"{placed} placed + {len(unplaced)} reported of {len(messages)}")
+    # And the fourth term stays zero unless the structure is corrupt.
+    check(f"nothing is unplaceable in {fixture['uuid']}"
+          if fixture is not CYCLE_OFF_PATH else
+          "the cycle fixture is the only one with unplaceable messages",
+          (len(unplaced) == 0) == (fixture is not CYCLE_OFF_PATH),
+          f"unplaced={len(unplaced)}")
 
 
 def run(*args):
@@ -1750,6 +1804,41 @@ with open(os.path.join(STAY_DIR, "protokoll.json"), encoding="utf-8") as handle:
     STAY_ENTRY = json.load(handle)["chats"]["shell-3"]
 check("an unchanged state leaves a deleted chat deleted",
       STAY_ENTRY["status"] == "deleted", STAY_ENTRY["status"])
+
+
+# ---------------------------------------------------------------------------
+# A protocol from another version
+# ---------------------------------------------------------------------------
+
+# Read, not refused: refusing would strand the user with a state file no tool
+# will touch. But not in silence either, because everything downstream assumes
+# the schema of this version. The write-back then records that a tool of this
+# version wrote it last, which is the truth -- and unknown fields survive it.
+VER_DIR = os.path.join(WORK, "fremde-version")
+os.makedirs(VER_DIR, exist_ok=True)
+with open(os.path.join(VER_DIR, cec.PROTOCOL_FILENAME), "w",
+          encoding="utf-8") as handle:
+    json.dump({"protocol_version": cec.PROTOCOL_VERSION + 1,
+               "project": "Aus der Zukunft", "chats": {},
+               "was-diese-fassung-nicht-kennt": {"bleibt": True}}, handle)
+result = run("diff", "--out", VER_DIR)
+check("a protocol from another version is still read", result.returncode == 0,
+      result.stderr)
+check("and the mismatch is reported with both numbers",
+      f"protocol_version {cec.PROTOCOL_VERSION + 1}" in result.stderr
+      and f"knows {cec.PROTOCOL_VERSION}" in result.stderr, result.stderr)
+with open(os.path.join(VER_DIR, cec.PROTOCOL_FILENAME),
+          encoding="utf-8") as handle:
+    VER_AFTER = json.load(handle)
+check("a field this version does not know survives the round trip",
+      VER_AFTER.get("was-diese-fassung-nicht-kennt") == {"bleibt": True},
+      str(VER_AFTER))
+
+# The counter-test: the matching version must stay quiet, or the warning is
+# noise on every single run.
+result = run("diff", "--out", PROT_DIR)
+check("a protocol of this version says nothing about versions",
+      "protocol_version" not in result.stderr, result.stderr)
 
 
 shutil.rmtree(WORK, ignore_errors=True)
