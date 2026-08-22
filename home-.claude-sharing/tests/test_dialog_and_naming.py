@@ -66,6 +66,7 @@ from pathlib import Path
 DAEMON = Path(__file__).resolve().parent.parent / "files" / "claude_sync_watchd.py"
 UNIT = Path(__file__).resolve().parent.parent / "files" / "claude-sync-watch.service"
 UNINSTALL = Path(__file__).resolve().parent.parent / "files" / "uninstall_service.sh"
+INSTALL = Path(__file__).resolve().parent.parent / "files" / "install_service.sh"
 
 failures = 0
 
@@ -1332,6 +1333,79 @@ def check_uninstall_guard(w: types.ModuleType, tmp_root: Path) -> None:
           "Hinweis vom Abmelden" in output, True)
 
 
+def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
+    """The login check decides on content, and only it may abort (doku 3.5).
+
+    Run are the real lines between the two markers in install_service.sh, cut
+    out of the file itself -- not a copy in here, which would be free to drift.
+    fail, warn, the binary and the timeout are supplied from outside.
+
+    The trap has the same shape as the one in the uninstaller: 'claude auth
+    status' exits 1 when not logged in AND when the subcommand is unknown
+    (measured), so the exit code cannot carry the decision. An older Claude
+    Code must not be read as a missing login.
+    """
+    print("Anmeldeprüfung (3.5):")
+    source = INSTALL.read_text(encoding="utf-8").splitlines()
+    start = next(i for i, line in enumerate(source)
+                 if line.startswith("# --- Anmeldepruefung: Anfang"))
+    end = next(i for i, line in enumerate(source)
+               if line.startswith("# --- Anmeldepruefung: Ende"))
+    check("die markierte Strecke ist auffindbar", start < end, True)
+    region = "\n".join(source[start:end + 1])
+
+    stage = tmp_root / "anmeldung"
+    stage.mkdir(parents=True, exist_ok=True)
+    stub = stage / "claude"
+
+    def run(auth_body: str, probe_body: str,
+            timeout: str = "1") -> tuple[int, str]:
+        stub.write_text("#!/bin/sh\ncase \"$1\" in\n"
+                        f"  auth) {auth_body} ;;\n"
+                        f"  *) {probe_body} ;;\n"
+                        "esac\n", encoding="utf-8")
+        stub.chmod(0o755)
+        script = ('fail () { printf "ABBRUCH\\n"; exit 3; }\n'
+                  'warn () { printf "WARNUNG: %s\\n" "$1"; }\n'
+                  f'CLAUDE_BIN="{stub}"\n'
+                  f'LOGIN_PROBE_TIMEOUT={timeout}\n'
+                  + region)
+        result = subprocess.run(["bash", "-c", script],
+                                capture_output=True, text=True)
+        return result.returncode, result.stdout + result.stderr
+
+    angemeldet = 'echo "{ \\"loggedIn\\": true }"'
+    abgemeldet = 'echo "{ \\"loggedIn\\": false }"; exit 1'
+    unbekannt = 'echo "error: unknown command" >&2; exit 1'
+
+    code, output = run(angemeldet, 'echo "Hallo!"')
+    check("angemeldet: laeuft durch", code, 0)
+    check("und ohne Warnung", "WARNUNG" in output, False)
+
+    code, output = run(abgemeldet, 'echo "Please run /login"')
+    check("nicht angemeldet: Abbruch", code, 3)
+
+    # Der Fall, um den es geht: Rueckgabewert 1 wie beim Abgemeldeten, aber
+    # kein Beweis -- also warnen und weitermachen, nicht abbrechen.
+    code, output = run(unbekannt, 'echo "Hallo!"')
+    check("Befehl unbekannt: kein Abbruch", code, 0)
+    check("sondern eine Warnung mit dem Wortlaut",
+          "WARNUNG" in output and "unknown command" in output, True)
+
+    # Zeitueberschreitung: 124, auch mit Teilausgabe -- darf nicht als
+    # bestaetigte Anmeldung durchgehen, aber auch nicht abbrechen.
+    code, output = run(angemeldet, 'echo teilausgabe; sleep 30')
+    check("Zeitueberschreitung: kein Abbruch", code, 0)
+    check("aber sie wird gemeldet", "geantwortet" in output, True)
+
+    # Gegenprobe zur Verengung: Der Prompt-Aufruf darf NICHTS mehr abbrechen,
+    # auch wenn seine Antwort nach einem Anmeldeproblem aussieht.
+    code, output = run(angemeldet, 'echo "Not logged in"')
+    check("Prompt-Antwort bricht nichts mehr ab", code, 0)
+    check("sie wird nur gezeigt",
+          "WARNUNG" in output and "Not logged in" in output, True)
+
+
 def check_folder_check(w: types.ModuleType, tmp_root: Path) -> None:
     """The folder check: three outcomes, and read-only by contract.
 
@@ -1497,6 +1571,7 @@ def main() -> int:
         check_launch_failure(w, Path(tmp))
         check_pass_guard(w, Path(tmp))
         check_uninstall_guard(w, Path(tmp))
+        check_login_check(w, Path(tmp))
         check_dry_run(w, Path(tmp))
         check_folder_check(w, Path(tmp))
         check_deferral_stamp(w, Path(tmp))
