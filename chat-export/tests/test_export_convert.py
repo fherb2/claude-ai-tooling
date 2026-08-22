@@ -126,8 +126,11 @@ LINEAR = conv("lin-1", "Linear", [
 ])
 
 # fork where the OLDER child carries the conversation -- the case that
-# disproved "youngest child at the fork"
-OLD_WINS = conv("old-1", "Aelteres Kind traegt", [
+# disproved "youngest child at the fork".
+# ``updated`` has to match the messages below and the chat list further down:
+# a conversation whose last message is from 2 May cannot carry 1 May as its
+# own update time. It did until the stale check in cmd_convert exposed it.
+OLD_WINS = conv("old-1", "Aelteres Kind traegt", updated="2026-05-02T12:00:00.000000Z", messages=[
     msg("o0", ROOT, "human", "Ausgangsfrage", "2026-05-02T09:00:00Z"),
     msg("o1", "o0", "assistant", "Antwort", "2026-05-02T09:01:00Z"),
     # older child: continues for three more messages
@@ -1558,6 +1561,63 @@ with open(os.path.join(EMPTY_OUT, "protokoll.json"), encoding="utf-8") as handle
     EMPTY_PROTO = json.load(handle)
 check("that protocol is well-formed, just empty",
       EMPTY_PROTO["project"] == "Leertest" and EMPTY_PROTO["chats"] == {})
+
+
+# ---------------------------------------------------------------------------
+# A source older than the chat list must not settle the chat (befund 2)
+# ---------------------------------------------------------------------------
+# The realistic mishap: several export ZIPs sit in the download folder, and the
+# older one gets converted. Before this check the entry went to 'exported',
+# exported_updated_at fell back to the old state, and diff reported nothing
+# pending -- a reconciliation claimed but never done.
+
+BEHIND_DIR = os.path.join(WORK, "veraltete-quelle")
+BEHIND_LIST = os.path.join(WORK, "liste-neuer.txt")
+with open(BEHIND_LIST, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/lin-1' "
+                 "updated_at='2026-07-01T09:00:00+00:00'>Content:\n"
+                 "Title: Linear\n</chat>\n")
+run("list", "--map", BEHIND_LIST, "--out", BEHIND_DIR)
+BEHIND_RUN = run("convert", "--zip", ARCHIVE, "--out", BEHIND_DIR,
+                 "--now", "2026-07-02T00:00:00+00:00")
+
+
+def behind_entry():
+    """The protocol entry after converting the outdated source."""
+    with open(os.path.join(BEHIND_DIR, "protokoll.json"),
+              encoding="utf-8") as handle:
+        return json.load(handle)["chats"]["lin-1"]
+
+
+check("converting an outdated source still writes the file",
+      BEHIND_RUN.returncode == 0
+      and os.path.exists(os.path.join(BEHIND_DIR, behind_entry()["file"])),
+      BEHIND_RUN.stderr)
+check("but the chat stays stale instead of being called exported",
+      behind_entry()["status"] == "stale", behind_entry()["status"])
+check("the run says so, naming both timestamps",
+      "OLDER than the chat list" in BEHIND_RUN.stdout
+      and "2026-07-01" in BEHIND_RUN.stdout, BEHIND_RUN.stdout)
+check("and diff does not claim there is nothing pending",
+      "1 stale" in run("diff", "--out", BEHIND_DIR).stdout)
+
+# The mirror image: the same instant in the two notations the sources actually
+# use -- '+00:00' from a chat list, 'Z' from an archive -- is NOT newer, so an
+# up-to-date conversion must settle the chat (befund 5).
+SAME_DIR = os.path.join(WORK, "gleicher-stand")
+SAME_LIST = os.path.join(WORK, "liste-gleich.txt")
+with open(SAME_LIST, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/lin-1' "
+                 "updated_at='2026-05-01T12:00:00.000000+00:00'>Content:\n"
+                 "Title: Linear\n</chat>\n")
+run("list", "--map", SAME_LIST, "--out", SAME_DIR)
+SAME_RUN = run("convert", "--zip", ARCHIVE, "--out", SAME_DIR,
+               "--now", "2026-05-02T00:00:00+00:00")
+with open(os.path.join(SAME_DIR, "protokoll.json"), encoding="utf-8") as handle:
+    SAME_ENTRY = json.load(handle)["chats"]["lin-1"]
+check("the same instant written 'Z' and '+00:00' counts as up to date",
+      SAME_ENTRY["status"] == "exported", SAME_ENTRY["status"])
+check("no stale warning for it", "OLDER than the chat list" not in SAME_RUN.stdout)
 
 
 shutil.rmtree(WORK, ignore_errors=True)

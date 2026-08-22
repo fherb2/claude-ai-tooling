@@ -2,35 +2,13 @@
 
 Grundlage sind zwei Dateien: `befunde_logikpruefung_2026-08-22.md` (Befunde einer unabhängigen Prüfung durch eine fremde Instanz) und `befund_pruefung_2026-08-22.md` (meine Nachprüfung jedes einzelnen Befundes gegen Code und Doku, mit Empfehlung). **Kein Befund beruhte auf einem Missverständnis** — alle sind technisch zutreffend, weshalb hier nur noch die Reihenfolge und der Zuschnitt der Arbeitsgänge zu klären waren.
 
-Reihenfolge nach Schwere. Schritte 1 bis 3 sind echte Fehlfunktionen, Schritt 4 bringt Texte auf das zurück, was belegt ist, Schritt 5 ist Doku-Präzisierung ohne Codeänderung.
+Reihenfolge nach Schwere. Schritt 1 ist die verbliebene echte Fehlfunktion, Schritt 2 bringt Texte auf das zurück, was belegt ist, Schritt 3 ist Doku-Präzisierung ohne Codeänderung.
 
 **Die Befundnummern werden nicht neu vergeben** (Repo-`CLAUDE.md`): Ein Rückblick auf „Befund 5" muss eindeutig bleiben. Nummer 12 ist **kein Befund** und in der Befundliste als solcher kommentiert.
 
 ---
 
-## 1. `convert` darf einen `stale`-Chat nicht ohne Standprüfung auf `exported` setzen
-
-**Löst Befund 2.** Die höchste Eintrittswahrscheinlichkeit der ganzen Liste, und der Fehler bleibt still.
-
-`cmd_convert()` setzt den Status bedingungslos auf `exported`. Wird versehentlich ein **älteres** ZIP konvertiert — und der Skill sucht die ZIP im Download-Ordner, wo bei diesem Nutzer sechs Exporte verschiedener Zeiträume liegen —, fällt `exported_updated_at` auf den alten Stand zurück und `diff` meldet „nichts offen". Das Werkzeug behauptet einen Abgleich, den es nicht geleistet hat.
-
-**Zu ändern:** In `cmd_convert()` vor dem Setzen von `exported` prüfen, ob das `updated_at` der verarbeiteten Quelle den bereits gelisteten Stand erreicht. Tut es das nicht, bleibt der Eintrag `stale`, und der Lauf sagt es in der Ausgabe. Die dafür nötige Information liegt im Protokoll direkt daneben (`listed_updated_at`) und wird heute nicht gelesen.
-
-**Prüfung:** Regressionstest in `tests/test_export_convert.py` — ein als `stale` geführter Chat, konvertiert aus einer Quelle mit älterem `updated_at`, muss `stale` bleiben und das melden. Leerprobe: Mit zurückgeschriebener Bedingung muss genau dieser Test anschlagen.
-
-## 2. Zeitstempel normalisieren, bevor sie verglichen werden
-
-**Löst Befund 5.** Bestes Verhältnis von Risiko zu Aufwand: Die Zutat liegt im echten Protokoll, und heute geht es nur durch einen ASCII-Zufall gut aus.
-
-Der `stale`-Vergleich ist ein roher Stringvergleich, und die verglichenen Werte kommen in **verschiedenen Schreibweisen** derselben Zeit: `listed_updated_at` endet auf `+00:00` (aus der Chatliste), `exported_updated_at` auf `Z` (aus dem ZIP) — nachgesehen in `tests/test_results/freecad/protokoll.json`. Dass der zeitgleiche Fall nicht als gewachsen kippt, hängt allein daran, dass `+` in ASCII vor `Z` liegt. Vertauschten die Quellen ihre Formate, würde jeder unveränderte Chat bei jedem `list` erneut geholt.
-
-**Zu ändern:** Beide Werte vor dem Vergleich auf eine Form bringen. **Die Normalisierung gehört in beide Umsetzungen** — Konverter und Maßstab (`tests/wegegleichheit_referenz.py`) —, weil der Maßstab nichts importieren darf (Vorgabe 2.5). Genau dafür gibt es `tests/test_wegegleichheit.py`: Eine einseitige Änderung fällt dort durch.
-
-**Dazu ein Prüfpunkt nach Kapitel 4:** Führen die Quellen ihre Zeitstempel weiterhin in derselben Form? Heute nirgends geführt. Art: kalt, am nächsten Protokoll ablesbar.
-
-**Prüfung:** Falltabelle in `tests/test_wegegleichheit.py` um die gemischten Formate erweitern — gleiche Zeit in beiden Schreibweisen darf nicht `stale` ergeben, und zwar in beiden Richtungen.
-
-## 3. Hüllen-Erkennung: Anhänge, Erzeugnisse und Denkschritte sind Lebenszeichen
+## 1. Hüllen-Erkennung: Anhänge, Erzeugnisse und Denkschritte sind Lebenszeichen
 
 **Löst Befund 1.**
 
@@ -42,7 +20,7 @@ Der `stale`-Vergleich ist ein roher Stringvergleich, und die verglichenen Werte 
 
 **Prüfung:** Prüfstück in `tests/test_export_convert.py` — ein Chat, dessen einzige Nachricht einen Anhang mit Inhalt und keinen Text trägt, darf nicht als Hülle gelten. Dazu die Gegenprobe, dass eine echte Hülle weiterhin erkannt wird.
 
-## 4. Vier Texte auf das zurücknehmen, was belegt ist
+## 2. Vier Texte auf das zurücknehmen, was belegt ist
 
 Ein Arbeitsgang, weil alle vier denselben Kern haben: Sie behaupten mehr, als die Messung oder der Code hergibt. Kein Codeverhalten ändert sich.
 
@@ -56,7 +34,7 @@ Ein Arbeitsgang, weil alle vier denselben Kern haben: Sie behaupten mehr, als di
 
 **Prüfung:** Für (d) eine Erwartung in `tests/test_inspect_export.py` — das Fixture trägt eine Datei, die als inhaltsloser `files`-Eintrag *und* als `attachment` mit Inhalt vorkommt; sie darf nicht als Verlust gezählt werden. Für (a) bis (c) genügt der Docstring-Wächter bzw. das Lesen.
 
-## 5. Vier Doku-Präzisierungen
+## 3. Vier Doku-Präzisierungen
 
 Ein Arbeitsgang, alles Formulierung ohne Codeänderung. Jeder Punkt hält eine Grenze fest, die heute stärker klingt, als sie ist.
 
@@ -78,6 +56,12 @@ Diese Befunde sind geprüft und zutreffend, aber ohne heutige Fehlfunktion. Sie 
 
 ## Erledigt am 22. August 2026
 
-**Kommandonamen, Flags und Feldnamen einmal vollständig gegen den Code gehalten**, über alle Dokumente des Bereichs und in beiden Richtungen. Zwei echte Funde, beide behoben: die Kommandonamen in 1.4 (Randnotiz 2, Schritt 4b) und das undokumentierte Metadatenfeld `imported_at`; dazu `chats` als fehlende Strukturangabe in 2.4. Beide Feldmengen sind seither deckungsgleich, maschinell geprüft.
+**Befunde 2 und 5 in einem Zug gelöst** — sie mussten zusammen, weil der neue Standvergleich in `cmd_convert()` genau das Wertepaar aus Befund 5 benutzt und den Fehler sonst geerbt hätte. Eingeführt sind `utc_key()` als Sortierschlüssel und `is_newer()` als einzige Stelle, an der ein Zeitstempelvergleich entschieden wird — in **beiden** Umsetzungen, weil der Maßstab nichts importieren darf. Drei Aufrufstellen laufen jetzt darüber: der `stale`-Vergleich in `update_from_list()`, die Sortierung in `window_start()` und die neue Standprüfung in `cmd_convert()`. Eine Quelle, die älter ist als die Chatliste, lässt den Eintrag `stale` und wird unter Nennung beider Zeitstempel gemeldet; die Datei wird trotzdem geschrieben, denn sie ist, was diese Quelle hergibt.
+
+Sechs neue Prüfungen in `tests/test_export_convert.py`, ein Formatfall in der gemeinsamen Falltabelle von `tests/test_wegegleichheit.py` (75 Prüfungen dort). Beide Leerproben bestanden: Mit deaktivierter Standprüfung fallen drei Prüfungen, mit deaktivierter Normalisierung zusätzlich bestehende — die Datei wurde per Prüfsumme wiederhergestellt.
+
+**Nebenbefund aus dem Lauf:** Der neue Vergleich hat einen Fehler im Prüfmaterial aufgedeckt. Das Fixture `OLD_WINS` trug als `updated_at` den Standardwert vom 1. Mai, während seine Nachrichten und die Chatliste den 2. Mai nennen — eine Konversation, deren letzte Nachricht jünger ist als ihr eigener Änderungsstand. Korrigiert und im Fixture kommentiert.
+
+**Kommandonamen, Flags und Feldnamen einmal vollständig gegen den Code gehalten**, über alle Dokumente des Bereichs und in beiden Richtungen. Zwei echte Funde, beide behoben: die Kommandonamen in 1.4 (Randnotiz 2, Schritt 2b) und das undokumentierte Metadatenfeld `imported_at`; dazu `chats` als fehlende Strukturangabe in 2.4. Beide Feldmengen sind seither deckungsgleich, maschinell geprüft.
 
 **Das Verfahren und die typischen Falsch-Positiven stehen jetzt in Vorgabe 2.9**, nicht hier — diese Datei verschwindet mit den Befunden, die Regel gilt weiter.

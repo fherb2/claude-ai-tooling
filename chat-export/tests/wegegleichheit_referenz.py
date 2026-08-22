@@ -134,6 +134,45 @@ def uuid_from_url(url: str) -> str:
     """Return the trailing path segment of a chat URL."""
     return url.rstrip("/").rsplit("/", 1)[-1]
 
+def utc_key(value: str) -> str:
+    """Return a timestamp in one comparable form, whatever shape it arrived in.
+
+    The sources disagree on notation for the same instant: a chat list ends its
+    timestamps with ``+00:00``, an export archive with ``Z``, and a project
+    start typed in by hand is a bare date. Comparing those as plain strings
+    happens to work today only because ``+`` sorts before ``Z`` in ASCII -- for
+    the *same* instant. It breaks as soon as the fractional precision differs:
+    ``…00.5+00:00`` sorts before ``…00Z`` although it is later.
+
+    Anything unparseable is returned unchanged rather than guessed at, and an
+    empty value stays empty -- callers rely on the falsiness.
+    """
+    if not value:
+        return ""
+    text = value.strip()
+    if text.endswith(("Z", "z")):
+        text = text[:-1] + "+00:00"
+    try:
+        moment = datetime.datetime.fromisoformat(text)
+    except ValueError:
+        return text
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=datetime.timezone.utc)
+    return moment.astimezone(datetime.timezone.utc).isoformat(
+        timespec="microseconds")
+
+
+def is_newer(candidate: str, reference: str) -> bool:
+    """True if ``candidate`` is strictly later than ``reference``.
+
+    The one place the comparison lives, so no caller can write it the wrong way
+    round or forget the normalisation. An empty candidate is never newer.
+    """
+    if not candidate:
+        return False
+    return utc_key(candidate) > utc_key(reference)
+
+
 def clean_title(text: str) -> str:
     """Strip zero-width noise and surrounding whitespace from a title."""
     return text.translate(ZERO_WIDTH).strip()
@@ -433,8 +472,9 @@ def update_state(store_dir: str, records: list[dict[str, str]],
             entry["listed_updated_at"] = record["updated_at"]
         if record.get("title"):
             entry["title"] = record["title"]
-        if (entry["status"] == "exported" and entry["listed_updated_at"]
-                and entry["listed_updated_at"] > (entry["exported_updated_at"] or "")):
+        if (entry["status"] == "exported"
+                and is_newer(entry["listed_updated_at"],
+                             entry["exported_updated_at"] or "")):
             entry["status"] = "stale"
     if now:
         state["listed_at"] = now
@@ -500,7 +540,7 @@ def window_start(protocol: dict[str, Any]) -> dict[str, Any]:
     if unbounded:
         return {"start": "", "source": "unbounded", "chats": [],
                 "unbounded": sorted(unbounded)}
-    start = min(value for value, _ in bounds.values())
+    start = min((value for value, _ in bounds.values()), key=utc_key)
     source = next(kind for value, kind in bounds.values() if value == start)
     return {"start": start, "source": source,
             "chats": sorted(u for u, (v, _) in bounds.items() if v == start),

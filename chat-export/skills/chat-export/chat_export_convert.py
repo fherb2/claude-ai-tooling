@@ -118,6 +118,22 @@ the same calculation is how a report and its preview drift apart. The result
 is the earliest date an account export needs to cover everything still
 pending.
 
+**Timestamps are compared through ``is_newer``, never as plain strings.** The
+sources disagree on notation for the same instant -- a chat list ends on
+``+00:00``, an archive on ``Z`` -- and they differ in fractional precision. A
+raw string comparison happens to work for the identical instant only because
+``+`` sorts before ``Z``, and it gets the order wrong as soon as the fractions
+differ. ``is_newer`` and the sort key ``utc_key`` behind it are the single
+place that decides this, so no caller can write the comparison the wrong way
+round; ``window_start`` sorts its bounds through the same key.
+
+**A source older than the chat list does not settle a chat.** ``convert``
+writes the file either way -- it is what that source holds -- but leaves the
+entry ``stale`` and says so, because otherwise converting a stale-marked chat
+from an outdated archive would reset ``exported_updated_at`` and make ``diff``
+report nothing pending: a reconciliation claimed but never done. The realistic
+mishap is several export ZIPs in one download folder.
+
 **``convert`` ends by printing an instruction block** -- a ready-made German
 paragraph the user pastes into the *target* project, telling that project's
 instance an archive exists and where, so it looks before asking.
@@ -224,6 +240,45 @@ ZERO_WIDTH = dict.fromkeys(map(ord, "​‌‍﻿"))
 # ---------------------------------------------------------------------------
 # Small helpers
 # ---------------------------------------------------------------------------
+
+def utc_key(value: str) -> str:
+    """Return a timestamp in one comparable form, whatever shape it arrived in.
+
+    The sources disagree on notation for the same instant: a chat list ends its
+    timestamps with ``+00:00``, an export archive with ``Z``, and a project
+    start typed in by hand is a bare date. Comparing those as plain strings
+    happens to work today only because ``+`` sorts before ``Z`` in ASCII -- for
+    the *same* instant. It breaks as soon as the fractional precision differs:
+    ``…00.5+00:00`` sorts before ``…00Z`` although it is later.
+
+    Anything unparseable is returned unchanged rather than guessed at, and an
+    empty value stays empty -- callers rely on the falsiness.
+    """
+    if not value:
+        return ""
+    text = value.strip()
+    if text.endswith(("Z", "z")):
+        text = text[:-1] + "+00:00"
+    try:
+        moment = datetime.datetime.fromisoformat(text)
+    except ValueError:
+        return text
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=datetime.timezone.utc)
+    return moment.astimezone(datetime.timezone.utc).isoformat(
+        timespec="microseconds")
+
+
+def is_newer(candidate: str, reference: str) -> bool:
+    """True if ``candidate`` is strictly later than ``reference``.
+
+    The one place the comparison lives, so no caller can write it the wrong way
+    round or forget the normalisation. An empty candidate is never newer.
+    """
+    if not candidate:
+        return False
+    return utc_key(candidate) > utc_key(reference)
+
 
 def clean_title(text: str) -> str:
     """Strip zero-width noise and surrounding whitespace from a title."""
@@ -980,7 +1035,7 @@ def update_from_list(protocol: dict[str, Any],
             entry["created_at"] = record["created_at"]
         exported = entry.get("exported_updated_at") or ""
         listed = entry.get("listed_updated_at") or ""
-        if entry["status"] == STATUS_EXPORTED and listed and listed > exported:
+        if entry["status"] == STATUS_EXPORTED and is_newer(listed, exported):
             entry["status"] = STATUS_STALE
             counts["stale"] += 1
         else:
@@ -1050,7 +1105,7 @@ def window_start(protocol: dict[str, Any]) -> dict[str, Any]:
     if unbounded:
         return {"start": "", "source": "unbounded", "chats": [],
                 "unbounded": sorted(unbounded)}
-    start = min(value for value, _ in bounds.values())
+    start = min((value for value, _ in bounds.values()), key=utc_key)
     source = next(kind for value, kind in bounds.values() if value == start)
     return {"start": start, "source": source,
             "chats": sorted(u for u, (v, _) in bounds.items() if v == start),
@@ -1319,6 +1374,7 @@ def cmd_convert(args: argparse.Namespace) -> int:
     wanted = [uuid for uuid, entry in protocol["chats"].items()
               if entry["status"] in (STATUS_LISTED, STATUS_STALE)]
     missing = [uuid for uuid in wanted if uuid not in conversations]
+    behind_names: list[str] = []
     written = 0
     for uuid in wanted:
         conversation = conversations.get(uuid)
@@ -1350,6 +1406,20 @@ def cmd_convert(args: argparse.Namespace) -> int:
             write_json(creations_document(record, chat_name),
                        os.path.join(args.out, side_files[-1]))
 
+        # A source older than what the list already reported does not settle
+        # the chat: converting the wrong archive -- an earlier export still
+        # sitting in the download folder -- would otherwise claim a
+        # reconciliation that never happened, and 'diff' would report nothing
+        # pending. The entry stays stale so the next run fetches it again.
+        behind = is_newer(entry.get("listed_updated_at") or "",
+                          record["updated_at"])
+        if record["deleted"]:
+            settled = STATUS_DELETED
+        elif behind:
+            settled = STATUS_STALE
+        else:
+            settled = STATUS_EXPORTED
+
         entry.update({
             "title":       record["title"],
             "created_at":  record["created_at"],
@@ -1357,13 +1427,17 @@ def cmd_convert(args: argparse.Namespace) -> int:
             "turns":       record["turns"],
             "file":        chat_name,
             "side_files":  side_files,
-            "status":      STATUS_DELETED if record["deleted"] else STATUS_EXPORTED,
+            "status":      settled,
             "exported_at": now,
         })
         written += 1
+        if behind and not record["deleted"]:
+            behind_names.append(record["uuid"])
         marks = []
         if record["deleted"]:
             marks.append("hollow, deleted at the source")
+        if behind and not record["deleted"]:
+            marks.append("STILL STALE -- this source is older than the list")
         if record["thinking"]:
             marks.append(f"{len(record['thinking'])} thinking entr(ies)")
         if record["attachments"]:
@@ -1384,6 +1458,17 @@ def cmd_convert(args: argparse.Namespace) -> int:
     save_protocol(args.out, protocol)
     print()
     print(f"{written} chat(s) written to {args.out}")
+    if behind_names:
+        print(f"{len(behind_names)} chat(s) came from a source OLDER than the "
+              "chat list and stay stale:")
+        for uuid in behind_names:
+            entry = protocol["chats"][uuid]
+            print(f"  {uuid}  {entry.get('title', '')!r}")
+            print(f"      list says {entry.get('listed_updated_at', '')}, "
+                  f"this source {entry.get('exported_updated_at', '')}")
+        print("  The file was written -- it is what this source holds -- but "
+              "the chat is not settled. Fetch the current state, most likely "
+              "from a newer export than the one just used.")
     if missing:
         print(f"{len(missing)} chat(s) are listed but not in this {source}:")
         for uuid in missing:

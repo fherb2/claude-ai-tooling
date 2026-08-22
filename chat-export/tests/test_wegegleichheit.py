@@ -442,6 +442,13 @@ WINDOW_CASES = [
      prot("", {"a": chat("stale", "2026-03-01"),
                "b": chat("stale", "2026-02-01")}),
      {"start": "2026-02-01", "source": "created_at"}),
+    # The sources write the same instant differently -- 'Z' from an archive,
+    # '+00:00' from a chat list -- and they differ in fractional precision.
+    # Compared as plain strings, the later of these two sorts first.
+    ("mixed notations are ordered by instant, not by ASCII",
+     prot("", {"a": chat("stale", "2026-02-01T10:00:00Z"),
+               "b": chat("stale", "2026-02-01T10:00:00.500000+00:00")}),
+     {"start": "2026-02-01T10:00:00Z", "source": "created_at"}),
     ("created_after is used when created_at is unknown",
      prot("2025-01-01", {"a": chat("listed", "", "2026-05-01")}),
      {"start": "2026-05-01", "source": "created_after"}),
