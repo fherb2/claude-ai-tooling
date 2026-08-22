@@ -39,6 +39,11 @@ WATCH_DIR="$HOME/.claude"
 # the one thing here that must not go untested (doku 3.5).
 CLAUDE_BIN="/usr/bin/claude"
 
+# How long the answer probe may take. A variable for the same reason as
+# the path above: the timeout case is one of the four the test covers, and
+# waiting two minutes for it would be waiting for nothing (doku 3.5).
+LOGIN_PROBE_TIMEOUT=120
+
 fail() {
     printf 'Abbruch: %s\n' "$1" >&2
     if [ $# -gt 1 ]; then
@@ -163,7 +168,7 @@ fi
 [ -x "$CLAUDE_BIN" ] || fail \
     "$CLAUDE_BIN ist nicht vorhanden oder nicht ausführbar." \
 "Ohne Claude Code kann keine Konfliktsitzung starten. Bitte Claude Code
-installieren und sicherstellen, dass es unter /usr/bin/claude erreichbar
+installieren und sicherstellen, dass es unter $CLAUDE_BIN erreichbar
 ist."
 
 # Present is not enough: the conflict session is worthless if the terminal
@@ -171,13 +176,24 @@ ist."
 # itself, dutifully shows dialogs and opens terminals in which nothing
 # useful happens -- a silent failure.
 #
-# The call costs a fraction of a cent in tokens and one network access.
-# NOT with --bare: that reports an existing login as missing (observed,
-# doku 3.8).
-printf 'Prüfe die Anmeldung von Claude Code (ein kurzer Aufruf) …\n'
-login_probe="$(timeout 120 /usr/bin/claude -p "ok" 2>&1 || true)"
-case "$login_probe" in
-    *"Not logged in"*|*"/login"*)
+# --- Anmeldepruefung: Anfang (doku 3.5) -------------------------------------
+# Everything between these markers is run by the test script as it stands, with
+# fail/warn and CLAUDE_BIN supplied. Do not restructure without looking there.
+#
+# The deciding test is documented: 'claude auth status' exits 0 when logged in
+# and 1 when not. The exit code alone must NOT carry the decision, though -- an
+# unknown subcommand exits 1 as well (measured), so an older Claude Code would
+# look exactly like a missing login. Decided on the CONTENT, with the spaces
+# removed so a change of formatting cannot break it.
+printf 'Prüfe die Anmeldung von Claude Code …\n'
+auth_report="$("$CLAUDE_BIN" auth status 2>&1 || true)"
+auth_flat="$(printf '%s' "$auth_report" | tr -d ' \t\n\r')"
+
+case "$auth_flat" in
+    *'"loggedIn":true'*)
+        printf 'Angemeldet.\n'
+        ;;
+    *'"loggedIn":false'*)
         fail "Claude Code ist in dieser Terminal-Umgebung nicht angemeldet." \
 "Die Konfliktsitzung koennte nichts tun. Bitte einmal von Hand anmelden:
 
@@ -186,12 +202,59 @@ case "$login_probe" in
 Dort das Erst-Start-Gespraech durchlaufen (Theme waehlen; 'auto' passt sich
 dem Terminal an) und '/login' ausfuehren. Danach dieses Skript erneut starten."
         ;;
-    "")
-        warn 'Hinweis: Die Anmeldeprüfung lieferte keine Antwort.
-Der Dienst wird trotzdem eingerichtet; bitte einmal von Hand
-"claude" starten und sicherstellen, dass es antwortet.'
+    *)
+        # Not an abort: an older Claude Code without this subcommand is no
+        # evidence of a missing login, and the same principle already governs
+        # the hanging line below (doku 3.5). The answer is shown rather than
+        # silently classified.
+        warn "Hinweis: Die Anmeldung liess sich nicht feststellen.
+Antwort von '$CLAUDE_BIN auth status':
+
+$auth_report
+
+Der Dienst wird eingerichtet. Bitte einmal von Hand 'claude' starten und
+sicherstellen, dass es ohne Anmeldefrage antwortet."
         ;;
 esac
+
+# Second test, WARN ONLY: does it actually answer? This is a different question
+# from being logged in -- an expired subscription, an exhausted allowance, no
+# connection. Since it can no longer abort anything, its inevitably vague
+# classification can no longer do harm either.
+#
+# The call costs a fraction of a cent in tokens and one network access.
+# NOT with --bare: that reports an existing login as missing (observed,
+# doku 3.8).
+printf 'Prüfe, ob Claude Code antwortet (ein kurzer Aufruf) …\n'
+if login_probe="$(timeout "$LOGIN_PROBE_TIMEOUT" "$CLAUDE_BIN" -p "ok" 2>&1)"; then
+    probe_status=0
+else
+    probe_status=$?
+fi
+
+# 124 is timeout's own return value, and it comes even when the call had
+# already produced output -- which is why the old '|| true' let a hanging line
+# pass for a confirmed login (doku 3.5).
+if [ "$probe_status" -eq 124 ]; then
+    warn "Hinweis: Claude Code hat binnen $LOGIN_PROBE_TIMEOUT Sekunden nicht
+geantwortet. Der Dienst wird trotzdem eingerichtet; eine haengende Leitung
+ist kein Beweis fuer eine fehlende Anmeldung. Bitte einmal von Hand pruefen."
+else
+    case "$login_probe" in
+        *"Not logged in"*|*"run /login"*)
+            warn "Hinweis: Die Antwort sieht nach einem Anmeldeproblem aus,
+obwohl die Anmeldung bestaetigt wurde. Antwort im Wortlaut:
+
+$login_probe"
+            ;;
+        "")
+            warn 'Hinweis: Die Antwort war leer.
+Der Dienst wird trotzdem eingerichtet; bitte einmal von Hand
+"claude" starten und sicherstellen, dass es antwortet.'
+            ;;
+    esac
+fi
+# --- Anmeldepruefung: Ende --------------------------------------------------
 
 # Checked is exactly the interpreter the unit starts -- NOT the "python3" of
 # this shell. On a machine whose shell carries a virtualenv in PATH those are
