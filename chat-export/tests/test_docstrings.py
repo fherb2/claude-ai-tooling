@@ -2,8 +2,8 @@
 """Guard against docstring drift: every CLI symbol, and every hand-picked
 concept, has to be mentioned in the module docstring of its own script.
 
-Vorgabe 2.9 keeps the uploadable scripts self-contained -- the docstring IS
-the operating manual, nothing else travels with the file. Twice already a
+Vorgabe 2.9 makes the docstring the operating manual: Claude Code reads it and
+not necessarily the implementation doc. Twice already a
 feature shipped (attachments/creations/window, then the protocol timestamp
 fields) while the docstring kept describing an earlier version. This test is
 the guard against a third time: it does not check that the explanation is

@@ -416,7 +416,7 @@ check("the file names differ only in the date segment",
 # The window computation: same table, both implementations (doku 2.4)
 # ---------------------------------------------------------------------------
 
-# Vorgabe 2.9 keeps the two scripts separate, so window_start exists twice.
+# Vorgabe 2.5 keeps the yardstick independent, so window_start exists twice.
 # The table below is the guard against the two drifting apart -- a wrong window
 # is the one error that loses content silently.
 def prot(project_start, chats):
@@ -485,8 +485,8 @@ for name, module in (("zip", cec), ("read", crs)):
 # ---------------------------------------------------------------------------
 # Wording both routes have to share
 # ---------------------------------------------------------------------------
-# The scripts cannot import from each other -- the uploadable one has to stand
-# alone (vorgabe 2.9) -- so a shared sentence exists twice and can drift. It
+# The yardstick must not import from the converter -- it would stop being one
+# (vorgabe 2.5) -- so a shared sentence exists twice and can drift. It
 # has happened twice in this project already: analyse against report, and list
 # against plan. Whatever both are meant to say word for word is guarded here.
 

@@ -413,7 +413,7 @@ Das Feld `summaries` (in 3.788 Blöcken, Median 241 Zeichen) ist **keine Zusamme
 
 **Ein Export ohne Denktext ist deshalb kein Befund über das Format.** Wer in einem frischen Archiv keine Denkdatei findet, hat eine Stichprobe gezogen, mehr nicht; der Schluss „der Export führt keine Denkschritte" wäre falsch und ist hier schon einmal beinahe gezogen worden. Ist Denktext vorhanden, wird er unverändert genutzt; fehlt er, ist nichts zu holen, und das Verwerfen leerer Blöcke nach 3.1.3 bleibt verlustfrei.
 
-Drei strukturelle Befunde, die die Auswahl tragen (Details der Ableitung in 3.1.3):
+Drei strukturelle Befunde, die die Auswahl tragen; die Festlegung, die daraus folgt, steht in 3.1.3:
 
 | Merkmal                        | Blöcke      | Volumen        | mit Abwägungsmarker |
 | ------------------------------ | ----------- | -------------- | ------------------- |

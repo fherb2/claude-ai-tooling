@@ -43,7 +43,7 @@ Roughly in the order the checks appear:
   window calculation, an implausible project date, growth detection from a
   fresh list alone.
 * **A chat the fresh list no longer offers** -- reported, never removed, and
-  the wording is shared with the read path (Vorgabe 2.4).
+  the wording is shared with the comparison yardstick (Vorgabe 2.4).
 * **Replacing cleans up** -- previous files are removed *before* writing,
   because the file stem can have changed, and they are named in the output.
 * **``analyse`` against ``report``** -- the same material from opposite sides:
