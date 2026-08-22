@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
-"""Both ways must produce the same file for the same chat.
+"""The converter must produce the documented file, measured against a second implementation.
 
-The promise of ``implementation_doku.md`` Vorgabe 2.5: a chat fetched out of an account
-export and the same chat fetched through ``read_conversation`` end up as the
-same document.  Otherwise the content of the archive depends on which route a
-chat came in by, and "do I have this chat?" stops being a sharp question.
+The promise of ``implementation_doku.md`` Vorgabe 2.5: the same chat ends up
+as the same document, whichever way it came in. Otherwise the content of the
+archive depends on the route, and "do I have this chat?" stops being a sharp
+question.
 
-Nothing enforces that at runtime -- the two scripts are deliberately separate,
-because ``chat_read_store.py`` has to stay uploadable as a single file.  This
-test is the only thing standing between the two shapes and silent drift.
+The converter's two real routes -- account export and web bundle -- satisfy
+that *by construction*, because both run through the same code and only the
+unwrapping differs. That is exactly why it cannot be the measure here: a
+yardstick that shares code with what it measures passes every format change by
+definition. So the comparison runs against ``wegegleichheit_referenz.py``, an
+independent second implementation of the file format that imports nothing from
+the converter.
 
-**One of the two routes is no longer runnable.** ``read_conversation``
-disappeared from claude.ai on 18 August 2026, so nobody can fetch a chat that
-way today. That does not retire this test -- it makes it the whole reason
-``chat_read_store.py`` is still kept: it is the second implementation the
-promise is measured against. Delete it and the converter becomes the only
-yardstick of itself. Both files therefore live in ``tests/``.
+That module descends from the read route the platform withdrew on 18 August
+2026 (doku 1.7). Its command line and fetch loop are gone with the route; what
+remains is only the shape -- enough to build a document and a protocol and
+hold them next to the converter's.
 
     python3 tests/test_wegegleichheit.py
     python3 -O tests/test_wegegleichheit.py
@@ -23,7 +25,7 @@ yardstick of itself. Both files therefore live in ``tests/``.
 WHAT IS COVERED
 ---------------
 The same conversation is described twice -- once the way the export writes it,
-once the way ``read_conversation`` handed it over -- and then compared:
+once the way the reference implementation builds it -- and then compared:
 
 * **Same top-level keys**, with ``branches`` the single permitted exception:
   only the zip route can observe a branch at all, so an empty list on the read
@@ -40,9 +42,9 @@ once the way ``read_conversation`` handed it over -- and then compared:
 * **The protocols too**, not just the chat files: same key sets, same core
   fields, and the window calculation run through one shared table of cases so
   the two implementations cannot drift apart on it.
-* **``VANISHED_NOTE`` is identical in both scripts** -- the same sentence about
-  a chat the fresh list no longer offers, which they cannot share as code
-  (Vorgabe 2.9) and therefore have to hold twice.
+* **``VANISHED_NOTE`` is identical on both sides** -- the same sentence about
+  a chat the fresh list no longer offers, which they must not share as code
+  and therefore hold twice.
 """
 
 import json
@@ -51,17 +53,16 @@ import sys
 import zipfile
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-# Two scripts, two homes: the converter ships with the skill, the read path
-# sits here beside the tests -- it is not runnable since read_conversation
-# disappeared, and the only thing still exercising it is this test, which
-# measures vorgabe 2.5 against it.
+# Two homes: the converter ships with the skill, the reference implementation
+# sits here beside the tests -- it is nobody's tool, only this test's yardstick
+# for vorgabe 2.5.
 SOURCE_DIR = _HERE
 CONVERT_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
 sys.path.insert(0, SOURCE_DIR)
 sys.path.insert(0, CONVERT_DIR)
 
 import chat_export_convert as cec
-import chat_read_store as crs
+import wegegleichheit_referenz as crs
 
 FAILURES = []
 
@@ -273,7 +274,10 @@ for field, empty in (("dropped_duplicates", 0), ("dropped_blocks", {}),
 
 
 # ---------------------------------------------------------------------------
-# The same through both command lines, on files
+# The same on files: the converter through its command line, the reference
+# through its API. The read route had a command line once; it is gone with the
+# route (doku 1.7), so what is compared here is the written result, not two
+# invocations.
 # ---------------------------------------------------------------------------
 
 import shutil
@@ -290,41 +294,39 @@ with open(listing, "w", encoding="utf-8") as handle:
     handle.write(f"<chat url='https://claude.ai/chat/{UUID}' "
                  f"updated_at='{UPDATED}'>Content:\nTitle: {TITLE}\n</chat>\n")
 
-page_file = os.path.join(WORK, "seite.txt")
-with open(page_file, "w", encoding="utf-8") as handle:
-    handle.write(page)
-
 out_export = os.path.join(WORK, "aus-zip")
 out_read = os.path.join(WORK, "aus-read")
+os.makedirs(out_read, exist_ok=True)
 convert = os.path.join(CONVERT_DIR, "chat_export_convert.py")
-read = os.path.join(SOURCE_DIR, "chat_read_store.py")
 
 
 def run(*args):
-    """Invoke one of the two scripts."""
+    """Invoke the converter."""
     return subprocess.run([sys.executable, *args], capture_output=True, text=True)
 
 
-# Both routes start from the same chat list, folded in at the same
+# Both sides start from the same chat list, folded in at the same
 # reconciliation time -- otherwise the bound below cannot be compared, and the
-# real workflow starts that way on either route (doku 1.5).
+# real workflow starts that way (doku 1.5).
 LISTED_AT = "2026-04-30T00:00:00+00:00"
 run(convert, "list", "--map", listing, "--out", out_export, "--now", LISTED_AT)
-run(read, "--store-dir", out_read, "map", "--raw", listing, "--now", LISTED_AT)
 result = run(convert, "convert", "--zip", archive_path, "--out", out_export,
              "--now", NOW)
 check("the zip route writes its file", result.returncode == 0, result.stderr)
 
-run(read, "--store-dir", out_read, "ingest", "--raw", page_file)
-# No --out: the file name has to follow doku 2.3 on this route as well, so
-# that the protocol can carry a name a later run will recognise.
-result = subprocess.run(
-    [sys.executable, read, "--store-dir", out_read, "export", "--chat", UUID,
-     "--now", NOW], capture_output=True, text=True, cwd=WORK)
-read_file = os.path.join(WORK, f"ohne-datum_wegegleichheit_{UUID[:8]}.json")
-check("the read route writes its file under the 2.3 name",
-      result.returncode == 0 and os.path.exists(read_file),
-      result.stderr + str(os.listdir(WORK)))
+# The reference side: same list, same time, then the same document written out.
+# No --out equivalent -- the name has to follow doku 2.3 on this side as well,
+# so that the protocol can carry a name a later run would recognise.
+crs.update_state(out_read, [{"uuid": UUID, "url": f"https://claude.ai/chat/{UUID}",
+                             "title": TITLE, "updated_at": UPDATED}],
+                 now=LISTED_AT)
+read_file = os.path.join(out_read, f"{crs.file_stem(store)}.json")
+crs.record_export(out_read, store, read_file, NOW)
+check("the reference writes its file under the 2.3 name",
+      os.path.exists(read_file)
+      and os.path.basename(read_file)
+      == f"ohne-datum_wegegleichheit_{UUID[:8]}.json",
+      os.path.basename(read_file))
 
 written = [name for name in os.listdir(out_export)
            if name.endswith(".json") and name != cec.PROTOCOL_FILENAME]
@@ -335,13 +337,12 @@ with open(read_file, "r", encoding="utf-8") as handle:
 
 check("the files agree on the transcript",
       file_export["messages"] == file_read["messages"],
-      f"{file_export['messages']}\n  vs {file_read['messages']}")
+      f"{file_export['messages']} vs {file_read['messages']}")
 check("the files agree on the metadata keys",
       list(file_export["metadata"]) == list(file_read["metadata"]),
-      f"{list(file_export['metadata'])}\n  vs {list(file_read['metadata'])}")
-
+      f"{list(file_export['metadata'])} vs {list(file_read['metadata'])}")
 # The one difference a reader may rely on: the fields whose value depends on
-# what the route can observe. Everything else must be equal.
+# what each side can observe. Everything else must be equal.
 differing = {key for key in file_export["metadata"]
              if file_export["metadata"][key] != file_read["metadata"][key]}
 check("only the fields that depend on the route differ",

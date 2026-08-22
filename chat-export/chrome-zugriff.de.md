@@ -129,7 +129,7 @@ Auf Wunsch des Nutzers geprüft: die linke Seitenleiste der claude.ai-Oberfläch
 
 ## Stufe 7: Erster echter Testlauf des Skill-Ablaufs — Team-Konto ohne Selbstbedienungs-Export, abgebrochen an einer Code-Lücke
 
-**Ausgangslage.** Auf Wunsch des Nutzers wurde der geplante Skill-Ablauf erstmals real durchgespielt — nicht nur simuliert —, mit `chat_export_convert.py` aus `chat-export/source/` als ausführendem Werkzeug, gegen das Team-Konto (`HZDR - FWF`), das in Chrome aktiv angemeldet war.
+**Ausgangslage.** Auf Wunsch des Nutzers wurde der geplante Skill-Ablauf erstmals real durchgespielt — nicht nur simuliert —, mit `chat_export_convert.py` als ausführendem Werkzeug, gegen das Team-Konto (`HZDR - FWF`), das in Chrome aktiv angemeldet war.
 
 **Wichtiger Nebenbefund, der so noch nirgends stand:** Das Team-Konto hat **keinen Selbstbedienungs-Export** — anders als bisher in der Zielvorlage/im Fahrplan formuliert („Web-Weg für kleine Nachträge, sonst Kontoexport"), ist der Web-Weg hier **die einzige Möglichkeit überhaupt**, nicht nur die bequemere. Deckt sich mit der bereits dokumentierten Kontotyp-Einschränkung (Doku 1.2/1.6: Team-/Enterprise-Mitglieder ohne Primary-Owner-Rechte haben keinen Export). **Folge für den Skill:** Er muss erkennen (oder sich sagen lassen) können, dass für ein Konto kein Export existiert, und darf dann den Export-Weg gar nicht erst als Alternative anbieten.
 

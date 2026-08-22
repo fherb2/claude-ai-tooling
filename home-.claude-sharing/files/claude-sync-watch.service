@@ -31,6 +31,8 @@ ExecStart=/usr/bin/python3 %h/.claude-sync-watch/claude_sync_watchd.py
 # A long-running service must not die unnoticed.
 Restart=on-failure
 RestartSec=30
+# 78 = EX_CONFIG: a precondition a restart cannot heal (doku 3.5).
+RestartPreventExitStatus=78
 
 [Install]
 WantedBy=graphical-session.target

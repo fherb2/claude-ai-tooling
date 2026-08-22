@@ -58,6 +58,7 @@ import enum
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -186,6 +187,13 @@ LOCK_STALE_AFTER = datetime.timedelta(minutes=60)
 # section below (doku 2.4).
 SYNCTHING_API = "http://127.0.0.1:8384"
 
+# EX_CONFIG from sysexits.h: a precondition that no restart can heal. The unit
+# pairs it with RestartPreventExitStatus, so the service stops visibly after
+# the first attempt instead of looping (doku 3.5). Structural failures use it;
+# a transient one -- the watched directory not being there yet -- keeps exit 1
+# and its restart, because Claude Code creates that directory itself.
+EXIT_PRECONDITION = 78
+
 DRY_RUN = False
 
 
@@ -252,6 +260,18 @@ def terminal_candidates() -> list[tuple[str, str]]:
         ("kitty", "-e"),
         ("xterm", "-e"),
     ]
+
+
+def terminal_run_flags() -> tuple[str, ...]:
+    """The flags that make a terminal run a command, most common first.
+
+    Platform-dependent data, so it belongs in the capsule rather than sitting
+    as a literal in the detection (doku 2.4, finding 5). Two uses: the fallback
+    for a candidate whose flag is unknown, and the check whether a hand-typed
+    command already carries one.
+    """
+    _require_linux("Terminal run flags")
+    return ("-e", "--")
 
 
 def claude_binary() -> str:
@@ -522,8 +542,17 @@ def spawn_detached(argv: list[str], cwd: Path) -> Optional[int]:
     """Start a process decoupled from this one; return its pid."""
     global _session_process
     _require_linux("Terminal launch")
-    process = subprocess.Popen(argv, cwd=str(cwd), start_new_session=True,
-                               env=child_environment())
+    try:
+        process = subprocess.Popen(argv, cwd=str(cwd), start_new_session=True,
+                                   env=child_environment())
+    except OSError as error:
+        # An unusable terminal command reached Popen and the exception rose all
+        # the way up, killing the pass and with it the observer thread. Reported
+        # and turned into "no pid" instead: the caller then leaves the episode
+        # open, and it reports itself again later (doku 3.3, 2.6).
+        print(f"Terminalstart fehlgeschlagen ({argv[0]!r}): {error}",
+              file=sys.stderr, flush=True)
+        return None
     _session_process = process
     return process.pid
 
@@ -908,6 +937,30 @@ def pair_conflicts(copies: list[Path]) -> list[ConflictPair]:
 # (tests/test_detect_terminal.py, tests/test_zenity_list.py).
 # ---------------------------------------------------------------------------
 
+def _terminal_from_text(entered: str) -> Optional[list[str]]:
+    """Turn a hand-typed terminal command into an argv prefix, or None.
+
+    Taken apart with shlex instead of used as one word: "urxvt -hold" is what a
+    user naturally types, and as argv[0] that is a program name containing a
+    space -- one that can never exist. EVERY multi-word entry was therefore
+    broken, not just a typo (doku 3.3).
+
+    The user's words are kept and the run flag is APPENDED, unless they already
+    typed one: the flag has to end up last, directly before the command, and
+    doubling it would break the launch just as surely as leaving it out.
+    """
+    try:
+        words = shlex.split(entered)
+    except ValueError:
+        return None                      # unbalanced quotes, for instance
+    if not words or not shutil.which(words[0]):
+        return None
+    flags = terminal_run_flags()
+    if any(word in flags for word in words):
+        return words
+    return [*words, flags[0]]
+
+
 def _distinct_terminals(
         candidates: list[tuple[str, str]]) -> list[tuple[str, str]]:
     """The candidates that exist, one entry per actual program (doku 3.3).
@@ -972,7 +1025,7 @@ def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
             DIALOG_TIMEOUT_SECONDS)
         if selected is None:
             return outcome, None
-        chosen = [selected, dict(found).get(selected, "-e")]
+        chosen = [selected, dict(found).get(selected, terminal_run_flags()[0])]
     else:
         outcome, entered = ask_text(
             "Claude-Sync: Terminal-Emulator",
@@ -980,7 +1033,21 @@ def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
             DIALOG_TIMEOUT_SECONDS)
         if entered is None:
             return outcome, None
-        chosen = [entered, "-e"]
+        candidate = _terminal_from_text(entered)
+        if candidate is None:
+            # Not silently accepted: the launch would fail deep inside Popen,
+            # where the exception used to kill the whole pass. Reported here,
+            # and the answer NO lands in the retry question escalate already
+            # asks -- one loop, not a second one (doku 3.3).
+            print(f"Eingegebener Terminal-Befehl nicht verwendbar: {entered!r}",
+                  file=sys.stderr, flush=True)
+            show_message(
+                "Claude-Sync: Terminal-Befehl unbrauchbar",
+                f"Der eingegebene Befehl „{entered}“ lässt sich nicht "
+                "verwenden — das erste Wort muss ein vorhandenes Programm "
+                "sein. Beispiele: „konsole“ oder „urxvt -hold“.")
+            return Answer.NO, None
+        chosen = candidate
 
     state.terminal_cmd = chosen
     return Answer.YES, chosen
@@ -1050,7 +1117,17 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
     if DRY_RUN:
         print("[dry-run] würde starten:", " ".join(repr(a) for a in argv))
         return None
-    return spawn_detached(argv, cwd=watch_dir)
+    pid = spawn_detached(argv, cwd=watch_dir)
+    if pid is None:
+        # Same treatment as a missing instruction file: tell the user, record
+        # no pid, let the episode report itself again (doku 3.3).
+        show_message(
+            "Claude-Sync: Terminal konnte nicht starten",
+            f"Der Terminalbefehl „{' '.join(terminal_cmd)}“ ließ sich nicht "
+            "ausführen. Die Konfliktkopien bleiben liegen; der Wächter meldet "
+            "sich wieder. Einzelheiten stehen im Journal: "
+            "journalctl --user -u claude-sync-watch")
+    return pid
 
 
 def defer(state: WatchState) -> None:
@@ -1536,6 +1613,30 @@ def run_pass(watch_dir: Path, reason: str) -> int:
 # Event-driven observation with a safety net (doku 3.1)
 # ---------------------------------------------------------------------------
 
+def guarded_pass(watch_dir: Path, reason: str) -> None:
+    """Run a pass so its failure cannot take the observation with it.
+
+    The event handlers run in the watchdog observer's thread. An exception
+    escaping one of them kills that thread: the watcher then survives on the
+    safety scan alone, every event goes unnoticed, and nobody learns of it
+    except through a traceback nobody reads (doku 3.1). The same holds for the
+    start-up scan and the safety scan, which run in the service's main thread
+    -- an exception there ends the service and, with RestartSec=30, restarts it
+    every thirty seconds (doku 3.5).
+
+    Swallowed silently would be worse than the crash, so the traceback goes to
+    the journal (doku 2.6). ``--once`` deliberately does NOT use this: a hand
+    run has to fail loudly, with a traceback and a return code.
+    """
+    try:
+        run_pass(watch_dir, reason)
+    except Exception:
+        print(f"Durchgang '{reason}' mit einem Fehler abgebrochen; "
+              "der Waechter laeuft weiter:", file=sys.stderr, flush=True)
+        traceback.print_exc()
+        sys.stderr.flush()
+
+
 def watch_forever(watch_dir: Path) -> int:
     """Observe the directory and run a pass on every relevant event.
 
@@ -1554,7 +1655,11 @@ def watch_forever(watch_dir: Path) -> int:
               "Bitte über die Distribution installieren (zum Beispiel: "
               "sudo apt install python3-watchdog) und den Dienst erneut "
               "starten.", file=sys.stderr)
-        return 1
+        # Not exit 1: a missing library is structural. With RestartSec=30 the
+        # start-rate limit never triggers (five starts in ten seconds is the
+        # default), so exit 1 looped every thirty seconds forever and the unit
+        # never reached "failed" (doku 3.5).
+        return EXIT_PRECONDITION
 
     # A conflict name is always a finished finding, never an intermediate
     # state: incoming transfers are written to .syncthing.<name>.tmp and
@@ -1572,11 +1677,11 @@ def watch_forever(watch_dir: Path) -> int:
 
         def on_created(self, event: Any) -> None:
             if self._relevant(event):
-                run_pass(watch_dir, "Ereignis: angelegt")
+                guarded_pass(watch_dir, "Ereignis: angelegt")
 
         def on_moved(self, event: Any) -> None:
             if self._relevant(event):
-                run_pass(watch_dir, "Ereignis: verschoben")
+                guarded_pass(watch_dir, "Ereignis: verschoben")
 
         def on_deleted(self, event: Any) -> None:
             # A copy that disappears ends the episode. Without this the state
@@ -1585,9 +1690,9 @@ def watch_forever(watch_dir: Path) -> int:
             # copy vanishing because it was resolved elsewhere is the normal
             # case, not an edge one (doku 3.1, step 1).
             if self._relevant(event):
-                run_pass(watch_dir, "Ereignis: gelöscht")
+                guarded_pass(watch_dir, "Ereignis: gelöscht")
 
-    run_pass(watch_dir, "Startlauf")
+    guarded_pass(watch_dir, "Startlauf")
 
     observer = Observer()
     observer.schedule(ConflictHandler(), str(watch_dir), recursive=True)
@@ -1597,7 +1702,7 @@ def watch_forever(watch_dir: Path) -> int:
         while True:
             time.sleep(30)
             if datetime.datetime.now() - last_safety >= SAFETY_SCAN_INTERVAL:
-                run_pass(watch_dir, "Sicherheitslauf")
+                guarded_pass(watch_dir, "Sicherheitslauf")
                 last_safety = datetime.datetime.now()
     except KeyboardInterrupt:
         pass

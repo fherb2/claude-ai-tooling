@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Inspect a claude.ai account data export (.zip) without extracting it.
 
-The schema watchdog of this folder (implementation_doku.md 3.3, first building
+The schema watchdog of this folder (implementation_doku.md 3.2, first building
 block of 4.1): it answers whether an export still looks the way everything
 here assumes -- before a conversion run quietly produces something wrong.
 Where ``analyse`` in chat_export_convert.py describes the *interpretation* an

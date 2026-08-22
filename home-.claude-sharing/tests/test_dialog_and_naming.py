@@ -64,6 +64,7 @@ import types
 from pathlib import Path
 
 DAEMON = Path(__file__).resolve().parent.parent / "files" / "claude_sync_watchd.py"
+UNIT = Path(__file__).resolve().parent.parent / "files" / "claude-sync-watch.service"
 
 failures = 0
 
@@ -786,6 +787,7 @@ def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
               loop_state.dialog_last_shown is not None, True)
     finally:
         w.ask_question = original_ask
+        w.launch_session = original_launch
         w.detect_terminal = original_detect
         w.set_tool_dir(original_dir)
 
@@ -1076,6 +1078,187 @@ def check_dry_run(w: types.ModuleType, tmp_root: Path) -> None:
         watched.rmdir()
 
 
+def check_precondition_exit(w: types.ModuleType, tmp_root: Path) -> None:
+    """A structural precondition stops the service; a transient one retries.
+
+    The pair only works if two files agree: the unit names an exit status, the
+    daemon returns one. Nothing forces them together, so the invariant is
+    pinned here -- it is exactly the kind that drifts in silence (doku 3.5).
+
+    Why it matters: RestartSec=30 puts every restart far outside systemd's
+    default start-rate limit of five starts in ten seconds, so a repeated
+    exit 1 looped every thirty seconds and the unit never reached "failed".
+    """
+    print("Vorbedingungen und Neustart (3.5):")
+    unit = UNIT.read_text(encoding="utf-8")
+    named = [line.split("=", 1)[1].strip() for line in unit.splitlines()
+             if line.startswith("RestartPreventExitStatus=")]
+    check("die Unit nennt genau einen Ausstiegswert", len(named), 1)
+    check("und er ist der des Waechters", named[0] if named else None,
+          str(w.EXIT_PRECONDITION))
+    check("RestartSec bleibt gesetzt -- der Grund fuer die Kopplung",
+          any(line.strip() == "RestartSec=30" for line in unit.splitlines()),
+          True)
+
+    # Fehlende Bibliothek: strukturell, also 78 und kein Neustart.
+    blocked = {"watchdog": None, "watchdog.events": None,
+               "watchdog.observers": None}
+    saved = {name: sys.modules.get(name) for name in blocked}
+    watched = tmp_root / "vorbedingung"
+    watched.mkdir(parents=True, exist_ok=True)
+    try:
+        sys.modules.update(blocked)
+        buffer = io.StringIO()
+        with contextlib.redirect_stderr(buffer):
+            code = w.watch_forever(watched)
+        check("fehlende Bibliothek liefert EX_CONFIG", code,
+              w.EXIT_PRECONDITION)
+        check("und sagt, was zu tun ist",
+              "python3-watchdog" in buffer.getvalue(), True)
+    finally:
+        for name, module in saved.items():
+            if module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = module
+
+    # Gegenprobe: Der fehlende Ordner ist voruebergehend und behaelt seinen
+    # Neustart -- Claude Code legt ihn beim ersten Lauf selbst an.
+    buffer = io.StringIO()
+    with contextlib.redirect_stderr(buffer):
+        code = w.main(["--once", "--watch-dir", str(tmp_root / "gibtsnicht")])
+    check("fehlender Ordner bleibt bei 1", code, 1)
+    check("und ist damit vom Neustartverbot ausgenommen",
+          code != w.EXIT_PRECONDITION, True)
+
+
+def check_free_text_terminal(w: types.ModuleType, tmp_root: Path) -> None:
+    """A hand-typed terminal command is checked before it is used (doku 3.3).
+
+    It used to be taken as argv[0] unchanged, so "urxvt -hold" -- the entry a
+    user naturally types -- became a program name with a space in it. Popen
+    then raised, and the exception rose through the whole pass: in the observer
+    thread it killed the observation, in the main thread the service.
+
+    Only `which` is stubbed; the entries themselves are real strings, so the
+    group does not depend on which emulators this machine has.
+    """
+    print("Freitext-Terminal (3.3):")
+    binaries = tmp_root / "freitext-bin"
+    binaries.mkdir(parents=True, exist_ok=True)
+    (binaries / "konsole").write_text("#!/bin/sh\n", encoding="utf-8")
+    original_which = w.shutil.which
+    w.shutil.which = lambda binary: (str(binaries / binary)
+                                     if binary == "konsole" else None)
+    try:
+        check("ein Wort bekommt den Schalter angehaengt",
+              w._terminal_from_text("konsole"), ["konsole", "-e"])
+        check("Mehrwort-Eingabe wird zerlegt, nicht verworfen",
+              w._terminal_from_text("konsole -hold"),
+              ["konsole", "-hold", "-e"])
+        check("ein selbst getippter Schalter wird nicht verdoppelt",
+              w._terminal_from_text("konsole -e"), ["konsole", "-e"])
+        check("unbekanntes Programm wird abgelehnt",
+              w._terminal_from_text("gibtsnicht"), None)
+        check("unbalancierte Anfuehrungszeichen werfen nicht",
+              w._terminal_from_text('kon"sole'), None)
+        check("leere Eingabe wird abgelehnt", w._terminal_from_text("   "),
+              None)
+
+        # Und der Beweis, dass die Kaskade die Pruefung benutzt: kein Fund,
+        # Freitext mit Tippfehler -> Antwort NO und keine Uebernahme.
+        original_text, original_message = w.ask_text, w.show_message
+        gemeldet: list[str] = []
+        try:
+            w.shutil.which = lambda binary: None      # gar kein Emulator
+            w.ask_text = lambda *a, **k: (w.Answer.YES, "gibtsnicht")
+            w.show_message = lambda title, text: gemeldet.append(title)
+            state = w.WatchState()
+            outcome, cmd = w.detect_terminal(state)
+            check("Tippfehler wird nicht uebernommen", cmd, None)
+            check("und gilt als Abbruch, nicht als Anzeigefehler",
+                  outcome, w.Answer.NO)
+            check("der Nutzer wird darauf hingewiesen", len(gemeldet), 1)
+            check("und nichts wird zwischengespeichert",
+                  state.terminal_cmd, None)
+        finally:
+            w.ask_text, w.show_message = original_text, original_message
+    finally:
+        w.shutil.which = original_which
+
+
+def check_launch_failure(w: types.ModuleType, tmp_root: Path) -> None:
+    """A terminal that cannot start is reported, not raised (doku 3.3, 2.6).
+
+    The pass has to survive it, and the episode has to stay open so it reports
+    itself again -- the same treatment a missing instruction file gets.
+    """
+    print("Fehlgeschlagener Terminalstart:")
+    original_dir = w.TOOL_DIR
+    original_popen = w.subprocess.Popen
+    original_message = w.show_message
+    w.set_tool_dir(tmp_root / "start")
+    gemeldet: list[str] = []
+    pair = w.ConflictPair(copy=tmp_root / "a.sync-conflict-x.txt",
+                          original=tmp_root / "a.txt", device="DEV")
+    try:
+        w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
+        w.INSTRUCTION_FILE.write_text("egal", encoding="utf-8")
+
+        def refusing(*args, **kwargs):
+            raise OSError(2, "No such file or directory")
+
+        w.subprocess.Popen = refusing
+        w.show_message = lambda title, text: gemeldet.append(title)
+        buffer = io.StringIO()
+        with contextlib.redirect_stderr(buffer):
+            pid = w.launch_session(["gibtsnicht", "-e"], [pair], tmp_root)
+        check("kein Fehler nach oben, keine PID", pid, None)
+        check("Journalzeile geschrieben",
+              "Terminalstart fehlgeschlagen" in buffer.getvalue(), True)
+        check("und der Nutzer erfaehrt es", len(gemeldet), 1)
+    finally:
+        w.subprocess.Popen = original_popen
+        w.show_message = original_message
+        w.set_tool_dir(original_dir)
+
+
+def check_pass_guard(w: types.ModuleType, tmp_root: Path) -> None:
+    """One failing pass must not take the observation with it (doku 3.1).
+
+    Both halves are pinned: that the guard swallows and journals, and that the
+    five places of continuous operation actually use it while --once does not.
+    Without the second half the guard could sit there unused and every check
+    above would still pass.
+    """
+    print("Durchgang mit Fehler:")
+    original_run = w.run_pass
+    try:
+        def exploding(watch_dir, reason):
+            raise RuntimeError("geplatzt")
+
+        w.run_pass = exploding
+        buffer = io.StringIO()
+        with contextlib.redirect_stderr(buffer):
+            w.guarded_pass(tmp_root, "Probe")
+        journal = buffer.getvalue()
+        check("der Traceback landet im Journal",
+              "RuntimeError" in journal and "geplatzt" in journal, True)
+        check("und der Anlass steht dabei", "Probe" in journal, True)
+    finally:
+        w.run_pass = original_run
+
+    source = DAEMON.read_text(encoding="utf-8")
+    gesichert = [reason for reason in
+                 ("Ereignis: angelegt", "Ereignis: verschoben",
+                  "Ereignis: gel\u00f6scht", "Startlauf", "Sicherheitslauf")
+                 if f'guarded_pass(watch_dir, "{reason}")' in source]
+    check("alle fuenf Stellen des Dauerbetriebs sind gesichert",
+          len(gesichert), 5)
+    check("der Einzellauf bleibt ungesichert",
+          'run_pass(watch_dir, "Einzellauf")' in source, True)
+
+
 def check_folder_check(w: types.ModuleType, tmp_root: Path) -> None:
     """The folder check: three outcomes, and read-only by contract.
 
@@ -1236,6 +1419,10 @@ def main() -> int:
         check_swallowed_errors(w, Path(tmp))
         check_episode_clock(w, Path(tmp))
         check_terminal_duplicates(w, Path(tmp))
+        check_precondition_exit(w, Path(tmp))
+        check_free_text_terminal(w, Path(tmp))
+        check_launch_failure(w, Path(tmp))
+        check_pass_guard(w, Path(tmp))
         check_dry_run(w, Path(tmp))
         check_folder_check(w, Path(tmp))
         check_deferral_stamp(w, Path(tmp))

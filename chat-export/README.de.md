@@ -19,6 +19,5 @@ Kopiert wird ausschließlich der Ordner `skills/chat-export/` — alles andere h
 
 - **Erster Durchlauf in ein echtes, dauerhaftes Zielprojekt.** Bisher lief jeder Test in einen eigens angelegten oder ausdrücklich gekennzeichneten Testordner. Welches Projekt das erste reguläre Ziel wird, steht noch nicht fest.
 - **Gegenprobe am FreeCAD-Altbestand.** Der Listen-Endpunkt zeigt für dieses Quellprojekt 23 Chats, das vorhandene Protokoll führt 22 — die bekannte Lücke durch den nicht mitgelisteten laufenden Chat (Doku 1.6/1.7), hier an echten Daten bestätigt. Offen ist nur noch, **welcher** Chat fehlt; ein rein lokaler Abgleich der aktuellen Chatliste gegen `freecad/protokoll.json`, das auf dem Laptop liegt, nicht auf jedem Rechner.
-- **Entscheidung über `chat_crawl_store.py`.** Der Weg über Suchschnipsel ist überholt, wo die Web-Endpunkte greifen, aber weiterhin das einzige Werkzeug für Umgebungen ohne sie (Doku 3.4). Die Faktenlage ist vollständig; es fehlt nur die Entscheidung, ob er bleibt.
 
 Alle Fakten, Belege und Prüfpunkte zu diesem Vorhaben stehen in [`implementation_doku.md`](implementation_doku.md); die Mechanik der Chrome-Anbindung samt ihrer Fallstricke in [`chrome-zugriff.de.md`](chrome-zugriff.de.md) / [`chrome-access.en.md`](chrome-access.en.md).
