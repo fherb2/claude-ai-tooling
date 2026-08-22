@@ -1406,6 +1406,87 @@ def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
           "WARNUNG" in output and "Not logged in" in output, True)
 
 
+def check_clock(w: types.ModuleType, tmp_root: Path) -> None:
+    """Waiting periods survive a change of the clock (doku 3.2).
+
+    Measured before the change: a stamp written at 02:50 CEST and read at 02:10
+    CET -- twenty real minutes -- computed as MINUS forty. The notice then said
+    "-1 Stunde(n)" and dialog_due() stayed False for up to an hour.
+
+    The first case here is a regression guard, not a feature: writing stamps
+    with an offset while _age still subtracted them from a naive now() would
+    raise TypeError, which _age turns into "ancient" -- and then EVERY waiting
+    period in an existing state file is due at once.
+    """
+    print("Uhrensprünge (3.2):")
+    stamp = w._now()
+    check("neue Stempel tragen eine Zone",
+          datetime.datetime.fromisoformat(stamp).tzinfo is not None, True)
+
+    naive = datetime.datetime.now().replace(microsecond=0).isoformat()
+    check("alte naive Stempel bleiben lesbar",
+          w._age(naive) < datetime.timedelta(minutes=1), True)
+    check("und gelten nicht als uralt",
+          w._age(naive) == datetime.timedelta.max, False)
+
+    # Der eigentliche Fall, mit festen Offsets statt einer echten Umstellung.
+    spanne = (w._age("2026-10-25T02:50:00+02:00")
+              - w._age("2026-10-25T02:10:00+01:00"))
+    check("über die Zonengrenze exakt gerechnet",
+          abs(spanne - datetime.timedelta(minutes=20))
+          < datetime.timedelta(seconds=5), True)
+
+    check("unlesbar bleibt uralt", w._age("kaputt"),
+          datetime.timedelta.max)
+
+    zukunft = (datetime.datetime.now().astimezone()
+               + datetime.timedelta(hours=3)).isoformat()
+    check("Stempel aus der Zukunft: keine negative Stundenzahl",
+          w._hours_since(zukunft), 0)
+
+    # Und in der Meldung selbst, denn dort wurde die Zahl sichtbar.
+    original_key, original_get = w.read_api_key, w.rest_get
+    try:
+        w.read_api_key = lambda: None          # keine Zahlen, nur der Hinweis
+        text, _ = w.build_notice(
+            w.WatchState(conflict_since=zukunft), 2, tmp_root)
+        check("und auch nicht in der Meldung",
+              "seit 0 Stunde(n)" in text and "-" not in text.split("seit")[1],
+              True)
+    finally:
+        w.read_api_key, w.rest_get = original_key, original_get
+
+    # Die Schleife des Sicherheits-Suchlaufs: monotone Uhr statt Wanduhr.
+    source = DAEMON.read_text(encoding="utf-8")
+    schleife = source[source.index("def watch_forever"):
+                      source.index("def check_folder")]
+    check("die Suchlaufschleife nimmt die monotone Uhr",
+          "time.monotonic()" in schleife, True)
+    check("und keine Wanduhr mehr",
+          "datetime.datetime.now()" in schleife, False)
+
+    # Sperrenalter: geklemmt, damit im Journal keine negative Zahl steht.
+    original_dir = w.TOOL_DIR
+    w.set_tool_dir(tmp_root / "uhr")
+    try:
+        w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
+        w.LOCK_FILE.write_text(f"pid {_dead_pid()} 2000-01-01T00:00:00\n",
+                               encoding="utf-8")
+        kommend = time.time() + 3600
+        os.utime(w.LOCK_FILE, (kommend, kommend))
+        buffer = io.StringIO()
+        with contextlib.redirect_stderr(buffer):
+            taken = w.acquire_lock()
+        if taken:
+            w.release_lock()
+        check("Sperre aus der Zukunft: kein negatives Alter im Journal",
+              "-" in buffer.getvalue().split("Alter")[1].split("s)")[0]
+              if "Alter" in buffer.getvalue() else False, False)
+    finally:
+        w.LOCK_FILE.unlink(missing_ok=True)
+        w.set_tool_dir(original_dir)
+
+
 def check_folder_check(w: types.ModuleType, tmp_root: Path) -> None:
     """The folder check: three outcomes, and read-only by contract.
 
@@ -1572,6 +1653,7 @@ def main() -> int:
         check_pass_guard(w, Path(tmp))
         check_uninstall_guard(w, Path(tmp))
         check_login_check(w, Path(tmp))
+        check_clock(w, Path(tmp))
         check_dry_run(w, Path(tmp))
         check_folder_check(w, Path(tmp))
         check_deferral_stamp(w, Path(tmp))
