@@ -65,6 +65,7 @@ from pathlib import Path
 
 DAEMON = Path(__file__).resolve().parent.parent / "files" / "claude_sync_watchd.py"
 UNIT = Path(__file__).resolve().parent.parent / "files" / "claude-sync-watch.service"
+UNINSTALL = Path(__file__).resolve().parent.parent / "files" / "uninstall_service.sh"
 
 failures = 0
 
@@ -1259,6 +1260,78 @@ def check_pass_guard(w: types.ModuleType, tmp_root: Path) -> None:
           'run_pass(watch_dir, "Einzellauf")' in source, True)
 
 
+def check_uninstall_guard(w: types.ModuleType, tmp_root: Path) -> None:
+    """The uninstaller removes the unit only when the service is provably gone.
+
+    It used to throw both the return value and the message away, so it claimed
+    success while a watcher kept running -- and without its unit that watcher
+    was harder to stop than before (doku 3.5).
+
+    Run as a subprocess against a stubbed systemctl, so this needs no systemd
+    and cannot touch the real installation. The bus case is the one that
+    matters: there, is-active exits 1, which read as a return value looks like
+    "not running".
+    """
+    print("Abmelden mit Nachweis (3.5):")
+    stage = tmp_root / "abmelden"
+    fake_bin = stage / "bin"
+    fake_bin.mkdir(parents=True, exist_ok=True)
+    unit_dir = stage / ".config" / "systemd" / "user"
+    unit_dir.mkdir(parents=True, exist_ok=True)
+    unit_file = unit_dir / "claude-sync-watch.service"
+
+    def systemctl_stub(disable_rc: int, is_active_word: str,
+                       is_active_rc: int) -> None:
+        (fake_bin / "systemctl").write_text(
+            "#!/bin/sh\n"
+            "case \"$*\" in\n"
+            f'  *"disable"*) echo "disable sagte etwas" >&2; exit {disable_rc} ;;\n'
+            f'  *"is-active"*) echo "{is_active_word}"; exit {is_active_rc} ;;\n'
+            "  *) exit 0 ;;\n"
+            "esac\n", encoding="utf-8")
+        (fake_bin / "systemctl").chmod(0o755)
+
+    def run() -> tuple[int, str]:
+        unit_file.write_text("[Unit]\n", encoding="utf-8")
+        environment = dict(os.environ)
+        environment["PATH"] = f"{fake_bin}:{environment['PATH']}"
+        environment["HOME"] = str(stage)
+        result = subprocess.run(["bash", str(UNINSTALL)], env=environment,
+                                capture_output=True, text=True)
+        return result.returncode, result.stdout + result.stderr
+
+    # 1. Dienst laeuft weiter: Abbruch, und die Unit bleibt liegen.
+    systemctl_stub(disable_rc=1, is_active_word="active", is_active_rc=0)
+    code, output = run()
+    check("laufender Dienst: Abbruch", code, 1)
+    check("und die Unit bleibt liegen", unit_file.exists(), True)
+    check("mit Hinweis, wie weiter", "systemctl --user stop" in output, True)
+
+    # 2. Kein Benutzer-Bus: Rueckgabewert sieht wie "inaktiv" aus, ist es aber
+    #    nicht -- entschieden wird am Wort.
+    systemctl_stub(disable_rc=1, is_active_word="Failed to connect to bus",
+                   is_active_rc=1)
+    code, output = run()
+    check("ohne Bus: trotzdem Abbruch", code, 1)
+    check("und auch hier bleibt die Unit", unit_file.exists(), True)
+
+    # 3. Dienst inaktiv: regulaerer Verlauf.
+    systemctl_stub(disable_rc=0, is_active_word="inactive", is_active_rc=4)
+    code, output = run()
+    check("inaktiv: Abmelden laeuft durch", code, 0)
+    check("Unit entfernt", unit_file.exists(), False)
+    check("und die Schlusszeile erscheint",
+          "Der Dienst ist abgemeldet" in output, True)
+
+    # 4. Nie eingerichtet: kein Abbruch, aber die Meldung wird nicht
+    #    verschluckt (2.6).
+    systemctl_stub(disable_rc=1, is_active_word="inactive", is_active_rc=4)
+    code, output = run()
+    check("nie eingerichtet: kein Abbruch", code, 0)
+    check("aber die Meldung erscheint",
+          "Hinweis vom Abmelden" in output, True)
+
+
 def check_folder_check(w: types.ModuleType, tmp_root: Path) -> None:
     """The folder check: three outcomes, and read-only by contract.
 
@@ -1423,6 +1496,7 @@ def main() -> int:
         check_free_text_terminal(w, Path(tmp))
         check_launch_failure(w, Path(tmp))
         check_pass_guard(w, Path(tmp))
+        check_uninstall_guard(w, Path(tmp))
         check_dry_run(w, Path(tmp))
         check_folder_check(w, Path(tmp))
         check_deferral_stamp(w, Path(tmp))
