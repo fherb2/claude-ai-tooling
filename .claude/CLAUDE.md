@@ -3,8 +3,7 @@
 Ergänzung zu `~/.claude/CLAUDE.md` (im Folgenden „Arbeitsanweisungen"),
 **keine Kopie**: Hier steht nur, was dort nicht steht — und nur, was für
 **alle Vorhaben** dieses Repos gilt. Was nur eines betrifft, gehört in
-dessen `fahrplan.md` unter „Dauerhaft" — in `skills/` in die `README.md` des
-betroffenen Skills —, nicht hierher.
+dessen eigene Doku oder README — nicht hierher.
 
 **Und es bleibt bei diesen zwei Ebenen.** Eine dritte — eine `CLAUDE.md` in
 einem Unterordner oder eine pfadgebundene Regel unter `.claude/rules/` — ist
@@ -15,7 +14,8 @@ CLAUDE.md (belegt, [memory](https://code.claude.com/docs/en/memory)). Bei
 einem Kontexthaushalt, der Kompaktierung als Normalfall einplant
 (Arbeitsanweisungen §1.9), wären solche Regeln nach der ersten Verdichtung
 verschwunden. Was ein einzelnes Vorhaben dauerhaft binden soll, steht
-deshalb in seinem Fahrplan unter „Dauerhaft" oder in seiner Doku.
+deshalb in seiner Doku oder README — nicht in einer Datei, die mit dem Ende
+der Entwicklung entfällt (siehe unten).
 
 ## Zuerst lesen: `.claude/arbeitsdaten.json`
 
@@ -46,50 +46,46 @@ Chats umverteilen — dann meldet er sich **aktiv**. Hat eine Instanz die
 Rechte einmal vom Nutzer erhalten, muss sie nicht bei jedem Commit erneut
 nachfragen.
 
-## Vier Vorhaben, unterschiedlich aufgebaut
+## Jedes Vorhaben ist eigenständig aufgebaut
 
-Alle sind eigenständig. Die Unterschiede sind gewachsen und Absicht, keine
-Nachlässigkeit:
+Die Vorhaben dieses Repos unterscheiden sich in Doku-Aufbau, Benennung und
+Begleitdateien. Das ist Absicht und keine Nachlässigkeit: **Vereinheitliche
+nichts über Ordnergrenzen hinweg**, und leite aus dem Aufbau eines Vorhabens
+nichts für ein anderes ab. Welche Struktur eines hat, sagt seine eigene
+README; welche Regeln darin gelten, sein eigener Vorgabenteil (siehe nächster
+Abschnitt).
 
-|               | `chat-export/`                        | `home-.claude-sharing/`                   | `pack-source-to-txt/`                  | `skills/`                              |
-| ------------- | -------------------------------------- | ------------------------------------------ | --------------------------------------- | --------------------------------------- |
-| Doku          | `implementation_doku.md`, vier Kapitel | `implementierungs_doku.md`, drei Segmente | keine — nur `README.md`/`README.de.md` | `skill_vorgaben.md`, keine Segmente     |
-| Status        | — (Abschnitt in der README)            | `status.md`                                | —                                        | —                                       |
-| Fahrplan      | — (Abschnitt in der README)            | eigener, mit Abschnitt „Dauerhaft“         | —                                        | — (README je Skill)                     |
-| Eigenes Wort  | kalt / warm / Beobachtung              | —                                           | —                                        | —                                        |
+**Nicht zur Weitergabe freigegeben ist `home-.claude-sharing`** — die README
+trägt den Hinweis „Nicht benutzen!“. Bei jedem anderen Vorhaben entscheidet
+seine README.
 
-Dazu, was aus der Tabelle nicht hervorgeht: Kapitel 4 von `chat-export` ist
-die Prüfliste gegen Änderungen bei Anthropic, ein viertes Segment über §2.4
-hinaus. Die drei Prüfarten von
-`chat-export` — **kalt**, **warm** und **Beobachtung** — sind normativ in
-`chat-export/implementation_doku.md` 4.1 festgelegt; hier steht bewusst
-keine zweite Definition. `chat-export` hat **Fahrplan und Statusdatei am
-22. August 2026 abgelegt**, als es produktiv wurde: Ohne offene Schritte
-wären beide leere Hüllen, und der Arbeitsstand steht ohnehin im Abschnitt
-„Stand" seiner README. Steht wieder ein Schritt an, kommt der Fahrplan
-zurück — bis dahin ist die README der Ort, an dem Offenes benannt wird.
-`pack-source-to-txt` ist kein über Konzept- und
-Implementierungsdoku entwickeltes eigenes Vorhaben, sondern ein von extern
-übernommenes und angepasstes Werkzeug — daher keine Segment-Doku, kein
-Fahrplan, keine Status-Datei, nur die README in Englisch (Original) und
-Deutsch. `skills/` hat seine Segmentstruktur, seinen Fahrplan und seine
-Statusdatei am 16. August 2026 abgelegt: Dort entsteht kein Quellcode,
-sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte, von
-denen keiner auf einem anderen aufbaut. Die projektweiten Vorgaben stehen
-seither in `skills/skill_vorgaben.md`, der Arbeitsstand jedes einzelnen
-Skills in der `README.md` seines Ordners. Die Begründung im Wortlaut steht
-im Kopf von `skill_vorgaben.md`.
+## `fahrplan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich
 
-Die README von `home-.claude-sharing` trägt den Hinweis „Nicht benutzen!“;
-das Vorhaben ist nicht zur Weitergabe freigegeben. `chat-export` trug ihn bis
-zum 21. August 2026 und ist seither produktiv; `pack-source-to-txt` und
-`skills` unterlagen dieser Einschränkung nie.
+Diese drei Dateien tragen die Entwicklung eines Vorhabens. Sie sind
+**keine Pflichtausstattung** eines Ordners, und ihr Fehlen ist kein Mangel,
+den man beheben müsste.
+
+- **Während der Entwicklung** gelten die Arbeitsanweisungen §2.3 und §2.6:
+  Fahrplan und Status werden geführt, die Doku wächst mit dem Code.
+- **Ist ein Vorhaben fertig**, können `fahrplan.md` und `status.md`
+  **entfallen** — ohne offene Schritte wären sie leere Hüllen. Bevor sie
+  gelöscht werden, wandert ihr dauerhaft geltender Teil in die Doku oder die
+  README; was dort schon steht, entfällt ersatzlos.
+- **Über die Implementierungsdoku entscheidet der Nutzer**, nicht Claude.
+  Frage nach, wenn ihr Verbleib zur Frage steht.
+- **Wo es keinen Fahrplan gibt**, benennt die README das Offene und trägt den
+  Plan des nächsten Schritts. Steht wieder ein größerer Schritt an, kann der
+  Fahrplan zurückkommen.
+
+Prüfbar: Auf jede Stelle, die eine dieser Dateien in einem fertigen Vorhaben
+verlangt oder ihr Fehlen als Defekt meldet, lässt sich zeigen — das ist der
+Verstoß.
 
 ## Die Vorgaben lesen, bevor eine Datei des Vorhabens entsteht oder sich ändert
 
-Was für ein einzelnes Vorhaben gilt, steht in dessen Doku — bei den beiden
-Vorhaben mit Segmentstruktur in Segment 2 („Vorgaben"), bei `skills/` in
-`skill_vorgaben.md`. Diese Texte werden **nicht** automatisch in den Kontext
+Was für ein einzelnes Vorhaben gilt, steht in dessen eigenem Vorgabenteil —
+bei Segmentstruktur in Segment 2 („Vorgaben"), sonst dort, wo die README des
+Vorhabens hinzeigt. Diese Texte werden **nicht** automatisch in den Kontext
 geladen, anders als diese Datei. Deshalb gilt hier ausdrücklich: Wer eine
 Datei eines Vorhabens anlegt oder ändert, liest **vorher** dessen Vorgaben
 vollständig — nicht nur die Sektion, die zur Aufgabe gehört.
@@ -112,8 +108,7 @@ Vorhaben mit eigenem Fahrplan und für den Fragenkatalog einer Doku genauso.
 
 Gilt für jede Befundliste in diesem Repo — Doku-Review, Code-Review,
 Docstring-Review. Welche derzeit offen sind, sagt der Fahrplan des
-jeweiligen Vorhabens — wo es keinen gibt (`skills/`, derzeit
-`chat-export/`), die zugehörige `README.md`.
+jeweiligen Vorhabens — wo es keinen gibt, die zugehörige `README.md`.
 
 - Jeder Befund wird **einzeln vorgelegt und besprochen**, nicht selbständig
   ausgeführt. Die Entscheidung liegt beim Entwickler.
@@ -157,9 +152,8 @@ Plan-Dateien**:
   §2.6 beschreibt den Fahrplan ohnehin als „die nächsten Schritte in
   aufgabenangemessener Detaillierung", und §1.9 verlangt, diese Detaillierung
   vor einer Komprimierung zu vertiefen — das ist genau ein Plan. Wo es keinen
-  Fahrplan gibt — in `skills/` und derzeit in `chat-export/` —, steht der Plan
-  unter „Offen" bzw. „Stand" in der zugehörigen `README.md`. Bringt ein
-  Vorhaben seinen Fahrplan zurück, wandert der Plan dorthin.
+  Fahrplan gibt, steht der Plan unter „Offen" bzw. „Stand" in der `README.md`
+  des Vorhabens. Bringt es seinen Fahrplan zurück, wandert der Plan dorthin.
 
 In beiden Fällen steht **höchstens ein** noch nicht ausgeführter Plan
 gleichzeitig da, deutlich als solcher gekennzeichnet. Sein Zweck ist die
@@ -232,8 +226,8 @@ den eigenen Ordner. Die Befehle, die das leisten:
 
 ## Aufbewahren gehört ins Projekt
 
-`/tmp` als Arbeitsfläche ist richtig und in `chat-export` sogar Teil des
-Prüfverfahrens („kalt"). Der Sitzungsordner dort ist aber
+`/tmp` als Arbeitsfläche ist richtig und kann sogar Teil eines
+Prüfverfahrens sein. Der Sitzungsordner dort ist aber
 sitzungsgebunden und beim nächsten Neustart weg. Was über die Sitzung
 hinaus gebraucht wird, kommt deshalb **sofort** ins Repo. Was dort abgelegt
 wurde und sich als entbehrlich erweist, wird bewusst gelöscht und das
