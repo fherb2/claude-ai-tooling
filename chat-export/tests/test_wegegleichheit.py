@@ -351,7 +351,7 @@ check("only the fields that depend on the route differ",
       str(sorted(differing)))
 
 # ---------------------------------------------------------------------------
-# The protocol has to converge as well -- this was the gap of Fahrplan 12
+# The protocol has to converge as well, not just the chat files (doku 2.4)
 # ---------------------------------------------------------------------------
 
 def load_protocol(directory):

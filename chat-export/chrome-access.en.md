@@ -107,11 +107,11 @@ The user's question: can this session find and reuse a Chrome tab the user has a
 
 **A chat was written entirely through the interface** (click into the input field via `find` + `computer left_click`, `computer type` for "Hello!", `computer key Return` to submit) — not via the API. The user watched the screen and confirmed each step before the next one happened. Response received: "Hello! Great to have you here. What can I help you with today?"
 
-**Then read back as structured JSON**, without any further text recognition from the visible page: the chat UUID was right there in the tab URL after submitting (`https://claude.ai/chat/028964c2-…`), and the same conversation endpoint as in roadmap items 26/27 returned the full turn — `sender: "human"` with "Hello!", `sender: "assistant"` with the exact reply text, both with full `content` blocks, status 200, 2 messages.
+**Then read back as structured JSON**, without any further text recognition from the visible page: the chat UUID was right there in the tab URL after submitting (`https://claude.ai/chat/028964c2-…`), and the same conversation endpoint the web route uses returned the full turn — `sender: "human"` with "Hello!", `sender: "assistant"` with the exact reply text, both with full `content` blocks, status 200, 2 messages.
 
 **A secondary finding on the account question, confirmed on a third, independent case:** the call ran under the **Team account** (`HZDR - FWF`) then active in Chrome — even though the chat had been created through the ordinary user interface, not via a targeted API call. So the bridge consistently reads whichever claude.ai session is currently active, regardless of this Claude Code session's own account.
 
-**Consequence for the skill, beyond what has been described so far:** it is not only able to read existing chats — in principle it could also create a new chat itself (via the interface or directly via the API endpoint) and then export it in structured form. That is not planned for roadmap item 27, but is technically shown to be possible.
+**Consequence for the skill, beyond what has been described so far:** it is not only able to read existing chats — in principle it could also create a new chat itself (via the interface or directly via the API endpoint) and then export it in structured form. That is not planned for this project, but is technically shown to be possible.
 
 ## Stage 6: navigation via the left sidebar — "Home" works, "Code" leads nowhere useful
 
@@ -125,13 +125,13 @@ Checked at the user's request: the left sidebar of the claude.ai interface, with
 - **Web tile ("Start Claude Code Web"):** leads to an onboarding page (`/code/onboarding`) with a repository picker and an input field, but with the notice: *"Claude Code on the web requires GitHub access. Please contact an organization owner."* Locked for this account, then; not submitted.
 - **IDE extension:** not checked further (an install link into an IDE, no browser access to be expected).
 
-**Result: no locally created Claude Code projects from Claude Desktop can be reached via the Chrome tab.** The "Code" view in claude.ai is built for *starting* new sessions (terminal install, web with GitHub connection, IDE extension), not for *listing* existing local projects. For roadmap item 27, that means: **the only part of the Chrome tab that is usefully applicable is the "Home" area** — chats and projects in the ordinary claude.ai sense. Whether that changes in the future (e.g. a later list of connected local projects) is speculation and is not claimed here.
+**Result: no locally created Claude Code projects from Claude Desktop can be reached via the Chrome tab.** The "Code" view in claude.ai is built for *starting* new sessions (terminal install, web with GitHub connection, IDE extension), not for *listing* existing local projects. For the web route, that means: **the only part of the Chrome tab that is usefully applicable is the "Home" area** — chats and projects in the ordinary claude.ai sense. Whether that changes in the future (e.g. a later list of connected local projects) is speculation and is not claimed here.
 
 ## Stage 7: first real test run of the skill flow — Team account with no self-serve export, aborted on a code gap
 
 **Starting point.** At the user's request, the planned skill flow was run for real for the first time — not merely simulated —, with `chat_export_convert.py` as the executing tool, against the Team account (`HZDR - FWF`) that was actively logged into Chrome.
 
-**An important secondary finding, not stated anywhere before:** the Team account has **no self-serve export** — unlike what had so far been stated in the target template/roadmap ("web route for small top-ups, otherwise the account export"), the web route here is **the only option at all**, not just the more convenient one. This matches the already-documented account-type restriction (doku 1.2/1.6: Team/Enterprise members without Primary Owner rights have no export). **Consequence for the skill:** it has to be able to recognize (or be told) that no export exists for an account, and must then not even offer the export route as an alternative.
+**An important secondary finding, not stated anywhere before:** the Team account has **no self-serve export** — unlike what the rule of thumb "web route for small top-ups, otherwise the account export" suggests, the web route here is **the only option at all**, not just the more convenient one. This matches the already-documented account-type restriction (doku 1.2/1.6: Team/Enterprise members without Primary Owner rights have no export). **Consequence for the skill:** it has to be able to recognize (or be told) that no export exists for an account, and must then not even offer the export route as an alternative.
 
 **Procedure, step by step:**
 
