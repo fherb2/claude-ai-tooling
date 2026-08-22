@@ -231,7 +231,7 @@ Zusätzliche Metadatenfelder, in dieser Reihenfolge:
 | `dropped_thinking` | verworfene Denkblöcke nach den Schwellen in 3.1.3 |
 | `attachments_with_content` | Anhänge, deren Text mitkam (Dateien, nicht Nachrichten) |
 | `creations` | Erzeugnisse der KI, deren Inhalt mitkam (Artefakte, erstellte Dateien, Änderungen) |
-| `attachments_without_content` | Namen der Verweise, deren Inhalt die Quelle nicht hat |
+| `attachments_without_content` | Namen der Verweise, deren Inhalt die Quelle nicht hat. Ein **Name** ist ein Schlüssel: Derselbe Name im `files`-Feld und in einem inhaltslosen `attachments`-Eintrag ist eine Datei, zweimal aufgeführt, und zählt einmal. Ein **fehlender** Name ist kein Schlüssel — der Behelf nennt nur den Dateityp, nicht die Datei —, deshalb zählt dort jedes Vorkommen. Zusammengefasst wird je Nachricht, nicht über den Chat: derselbe Name in zwei Nachrichten sind zwei Verweise |
 
 Nachrichten tragen `n`, `role`, `content`. `warnings` ist auf oberster Ebene immer vorhanden, auch leer.
 
