@@ -456,11 +456,13 @@ Befund am Drei-Monats-Export: **20 Gabelungen in 13 von 211 Konversationen.** Ke
 
 Hier trägt das **ältere** Kind das Gespräch. „Jüngstes Kind" hätte 29 Nachrichten weggeworfen und eine Sackgasse ins Archiv geschrieben. Der Pfad zur neuesten Nachricht greift in allen 20 Fällen richtig.
 
-**Regel 2: Verworfene Zweige kommen mit, in ein eigenes Feld — außer wenn ihr Text mit dem gewählten Geschwister identisch ist.** Was in den verworfenen Zweigen steckt, zeigen dieselben Daten:
+**Regel 2: Verworfene Zweige kommen mit, in ein eigenes Feld — außer wenn sie mit dem gewählten Geschwister in allem übereinstimmen, was mitwandert.** Was in den verworfenen Zweigen steckt, zeigen dieselben Daten:
 
 - **Meist Dubletten.** Bei „Dell DA300 Dockingstation" hängen **14 Kinder** an derselben Stelle, alle mit **exakt 440 Zeichen**, im Abstand von Sekunden bis Minuten — ein Sende-Sturm. Ebenso 10× 37 Zeichen und 5× 553 Zeichen in anderen Chats. Ohne die Ausnahme in Regel 2 stünden allein dort 13 Kopien derselben Nachricht im Archiv.
 - **Manchmal Fehlversuche.** Bei „Negativform Bajonett-Kurven" zwei Assistant-Kinder: eines mit **0 Zeichen**, eines mit 41.077. Das leere ist eine fehlgeschlagene Antwort.
 - **Selten echter Inhalt.** Bei „Technische 2D-Zeichnung" sind die verworfenen Kinder 113 und 149 Zeichen — umformulierte Fragen, inhaltlich redundant. Im Gegenbeispiel oben hängen am verworfenen Zweig zwei echte Nachrichten.
+
+**Gleichheit am Text allein reicht dafür nicht.** Sie ist genau die Prüfung, die bei der Hüllen-Erkennung schon zu eng war (3.1.3): Eine Nachricht kann aus einem Upload ohne ein einziges Begleitwort bestehen — 22 von 10.779 Nachrichten über alle vorliegenden Archive, davon 9 im Drei-Monats-Export und 13 in einem weiteren. Zwischen zwei solchen entscheidet der Textvergleich nichts, weil beide Texte leer sind; das Geschwister gälte als Sendewiederholung, und sein Anhang fiele mit ihm weg, gezählt als Dublette und in keiner anderen Zahl genannt. Wer eine Upload-Nachricht nachbearbeitet und die Datei austauscht, erzeugt genau dieses Paar. Verglichen werden deshalb dieselben vier Merkmale, die auch eine Hülle von einem Chat unterscheiden: Gesprächstext, Anhang mit Inhalt, Erzeugnis, behaltener Denkblock. Alle vier sind strukturell (Vorgabe 2.7), und die Reihenfolge folgt den Kosten — der Text ist der billigste und trennschärfste Vergleich, die Anhangsinhalte werden nur angefasst, wenn die Texte schon gleich sind.
 
 Deshalb mitnehmen statt zählen: Das Ziel des Archivs ist Wiederfinden, nicht die Rekonstruktion des Gesprächsverlaufs. Wer sucht, will den Satz finden, egal auf welchem Zweig er stand. Eine bloße Zahl („1 Zweig verworfen") verschweigt, ob darin zwei oder vierzig Nachrichten lagen.
 
@@ -598,6 +600,7 @@ Das Profil steht hier und nicht bei den erledigten Schritten, weil es sich nicht
 | Denkschritte | eine Aufgabe, die **wirklich** Abwägung erzwingt — mehrere Ansätze unter Nebenbedingungen gegeneinander stellen und die Wahl begründen lassen; dazu eine banale Frage für den kurzen Block | Denkdatei und die Schwellen aus 3.1.3 |
 | Erzeugnis | ausdrücklich ein **Artefakt** erstellen lassen und danach ändern | Creations-Datei (3.1.3) |
 | Sendewiederholung | **kein bekanntes Rezept** — s. u. | Dublettenerkennung, Regel 2 (3.1.2) |
+| ausgetauschter Upload | eine Upload-Nachricht **ohne Begleittext** nachbearbeiten und dabei die Datei wechseln | die andere Hälfte von Regel 2 (3.1.2): dass zwei textlose Geschwister *nicht* als Dublette gelten und beide Anhänge mitkommen |
 | Hülle | einen Chat anlegen und wieder löschen | Erkennung gelöschter Chats (3.1.3) |
 | langer Chat | einer mit vielen Nachrichten | Baumlauf über eine lange Kette und die Integritätsrechnung (3.1.2, 3.1.7) |
 | wachsender Chat | einer, der Tage später fortgesetzt wird | `stale`, Ersetzen (2.6) und die Fensterrechnung (2.4) |
@@ -606,7 +609,7 @@ Die Zeile zum wachsenden Chat ist die einzige mit Vorlaufzeit: Der Zeitraumfilte
 
 **Die Rezepte für Denkschritte und Erzeugnis sind bereits einmal fehlgeschlagen** — zu leichte Fragen, und ein Chat über Bildgenerierung, der keinen der drei Werkzeugnamen aus 3.1.3 erzeugt. Beide Lehren stehen oben in der Tabelle; deshalb ist sie dort so ausführlich formuliert.
 
-**Für die Sendewiederholung gibt es kein Rezept.** Zwei identisch abgeschickte Nachrichten stehen als Eltern und Kind hintereinander, der Code sucht aber **Geschwister ohne Nachfahren** an einer Gabelung. Belegt ist das Phänomen nur aus echten Daten (14 Kinder mit je 440 Zeichen, 3.1.2); herstellen konnten wir es nicht. Dieser Codeweg bleibt damit ungeprüft — ausdrücklich vermerkt statt stillschweigend als abgedeckt geführt.
+**Für die Sendewiederholung gibt es kein Rezept.** Zwei identisch abgeschickte Nachrichten stehen als Eltern und Kind hintereinander, der Code sucht aber **Geschwister ohne Nachfahren** an einer Gabelung. Belegt ist das Phänomen nur aus echten Daten (14 Kinder mit je 440 Zeichen, 3.1.2); herstellen konnten wir es nicht. Dieser Codeweg bleibt damit ungeprüft — ausdrücklich vermerkt statt stillschweigend als abgedeckt geführt. Betroffen ist allerdings nur die Hälfte, die *verwirft*: Dass zwei textlose Geschwister eben **keine** Dublette sind, lässt sich mit dem Rezept eine Zeile darunter sehr wohl live erzeugen, weil dafür nur eine Gabelung nötig ist — und die ist erprobt.
 
 **Drei Prüfarten.** Jeder Punkt trägt genau eine:
 

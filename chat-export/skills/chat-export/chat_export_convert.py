@@ -69,11 +69,15 @@ in exactly one case, which is a genuine tie of one descendant each. The
 tempting alternative, "youngest child at the fork", is *wrong* -- in one
 conversation the older child carries 29 messages and the younger is a dead end.
 
-**Side branches are kept, duplicates are not.** A sibling whose text is
-identical to the chosen one and which has no descendants is a resend, not
-content: one conversation has fourteen such children with exactly 440
-characters each. Those are counted, not stored. A duplicate *with* descendants
-is kept regardless, because its subtree is not a duplicate.
+**Side branches are kept, duplicates are not.** A sibling identical to the
+chosen one and without descendants is a resend, not content: one conversation
+has fourteen such children with exactly 440 characters each. Those are counted,
+not stored. A duplicate *with* descendants is kept regardless, because its
+subtree is not a duplicate. Identical means identical in everything that
+travels, not just in the text -- between two messages that are an upload and
+nothing else, equal text says nothing at all, and dropping one of them would
+drop its attachment. The signs are the same ones that keep a chat from being
+taken for a deleted hollow, see ``conversation_record``.
 
 **Text comes from the content blocks, not from ``text``.** The flat ``text``
 field *contains the thinking*: 20.8 million characters against 11.3 million in
@@ -639,14 +643,39 @@ def subtree(head: dict[str, Any],
     return collected
 
 
+def is_resend(message: dict[str, Any], sibling: dict[str, Any]) -> bool:
+    """True if *message* would contribute nothing *sibling* does not already.
+
+    Equal text is too weak a test to drop a message on. A message can consist
+    of an upload without a single accompanying word -- 22 of 10,779 messages
+    across the archives at hand -- and between two of those, the text compares
+    nothing: both are empty, so one is declared a resend, dropped, and its
+    attachment goes with it, reported in no count. Editing an upload to swap the
+    file produces exactly that pair, which is why this is not a constructed
+    case. So identity has to mean everything that travels -- the same set that
+    decides a hollow chat in ``conversation_record``.
+
+    Ordered by cost: the text is the cheapest and the most selective test, so
+    the attachment contents are only ever touched once the texts already match.
+    Forks are rare to begin with: 20 in the three-month export of 211 chats.
+    """
+    if message_text(message) != message_text(sibling):
+        return False
+    if attachment_records(message) != attachment_records(sibling):
+        return False
+    if message_creations(message) != message_creations(sibling):
+        return False
+    return message_thinking(message) == message_thinking(sibling)
+
+
 def split_branches(messages: list[dict[str, Any]], path: list[dict[str, Any]]
                    ) -> tuple[list[list[dict[str, Any]]], int, list[dict[str, Any]]]:
     """Separate the side branches from the chosen path.
 
     Returns ``(branches, duplicates_skipped, orphans)``.  A branch is a whole
-    subtree hanging off the path.  A childless sibling whose text equals the
-    chosen message's text is a resend and is skipped; one with children is kept
-    even so, because its subtree is not a duplicate.
+    subtree hanging off the path.  A childless sibling that is a resend of the
+    chosen message (``is_resend``) is skipped; one with children is kept even
+    so, because its subtree is not a duplicate.
     """
     children = child_map(messages)
     path_uuids = {message["uuid"] for message in path}
@@ -665,7 +694,7 @@ def split_branches(messages: list[dict[str, Any]], path: list[dict[str, Any]]
         head_children = children.get(message["uuid"], [])
         sibling = chosen_at.get(parent)
         if (not head_children and sibling is not None
-                and message_text(message)[0] == message_text(sibling)[0]):
+                and is_resend(message, sibling)):
             duplicates += 1
             claimed.add(message["uuid"])
             continue

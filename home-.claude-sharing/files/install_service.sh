@@ -44,6 +44,13 @@ CLAUDE_BIN="/usr/bin/claude"
 # waiting two minutes for it would be waiting for nothing (doku 3.5).
 LOGIN_PROBE_TIMEOUT=120
 
+# Syncthing's documented default GUI address ("The default listening address is
+# 127.0.0.1:8384", docs.syncthing.net FAQ). Used in exactly one place: the hint
+# after the exclusion list was copied. Only the base address, no deep link into
+# the folder settings -- the addresses inside the interface are not documented,
+# and a guessed link would be a claim (doku 3.5).
+SYNCTHING_GUI="http://127.0.0.1:8384"
+
 fail() {
     printf 'Abbruch: %s\n' "$1" >&2
     if [ $# -gt 1 ]; then
@@ -63,6 +70,46 @@ warn() {
     sleep "$WARN_PAUSE_SECONDS"
 }
 
+# --- Frage: Anfang (doku 3.5) -----------------------------------------------
+# Cut out and run by the test script as it stands. Do not restructure without
+# looking there.
+#
+# Ask a yes/no question and answer through the exit status. Arguments: the
+# question, then the default -- "j" or "n" -- which an empty answer selects and
+# which the prompt shows in capitals.
+#
+# One reader for both questions: the packages default to NO, because installing
+# something is the larger step, and the exclusion list defaults to YES, because
+# leaving it diverging is (doku 2.8). Two nearly identical readers side by side
+# would be the duplication 2.4 rules out.
+#
+# The answer is read from /dev/tty, not from standard input, so a redirection
+# cannot swallow the question; sudo reads the password from the same place,
+# which is why a password prompt does not disturb this script (measured,
+# doku 3.5). The order of the redirections matters: bash applies them left to
+# right, so 2>/dev/null has to come first to swallow the failure message of the
+# one after it. Reversed, the shell reports the missing terminal itself.
+#
+# Belt and braces: the terminal check at the top already rules a failing read
+# out, so a failure here means the terminal vanished mid-run. It selects the
+# default -- and quietly, because the shell's own error would say nothing the
+# user could act on.
+ask_yes_no() {
+    local question="$1" default="$2" answer=""
+    if [ "$default" = "j" ]; then
+        printf '%s [J/n] ' "$question" >&2
+    else
+        printf '%s [j/N] ' "$question" >&2
+    fi
+    read -r answer 2>/dev/null < /dev/tty || answer=""
+    [ -n "$answer" ] || answer="$default"
+    case "$answer" in
+        j|J|ja|Ja|JA|y|Y|yes|Yes) return 0 ;;
+    esac
+    return 1
+}
+# --- Frage: Ende ------------------------------------------------------------
+
 # Offer to install a missing package instead of only naming the command.
 # Arguments: package, what doing without costs, the abort text -- empty makes
 # the package optional and a refusal survivable -- then the command that tests
@@ -79,33 +126,21 @@ ensure_package() {
     printf '\n%s fehlt — %s\n' "$package" "$consequence" >&2
     printf 'Jetzt nachinstallieren? Das Skript ruft dazu\n' >&2
     printf '    sudo apt install %s\n' "$package" >&2
-    printf 'auf; das System fragt dabei nach dem Passwort. [j/N] ' >&2
-    local answer=""
-    # Belt and braces: the terminal check above already rules this out, so a
-    # failure here means the terminal vanished mid-run. Treated as "no" -- and
-    # quietly, because the shell's own redirection error would say nothing the
-    # user could act on.
-    # The order of the redirections matters: bash applies them left to right,
-    # so 2>/dev/null has to come first to swallow the failure message of the
-    # one after it. Reversed, the shell reports the missing terminal itself.
-    read -r answer 2>/dev/null < /dev/tty || answer=""
-    case "$answer" in
-        j|J|ja|Ja|JA|y|Y|yes|Yes)
-            local apt_log=""
-            printf 'Installiere %s …\n' "$package"
-            # apt's output is captured and shown only on failure: this whole
-            # change exists because the run was too talkative to be read. The
-            # "unstable CLI interface" notice apt emits without a tty lands in
-            # the same capture and stays invisible unless something breaks.
-            if apt_log="$(sudo apt install -y "$package" 2>&1)" \
-                    && "$@" >/dev/null 2>&1; then
-                printf '%s ist installiert.\n\n' "$package"
-                return 0
-            fi
-            printf 'Die Installation von %s ist fehlgeschlagen:\n' "$package" >&2
-            printf '%s\n' "$apt_log" >&2
-            ;;
-    esac
+    if ask_yes_no "auf; das System fragt dabei nach dem Passwort." "n"; then
+        local apt_log=""
+        printf 'Installiere %s …\n' "$package"
+        # apt's output is captured and shown only on failure: this whole
+        # change exists because the run was too talkative to be read. The
+        # "unstable CLI interface" notice apt emits without a tty lands in
+        # the same capture and stays invisible unless something breaks.
+        if apt_log="$(sudo apt install -y "$package" 2>&1)" \
+                && "$@" >/dev/null 2>&1; then
+            printf '%s ist installiert.\n\n' "$package"
+            return 0
+        fi
+        printf 'Die Installation von %s ist fehlgeschlagen:\n' "$package" >&2
+        printf '%s\n' "$apt_log" >&2
+    fi
     if [ -n "$abort_text" ]; then
         fail "$package fehlt — $consequence" "$abort_text"
     fi
@@ -334,34 +369,70 @@ Ob der Ordner abgeglichen wird, ist damit offen. Der Dienst wird
 eingerichtet; bitte in Syncthings Oberfläche nachsehen." ;;
 esac
 
+# --- Ausschlussliste: Anfang (doku 3.5) -------------------------------------
+# Everything between these markers is run by the test script as it stands, with
+# warn, ask_yes_no, the two paths and the GUI address supplied. Do not
+# restructure without looking there.
+#
 # The exclusion list does not travel with the sync (doku 2.8): differences
-# between the machines would otherwise NEVER surface by themselves. The copy
-# in this folder is therefore the authoritative one, and this is where it is
-# compared. A warning only, not an abort: a diverging exclusion list is a
-# defect, but no reason to leave the watcher uninstalled.
-if [ -f "$WATCH_DIR/.stignore" ]; then
-    if cmp -s "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"; then
-        printf 'Ausschlussliste stimmt mit der maßgeblichen Fassung überein.\n'
+# between the machines would otherwise NEVER surface by themselves. The copy in
+# this folder is therefore the authoritative one, and this is where it is
+# compared -- and offered, because merely naming the command left the last step
+# to the hand that forgets it: on 14 August 2026 the same list had to be copied
+# by hand on two machines in one day (doku 2.8).
+#
+# Offered, never done silently. This is the one place where the installer
+# writes into the synced folder, and the user has to say so first. A refusal is
+# survivable and never aborts: a diverging exclusion list is a defect, but no
+# reason to leave the watcher uninstalled.
+stignore_copied=0
+if [ ! -f "$WATCH_DIR/.stignore" ]; then
+    # The weaker case gets the same default as the other one on purpose: here
+    # NOTHING is excluded, not even the credentials, so leaving it as it is is
+    # the worse of the two answers.
+    printf '\nWARNUNG: %s/.stignore fehlt — nichts ist ausgeschlossen,\n' \
+        "$WATCH_DIR" >&2
+    printf 'auch nicht die Zugangsdaten.\n' >&2
+    if ask_yes_no "Die maßgebliche Fassung jetzt übernehmen?" "j"; then
+        cp "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"
+        stignore_copied=1
     else
-        # The diff goes into the message instead of straight to the terminal,
-        # so the whole warning is one block and the pause comes after all of it.
-        stignore_diff="$(diff -u "$WATCH_DIR/.stignore" "$SCRIPT_DIR/.stignore" || true)"
-        warn "WARNUNG: $WATCH_DIR/.stignore weicht von der Fassung in diesem
-Ordner ab. Die Datei wandert nicht mit dem Abgleich, Abweichungen
-zwischen den Rechnern fallen also nie von selbst auf. Unterschiede:
-
-$stignore_diff
-
-Maßgeblich ist die Fassung hier. Übernehmen mit:
-    cp $SCRIPT_DIR/.stignore $WATCH_DIR/.stignore
-Danach in Syncthing die Ordnereinstellungen neu einlesen lassen."
-    fi
-else
-    warn "WARNUNG: $WATCH_DIR/.stignore fehlt — nichts ist ausgeschlossen,
-auch nicht die Zugangsdaten. Bitte die Fassung aus diesem Ordner
-kopieren, bevor weiter abgeglichen wird:
+        warn "Weiter ohne Ausschlussliste. Übernehmen mit:
     cp $SCRIPT_DIR/.stignore $WATCH_DIR/.stignore"
+    fi
+elif cmp -s "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"; then
+    printf 'Ausschlussliste stimmt mit der maßgeblichen Fassung überein.\n'
+else
+    # The differences are listed in full BEFORE the question: the answer is
+    # about them, and an offer to overwrite something unseen would be no offer.
+    stignore_diff="$(diff -u "$WATCH_DIR/.stignore" "$SCRIPT_DIR/.stignore" || true)"
+    printf '\nWARNUNG: %s/.stignore weicht von der Fassung in diesem\n' \
+        "$WATCH_DIR" >&2
+    printf 'Ordner ab. Die Datei wandert nicht mit dem Abgleich, Abweichungen\n' >&2
+    printf 'zwischen den Rechnern fallen also nie von selbst auf. Unterschiede:\n\n' >&2
+    printf '%s\n\n' "$stignore_diff" >&2
+    if ask_yes_no "Maßgeblich ist die Fassung hier. Jetzt übernehmen?" "j"; then
+        cp "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"
+        stignore_copied=1
+    else
+        warn "Die Abweichung bleibt bestehen. Übernehmen mit:
+    cp $SCRIPT_DIR/.stignore $WATCH_DIR/.stignore"
+    fi
 fi
+
+# Only after a copy really happened. Whether Syncthing picks a changed
+# .stignore up by itself is stated NOWHERE in its documentation -- neither on
+# the page about ignoring files nor in the REST description (checked 22 August
+# 2026). The recommendation is therefore the only defensible statement, and it
+# is a warn() so that it survives the blocks that follow (doku 3.5).
+if [ "$stignore_copied" -eq 1 ]; then
+    printf 'Ausschlussliste übernommen.\n'
+    warn "Bitte den Ordner in Syncthing einmal neu einlesen lassen:
+    $SYNCTHING_GUI
+Ob eine geänderte .stignore von selbst wirksam wird, sagt Syncthings
+Dokumentation an keiner Stelle — deshalb die Empfehlung."
+fi
+# --- Ausschlussliste: Ende --------------------------------------------------
 
 if command -v pgrep >/dev/null 2>&1 && ! pgrep -x syncthing >/dev/null 2>&1; then
     warn 'Hinweis: Syncthing scheint gerade nicht zu laufen.
