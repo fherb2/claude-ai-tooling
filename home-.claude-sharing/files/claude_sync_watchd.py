@@ -738,16 +738,48 @@ class WatchState:
 
 
 def _now() -> str:
-    """Current local time as an ISO 8601 string."""
-    return datetime.datetime.now().isoformat()
+    """Current local time as an ISO 8601 string, WITH its zone offset.
+
+    The offset is what makes a difference between two stamps exact across a
+    daylight-saving change: without it, a stamp written at 02:50 CEST and read
+    at 02:10 CET -- twenty real minutes -- computes as MINUS forty (doku 3.2).
+
+    Local time rather than UTC on purpose: the state file is also a diagnostic
+    surface a person reads, and "02:50:00+02:00" says something at a glance
+    where "00:50:00+00:00" needs arithmetic first. Both are equally exact.
+    """
+    return datetime.datetime.now().astimezone().isoformat()
 
 
 def _age(timestamp: str) -> datetime.timedelta:
-    """How long ago an ISO 8601 timestamp was. Unparsable counts as ancient."""
+    """How long ago an ISO 8601 timestamp was. Unparsable counts as ancient.
+
+    Reads BOTH forms, and that is not a courtesy: subtracting a naive datetime
+    from an aware one raises TypeError, which the branch below would turn into
+    "ancient" -- and then every waiting period in an existing state file would
+    be due at once, on the first pass after the change (doku 3.2). A stamp
+    without an offset is therefore read as local time, which resolves winter
+    and summer correctly by date. Its one residual: a naive stamp from the
+    SECOND pass through an ambiguous hour is read an hour off, once.
+    """
     try:
-        return datetime.datetime.now() - datetime.datetime.fromisoformat(timestamp)
+        moment = datetime.datetime.fromisoformat(timestamp)
     except (ValueError, TypeError):
         return datetime.timedelta.max
+    if moment.tzinfo is None:
+        moment = moment.astimezone()
+    return datetime.datetime.now().astimezone() - moment
+
+
+def _hours_since(timestamp: str) -> int:
+    """Full hours since a timestamp, never negative (doku 1.8).
+
+    One place for the rule, because three notices ask for it. The clamp holds
+    even where the zone offset cannot help: a corrected system clock moves
+    wall-clock time in both directions, and "kein Konflikt seit -1 Stunde(n)"
+    is the kind of sentence nobody can explain from the outside.
+    """
+    return max(0, int(_age(timestamp).total_seconds() // 3600))
 
 
 def load_state() -> WatchState:
@@ -792,8 +824,18 @@ def acquire_lock() -> bool:
                              0o644)
         except FileExistsError:
             try:
-                age = datetime.datetime.now() - datetime.datetime.fromtimestamp(
-                    LOCK_FILE.stat().st_mtime)
+                # Clamped at zero, and precisely about the journal line
+                # below: after the clock moves back, a lock file looks as if it
+                # came from the future, and "Alter -3540 s" is a sentence
+                # nobody can act on. The DECISION is unaffected -- a negative
+                # age is below the limit just as zero is, and the age only
+                # decides at all when the holder cannot be read. A forward jump
+                # cannot be caught here and need not be: the holder's pid
+                # decides, and that check hangs on no clock (doku 3.2).
+                age = max(
+                    datetime.timedelta(0),
+                    datetime.datetime.now() - datetime.datetime.fromtimestamp(
+                        LOCK_FILE.stat().st_mtime))
             except FileNotFoundError:
                 # Released between the failed create and the stat: try again.
                 continue
@@ -1314,7 +1356,7 @@ def build_notice(state: WatchState, open_conflicts: int,
         # older state file must not be made to claim zero.
         since = ""
         if state.conflict_since:
-            hours = int(_age(state.conflict_since).total_seconds() // 3600)
+            hours = _hours_since(state.conflict_since)
             since = f" seit {hours} Stunde(n)"
         # Both a pause and a backlog change what the user has to do, so both
         # are named alongside the conflict instead of waiting for a quiet hour
@@ -1342,7 +1384,7 @@ def build_notice(state: WatchState, open_conflicts: int,
     if not figures["connected"]:
         since = ""
         if state.last_connected:
-            hours = int(_age(state.last_connected).total_seconds() // 3600)
+            hours = _hours_since(state.last_connected)
             since = f" seit {hours} Stunde(n)"
         return (f"keine Verbindung zum Abgleich{since}",
                 NOTICE_SECONDS_ATTENTION)
@@ -1352,7 +1394,7 @@ def build_notice(state: WatchState, open_conflicts: int,
     # fresh installation that has never seen a conflict. From the outside the
     # two are indistinguishable, and it is true of both.
     if state.last_conflict_seen:
-        hours = int(_age(state.last_conflict_seen).total_seconds() // 3600)
+        hours = _hours_since(state.last_conflict_seen)
         quiet = f"; kein Konflikt seit {hours} Stunde(n)"
     else:
         quiet = "; Zählung neu begonnen"
@@ -1698,12 +1740,17 @@ def watch_forever(watch_dir: Path) -> int:
     observer.schedule(ConflictHandler(), str(watch_dir), recursive=True)
     observer.start()
     try:
-        last_safety = datetime.datetime.now()
+        # The monotonic clock, not the wall clock: this interval outlives no
+        # process, so it is the ONE place where a full fix is possible. It is
+        # immune to every clock jump -- a daylight-saving change, an NTP
+        # correction -- where a persisted timestamp can only be made exact
+        # against the first of those (doku 3.1, 3.2).
+        last_safety = time.monotonic()
         while True:
             time.sleep(30)
-            if datetime.datetime.now() - last_safety >= SAFETY_SCAN_INTERVAL:
+            if time.monotonic() - last_safety >= SAFETY_SCAN_INTERVAL.total_seconds():
                 guarded_pass(watch_dir, "Sicherheitslauf")
-                last_safety = datetime.datetime.now()
+                last_safety = time.monotonic()
     except KeyboardInterrupt:
         pass
     finally:
