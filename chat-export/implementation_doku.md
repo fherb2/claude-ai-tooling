@@ -28,14 +28,15 @@ Je Chat entstehen bis zu vier Dateien — Gespräch, Denkschritte, Anhänge, Erz
 
 Der Engpass ist nicht die Suche, sondern die **Transkription**: Chattext erreicht ein Dateisystem nur, wenn er irgendwie dorthin gelangt, ohne durch den Kontext einer Instanz zu laufen — sonst wird aus Kopieren unweigerlich Nacherzählen (Vorgabe 2.8). Beide benutzbaren Wege umgehen diesen Engpass, und beide bedient dasselbe Skript, `chat_export_convert.py` (3.1).
 
-| | Kontoexport | Web-Weg |
-| --- | --- | --- |
-| Quelle | ZIP per E-Mail, Zeitraum wählbar | die internen Endpunkte der claude.ai-Weboberfläche |
-| Zugang | Konto mit Selbstbedienungs-Export | angemeldeter Chrome plus Browser-Anbindung |
-| Wartezeit | Antrag, E-Mail, Download | keine |
-| Menge | alles in einem Zug, keine Last je Chat | je Chat ein Abruf, deshalb gebremst |
+
+|              | Kontoexport                                   | Web-Weg                                             |
+| ------------ | --------------------------------------------- | --------------------------------------------------- |
+| Quelle       | ZIP per E-Mail, Zeitraum wählbar             | die internen Endpunkte der claude.ai-Weboberfläche |
+| Zugang       | Konto mit Selbstbedienungs-Export             | angemeldeter Chrome plus Browser-Anbindung          |
+| Wartezeit    | Antrag, E-Mail, Download                      | keine                                               |
+| Menge        | alles in einem Zug, keine Last je Chat        | je Chat ein Abruf, deshalb gebremst                 |
 | Projektbezug | fehlt — braucht eine Chatliste aus claude.ai | `project_uuid` und `created_at` stehen in den Daten |
-| Aufruf | `convert --zip` | `list --web`, `convert --bundle` |
+| Aufruf       | `convert --zip`                               | `list --web`, `convert --bundle`                    |
 
 **Wann welcher.** Der Kontoexport ist der Anker: Er existiert, weil die Datenschutz-Grundverordnung ihn erzwingt — sein Format kann sich ändern, aber er verschwindet nicht. Der Web-Weg ist die bessere Wahl für **kleine Nachträge** eines Projekts, und für eine Erstmigration oder ganze Chats mit reichlich Anhängen bleibt der Export vorzuziehen: Ein Massenabruf über die Weboberfläche fällt serverseitig auf und kann Captcha- oder Cloudflare-Prüfungen auslösen. Deshalb die Abrufbremse von 4 bis 12 Sekunden je Chat.
 
@@ -106,11 +107,11 @@ Nicht in Artefakte: die kennen keinen JSON-Typ, kein spezifiziertes Downloadform
 ### Migrationsmatrix, heraus
 
 
-| Quelle                    | Weg                                 | Format                        | Haken                                                                           |
-| ------------------------- | ----------------------------------- | ----------------------------- | ------------------------------------------------------------------------------- |
-| claude.ai, alle Chats     | Kontoexport                         | ZIP,`conversations.json`      | kein Projektbezug; Gelöschtes als Hülle; `files` nur als Name; Momentaufnahme |
-| claude.ai, ein Projekt    | **interne Web-Endpunkte**           | JSON, Baum vollständig        | undokumentiert, jederzeit änderbar; braucht angemeldeten Browser                |
-| claude.ai, ein Projekt    | `recent_chats`                      | UUID, Zeit, Titel             | nur Metadaten, ohne `created_at`; übergeht den laufenden Chat                   |
+| Quelle                 | Weg                       | Format                   | Haken                                                                          |
+| ---------------------- | ------------------------- | ------------------------ | ------------------------------------------------------------------------------ |
+| claude.ai, alle Chats  | Kontoexport               | ZIP, `conversations.json` | kein Projektbezug; Gelöschtes als Hülle; `files` nur als Name; Momentaufnahme |
+| claude.ai, ein Projekt | **interne Web-Endpunkte** | JSON, Baum vollständig  | undokumentiert, jederzeit änderbar; braucht angemeldeten Browser              |
+| claude.ai, ein Projekt | `recent_chats`            | UUID, Zeit, Titel        | nur Metadaten, ohne `created_at`; übergeht den laufenden Chat                  |
 
 Die geprüften und verworfenen Quellen — Claude Code CLI, Cowork, Compliance-API und die beiden entfallenen claude.ai-Werkzeuge — stehen samt Grund in 1.7 und nicht hier: Diese Matrix führt, was benutzbar ist.
 
@@ -141,26 +142,26 @@ Die geprüften und verworfenen Quellen — Claude Code CLI, Cowork, Compliance-A
 ### Umgebungsfakten, die den Gesamtentwurf tragen
 
 
-| Aussage                                                                                                                                                                                     | Beleglage                                                                                                               |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Kontoexport unter Settings → Privacy, Link per E-Mail, verfällt nach 24 h — *„available to individual Claude users on Free, Pro, and Max plans"*                                          | belegt ([9450526](https://support.claude.com/en/articles/9450526-export-your-claude-data))                              |
-| **In Team und Enterprise hat ein gewöhnliches Mitglied keinen Export**: *„Individual members of Team and Enterprise organizations do not have a self-serve export option"*; nur der Primary Owner exportiert, und zwar unter *Organization settings → Data and privacy* | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                    |
-| **Der Export lässt einen Zeitraum wählen**                                                                                                                                                | **beobachtet**, in keinem Artikel erwähnt                                                                              |
-| Gelöschte Inhalte*„will not be included in data exports initiated after the deletion"*                                                                                                    | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                    |
-| **Der Löschvorgang nimmt den Inhalt, nicht den Eintrag.** Zwei am 17. August gelöschte Chats standen im danach angeforderten Export als Hüllen — Gerüst da, null Zeichen Text            | beobachtet                                                                                                              |
-| **Ein gelöschter Chat verschwindet dagegen aus `recent_chats`** und ist damit keinem Projekt mehr zuzuordnen                                                                              | beobachtet                                                                                                              |
-| **`recent_chats` listet den laufenden Chat nicht mit.** Aus Chat A kommt B, aus B kommt A — jeder sieht den anderen, keiner sich selbst                                                    | beobachtet (zwei symmetrische Versuche)                                                                                 |
-| Projektdateien: 30 MB je Datei, Anzahl unbegrenzt,*„Text extraction only"*                                                                                                                 | belegt ([8241126](https://support.claude.com/en/articles/8241126-upload-files-to-claude))                               |
-| RAG für Projekte schaltet automatisch nahe der Kontextgrenze ein,*„up to 10x"*, Claude nutzt dann ein *project knowledge search tool*; **kein Schwellwert dokumentiert**, nicht steuerbar | belegt ([11473015](https://support.claude.com/en/articles/11473015-retrieval-augmented-generation-rag-for-projects))    |
-| RAG-Schwelle richte sich nach**Dateianzahl**, nicht Größe                                                                                                                                 | Community ([#25759](https://github.com/anthropics/claude-code/issues/25759)), als `invalid` geschlossen                 |
-| Projektdateien im Container*„accessible … **while remaining in context**"* — spart **keinen** Kontext                                                                                    | belegt ([12111783](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude))                  |
-| Container-Netzzugang nur gegen eine Allowlist;`claude.ai` steht **nicht** darauf                                                                                                            | belegt (ebd.)                                                                                                           |
-| Kontextfenster Opus 5 / Sonnet 5: 1 Mio Token auf bezahlten Plänen                                                                                                                         | belegt ([8606394](https://support.claude.com/en/articles/8606394-how-large-is-the-context-window-on-paid-claude-plans)) |
-| Ein langes Gespräch bricht nicht ab, sondern**fasst frühere Teile zusammen**                                                                                                              | belegt (ebd.)                                                                                                           |
-| Opus 4.7 und spätere Opus-Modelle erhalten**keine** Token-Budget-Tags                                                                                                                      | belegt ([Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows))                       |
-| Claude-Code-Transkripte:`~/.claude/projects/<p>/<id>.jsonl`, Format *„internal … changes between versions"*, Aufräumung nach `cleanupPeriodDays` (Standard 30, Minimum 1, einstellbar), **kein Import**                                   | belegt ([sessions](https://code.claude.com/docs/en/sessions))                                                           |
-| **`/api/organizations` kann mehrere Organisationen liefern, auch bei einem einzigen Nutzer.** Eine reine API-/Console-Organisation (ohne `"chat"` in `capabilities`) neben der claude.ai-Chat-Organisation ist normal, keine Störung — Chat-Abo und API-Zugriff sind bei Anthropic bewusst getrennte Organisationen, getrennt abgerechnet | belegt ([9876003](https://support.claude.com/en/articles/9876003-i-have-a-paid-claude-subscription-pro-max-team-or-enterprise-plans-why-do-i-have-to-pay-separately-to-use-the-claude-api-and-console)) |
-| **Zur Export-Antragsseite führt kein Deep-Link.** Direkte Navigation auf `claude.ai/settings/data-privacy-controls` (o. ä.) rendert nur die gewöhnliche Chat-Oberfläche; die Einstellungen öffnen client-seitig erst nach einem echten Klick durch die Oberfläche (Konto-/Einstellungsmenü → „Datenschutz" → „Daten exportieren") | beobachtet |
+| Aussage                                                                                                                                                                                                                                                                                                                                      | Beleglage                                                                                                                                                                                               |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kontoexport unter Settings → Privacy, Link per E-Mail, verfällt nach 24 h —*„available to individual Claude users on Free, Pro, and Max plans"*                                                                                                                                                                                          | belegt ([9450526](https://support.claude.com/en/articles/9450526-export-your-claude-data))                                                                                                              |
+| **In Team und Enterprise hat ein gewöhnliches Mitglied keinen Export**: *„Individual members of Team and Enterprise organizations do not have a self-serve export option"*; nur der Primary Owner exportiert, und zwar unter *Organization settings → Data and privacy*                                                                   | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                                                                                                    |
+| **Der Export lässt einen Zeitraum wählen**                                                                                                                                                                                                                                                                                                 | **beobachtet**, in keinem Artikel erwähnt                                                                                                                                                              |
+| Gelöschte Inhalte*„will not be included in data exports initiated after the deletion"*                                                                                                                                                                                                                                                     | belegt ([13346720](https://support.claude.com/en/articles/13346720-export-your-organization-s-data))                                                                                                    |
+| **Der Löschvorgang nimmt den Inhalt, nicht den Eintrag.** Zwei am 17. August gelöschte Chats standen im danach angeforderten Export als Hüllen — Gerüst da, null Zeichen Text                                                                                                                                                           | beobachtet                                                                                                                                                                                              |
+| **Ein gelöschter Chat verschwindet dagegen aus `recent_chats`** und ist damit keinem Projekt mehr zuzuordnen                                                                                                                                                                                                                                | beobachtet                                                                                                                                                                                              |
+| **`recent_chats` listet den laufenden Chat nicht mit.** Aus Chat A kommt B, aus B kommt A — jeder sieht den anderen, keiner sich selbst                                                                                                                                                                                                     | beobachtet (zwei symmetrische Versuche)                                                                                                                                                                 |
+| Projektdateien: 30 MB je Datei, Anzahl unbegrenzt,*„Text extraction only"*                                                                                                                                                                                                                                                                  | belegt ([8241126](https://support.claude.com/en/articles/8241126-upload-files-to-claude))                                                                                                               |
+| RAG für Projekte schaltet automatisch nahe der Kontextgrenze ein,*„up to 10x"*, Claude nutzt dann ein *project knowledge search tool*; **kein Schwellwert dokumentiert**, nicht steuerbar                                                                                                                                                  | belegt ([11473015](https://support.claude.com/en/articles/11473015-retrieval-augmented-generation-rag-for-projects))                                                                                    |
+| RAG-Schwelle richte sich nach**Dateianzahl**, nicht Größe                                                                                                                                                                                                                                                                                  | Community ([#25759](https://github.com/anthropics/claude-code/issues/25759)), als `invalid` geschlossen                                                                                                 |
+| Projektdateien im Container*„accessible …**while remaining in context**"* — spart **keinen** Kontext                                                                                                                                                                                                                                      | belegt ([12111783](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude))                                                                                                  |
+| Container-Netzzugang nur gegen eine Allowlist; `claude.ai` steht **nicht** darauf                                                                                                                                                                                                                                                             | belegt (ebd.)                                                                                                                                                                                           |
+| Kontextfenster Opus 5 / Sonnet 5: 1 Mio Token auf bezahlten Plänen                                                                                                                                                                                                                                                                          | belegt ([8606394](https://support.claude.com/en/articles/8606394-how-large-is-the-context-window-on-paid-claude-plans))                                                                                 |
+| Ein langes Gespräch bricht nicht ab, sondern**fasst frühere Teile zusammen**                                                                                                                                                                                                                                                               | belegt (ebd.)                                                                                                                                                                                           |
+| Opus 4.7 und spätere Opus-Modelle erhalten**keine** Token-Budget-Tags                                                                                                                                                                                                                                                                       | belegt ([Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows))                                                                                                       |
+| Claude-Code-Transkripte: `~/.claude/projects/<p>/<id>.jsonl`, Format *„internal … changes between versions"*, Aufräumung nach `cleanupPeriodDays` (Standard 30, Minimum 1, einstellbar), **kein Import**                                                                                                                                   | belegt ([sessions](https://code.claude.com/docs/en/sessions))                                                                                                                                           |
+| **`/api/organizations` kann mehrere Organisationen liefern, auch bei einem einzigen Nutzer.** Eine reine API-/Console-Organisation (ohne `"chat"` in `capabilities`) neben der claude.ai-Chat-Organisation ist normal, keine Störung — Chat-Abo und API-Zugriff sind bei Anthropic bewusst getrennte Organisationen, getrennt abgerechnet  | belegt ([9876003](https://support.claude.com/en/articles/9876003-i-have-a-paid-claude-subscription-pro-max-team-or-enterprise-plans-why-do-i-have-to-pay-separately-to-use-the-claude-api-and-console)) |
+| **Zur Export-Antragsseite führt kein Deep-Link.** Direkte Navigation auf `claude.ai/settings/data-privacy-controls` (o. ä.) rendert nur die gewöhnliche Chat-Oberfläche; die Einstellungen öffnen client-seitig erst nach einem echten Klick durch die Oberfläche (Konto-/Einstellungsmenü → „Datenschutz" → „Daten exportieren") | beobachtet                                                                                                                                                                                              |
 
 Formatnahe Fakten stehen bei dem Skript, das sie verarbeitet — der Aufbau des Export-ZIP in 3.1.1. Was quer über alle Werkzeuge gilt, steht als Vorgabe in Kapitel 2; die Prüfliste gegen Anthropic-Änderungen ist Kapitel 4.
 
@@ -216,22 +217,22 @@ Grundlage ist §1.12 der Arbeitsanweisungen: JSON, `messages` mit `role` (`user`
 Zusätzliche Metadatenfelder, in dieser Reihenfolge:
 
 
-| Feld | Wozu |
-| --- | --- |
-| `chat_uuid`, `url`, `title` | Identität und Auffindbarkeit |
-| `imported_at` | Zeitpunkt dieses Laufs — sagt, wie alt die Fassung im Archiv ist, und unterscheidet sie vom Stand der Quelle (`last_updated_at`) |
-| `source` | `account-export` oder `web-api` — der Behälter, aus dem der Chat kam |
-| `last_updated_at` | Stand der Quelle beim Import — macht Veralten erkennbar; **die** für Historie und Sortierung entscheidende Angabe, s. den Absatz zu `predecessor`/`successor` oben |
-| `turns` | Anzahl der Redebeiträge, die der Chat trägt. Bei einer Hülle bleibt `messages` leer, `turns` nennt aber weiter die Länge des Gerüsts — die Auskunft, wie groß der Chat vor seiner Löschung war |
-| `total_turns`, `complete`, `turns_missing` | Vollständigkeit samt Beleg; keiner der beiden Wege hat ein Sollmaß, also durchgehend `null` (2.5) |
-| `deleted` | Hülle eines an der Quelle gelöschten Chats; dann ohne `messages` |
-| `branches` | mitgenommene Nebenzweige des Nachrichtenbaums (3.1.2); **einziges optionales Feld** — s. 2.5 |
-| `dropped_duplicates` | übersprungene Sendewiederholungen |
-| `dropped_blocks` | weggelassene Blocktypen je Anzahl, **ohne** `thinking` — das liegt in der Denkdatei und wäre kein Verlust |
-| `dropped_thinking` | verworfene Denkblöcke nach den Schwellen in 3.1.3 |
-| `attachments_with_content` | Anhänge, deren Text mitkam (Dateien, nicht Nachrichten) |
-| `creations` | Erzeugnisse der KI, deren Inhalt mitkam (Artefakte, erstellte Dateien, Änderungen) |
-| `attachments_without_content` | Namen der Verweise, deren Inhalt die Quelle nicht hat. Ein **Name** ist ein Schlüssel: Derselbe Name im `files`-Feld und in einem inhaltslosen `attachments`-Eintrag ist eine Datei, zweimal aufgeführt, und zählt einmal. Ein **fehlender** Name ist kein Schlüssel — der Behelf nennt nur den Dateityp, nicht die Datei —, deshalb zählt dort jedes Vorkommen. Zusammengefasst wird je Nachricht, nicht über den Chat: derselbe Name in zwei Nachrichten sind zwei Verweise |
+| Feld                                       | Wozu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `chat_uuid`, `url`, `title`                | Identität und Auffindbarkeit                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `imported_at`                              | Zeitpunkt dieses Laufs — sagt, wie alt die Fassung im Archiv ist, und unterscheidet sie vom Stand der Quelle (`last_updated_at`)                                                                                                                                                                                                                                                                                                                                                    |
+| `source`                                   | `account-export` oder `web-api` — der Behälter, aus dem der Chat kam                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `last_updated_at`                          | Stand der Quelle beim Import — macht Veralten erkennbar;**die** für Historie und Sortierung entscheidende Angabe, s. den Absatz zu `predecessor`/`successor` oben                                                                                                                                                                                                                                                                                                                  |
+| `turns`                                    | Anzahl der Redebeiträge, die der Chat trägt. Bei einer Hülle bleibt `messages` leer, `turns` nennt aber weiter die Länge des Gerüsts — die Auskunft, wie groß der Chat vor seiner Löschung war                                                                                                                                                                                                                                                                                |
+| `total_turns`, `complete`, `turns_missing` | Vollständigkeit samt Beleg; keiner der beiden Wege hat ein Sollmaß, also durchgehend `null` (2.5)                                                                                                                                                                                                                                                                                                                                                                                   |
+| `deleted`                                  | Hülle eines an der Quelle gelöschten Chats; dann ohne `messages`                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `branches`                                 | mitgenommene Nebenzweige des Nachrichtenbaums (3.1.2);**einziges optionales Feld** — s. 2.5                                                                                                                                                                                                                                                                                                                                                                                         |
+| `dropped_duplicates`                       | übersprungene Sendewiederholungen                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `dropped_blocks`                           | weggelassene Blocktypen je Anzahl,**ohne** `thinking` — das liegt in der Denkdatei und wäre kein Verlust                                                                                                                                                                                                                                                                                                                                                                           |
+| `dropped_thinking`                         | verworfene Denkblöcke nach den Schwellen in 3.1.3                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `attachments_with_content`                 | Anhänge, deren Text mitkam (Dateien, nicht Nachrichten)                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `creations`                                | Erzeugnisse der KI, deren Inhalt mitkam (Artefakte, erstellte Dateien, Änderungen)                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `attachments_without_content`              | Namen der Verweise, deren Inhalt die Quelle nicht hat. Ein**Name** ist ein Schlüssel: Derselbe Name im `files`-Feld und in einem inhaltslosen `attachments`-Eintrag ist eine Datei, zweimal aufgeführt, und zählt einmal. Ein **fehlender** Name ist kein Schlüssel — der Behelf nennt nur den Dateityp, nicht die Datei —, deshalb zählt dort jedes Vorkommen. Zusammengefasst wird je Nachricht, nicht über den Chat: derselbe Name in zwei Nachrichten sind zwei Verweise |
 
 Nachrichten tragen `n`, `role`, `content`. `warnings` ist auf oberster Ebene immer vorhanden, auch leer.
 
@@ -257,18 +258,18 @@ Der Grund für die Auslagerung ist stets dieselbe Rechnung: Denkschritte (9,2 Mi
 Eine `protokoll.json` je Quellprojekt, neben den Chatdateien. Sie wird mit der Chatliste angelegt — vor jedem Chattext — und ist ab da die Referenz; bei Widerspruch zwischen Protokoll und Verzeichnis gilt das Protokoll. Je Chat:
 
 
-| Feld | Wozu |
-| --- | --- |
-| `title`, `created_at` | Auffindbarkeit; `created_at` liefern der ZIP-Weg und die Chatliste des Web-Wegs, ein `recent_chats`-Abzug nicht |
-| `created_after` | Untergrenze für Chats ohne `created_at`: der Stand des **vorherigen** Abgleichs beim ersten Sehen — damals war das Projekt gelistet und der Chat nicht dabei, also entstand er später. Wird nur beim ersten Sehen gesetzt und danach nie überschrieben. Die Herleitung setzt eine **vollständige** vorherige Liste voraus (s. u.) |
-| `listed_updated_at` | `updated_at` aus der zuletzt geholten Chatliste |
-| `exported_updated_at` | Stand, auf dem der vorliegende Export beruht |
-| `turns`, `total_turns` | Umfang beim Export |
-| `end_token` | Rest einer blätternden Quelle; kein heutiger Weg schreibt es, nichts hängt daran |
-| `file` | Name der Chatdatei, oder leer |
-| `side_files` | Namen der Nebendateien, damit sie beim Ersetzen mit entfernt werden (2.6) |
-| `status` | s. u. |
-| `exported_at` | Zeitpunkt |
+| Feld                   | Wozu                                                                                                                                                                                                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`, `created_at`  | Auffindbarkeit; `created_at` liefern der ZIP-Weg und die Chatliste des Web-Wegs, ein `recent_chats`-Abzug nicht                                                                                                                                                                                                                        |
+| `created_after`        | Untergrenze für Chats ohne `created_at`: der Stand des **vorherigen** Abgleichs beim ersten Sehen — damals war das Projekt gelistet und der Chat nicht dabei, also entstand er später. Wird nur beim ersten Sehen gesetzt und danach nie überschrieben. Die Herleitung setzt eine **vollständige** vorherige Liste voraus (s. u.) |
+| `listed_updated_at`    | `updated_at` aus der zuletzt geholten Chatliste                                                                                                                                                                                                                                                                                       |
+| `exported_updated_at`  | Stand, auf dem der vorliegende Export beruht                                                                                                                                                                                                                                                                                          |
+| `turns`, `total_turns` | Umfang beim Export                                                                                                                                                                                                                                                                                                                    |
+| `end_token`            | Rest einer blätternden Quelle; kein heutiger Weg schreibt es, nichts hängt daran                                                                                                                                                                                                                                                    |
+| `file`                 | Name der Chatdatei, oder leer                                                                                                                                                                                                                                                                                                         |
+| `side_files`           | Namen der Nebendateien, damit sie beim Ersetzen mit entfernt werden (2.6)                                                                                                                                                                                                                                                             |
+| `status`               | s. u.                                                                                                                                                                                                                                                                                                                                 |
+| `exported_at`          | Zeitpunkt                                                                                                                                                                                                                                                                                                                             |
 
 Statuswerte: `listed` (aus der Chatliste bekannt), `started` (teilweise gelesen — kein heutiger Weg setzt das, beide schreiben einen Chat immer ganz), `exported`, `stale` (die Quelle ist neuer als der Export), `deleted` (Hülle an der Quelle). `stale` entsteht durch den Vergleich `listed_updated_at` gegen `exported_updated_at`; `updated_at` trägt diese Erkennung, und zwar beobachtet: es liegt in allen Quellen vor — Export, Web-Chatliste, `recent_chats` — und sprang bei gelöschten Chats auf den Löschzeitpunkt.
 
@@ -284,13 +285,14 @@ Auf oberster Ebene trägt das Protokoll `chats` — die Einträge oben, nach Cha
 
 **Die Fenstergrenze, in einer Tabelle.** Wie weit ein Export zurückreichen muss, damit er einen Chat erfasst, ergibt sich aus drei Quellen unterschiedlicher Güte — genommen wird das Minimum über alle zu holenden Chats:
 
-| Chat-Lage | Fensterstart | Güte |
-| --- | --- | --- |
-| schon exportiert, aber gewachsen | sein `created_at` aus dem Protokoll | exakt |
-| erst beim letzten Abgleich hinzugekommen | sein `created_after` | exakt, **sofern die vorherige Liste vollständig war** — s. u. |
-| gelistet, aber nie in einem Archiv, ohne `created_after` | `created_at` des Projekts, aus dem Projekt-Endpunkt oder den Projektdateien eines Exports (3.1.1) | exakt, aber projektweit statt chatweise |
-| über den Web-Weg gelistet | sein eigenes `created_at` aus der Chatliste | exakt — deshalb braucht dieser Weg kein Projektdatum von außen |
-| kein Protokoll (Erstmigration) | ebenso der Projektbeginn | dito |
+
+| Chat-Lage                                               | Fensterstart                                                                                      | Güte                                                            |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| schon exportiert, aber gewachsen                        | sein `created_at` aus dem Protokoll                                                                | exakt                                                            |
+| erst beim letzten Abgleich hinzugekommen                | sein `created_after`                                                                               | exakt,**sofern die vorherige Liste vollständig war** — s. u.   |
+| gelistet, aber nie in einem Archiv, ohne `created_after` | `created_at` des Projekts, aus dem Projekt-Endpunkt oder den Projektdateien eines Exports (3.1.1) | exakt, aber projektweit statt chatweise                          |
+| über den Web-Weg gelistet                              | sein eigenes `created_at` aus der Chatliste                                                        | exakt — deshalb braucht dieser Weg kein Projektdatum von außen |
+| kein Protokoll (Erstmigration)                          | ebenso der Projektbeginn                                                                          | dito                                                             |
 
 Der Projektbeginn ist dabei die Untergrenze über alles: kein Chat eines Projekts kann älter sein als das Projekt. Ein zu großzügiges Fenster kostet nur Downloadgröße, ein zu knappes kostet Inhalt — deshalb im Zweifel aufrunden, nach unten.
 
@@ -304,7 +306,7 @@ Geprüft von `tests/test_wegegleichheit.py`, das auch die Protokolle vergleicht 
 
 Beide Wege erzeugen für denselben Chat **dieselbe Chatdatei** und **dasselbe Protokoll** (Protokollabgleich in 2.4). Sonst hinge der Inhalt des Archivs davon ab, auf welchem Weg ein Chat hereinkam, und „habe ich diesen Chat?" würde unscharf.
 
-Zwischen Kontoexport und Web-Weg ist das **baulich** erfüllt: Beide laufen durch denselben Konverter, und nur das Auspacken unterscheidet sich (3.1). Ein einziges Metadatenfeld weicht deshalb tatsächlich ab — `source`, der Herkunftsvermerk. Keiner der beiden Wege hat ein **Sollmaß**, an dem sich Vollständigkeit rechnen ließe: `total_turns`, `complete` und `turns_missing` bleiben durchgehend `null`, statt eine Zahl zu behaupten. An echten Daten belegt: Für denselben Chat liefern Web-API und Export-ZIP dieselben Nachrichten-UUIDs.
+Zwischen Kontoexport und Web-Weg ist das **baulich** erfüllt: Beide laufen durch denselben Konverter, und nur das Auspacken unterscheidet sich (3.1). Ein einziges Metadatenfeld weicht deshalb tatsächlich ab — `source`, der Herkunftsvermerk. Keiner der beiden Wege hat ein **Sollmaß**, an dem sich Vollständigkeit rechnen ließe: `total_turns`, `complete` und `turns_missing` bleiben durchgehend `null`, statt eine Zahl zu behaupten. An echten Daten belegt ist das (3.1).
 
 **Gemessen wird die Zusage trotzdem gegen eine zweite, unabhängige Umsetzung** des Dateiformats: `tests/wegegleichheit_referenz.py`, die allein zu diesem Zweck existiert und nichts aus dem Konverter importiert. Der Grund ist der Wert eines Maßstabs: Prüfte der Konverter nur gegen sich selbst, würde jede Formatänderung automatisch „bestehen". Gegen diese zweite Umsetzung dürfen genau **fünf** Metadatenfelder abweichen — `source`, `created_at`, `total_turns`, `complete`, `turns_missing` — und keines mehr. Wo eine Seite etwas nicht wissen kann, steht `null` statt einer Vermutung.
 
@@ -353,7 +355,6 @@ Diese Vorgabe gilt den **Archivdateien**. Der Anweisungsblock, den `convert` am 
 
 Prüfstücke werden synthetisch gebaut; echter Chatinhalt gehört nie in Tests oder Fixtures. Echte Exporte liegen ausschließlich unter `test_results/`, deren Inhalte die `.gitignore` vom Repo fernhält. Diagnosewerkzeuge (3.2) geben Struktur und Zahlen aus, nie Inhalt — ihre Ausgabe muss unbedenklich in eine Konversation kopierbar sein.
 
-
 # 3 Skripte
 
 ## 3.1 `chat_export_convert.py` — der Weg über den Kontoexport und über die Web-Endpunkte
@@ -362,7 +363,7 @@ Prüfstücke werden synthetisch gebaut; echter Chatinhalt gehört nie in Tests o
 
 Wandelt Chats in Dateien je Quellprojekt um und führt das Protokoll. Läuft lokal, wird nie hochgeladen. Es liegt in `skills/chat-export/` — es ist das eine Skript, das der Skill mitbringt (3.3), und der Ordner trägt genau die Struktur, die er am Zielort haben wird.
 
-**Zwei Quellen, ein Konverter.** Die Chats kommen entweder aus einem Kontoexport-ZIP (`--zip`) oder aus einem **Web-Behälter** (`--bundle`) — der Datei, die ein Browserschritt aus den claude.ai-Endpunkten schreibt. Beide führen dieselben Feldnamen je Konversation, weshalb sich der Unterschied auf das Auspacken beschränkt: Ab `conversation_record()` ist der Code geteilt. Am 19. August 2026 am echten Fall bestätigt — für denselben Chat nannten Web-API und Export-ZIP nicht nur dieselben Zahlen, sondern **dieselben Nachrichten-UUIDs**. Am 21. August 2026 an einem zweiten, größeren Fall wiederholt: ein Großimport aus vier realen Projekten mit 171 Chats über den Export-Weg, alle 171 Protokoll-UUIDs gegen die tatsächliche Export-ZIP verifiziert — 171 von 171 gefunden, keine Abweichung (3.1.7).
+**Zwei Quellen, ein Konverter.** Die Chats kommen entweder aus einem Kontoexport-ZIP (`--zip`) oder aus einem **Web-Behälter** (`--bundle`) — der Datei, die ein Browserschritt aus den claude.ai-Endpunkten schreibt. Beide führen dieselben Feldnamen je Konversation, weshalb sich der Unterschied auf das Auspacken beschränkt: Ab `conversation_record()` ist der Code geteilt. Am 19. August 2026 am echten Fall bestätigt — für denselben Chat nannten Web-API und Export-ZIP nicht nur dieselben Zahlen, sondern **dieselben Nachrichten-UUIDs**. An einem zweiten, größeren Fall wiederholt: dem Realdaten-Großlauf in 3.1.7.
 
 Damit ist die Wegegleichheit (Vorgabe 2.5) hier **baulich** gegeben statt bloß geprüft. Abweichen darf genau ein Feld: Die Chatdatei nennt als Herkunft `web-api` statt `account-export`, und `source` ist eines der fünf erlaubten. Dass sonst nichts abweicht, vergleicht `tests/test_export_convert.py` Datei für Datei — an einem Prüfbestand, der alle drei Nebendateiarten und einen Nebenzweig trägt, damit der Vergleich etwas aussagt.
 
@@ -394,10 +395,11 @@ Eine Nachricht: `uuid`, `text`, `content`, `sender` (`human`/`assistant`), `crea
 
 **`attachments` und `files` sind nicht dasselbe**, und die Verwechslung kostet Inhalt:
 
-| Feld | Zahl | Felder | Inhalt |
-| ------------- | ---- | ------------------------------------------------------------- | ------ |
+
+| Feld          | Zahl | Felder                                                         | Inhalt |
+| ------------- | ---- | -------------------------------------------------------------- | ------ |
 | `attachments` | 341  | `file_name`, `file_size`, `file_type`, **`extracted_content`** | **da** |
-| `files`       | 524  | `file_uuid`, `file_name`                                      | fehlt  |
+| `files`       | 524  | `file_uuid`, `file_name`                                       | fehlt  |
 
 Keiner der 341 ist leer, zusammen 9.635.919 Zeichen, Median 13.265, größter 169.818. Dateitypen überwiegend `text/x-python` (238), dazu `text/markdown` (26), `txt` (22), `x-shellscript` (11). Bei **22** ist der `file_name` leer, der Inhalt aber vorhanden — mehrere Kilobyte Code; ein Fragezeichen als Name würde das verstecken.
 
@@ -431,11 +433,12 @@ Das Feld `summaries` (in 3.788 Blöcken, Median 241 Zeichen) ist **keine Zusamme
 
 Drei strukturelle Befunde, die die Auswahl tragen; die Festlegung, die daraus folgt, steht in 3.1.3:
 
-| Merkmal                        | Blöcke      | Volumen        | mit Abwägungsmarker |
-| ------------------------------ | ----------- | -------------- | ------------------- |
-| `thinking_hidden=True`         | 788 (18 %)  | **0 Zeichen**  | 0 %                 |
-| kürzer als 200 Zeichen         | 1.367 (32 %)| 71.784 (0,8 %) | 2 %                 |
-| Rest (nicht hidden, ≥200)      | 2.951 (68 %)| 9.227.033 (99,2 %) | 60 %            |
+
+| Merkmal                    | Blöcke      | Volumen            | mit Abwägungsmarker |
+| -------------------------- | ------------ | ------------------ | -------------------- |
+| `thinking_hidden=True`     | 788 (18 %)   | **0 Zeichen**      | 0 %                  |
+| kürzer als 200 Zeichen    | 1.367 (32 %) | 71.784 (0,8 %)     | 2 %                  |
+| Rest (nicht hidden, ≥200) | 2.951 (68 %) | 9.227.033 (99,2 %) | 60 %                 |
 
 Die Medianlänge trennt dabei deutlicher als jedes Verhältnis: mit Marker 2.537 Zeichen, ohne 176 — Faktor 14. Ein `summaries` existiert außerdem **nicht immer** (530 Blöcke ohne), ein Verhältnis wäre für die also gar nicht bildbar.
 
@@ -449,10 +452,11 @@ Befund am Drei-Monats-Export: **20 Gabelungen in 13 von 211 Konversationen.** Ke
 
 **Regel 1: Gefolgt wird dem Pfad zur neuesten Nachricht im ganzen Baum** — nicht dem jüngsten Kind an der Gabelung. Die beiden Regeln fallen fast immer zusammen, aber nicht immer, und der Unterschied kostet Inhalt. Gegenbeispiel aus „Home-Verzeichnis zurück synchronisieren":
 
-| Kind | Zeit | Nachfahren |
-| --------- | -------- | -------------- |
-| `019efe1f` | 09:31:50 | **29** |
-| `019efe20` | 09:33:55 | 1 |
+
+| Kind       | Zeit     | Nachfahren |
+| ---------- | -------- | ---------- |
+| `019efe1f` | 09:31:50 | **29**     |
+| `019efe20` | 09:33:55 | 1          |
 
 Hier trägt das **ältere** Kind das Gespräch. „Jüngstes Kind" hätte 29 Nachrichten weggeworfen und eine Sackgasse ins Archiv geschrieben. Der Pfad zur neuesten Nachricht greift in allen 20 Fällen richtig.
 
@@ -475,16 +479,16 @@ Nicht zu verwechseln mit der **Waise** aus Vorgabe 2.6: Das ist eine Datei im Ve
 ### 3.1.3 Festlegungen und ihr Grund
 
 
-| Festlegung                                             | Grund                                                                                                                                                                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Baum ablaufen statt nach`created_at` sortieren, Regeln in **3.1.2** | Sortieren nach Zeit schreibt nachbearbeitete Fragen doppelt ins Transkript und mischt Zweige, die nie aufeinander folgten |
-| `content`-Blöcke statt `text`                         | `text` **enthält die Denkschritte** (Messung in 3.1.1) — es zu verwenden würde das Archiv mit internen Überlegungen fluten                                                                                                |
-| Hüllen mit`deleted: true` und ohne `messages`         | Die Existenz bleibt erhalten, ohne ein leeres Transkript vorzutäuschen                                                                                                                                            |
-| Zuordnung aus rohem`recent_chats`-Dump                 | Kein Formatieren von Hand nötig                                                                                                                                                                                   |
-| Jede zugeordnete UUID gegen das ZIP prüfen            | Ein vertippter Wert würde einen Chat still falsch einordnen                                                                                                                                                       |
-| Denkschritte und Anhänge in eigene Dateien nach Vorgabe **2.2** | Diagnosen und verworfene Alternativen erreichen die Antwort nie (9 % Vokabelüberlappung, Messung 3.1.1); getrennt gelegt bleibt das Gespräch schlank und die Mengenentscheidung fällt bei der Benutzung |
-| Denkblöcke verwerfen, wenn`thinking_hidden` oder kürzer als 200 Zeichen | Verlustfrei bzw. nahezu: die hidden-Blöcke sind leer, die kurzen tragen 0,8 % des Inhalts und nur 2 % von ihnen einen Marker. Ein Drittel der Einträge fällt weg, das Volumen bleibt — Filtern schafft Ordnung, nicht Platz. Auswahl strukturell nach Vorgabe **2.7**; die Marker waren nur der Prüfmaßstab |
-| Erzeugnisse in die vierte Datei, `tool_result` nur zählen | Die Auswahl ist strukturell (Werkzeugname + Feld, Vorgabe 2.7): `artifacts`-, `create_file`- und `str_replace`-Aufrufe tragen die Werke der KI (4,4 Mio Zeichen, Messung 3.1.1) — oft die einzige Kopie. `tool_result` (28,6 Mio) ist überwiegend fremd oder Duplikat und bliebe Ballast. Änderungen (`update`, `str_replace`) sind Deltas ohne Basis und werden als solche gekennzeichnet |
+| Festlegung                                                                | Grund                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Baum ablaufen statt nach `created_at` sortieren, Regeln in **3.1.2**       | Sortieren nach Zeit schreibt nachbearbeitete Fragen doppelt ins Transkript und mischt Zweige, die nie aufeinander folgten                                                                                                                                                                                                                                                                    |
+| `content`-Blöcke statt `text`                                            | `text` **enthält die Denkschritte** (Messung in 3.1.1) — es zu verwenden würde das Archiv mit internen Überlegungen fluten                                                                                                                                                                                                                                                               |
+| Hüllen mit `deleted: true` und ohne `messages`                            | Die Existenz bleibt erhalten, ohne ein leeres Transkript vorzutäuschen                                                                                                                                                                                                                                                                                                                      |
+| Zuordnung aus rohem `recent_chats`-Dump                                    | Kein Formatieren von Hand nötig                                                                                                                                                                                                                                                                                                                                                             |
+| Jede zugeordnete UUID gegen das ZIP prüfen                               | Ein vertippter Wert würde einen Chat still falsch einordnen                                                                                                                                                                                                                                                                                                                                 |
+| Denkschritte und Anhänge in eigene Dateien nach Vorgabe**2.2**           | Diagnosen und verworfene Alternativen erreichen die Antwort nie (9 % Vokabelüberlappung, Messung 3.1.1); getrennt gelegt bleibt das Gespräch schlank und die Mengenentscheidung fällt bei der Benutzung                                                                                                                                                                                   |
+| Denkblöcke verwerfen, wenn `thinking_hidden` oder kürzer als 200 Zeichen | Verlustfrei bzw. nahezu: die hidden-Blöcke sind leer, die kurzen tragen 0,8 % des Inhalts und nur 2 % von ihnen einen Marker. Ein Drittel der Einträge fällt weg, das Volumen bleibt — Filtern schafft Ordnung, nicht Platz. Auswahl strukturell nach Vorgabe**2.7**; die Marker waren nur der Prüfmaßstab                                                                             |
+| Erzeugnisse in die vierte Datei, `tool_result` nur zählen                 | Die Auswahl ist strukturell (Werkzeugname + Feld, Vorgabe 2.7): `artifacts`-, `create_file`- und `str_replace`-Aufrufe tragen die Werke der KI (4,4 Mio Zeichen, Messung 3.1.1) — oft die einzige Kopie. `tool_result` (28,6 Mio) ist überwiegend fremd oder Duplikat und bliebe Ballast. Änderungen (`update`, `str_replace`) sind Deltas ohne Basis und werden als solche gekennzeichnet |
 
 Das Ersetzen eines veralteten Chats samt Aufräumen der Vorgängerdateien ist Vorgabe **2.6**; beide erzwingenden Fälle — Umbenennung, wegfallende Nebendatei — sind dort benannt und hier nachgestellt worden.
 
@@ -498,11 +502,9 @@ Format, Felder, Dateinamen und die Referenzmechanik sind die Vorgaben **2.2** un
 
 Der ZIP-Weg ist der einzige, der `branches`, `dropped_duplicates`, `dropped_blocks`, `dropped_thinking` und die beiden `attachments_*`-Felder je mit Inhalt füllen kann — nur er sieht den Nachrichtenbaum und die Blockstruktur (2.5). Beim Drei-Monats-Export entstanden so 211 Gesprächs-, 145 Denk-, 62 Anhang- und 71 Erzeugnisdateien.
 
-
 ### 3.1.5 Aufbau des Protokolls
 
 Das Protokoll ist Vorgabe **2.4**. Weder `end_token` noch `total_turns` werden gefüllt — es gibt kein Sollmaß (2.5) —, und `started` kommt nie vor: Ein Chat wird immer ganz geschrieben.
-
 
 ### 3.1.6 Kommandos
 
@@ -514,7 +516,6 @@ Das Protokoll ist Vorgabe **2.4**. Weder `end_token` noch `total_turns` werden g
   Der **Web-Behälter** ist eine JSON-Datei mit zwei je nach Schritt gefüllten Teilen — `conversations` mit den Kopfdaten je Chat für `list --web`, `chats` mit den vollständigen Konversationen für `convert --bundle`; dazu `fetched_at` und `organization` als Herkunftsvermerk. Gelesen von `load_bundle()`, ausgepackt von `bundle_records()` und `bundle_conversations()`. Ein Behälter ohne den gebrauchten Teil bricht mit einer Meldung ab und rät nicht.
 - `diff --out <verzeichnis>` — Stand aus dem Protokoll: fehlend, veraltet, gelöscht, unbekannt. Braucht weder ZIP noch Chatdateien. Dazu **die Fenstergrenze** (Vorgabe 2.4) samt der Warnung vor einem unplausiblen Projektdatum — dieselben Sätze, die `list` ausgibt, hier aber ohne frische Chatliste: „was fehlt noch" und „wie weit muss der nächste Export zurückreichen" sind eine Frage, zweimal gestellt. Dazu der Waisen-Scan nach Vorgabe 2.6 — das Einzige, was ein Zuviel statt eines Zuwenig meldet.
 - `report --out <verzeichnis>` — was ein bestehender Bestand an Verlusten trägt. Es liest dazu **die Dateien im Verzeichnis**, nicht die Protokolleinträge: Es beschreibt, was dort liegt. Eine Waise zählt daher in seinen Summen mit — das ist folgerichtig und nicht dasselbe wie `diff`, das über das Protokoll läuft und die Waise als Zuviel meldet (Vorgabe 2.6). Genannt werden: Hüllen, übersprungene Dubletten, weggelassene Blocktypen, verworfene Denkblöcke, `files`-Verweise ohne Inhalt. Was mitkam, steht als Gegengewicht daneben — Nebenzweige, Denkblöcke, Anhänge mit Inhalt, Erzeugnisse —, damit sichtbar ist, dass ein Chat nicht linear verlief bzw. wie viel an ihm hing. Die behaltenen Denkblöcke werden dabei aus den Nebendateien gezählt: die Gesprächsdatei führt nur die verworfenen, und ein zusätzliches Metadatenfeld dafür würde das Dateiformat beider Wege ändern (Vorgaben 2.2 und 2.5) — zu viel für eine Berichtszeile.
-
 - `analyse --zip <datei> [--map <dump>]` — beschreibt, was der Leser aus einem Archiv macht, ohne etwas zu schreiben: gewählter Pfad, Nebenzweige, Umfang, und bei gegebener Zuordnung die UUIDs, die das Archiv nicht kennt. Es nennt **beide Seiten** — was mitkäme (Denkblöcke, Anhänge mit Inhalt, Erzeugnisse) und was wegfiele (verworfene Denkblöcke, Blocktypen, Hüllen, Sendewiederholungen, Namensverweise). Beantwortet eine andere Frage als 3.2 — das beschreibt den Rohexport, dieses die *Deutung*.
 
 Der Unterschied zu `report` ist die Blickrichtung, nicht der Inhalt: `report` läuft über einen **fertigen Bestand**, `analyse` über das **ZIP** und schreibt nichts — es ist die Vorschau vor dem Lauf. Beide nennen deshalb dieselben Posten, und dass sie dieselben Zahlen liefern, sichert `tests/test_export_convert.py` über drei Prüfbestände ab. Diese Absicherung ist keine Förmlichkeit: Nennt eine der beiden eine Nebendateiart nicht, verschweigt sie mit ihr einen der größten mitgenommenen Posten — Denkschritte 9,2 Mio Zeichen, Anhänge 9,6, Erzeugnisse 4,4 (Messung in 3.1.1).
@@ -523,11 +524,12 @@ Dazu ein fertig einfügbarer Textblock für das **Zielprojekt**: dass ein Chatar
 
 **Drei Fassungen, weil die Zielorte sich in genau dem unterscheiden, was der Block sagen soll** — wo das Archiv liegt und womit die Instanz es erreicht (1.3). Gewählt wird über `convert --target`; es steuert **nur** den Wortlaut, nicht eine geschriebene Datei (Vorgabe 2.10).
 
-| `--target` | Zielort | Suchmittel | einzusetzen in |
-| --- | --- | --- | --- |
-| `repo` (Vorgabe) | `<projekt>/.claude/imported_chats/` | `Grep` und `Read` | die `CLAUDE.md` des Zielprojekts |
-| `knowledge` | Projektwissen einer claude.ai-Instanz | Projektwissen bzw. Kontext | die Projektanweisungen dort |
-| `home` | `~/.claude/projects/<projekt>/` | `Grep` und `Read` | die `CLAUDE.md` des Zielprojekts |
+
+| `--target`       | Zielort                               | Suchmittel                 | einzusetzen in                  |
+| ---------------- | ------------------------------------- | -------------------------- | ------------------------------- |
+| `repo` (Vorgabe) | `<projekt>/.claude/imported_chats/`   | `Grep` und `Read`          | die `CLAUDE.md` des Zielprojekts |
+| `knowledge`      | Projektwissen einer claude.ai-Instanz | Projektwissen bzw. Kontext | die Projektanweisungen dort     |
+| `home`           | `~/.claude/projects/<projekt>/`       | `Grep` und `Read`          | die `CLAUDE.md` des Zielprojekts |
 
 Die `home`-Fassung trägt zusätzlich die Zugänglichkeitsbedingung aus 1.3 und die Anweisung, ihr Fehlen zu melden statt das Archiv für leer zu halten.
 
@@ -543,8 +545,8 @@ Die `home`-Fassung trägt zusätzlich die Zugänglichkeitsbedingung aus 1.3 und 
 - Vertippte UUID in einer Zuordnungsdatei wird gemeldet, nicht verschluckt.
 - **Integrität:** jede Nachricht landet auf dem gewählten Pfad, in einem Nebenzweig, in der Dublettenzählung — oder, nur bei einem beschädigten Export, in der Warnung über nicht platzierbare Nachrichten (3.1.2). Am Drei-Monats-Export: 7.393 im Export, 7.393 abgelegt oder gezählt, der vierte Ausgang leer. Die Prüfung rechnet ihn ausdrücklich mit, damit die Summe auch für den beschädigten Fall aufgeht statt ihn auszunehmen.
 - Lauf gegen ein echtes ZIP: **erledigt**. 211 Chats in gut einer Sekunde, 37 MB — davon 13 MB Gespräch, 9,9 MB Denkschritte, 9,9 MB Anhänge, 4,9 MB Erzeugnisse; 211 Gesprächs-, 145 Denk-, 62 Anhang- und 71 Erzeugnisdateien. Die Verteilung bestätigt die Rechnung aus Vorgabe 2.2 am geschriebenen Ergebnis: Wer nur das Gespräch liest, trägt gut ein Drittel statt des Ganzen. Alle Summen deckungsgleich mit unabhängig gemessenen: 5 Hüllen, 29 Sendewiederholungen, 1.367 verworfene Denkblöcke, 18 Nebenzweige, 341 Anhänge mit Inhalt, 524 reine Namensverweise.
-- Lauf gegen ein **Quellprojekt**: das FreeCAD-Projekt mit 22 Chats, aus **zwei** ZIPs verschiedener Zeiträume zu einem Verzeichnis zusammengeführt. Die Stichprobe hat der Nutzer inhaltlich abgenommen — der bislang einzige Beleg, dass ein Mensch das Ergebnis auf Inhalt und nicht nur auf Zahlen geprüft hat.
-- **Realdaten-Großlauf (21. August 2026):** vier echte claude.ai-Projekte, 171 Chats, über den Export-Weg geholt. Alle 171 Protokoll-UUIDs gegen die tatsächliche Export-ZIP gehalten — 171 von 171 gefunden, keine Abweichung. Stärkster verfügbarer Beleg für die Wegegleichheit (2.5) und die Integritätsrechnung an echten Daten in dieser Größenordnung.
+- Lauf gegen ein **Quellprojekt**: das FreeCAD-Projekt mit 22 Chats, aus **zwei** ZIPs verschiedener Zeiträume zu einem Verzeichnis zusammengeführt. Die Stichprobe hat der Nutzer inhaltlich abgenommen.
+- **Realdaten-Großlauf (21. August 2026):** vier echte claude.ai-Projekte, 171 Chats, über den Export-Weg geholt. Alle 171 Protokoll-UUIDs gegen die tatsächliche Export-ZIP gehalten — 171 von 171 gefunden, keine Abweichung. Trägt die Wegegleichheit (2.5) und die Integritätsrechnung an echten Daten.
 
 ### 3.1.8 Offen
 
@@ -564,7 +566,7 @@ Es beantwortet eine andere Frage als `analyse` (3.1.6): dieses beschreibt den Ro
 
 ## 3.3 Der Skill `chat-export` — das Frontend
 
-**Status: Am echten Lauf erprobt** — über drei unabhängige Sitzungen mit kaum Zutun des Nutzers, zuletzt an vier realen Projekten mit 171 Chats, gegen die tatsächliche Export-ZIP gegengeprüft. `README.de.md` und `README.en.md` sind geschrieben, reine Anwenderdokumentation ohne Statushinweis und ohne Entwicklungsangaben — bewusst abweichend von `skills/skill_vorgaben.md` 6.1. Der Grund: Was ein Nutzer kopiert, soll ihm die Bedienung sagen und nicht den Entwicklungsstand; der gehört in die Bereichs-README, wo er auch gepflegt wird.
+**Status: Am echten Lauf erprobt** — über drei unabhängige Sitzungen mit kaum Zutun des Nutzers, zuletzt am Realdaten-Großlauf (3.1.7). `README.de.md` und `README.en.md` sind geschrieben, reine Anwenderdokumentation ohne Statushinweis und ohne Entwicklungsangaben — bewusst abweichend von `skills/skill_vorgaben.md` 6.1. Der Grund: Was ein Nutzer kopiert, soll ihm die Bedienung sagen und nicht den Entwicklungsstand; der gehört in die Bereichs-README, wo er auch gepflegt wird.
 
 Der Skill ist die Klammer um das Skript: Er führt den Nutzer durch beide Wege, ohne ihm die Entscheidung abzunehmen. Er liegt in `skills/chat-export/` und enthält `chat_export_convert.py`, die Anwenderdokumentation in zwei Sprachfassungen (`README.de.md`, `README.en.md`) sowie die Anweisungsdatei ebenso zweisprachig, `SKILL.de.md` und `SKILL.en.md` — am Zielort wird genau eine davon zu `SKILL.md` (Konvention aus `skills/skill_vorgaben.md` 5.1). **Das ist alles, was ein Nutzer kopiert**; die übrigen Skripte dieses Ordners gehören zur Entwicklung und kommen in der Anweisungsdatei nicht vor.
 
@@ -598,18 +600,19 @@ Vorhandener Baustein ist `inspect_export.py` (3.2) als Schemawache des Exports. 
 
 Das Profil verbraucht sich nicht: Nach jeder Anthropic-Änderung, die eine Prüfung aus 4.2 oder 4.3 anschlagen lässt, wird dieselbe Vorlage wieder gebraucht. Es ist eine Prüf**vorlage**, kein Prüf**punkt** — die Übersicht weiter unten führt die Punkte, hier steht das Material, an dem man sie durchspielt.
 
-| Merkmal | Wie es entsteht | Was es prüft |
-| --- | --- | --- |
-| Gabelung | eine bereits gestellte Frage nachträglich bearbeiten | Baumlauf und Regel 1 (3.1.2) — **erprobt**, erzeugt zuverlässig einen Nebenzweig |
-| Anhang mit Inhalt | eine **Textdatei** hochladen (`.py`, `.md`) | `attachments` mit `extracted_content` (3.1.1) — **erprobt** |
-| reiner Namensverweis | ein **Bild** hochladen | `files` ohne Inhalt (1.6) — **erprobt**: Bilder werden nicht textextrahiert |
-| Denkschritte | eine Aufgabe, die **wirklich** Abwägung erzwingt — mehrere Ansätze unter Nebenbedingungen gegeneinander stellen und die Wahl begründen lassen; dazu eine banale Frage für den kurzen Block | Denkdatei und die Schwellen aus 3.1.3 |
-| Erzeugnis | ausdrücklich ein **Artefakt** erstellen lassen und danach ändern | Creations-Datei (3.1.3) |
-| Sendewiederholung | **kein bekanntes Rezept** — s. u. | Dublettenerkennung, Regel 2 (3.1.2) |
-| ausgetauschter Upload | eine Upload-Nachricht **ohne Begleittext** nachbearbeiten und dabei die Datei wechseln | die andere Hälfte von Regel 2 (3.1.2): dass zwei textlose Geschwister *nicht* als Dublette gelten und beide Anhänge mitkommen |
-| Hülle | einen Chat anlegen und wieder löschen | Erkennung gelöschter Chats (3.1.3) |
-| langer Chat | einer mit vielen Nachrichten | Baumlauf über eine lange Kette und die Integritätsrechnung (3.1.2, 3.1.7) |
-| wachsender Chat | einer, der Tage später fortgesetzt wird | `stale`, Ersetzen (2.6) und die Fensterrechnung (2.4) |
+
+| Merkmal               | Wie es entsteht                                                                                                                                                                                | Was es prüft                                                                                                                  |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Gabelung              | eine bereits gestellte Frage nachträglich bearbeiten                                                                                                                                          | Baumlauf und Regel 1 (3.1.2) —**erprobt**, erzeugt zuverlässig einen Nebenzweig                                              |
+| Anhang mit Inhalt     | eine**Textdatei** hochladen (`.py`, `.md`)                                                                                                                                                     | `attachments` mit `extracted_content` (3.1.1) — **erprobt**                                                                   |
+| reiner Namensverweis  | ein**Bild** hochladen                                                                                                                                                                          | `files` ohne Inhalt (1.6) — **erprobt**: Bilder werden nicht textextrahiert                                                   |
+| Denkschritte          | eine Aufgabe, die**wirklich** Abwägung erzwingt — mehrere Ansätze unter Nebenbedingungen gegeneinander stellen und die Wahl begründen lassen; dazu eine banale Frage für den kurzen Block | Denkdatei und die Schwellen aus 3.1.3                                                                                          |
+| Erzeugnis             | ausdrücklich ein**Artefakt** erstellen lassen und danach ändern                                                                                                                              | Creations-Datei (3.1.3)                                                                                                        |
+| Sendewiederholung     | **kein bekanntes Rezept** — s. u.                                                                                                                                                             | Dublettenerkennung, Regel 2 (3.1.2)                                                                                            |
+| ausgetauschter Upload | eine Upload-Nachricht**ohne Begleittext** nachbearbeiten und dabei die Datei wechseln                                                                                                          | die andere Hälfte von Regel 2 (3.1.2): dass zwei textlose Geschwister*nicht* als Dublette gelten und beide Anhänge mitkommen |
+| Hülle                | einen Chat anlegen und wieder löschen                                                                                                                                                         | Erkennung gelöschter Chats (3.1.3)                                                                                            |
+| langer Chat           | einer mit vielen Nachrichten                                                                                                                                                                   | Baumlauf über eine lange Kette und die Integritätsrechnung (3.1.2, 3.1.7)                                                    |
+| wachsender Chat       | einer, der Tage später fortgesetzt wird                                                                                                                                                       | `stale`, Ersetzen (2.6) und die Fensterrechnung (2.4)                                                                          |
 
 Die Zeile zum wachsenden Chat ist die einzige mit Vorlaufzeit: Der Zeitraumfilter des Exports arbeitet auf Tagesebene, also muss zwischen Anlegen und Fortsetzen mindestens ein Tageswechsel liegen.
 
@@ -629,28 +632,29 @@ Ein warmer Punkt kann **mangels Rechten unerreichbar** sein, ohne deshalb eine B
 
 **Übersicht.** Alle Punkte mit ihrem normativen Zuhause und ihrer Art — bewusst nur Zeiger, damit diese Tabelle nicht neben den Abschnitten herdriften kann:
 
-| Prüfpunkt | Zuhause | Art |
-| --- | --- | --- |
-| Verfügbarkeit des Exports je Kontotyp | 4.2, 1.6 | warm |
-| Aufbau des Organisationsexports (Primary Owner) | 4.2 | warm, mangels Rechten unerreichbar |
-| Zeitraumauswahl des Exports | 4.2 | warm beim Anfordern, danach kalt |
-| Zeitraumgrenze wirkt auf `created_at`, nicht `updated_at` | 4.2 | kalt |
-| Projektdateien vom Zeitraumfilter ausgenommen | 4.2 | kalt |
-| Archivmitglieder und Schlüsselmengen | 4.2, 3.1.1 | kalt |
-| `attachments` mit Inhalt gegen `files` ohne | 4.2, 3.1.1 | kalt |
-| Hüllen gelöschter Chats | 4.2, 3.1.3 | kalt |
-| Bekommt eine Konversation je einen Projektbezug? | 4.2, 1.6 | kalt |
-| Stückelung großer Exporte (`batch-0000`) | 4.2 | Beobachtung |
-| Web-Endpunkte: Pfade, Felder, Paginierung | 4.3, 1.2 | warm |
-| Bleibt der Browser-Zugriff ohne Captcha-Prüfung möglich? | 4.3 | warm |
-| Chatliste über `recent_chats` | 4.3 | warm |
-| Übergeht `recent_chats` weiterhin den laufenden Chat? | 4.3, 1.6 | warm |
-| Gibt es für `files` einen Abrufweg? | 4.3, 1.6 | warm |
-| RAG-Schwelle des Projektwissens | 4.4 | Beobachtung |
-| Container-Allowlist ohne `claude.ai` | 4.4 | warm |
-| Räumt die Aufräumung fremde Dateien in `~/.claude/projects/` mit weg? | 4.4, 1.3 | kalt |
-| Was nimmt `claude project purge` mit? | 4.4, 1.3 | kalt, destruktiv |
-| Cowork über beide Wege unerreichbar | 4.4, 1.6 | Beobachtung |
+
+| Prüfpunkt                                                             | Zuhause    | Art                                |
+| ---------------------------------------------------------------------- | ---------- | ---------------------------------- |
+| Verfügbarkeit des Exports je Kontotyp                                 | 4.2, 1.6   | warm                               |
+| Aufbau des Organisationsexports (Primary Owner)                        | 4.2        | warm, mangels Rechten unerreichbar |
+| Zeitraumauswahl des Exports                                            | 4.2        | warm beim Anfordern, danach kalt   |
+| Zeitraumgrenze wirkt auf `created_at`, nicht `updated_at`               | 4.2        | kalt                               |
+| Projektdateien vom Zeitraumfilter ausgenommen                          | 4.2        | kalt                               |
+| Archivmitglieder und Schlüsselmengen                                  | 4.2, 3.1.1 | kalt                               |
+| `attachments` mit Inhalt gegen `files` ohne                            | 4.2, 3.1.1 | kalt                               |
+| Hüllen gelöschter Chats                                              | 4.2, 3.1.3 | kalt                               |
+| Bekommt eine Konversation je einen Projektbezug?                       | 4.2, 1.6   | kalt                               |
+| Stückelung großer Exporte (`batch-0000`)                             | 4.2        | Beobachtung                        |
+| Web-Endpunkte: Pfade, Felder, Paginierung                              | 4.3, 1.2   | warm                               |
+| Bleibt der Browser-Zugriff ohne Captcha-Prüfung möglich?             | 4.3        | warm                               |
+| Chatliste über `recent_chats`                                          | 4.3        | warm                               |
+| Übergeht `recent_chats` weiterhin den laufenden Chat?                  | 4.3, 1.6   | warm                               |
+| Gibt es für `files` einen Abrufweg?                                    | 4.3, 1.6   | warm                               |
+| RAG-Schwelle des Projektwissens                                        | 4.4        | Beobachtung                        |
+| Container-Allowlist ohne `claude.ai`                                    | 4.4        | warm                               |
+| Räumt die Aufräumung fremde Dateien in `~/.claude/projects/` mit weg? | 4.4, 1.3   | kalt                               |
+| Was nimmt `claude project purge` mit?                                   | 4.4, 1.3   | kalt, destruktiv                   |
+| Cowork über beide Wege unerreichbar                                   | 4.4, 1.6   | Beobachtung                        |
 
 ## 4.2 Kontoexport — was verwendet wird und zu prüfen ist
 
