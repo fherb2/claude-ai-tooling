@@ -92,9 +92,17 @@ empty ``thinking_hidden`` blocks and blocks under 200 characters go, which is a
 third of the entries and 0.8 % of the content. Trigger words would break at the
 first change of language.
 
-**Hollow chats are deleted chats.** Messages present, no text anywhere. Verified
-in the browser: they no longer exist. Nothing recovers them, so they are marked
-rather than silently emptied.
+**Hollow chats are deleted chats.** Messages present and *nothing* that would
+travel: no conversation text, no attachment with content, no creation, no kept
+thinking block. Verified in the browser: they no longer exist. Nothing recovers
+them, so they are marked rather than silently emptied. Conversation text alone
+would be too narrow a test -- an upload with no covering words plus a failed
+answer leaves no text and still carries its attachment in full.
+
+Because a chat deleted at the source drops out of the chat list altogether, a
+``deleted`` entry that a fresh list still reports *with a newer state* is a
+contradiction and can only mean this test misfired; ``list`` sends it back to
+``stale`` so the mistake heals itself. An unchanged state leaves it deleted.
 
 **Up to four files per chat, not just the conversation.** Alongside the chat
 file itself, ``convert`` writes ``.thinking.json`` (kept thinking blocks),
@@ -760,6 +768,15 @@ def conversation_record(conversation: dict[str, Any]) -> dict[str, Any]:
     if unknown_roles:
         warnings.append(f"{unknown_roles} message(s) carry an unknown sender")
 
+    # A hollow chat is one that was deleted at the source: the skeleton is
+    # there, every trace of content is gone. Conversation text alone is too
+    # narrow a test -- a chat can consist of an upload and a failed answer and
+    # still carry its attachment in full. Anything that travels counts as a
+    # sign of life, and all of it is structural (vorgabe 2.7). Getting this
+    # wrong is expensive: a 'deleted' entry only returns to the fetch queue
+    # when the list reports a newer state (vorgabe 2.4).
+    carries_content = bool(text_total or attachments or creations or thinking)
+
     return {
         "uuid":          conversation.get("uuid", ""),
         "title":         clean_title(conversation.get("name") or ""),
@@ -771,7 +788,7 @@ def conversation_record(conversation: dict[str, Any]) -> dict[str, Any]:
         "message_count": len(messages),
         "chars":         text_total,
         "empty":         not messages,
-        "deleted":       bool(messages) and text_total == 0,
+        "deleted":       bool(messages) and not carries_content,
         "dropped_blocks":      dropped,
         "dropped_duplicates":  duplicates,
         "dropped_thinking":    dropped_thinking,
@@ -1035,7 +1052,13 @@ def update_from_list(protocol: dict[str, Any],
             entry["created_at"] = record["created_at"]
         exported = entry.get("exported_updated_at") or ""
         listed = entry.get("listed_updated_at") or ""
-        if entry["status"] == STATUS_EXPORTED and is_newer(listed, exported):
+        # 'deleted' is included on purpose, and it is not a grey area: a chat
+        # deleted at the source drops out of the list altogether (doku 1.6), so
+        # a deleted entry that the list still reports -- with a newer state at
+        # that -- contradicts itself and can only mean the hollow test misfired.
+        # Sending it back to 'stale' lets that mistake heal itself.
+        if (entry["status"] in (STATUS_EXPORTED, STATUS_DELETED)
+                and is_newer(listed, exported)):
             entry["status"] = STATUS_STALE
             counts["stale"] += 1
         else:
