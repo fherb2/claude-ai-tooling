@@ -248,3 +248,9 @@ Festlegung, vom Entwickler am 22. August 2026 bestätigt. Sie ist der Maßstab, 
 2. **Die zentrale `~/.claude/CLAUDE.md` bleibt minimal:** Chat auf Deutsch, Duzen, und die Trigger-Tafel (die stillen Trigger der Skills). Zieht ein Skill nicht, ist das der Notfall — der Entwickler wiederholt den Auftrag mit Hinweis auf den zu beachtenden Skill.
 3. **Die Projekt-`CLAUDE.md` ist der Ausnahmefall:** nur für irreversible projektspezifische Schutzfälle und für wirklich Nicht-Wiederverwendbares, das sich nicht über Kontext oder Skills abfangen lässt.
 4. **claude.ai ist zweite Zielwelt, kein Sonderfall:** Auch dort gibt es zentrale und projektlokale Anweisungen sowie hochladbare Skills. Manche Skills gelten beidseitig, manche nur auf einer Seite — entwickelt werden alle in diesem Vorhaben.
+
+### 8.3 Geltungsbereich: Claude arbeitet nicht nur am Code
+
+Festlegung, vom Entwickler am 22. August 2026 vorgegeben. Claude wird weit über das Coden hinaus eingesetzt; dass die bisher gesammelten Anweisungen fast nur vom Coden handeln, ist Zufall ihrer Herkunft, keine Aussage über die Nutzung. Daraus folgt für jede Anweisung und jeden Skill: Eine Regel, die nur fürs Coden gilt, muss ausdrücklich so deklariert sein — in der `description`, im Trigger und im Skill-Körper —, damit sie eine Claude-Instanz in anderen Arbeitsformen nicht bindet. Eine Dokumentation beschreibt nicht zwingend eine Software, ein Plan ist nicht zwingend ein Softwareentwicklungsplan.
+
+Prüffrage bei jeder Zuordnung eines Anweisungs-Postens: Gilt er nur beim Coden, in allen Arbeitsformen oder in einer anderen, benennbaren Arbeitsform? Die Antwort ist Teil der Zuordnung und wird mit festgehalten.

@@ -73,7 +73,9 @@ Was an einem einzelnen Skill offen ist, steht in dessen eigener `README.md` im S
 
 Übergreifend offen ist:
 
-- nichts
+- Die Neuordnung der Arbeitsanweisungen zu Skill-Zuhausen (Arbeitsmodell: `implementation_doku.md`, Kapitel 8).
+
+**Nächster Schritt (Plan, noch nicht ausgeführt):** Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner, der nach Abschluss entfällt) werden einzeln zugeordnet. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `implementation_doku.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `implementation_doku.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
 
 ## Lizenz
 

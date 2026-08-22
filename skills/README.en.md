@@ -73,7 +73,9 @@ What is open on an individual skill is stated in that skill's own `README.md` in
 
 Open across the project as a whole is:
 
-- nothing
+- Reorganizing the working instructions into skill homes (working model: `implementation_doku.md`, chapter 8).
+
+**Next step (plan, not yet executed):** The items of the instruction inventory (T1–T27; kept in a temporary working folder that will be removed once this is done) are assigned one by one. Claude hands them over pre-sorted — bundled by proposed skill home, each item with its origin, its variants, and a scope proposal per chapter 8.3 of `implementation_doku.md` (coding only / all kinds of work / other) — and the developer decides or confirms each assignment. The yardstick for the distribution is the working model in chapter 8.2. The confirmed list of homes is then written into `implementation_doku.md`; only after that does the writing of the individual skills begin.
 
 ## License
 
