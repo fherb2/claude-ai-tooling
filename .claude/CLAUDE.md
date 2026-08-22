@@ -54,8 +54,8 @@ Nachlässigkeit:
 |               | `chat-export/`                        | `home-.claude-sharing/`                   | `pack-source-to-txt/`                  | `skills/`                              |
 | ------------- | -------------------------------------- | ------------------------------------------ | --------------------------------------- | --------------------------------------- |
 | Doku          | `implementation_doku.md`, vier Kapitel | `implementierungs_doku.md`, drei Segmente | keine — nur `README.md`/`README.de.md` | `skill_vorgaben.md`, keine Segmente     |
-| Status        | `status.md`                            | `status.md`                                | —                                        | —                                       |
-| Fahrplan      | eigener, mit Abschnitt „Dauerhaft“     | eigener, mit Abschnitt „Dauerhaft“         | —                                        | — (README je Skill)                     |
+| Status        | — (Abschnitt in der README)            | `status.md`                                | —                                        | —                                       |
+| Fahrplan      | — (Abschnitt in der README)            | eigener, mit Abschnitt „Dauerhaft“         | —                                        | — (README je Skill)                     |
 | Eigenes Wort  | kalt / warm / Beobachtung              | —                                           | —                                        | —                                        |
 
 Dazu, was aus der Tabelle nicht hervorgeht: Kapitel 4 von `chat-export` ist
@@ -63,7 +63,12 @@ die Prüfliste gegen Änderungen bei Anthropic, ein viertes Segment über §2.4
 hinaus. Die drei Prüfarten von
 `chat-export` — **kalt**, **warm** und **Beobachtung** — sind normativ in
 `chat-export/implementation_doku.md` 4.1 festgelegt; hier steht bewusst
-keine zweite Definition. `pack-source-to-txt` ist kein über Konzept- und
+keine zweite Definition. `chat-export` hat **Fahrplan und Statusdatei am
+22. August 2026 abgelegt**, als es produktiv wurde: Ohne offene Schritte
+wären beide leere Hüllen, und der Arbeitsstand steht ohnehin im Abschnitt
+„Stand" seiner README. Steht wieder ein Schritt an, kommt der Fahrplan
+zurück — bis dahin ist die README der Ort, an dem Offenes benannt wird.
+`pack-source-to-txt` ist kein über Konzept- und
 Implementierungsdoku entwickeltes eigenes Vorhaben, sondern ein von extern
 übernommenes und angepasstes Werkzeug — daher keine Segment-Doku, kein
 Fahrplan, keine Status-Datei, nur die README in Englisch (Original) und
@@ -75,9 +80,10 @@ seither in `skills/skill_vorgaben.md`, der Arbeitsstand jedes einzelnen
 Skills in der `README.md` seines Ordners. Die Begründung im Wortlaut steht
 im Kopf von `skill_vorgaben.md`.
 
-Die READMEs von `chat-export` und `home-.claude-sharing` tragen den
-Hinweis „Nicht benutzen!“; beide sind nicht zur Weitergabe freigegeben.
-`pack-source-to-txt` und `skills` unterliegen dieser Einschränkung nicht.
+Die README von `home-.claude-sharing` trägt den Hinweis „Nicht benutzen!“;
+das Vorhaben ist nicht zur Weitergabe freigegeben. `chat-export` trug ihn bis
+zum 21. August 2026 und ist seither produktiv; `pack-source-to-txt` und
+`skills` unterlagen dieser Einschränkung nie.
 
 ## Die Vorgaben lesen, bevor eine Datei des Vorhabens entsteht oder sich ändert
 
@@ -106,8 +112,8 @@ Vorhaben mit eigenem Fahrplan und für den Fragenkatalog einer Doku genauso.
 
 Gilt für jede Befundliste in diesem Repo — Doku-Review, Code-Review,
 Docstring-Review. Welche derzeit offen sind, sagt der Fahrplan des
-jeweiligen Vorhabens — in `skills/` stattdessen die `README.md` des
-betroffenen Skills.
+jeweiligen Vorhabens — wo es keinen gibt (`skills/`, derzeit
+`chat-export/`), die zugehörige `README.md`.
 
 - Jeder Befund wird **einzeln vorgelegt und besprochen**, nicht selbständig
   ausgeführt. Die Entscheidung liegt beim Entwickler.
@@ -150,9 +156,10 @@ Plan-Dateien**:
 - **Alles andere** → im **Fahrplan**, im betreffenden Schritt ausdetailliert.
   §2.6 beschreibt den Fahrplan ohnehin als „die nächsten Schritte in
   aufgabenangemessener Detaillierung", und §1.9 verlangt, diese Detaillierung
-  vor einer Komprimierung zu vertiefen — das ist genau ein Plan. In `skills/`
-  gibt es keinen Fahrplan: Dort steht der Plan unter „Offen" in der
-  `README.md` des betroffenen Skills.
+  vor einer Komprimierung zu vertiefen — das ist genau ein Plan. Wo es keinen
+  Fahrplan gibt — in `skills/` und derzeit in `chat-export/` —, steht der Plan
+  unter „Offen" bzw. „Stand" in der zugehörigen `README.md`. Bringt ein
+  Vorhaben seinen Fahrplan zurück, wandert der Plan dorthin.
 
 In beiden Fällen steht **höchstens ein** noch nicht ausgeführter Plan
 gleichzeitig da, deutlich als solcher gekennzeichnet. Sein Zweck ist die
