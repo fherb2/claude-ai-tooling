@@ -89,6 +89,7 @@ REQUIRED_CONCEPTS = {
         "VANISHED_NOTE",
         "load_bundle", "bundle_records", "bundle_conversations",
         "SOURCE_WEB",
+        "is_newer", "utc_key",
     ],
     "inspect_export.py": [
         "created_at", "project",

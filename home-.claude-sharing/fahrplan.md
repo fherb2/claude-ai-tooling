@@ -4,7 +4,7 @@ Reine Abfolge der Arbeitsschritte, keine Inhalte. Details zu jedem Schritt stehe
 
 **Die Liste steht in der Reihenfolge der Dringlichkeit, nicht der Nummern.** Die Nummer ist eine gleichbleibende Referenz, damit ein Rückblick auf „Schritt 5" eindeutig bleibt — sie sagt nichts über die Reihenfolge und nichts über das Alter. Sortiert ist nach der Frage, was Schaden anrichtet, wenn es liegen bleibt: Zuerst das Betriebsrisiko (10, dann 4 mit den beiden riskanten Teilpunkten aus 3), danach das Sicherheitsnahe und die Absicherung (8, 9), zuletzt Ordnung und Ausbau (5, 2, 6). Die Begründung je Schritt steht dort, wo er steht.
 
-Der Mechanismus selbst ist fertig und seit dem 11. August 2026 auf beiden Rechnern im Betrieb. Die Dokumentation ist in sich geprüft, der Abgleich der Doku gegen den Code hat stattgefunden, und **seine 33 Befunde sind seit dem 22. August 2026 vollständig abgearbeitet** (Anhang B der Doku, Zeile dazu in `status.md`). Was jetzt folgt, ist keine Nachbesserung mehr, sondern Ausbau: Anwenderdokumentation, Beobachtung offener Fragen, Windows.
+Der Mechanismus selbst ist fertig und seit dem 11. August 2026 auf beiden Rechnern im Betrieb. Die Dokumentation ist in sich geprüft, der Abgleich der Doku gegen den Code hat stattgefunden, und **seine 33 Befunde sind seit dem 22. August 2026 vollständig abgearbeitet** (Anhang B der Doku, Zeile dazu in `status.md`). Was folgt, ist zweierlei: **zuerst noch Nachbesserung** — die Korrekturen sind geschrieben, aber nicht ausgerollt (Schritt 10), ein geparkter Fall ist ungelöst (Schritt 4), zwei Prüfungen fehlen (Schritte 3 und 9) —, **danach Ausbau**: Anwenderdokumentation, Ordnung unter `~/.claude`, Windows.
 
 Wie Befundlisten abgearbeitet werden, wo ein Plan steht und wie ein Review nachbearbeitet wird, steht repo-weit in `.claude/CLAUDE.md` — ebenso die Regel, dass Nummern beim Streichen erledigter Schritte nicht neu vergeben werden. **Für dieses Vorhaben heißt das:** Der Review und seine Bearbeitung liegen in `implementierungs_doku.md`, Anhang B; ein Schritt, der kein Review-Befund ist, wird hier im Fahrplan ausdetailliert, sobald er ansteht.
 
@@ -17,6 +17,8 @@ Wie Befundlisten abgearbeitet werden, wo ein Plan steht und wie ein Review nachb
    **Ein Neuaufsetzen des Dienstes steht aus.** Die Änderungen der Befunde 24 bis 33 stecken in Wächter, Unit und beiden Skripten, aber nicht im laufenden Dienst; die Unit ist diesmal mitbetroffen, ein `daemon-reload` gehört also dazu (macht `install_service.sh`). Auf FWFE41 ebenso.
 
    **Dabei mitzunehmen: der alte Ordner `werkzeuge/`.** Er ist seit der Umbenennung in `tools/` überzählig. Auf **xps am 22. August 2026 entfernt**; auf **FWFE41 liegt er noch**. Das Installskript weist beim nächsten Lauf darauf hin und nennt den Löschbefehl — entfernen muss ihn der Nutzer, denn niemand sonst weiß, ob dort etwas abgelegt wurde (3.5).
+
+   **Wer für diesen Schritt ohnehin an FWFE41 sitzt, nimmt Schritt 11 mit** — eine Zeile, dieselbe Maschine. Er steht nur deshalb weit unten, weil er für sich genommen nichts eilig macht.
 
 4. **Geparkter Fall: Konflikte in Sitzungsprotokollen.** Vollständig in `offener_fall_chatprotokolle.md`, nächste Schritte dort in Abschnitt 9. Bewusst **nicht** in die Doku eingepflegt, damit es einen Stand gibt, an dem Doku und Code widerspruchsfrei zueinander stehen und als Ausgangspunkt taugen.
 
@@ -31,6 +33,14 @@ Wie Befundlisten abgearbeitet werden, wo ein Plan steht und wie ein Review nachb
 2. **Anwenderdokumentation und README** aus Segment 1 ableiten (1.11 ist dafür als Vorlage angelegt). **Bedingung, die diesen Schritt auslöst, und der Grund für den Warnhinweis in der README:** Das Werkzeug läuft bisher ausschließlich beim Entwickler, als Quasi-Testbetrieb. Der Hinweis „Nicht benutzen" bleibt so lange stehen und entfällt erst, wenn es auch Kollegen benutzen dürfen — dieser Zeitpunkt ist der Anlass für die Anwenderdokumentation, nicht ein Restposten am Ende.
 
 6. **Windows-Pendant** entwickeln (Kap. 3.7).
+
+11. **Auf FWFE41 den Tag `werkbank-fwfe41-13aug` löschen.** Am 14. August 2026 dort angelegt, bevor die alte lokale Werkbank entfernt wurde: Sie war von `origin` abgedriftet und führte 36 Commits, die Git als nicht gemergt anzeigte. Geprüft wurde damals jeder Dateistand gegen `master` — es fehlten **genau** die vier Dateien, die wir absichtlich entfernt hatten (die beiden Befundlisten und die zwei Plan-Dateien, alle in Anhang B aufgegangen). Der Tag war der Rückweg für den Zweifelsfall; der Zweifel hat sich nicht eingestellt.
+
+    Er liegt **nur dort** — am 22. August 2026 geprüft: weder auf `xps` noch auf `origin`. Das Löschen ist deshalb rein lokal und braucht keinen Push:
+
+        git tag -d werkbank-fwfe41-13aug
+
+    Warum es überhaupt hier steht und nicht einfach vergessen wird: Nichts im Repo erklärt diesen Tag. Wer ihn in einem Jahr findet, muss annehmen, er sichere etwas Wichtiges.
 
 ## Dauerhaft
 
