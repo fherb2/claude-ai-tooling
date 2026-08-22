@@ -333,8 +333,8 @@ def bundle_records(bundle: dict[str, Any]) -> list[dict[str, str]]:
     """Turn a bundle's chat list into the records ``update_from_list`` takes.
 
     Unlike a ``recent_chats`` dump this list carries ``created_at`` per chat --
-    the one bound the older way never had, and the reason the sounding export
-    of doku 1.5 step 0 becomes unnecessary.
+    the one bound the older way never had, and the reason this route needs no
+    project start date from outside (doku 1.5).
     """
     entries = bundle.get(BUNDLE_CONVERSATIONS)
     if not isinstance(entries, list):

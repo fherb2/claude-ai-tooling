@@ -66,9 +66,9 @@ PROTOCOL_VERSION     = 1
 
 # What both routes say when the protocol knows a chat the fresh list no longer
 # offers. Held word for word in chat_export_convert.py too and guarded by
-# tests/test_wegegleichheit.py: the two scripts cannot import from each other
-# (vorgabe 2.9), and this project has twice watched one side of such a pair
-# grow while the other stood still.
+# tests/test_wegegleichheit.py: this module must not import from the converter
+# (vorgabe 2.5), or it would stop being a yardstick -- and this project has
+# twice watched one side of such a pair grow while the other stood still.
 VANISHED_NOTE = """\
 NOTE: {count} chat(s) in the protocol are not in this list.
   Deleted at the source, moved out of the project -- or the list was not paged
@@ -113,8 +113,8 @@ SLUG_MAX = 50
 def slug(title: str) -> str:
     """Turn a chat title into a filename part (doku 2.3).
 
-    Deliberately duplicated from chat_export_convert.py: this script has to
-    stay uploadable as a single file (doku 2.9), and the equality of the two
+    Deliberately duplicated from chat_export_convert.py: this module must not
+    import from the converter (vorgabe 2.5), and the equality of the two
     implementations is guarded by tests/test_wegegleichheit.py.
     """
     lowered = title.translate(UMLAUTS).lower()
