@@ -765,9 +765,18 @@ def conversation_record(conversation: dict[str, Any]) -> dict[str, Any]:
 
     path = main_path(messages)
     branches, duplicates, orphans = split_branches(messages, path)
+    # Not the case the wording used to name -- a message whose parent is not in
+    # this conversation at all becomes a branch head and is placed. What lands
+    # here is a parent cycle off the chosen path: every member points at another
+    # member, so none of them is ever a branch head and none is ever reached
+    # from one. A cycle *on* the path is absorbed by main_path's seen guard.
+    # This is a corrupt export, seen in none of the archives at hand, and this
+    # warning is the only thing that notices it: the integrity promise in doku
+    # 3.1.7 holds only as long as it is read.
     if orphans:
-        warnings.append(f"{len(orphans)} message(s) hang from a parent that is "
-                        "not in this conversation and were not placed")
+        warnings.append(f"{len(orphans)} message(s) could not be placed -- "
+                        "their parent chain never reaches the chosen path, "
+                        "which means the export is corrupt")
 
     main = render(path)
     rendered = main["messages"]
@@ -1008,6 +1017,16 @@ def load_protocol(out_dir: str) -> dict[str, Any]:
                 "chats": {}}
     with open(path, "r", encoding="utf-8") as handle:
         protocol = json.load(handle)
+    # A file from another version is read, not refused -- refusing would strand
+    # the user with a state file no tool will touch. But it must not happen
+    # silently: everything below assumes the schema of this version, so a newer
+    # file is read as if it were this one, and save_protocol will record that a
+    # tool of this version wrote it last.
+    found = protocol.get("protocol_version", PROTOCOL_VERSION)
+    if found != PROTOCOL_VERSION:
+        print(f"Warning: {path} says protocol_version {found}, this tool knows "
+              f"{PROTOCOL_VERSION}. Reading it anyway; anything this version "
+              "does not know is kept but not interpreted.", file=sys.stderr)
     protocol.setdefault("protocol_version", PROTOCOL_VERSION)
     protocol.setdefault("project", "")
     # The reading route records the direction of work here; this route does
@@ -1028,7 +1047,15 @@ def load_protocol(out_dir: str) -> dict[str, Any]:
 
 
 def save_protocol(out_dir: str, protocol: dict[str, Any]) -> None:
-    """Write the protocol atomically."""
+    """Write the protocol atomically, stamped with the version that wrote it.
+
+    Stamping unconditionally is deliberate, including over a *higher* version
+    read from disk: the field says which version wrote the file last, and that
+    is this one. Nothing is lost by it -- fields this version does not know are
+    carried through untouched, because ``load_protocol`` only fills defaults and
+    this writes the whole dict back. The reader is told about the mismatch
+    there, which is where it can still act on it.
+    """
     protocol["protocol_version"] = PROTOCOL_VERSION
     write_json(protocol, protocol_path(out_dir))
 

@@ -2,18 +2,11 @@
 
 Grundlage sind zwei Dateien: `befunde_logikpruefung_2026-08-22.md` (Befunde einer unabhängigen Prüfung durch eine fremde Instanz) und `befund_pruefung_2026-08-22.md` (meine Nachprüfung jedes einzelnen Befundes gegen Code und Doku, mit Empfehlung). **Kein Befund beruhte auf einem Missverständnis** — alle sind technisch zutreffend, weshalb hier nur noch die Reihenfolge und der Zuschnitt der Arbeitsgänge zu klären waren.
 
-**Ein Schritt ist offen** — Schritt 7. Er kam durch eine Neubewertung zurück in den Fahrplan, nicht durch einen neuen Befund: Befund 13 lag als „konstruierter Fall" ab, bis Befund 1 zeigte, dass **textlose Nachrichten mit Anhang real sind** — 22 von 10.779 in den vorliegenden Exporten. Bei denen ist Textgleichheit trivial erfüllt. Erledigt (Schritt 6).
+**Alle Befunde sind abgearbeitet.** Offen ist nichts mehr; was blieb, steht unter „Nur vermerkt" — ein einzelner Befund, der den Bericht betrifft und nicht das Archiv. Diese Datei kann fallen, sobald du das für richtig hältst: Ihr bleibender Teil steht in der Doku und in den Docstrings.
+
+**Zwei Befunde kamen unterwegs zurück in den Fahrplan**, beide durch eine Neubewertung und nicht durch einen neuen Befund — und in beiden Fällen war die *Notiz* zum Befund sachlich falsch, nicht der Befund. Bei 13 hieß es „konstruierter Fall", bis Befund 1 zeigte, dass textlose Nachrichten mit Anhang real sind. Bei 7 hieß es „toter Code, es geht nichts verloren"; nachgemessen ist die Warnung erreichbar und dann geht sehr wohl Inhalt verloren. Lehre für den nächsten Review: Eine Notiz „ohne heutige Fehlfunktion" ist eine Behauptung wie jede andere und gehört gemessen, bevor sie als Begründung dient.
 
 **Die Befundnummern werden nicht neu vergeben** (Repo-`CLAUDE.md`): Ein Rückblick auf „Befund 5" muss eindeutig bleiben. Nummer 12 ist **kein Befund** und in der Befundliste als solcher kommentiert. Die **Schrittnummern** dieser Datei wurden entgegen derselben Regel unterwegs zweimal neu vergeben (1–5 → 1–3 → 1–2); „Schritt 3" ist im Chatverlauf dadurch schon zweideutig. Deshalb zählen die neuen Schritte ab 6 weiter, damit keine Nummer ein drittes Mal kollidiert.
-
----
-
-## 7. Zwei kleine Zusagen einhalten
-
-**Befunde 7 und 10 in einem Zug** — beide klein, beide Robustheit, beide ohne heutigen Inhaltsverlust.
-
-- **Befund 7:** Die Waisen-Warnung ist toter Code. Eine Nachricht mit fremdem Elternteil fällt in `split_branches()` unter den Zweig `parent not in path_uuids and parent in {…}` und wird als Zweigkopf eingesammelt, bevor sie je in `orphans` landen könnte. Inhaltlich geht nichts verloren — verletzt ist nur eine Zusage: Die Doku kündigt eine Meldung an, die nie kommt. Zu klären ist dabei zuerst, ob die Warnung überhaupt bleiben soll oder ob die richtige Reaktion ist, sie samt Doku-Zusage zu **entfernen**; ein Code-Doku-Widerspruch lässt sich in beide Richtungen auflösen. Wer sie behält, muss den Prüffall schärfen, dessen „oder" den Verlust heute verdeckt.
-- **Befund 10:** `save_protocol()` stempelt eine fremde, auch höhere `protocol_version` kommentarlos auf 1 zurück. Ohne Version 2 ohne Wirkung — aber das Protokoll ist die zentrale Zustandsdatei, und ein stilles Zurückstempeln wäre teuer. Eine Warnung bei unbekannter Version, kein Abbruch.
 
 ---
 
@@ -26,6 +19,18 @@ Geprüft und zutreffend, aber ohne heutige Fehlfunktion. Steht hier, damit ein s
   Gemessen über alle vorliegenden Archive: **13 solche Kollisionen**, bei 49 namenlosen von 463 `attachments` und 65 namenlosen von 667 `files`-Verweisen. Namenlose Verweise sind also **nicht** selten — eine frühere Fassung dieser Notiz behauptete das mit einer Zahl, die ich nicht gemessen hatte. Der Befund bleibt hier stehen, weil er den Bericht betrifft und nicht das Archiv; bei 13 zu wenig gezählten Verweisen ist das aber eine Entscheidung und keine Selbstverständlichkeit.
 
 ## Erledigt am 22. August 2026
+
+**Befunde 7 und 10 gelöst (Schritt 7) — und die Notiz zu Befund 7 war in der Sache falsch.** Sie sagte, die Waisen-Warnung sei toter Code und es gehe nichts verloren. Nachgemessen gilt: Der Fall, den ihr *Text* nannte — ein Elternteil, der nicht in dieser Konversation vorkommt —, löst sie tatsächlich nie aus, weil die Nachricht dann Zweigkopf wird und vollständig mitkommt. Erreichbar ist sie aber über einen **Zyklus in den Elternzeigern abseits des gewählten Pfads**: 2 von 4 Nachrichten platziert, 2 verloren; mit angehängtem Kind 2 von 5. Liegt der Zyklus auf dem Pfad, saugt `main_path()` ihn über seinen Besuchsschutz ein und alles kommt mit. Entfernen wäre also falsch gewesen — die Warnung ist der einzige Wächter über die Integritätszusage. Geändert wurde deshalb ihr **Text**, nicht ihre Existenz.
+
+Der Prüffall lautete `A or B` und ließ beide Ausgänge durch; genau deshalb fiel nie auf, dass nur A eintritt. Er ist in vier Aussagen zerlegt: fremder Elternteil → platziert und keine Meldung; Zyklus abseits → gemeldet, mit Anzahl; Zyklus auf dem Pfad → vollständig platziert. Die Integritätsrechnung in `test_export_convert.py` zählt den vierten Ausgang jetzt ausdrücklich mit, statt den beschädigten Fall auszunehmen — sie ruft dazu `split_branches()` direkt auf, damit dem Datensatz kein Feld hinzugefügt werden muss (Vorgaben 2.2 und 2.5).
+
+**Bei Befund 10 ist das Stempeln richtig, das Schweigen war der Fehler.** `save_protocol()` bleibt unverändert: Das Feld sagt, welche Fassung die Datei zuletzt geschrieben hat, und das ist wahrheitsgemäß diese; unbekannte Felder überleben, weil `load_protocol()` nur Voreinstellungen ergänzt und das ganze Wörterbuch zurückgeschrieben wird. Ergänzt ist die Meldung beim **Lesen** — mit beiden Zahlen, auf stderr, ohne Abbruch. Verweigern hätte den Nutzer mit einer Zustandsdatei zurückgelassen, die kein Werkzeug mehr anfasst. Der Docstring von `save_protocol()` begründet das Stempeln jetzt, sonst meldet der nächste Review es wieder. Vier neue Prüfungen, darunter die Gegenprobe, dass die passende Version **nichts** sagt — sonst wäre die Meldung Rauschen bei jedem Lauf — und der Nachweis, dass ein unbekanntes Feld die Runde übersteht.
+
+Beide Leerproben bestanden: alter Warntext → eine Prüfung fällt; Versionsmeldung abgeschaltet → eine Prüfung fällt. Datei per Prüfsumme wiederhergestellt, alle vier Suiten grün, auch unter `-O`.
+
+**Doku:** Der Nachrichtenbaum in 3.1.2 hat jetzt eine **Regel 3** („Was sich nicht einordnen lässt, wird gemeldet") mit den beiden Fällen, die ähnlich aussehen und keine sind, und mit der Abgrenzung zur **Waise** aus Vorgabe 2.6 — das ist eine Datei ohne Protokolleintrag, ein Zuviel auf der Ablageseite, und hatte denselben Namen für etwas anderes. Die Integritätszusage in 3.1.7 nennt ihren vierten Ausgang.
+
+**Beim Einsetzen zweimal aufgepasst:** Regel 3 hatte ich zunächst zwischen Regel 2 und deren Begründung geschoben, sodass „Deshalb mitnehmen statt zählen" auf den falschen Absatz zurückverwies — korrigiert. Und der Verschiebe-Versuch über ein Heredoc brach an der Mischung aus deutschem öffnendem und ASCII-schließendem Anführungszeichen ab, genau die in §1.1 dokumentierte Falle; ausgeführt wurde es dann mit dem Edit-Werkzeug.
 
 **Befund 13 gelöst — eine Dublette ist nur, was in allem gleich ist (Schritt 6).** Neu ist `is_resend()`, das der Reihe nach Text, Anhänge, Erzeugnisse und behaltene Denkblöcke vergleicht; `split_branches()` ruft es statt des Textvergleichs. Verglichen werden bewusst die **ganzen** Rückgabewerte der vier bestehenden Funktionen, nicht nur ihre ersten Elemente: Damit fallen die Verlustnotizen und die verworfenen Blockzahlen mit in die Gleichheit, und der Code wird dabei kürzer statt länger. Vorgabe 2.5 ist nicht berührt — `wegegleichheit_referenz.py` trägt den Web-Weg, keinen Nachrichtenbaum, die Regel steht also nur an einer Stelle.
 

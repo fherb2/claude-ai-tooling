@@ -466,6 +466,12 @@ Hier trägt das **ältere** Kind das Gespräch. „Jüngstes Kind" hätte 29 Nac
 
 Deshalb mitnehmen statt zählen: Das Ziel des Archivs ist Wiederfinden, nicht die Rekonstruktion des Gesprächsverlaufs. Wer sucht, will den Satz finden, egal auf welchem Zweig er stand. Eine bloße Zahl („1 Zweig verworfen") verschweigt, ob darin zwei oder vierzig Nachrichten lagen.
 
+**Regel 3: Was sich nicht einordnen lässt, wird gemeldet.** Das ist der vierte Ausgang der Integritätsrechnung (3.1.7) und trifft genau **einen** Fall: einen **Zyklus in den Elternzeigern abseits des gewählten Pfads**. Jedes Mitglied zeigt auf ein anderes Mitglied, hat also einen Elternteil innerhalb des Chats, der nicht auf dem Pfad liegt — keines wird damit je Zweigkopf, und keines ist von einem Zweigkopf aus erreichbar. Gemessen an gestellten Fällen: ein solches Paar → 2 von 4 Nachrichten platziert, 2 gemeldet; mit einem angehängten Kind → 2 von 5, 3 gemeldet.
+
+Zwei Fälle sehen ähnlich aus und sind es nicht. Ein Elternteil, der **gar nicht** in dieser Konversation vorkommt, macht seine Nachricht zum Zweigkopf — sie kommt vollständig mit, es gibt nichts zu melden. Und ein Zyklus, der **auf** dem Pfad liegt, wird von der Pfadsuche über ihren Besuchsschutz einmal abgelaufen und mitgenommen; auch dort geht nichts verloren. Nur die Kombination aus Zyklus und Abseitslage verliert wirklich Inhalt, und dann ist der Export beschädigt — in keinem der vorliegenden Archive kommt das vor. Die Meldung bleibt trotzdem, denn sie ist das Einzige, was diesen Verlust überhaupt bemerkt; die Nachrichten selbst mitzunehmen wäre bei einem Zyklus keine sinnvolle Reihenfolge mehr.
+
+Nicht zu verwechseln mit der **Waise** aus Vorgabe 2.6: Das ist eine Datei im Verzeichnis ohne Protokolleintrag, also ein Zuviel auf der Ablageseite — hier geht es um eine Nachricht, die im Baum keinen Platz findet.
+
 ### 3.1.3 Festlegungen und ihr Grund
 
 
@@ -535,7 +541,7 @@ Die `home`-Fassung trägt zusätzlich die Zugänglichkeitsbedingung aus 1.3 und 
 - Synthetisches ZIP als Prüfstück: Verzweigung, abweichendes `text`, Hülle, null Nachrichten, Dateiverweise, alle Blocktypen — ohne echten Chatinhalt (Vorgabe 2.11).
 - `diff` gegen einen Bestand mit bekannter Lücke und einem veralteten Chat.
 - Vertippte UUID in einer Zuordnungsdatei wird gemeldet, nicht verschluckt.
-- **Integrität:** jede Nachricht landet auf dem gewählten Pfad, in einem Nebenzweig oder in der Dublettenzählung. Am Drei-Monats-Export: 7.393 im Export, 7.393 abgelegt oder gezählt.
+- **Integrität:** jede Nachricht landet auf dem gewählten Pfad, in einem Nebenzweig, in der Dublettenzählung — oder, nur bei einem beschädigten Export, in der Warnung über nicht platzierbare Nachrichten (3.1.2). Am Drei-Monats-Export: 7.393 im Export, 7.393 abgelegt oder gezählt, der vierte Ausgang leer. Die Prüfung rechnet ihn ausdrücklich mit, damit die Summe auch für den beschädigten Fall aufgeht statt ihn auszunehmen.
 - Lauf gegen ein echtes ZIP: **erledigt**. 211 Chats in gut einer Sekunde, 37 MB — davon 13 MB Gespräch, 9,9 MB Denkschritte, 9,9 MB Anhänge, 4,9 MB Erzeugnisse; 211 Gesprächs-, 145 Denk-, 62 Anhang- und 71 Erzeugnisdateien. Die Verteilung bestätigt die Rechnung aus Vorgabe 2.2 am geschriebenen Ergebnis: Wer nur das Gespräch liest, trägt gut ein Drittel statt des Ganzen. Alle Summen deckungsgleich mit unabhängig gemessenen: 5 Hüllen, 29 Sendewiederholungen, 1.367 verworfene Denkblöcke, 18 Nebenzweige, 341 Anhänge mit Inhalt, 524 reine Namensverweise.
 - Lauf gegen ein **Quellprojekt**: das FreeCAD-Projekt mit 22 Chats, aus **zwei** ZIPs verschiedener Zeiträume zu einem Verzeichnis zusammengeführt. Die Stichprobe hat der Nutzer inhaltlich abgenommen — der bislang einzige Beleg, dass ein Mensch das Ergebnis auf Inhalt und nicht nur auf Zahlen geprüft hat.
 - **Realdaten-Großlauf (21. August 2026):** vier echte claude.ai-Projekte, 171 Chats, über den Export-Weg geholt. Alle 171 Protokoll-UUIDs gegen die tatsächliche Export-ZIP gehalten — 171 von 171 gefunden, keine Abweichung. Stärkster verfügbarer Beleg für die Wegegleichheit (2.5) und die Integritätsrechnung an echten Daten in dieser Größenordnung.
