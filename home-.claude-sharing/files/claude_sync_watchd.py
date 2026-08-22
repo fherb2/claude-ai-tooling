@@ -161,6 +161,18 @@ NOTICE_INTERVAL = datetime.timedelta(hours=1)
 NOTICE_SECONDS_QUIET = 5
 NOTICE_SECONDS_ATTENTION = 12
 
+# Every notice is a leading statement plus up to two appended clauses. What
+# separates them is a line break, not "; ": on one line the daemon wraps the
+# second clause mid-phrase, and the eye has to jump back to the end of the
+# first line to make sense of it (observed in service, doku 1.8).
+#
+# Measured against Plasma 5.27.12 with a control probe (doku 3.8): a real
+# newline is honoured, and so is <br/>. The newline wins on how each FAILS
+# elsewhere -- a daemon that ignores it falls back to today's single line,
+# while one without `body-markup` would show the tag itself as text. The
+# specification defines neither.
+CLAUSE_BREAK = "\n"
+
 # The pause wording, in one place because it appears in two notices (doku 3.1,
 # point 4). Two deliberate forms, and they are laid out side by side so that
 # changing one and forgetting the other shows up in the diff: an appended
@@ -169,7 +181,7 @@ NOTICE_SECONDS_ATTENTION = 12
 # `_backlog_clause`: that one carries a decision (empty at zero), the pause
 # carries none -- the branch has already tested it. Function where something is
 # decided, constant where there is only text.
-PAUSE_CLAUSE_SHORT = "; Abgleich angehalten"
+PAUSE_CLAUSE_SHORT = CLAUSE_BREAK + "Abgleich angehalten"
 PAUSE_SENTENCE = ("Abgleich für diesen Ordner angehalten — Änderungen und "
                   "Konfliktkopien bleiben liegen")
 SAFETY_SCAN_INTERVAL = datetime.timedelta(minutes=15)
@@ -1330,7 +1342,7 @@ def _backlog_clause(count: int) -> str:
     turns down on purpose. Named here because the pause sentence speaks of both
     directions while this number can only vouch for one (doku 1.8).
     """
-    return f"; Rückstand: {count} Datei(en)" if count else ""
+    return f"{CLAUSE_BREAK}Rückstand: {count} Datei(en)" if count else ""
 
 
 def build_notice(state: WatchState, open_conflicts: int,
@@ -1395,9 +1407,9 @@ def build_notice(state: WatchState, open_conflicts: int,
     # two are indistinguishable, and it is true of both.
     if state.last_conflict_seen:
         hours = _hours_since(state.last_conflict_seen)
-        quiet = f"; kein Konflikt seit {hours} Stunde(n)"
+        quiet = f"{CLAUSE_BREAK}kein Konflikt seit {hours} Stunde(n)"
     else:
-        quiet = "; Zählung neu begonnen"
+        quiet = CLAUSE_BREAK + "Zählung neu begonnen"
 
     if figures["comparable"]:
         text = (f"abgeglichen: {_human_bytes(figures['outgoing'])} hoch, "

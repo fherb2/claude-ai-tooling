@@ -2,34 +2,9 @@
 
 Grundlage sind zwei Dateien: `befunde_logikpruefung_2026-08-22.md` (Befunde einer unabhängigen Prüfung durch eine fremde Instanz) und `befund_pruefung_2026-08-22.md` (meine Nachprüfung jedes einzelnen Befundes gegen Code und Doku, mit Empfehlung). **Kein Befund beruhte auf einem Missverständnis** — alle sind technisch zutreffend, weshalb hier nur noch die Reihenfolge und der Zuschnitt der Arbeitsgänge zu klären waren.
 
-Reihenfolge nach Schwere. Die echten Fehlfunktionen sind erledigt; es bleiben Schritt 1 — Texte auf das zurücknehmen, was belegt ist — und Schritt 2, Doku-Präzisierung ohne Codeänderung. Beide ändern kein Codeverhalten.
+**Alle Befunde sind abgearbeitet.** Was blieb, steht unter „Nur vermerkt“ — geprüft, zutreffend, ohne heutige Fehlfunktion — und unter „Erledigt“, wie es gelöst wurde. Diese Datei kann fallen, sobald du das für richtig hältst: Ihr bleibender Teil steht in der Doku und in den Docstrings.
 
 **Die Befundnummern werden nicht neu vergeben** (Repo-`CLAUDE.md`): Ein Rückblick auf „Befund 5" muss eindeutig bleiben. Nummer 12 ist **kein Befund** und in der Befundliste als solcher kommentiert.
-
----
-
-## 1. Vier Texte auf das zurücknehmen, was belegt ist
-
-Ein Arbeitsgang, weil alle vier denselben Kern haben: Sie behaupten mehr, als die Messung oder der Code hergibt. Kein Codeverhalten ändert sich.
-
-**a) Die „Umfang"-Spalte aus beiden SKILL-Dateien entfernen** — löst **Befund 3**. Die Statistik-Vorlage verlangt eine Nachrichtenzahl, die vor dem Abruf niemand kennt, während dieselbe Datei zweimal verbietet, eine Zahl selbst zu bilden. Beide echten Läufe haben deshalb von der Vorlage abweichen müssen. Ersatzlos streichen; die Anwender-READMEs führen die Tabelle längst richtig ohne diese Spalte.
-
-**b) Die Kommandonamen in Doku 1.4 richtigstellen** — **erledigt am 22. August 2026** im Zug der mechanischen Prüfung unten, weil sie genau dieser Fund war. Dort standen `plan`, `overview` und `map`; jetzt stehen die Kommandos, die tatsächlich rechnen (`list` und `diff`).
-
-**c) Den Denkschritte-Absatz beider Skill-READMEs zurücknehmen** — löst **Randnotiz 1**. Sie behaupten kategorisch, Anthropic schreibe die Überlegungen „seit Ende Juli 2026 nicht mehr" aus und bei älteren Chats seien sie „vollständig vorhanden". Doku 3.1.1 sagt dagegen, das Verhältnis schwanke „innerhalb eines einzigen Chats von Tag zu Tag" und die Ursache sei „nicht ermittelt". Die brauchbarere Auskunft für den Nutzer: Überlegungen können fehlen, die Ursache ist unbekannt, ein leeres Ergebnis ist kein Defekt des Werkzeugs.
-
-**d) Den Namens-Join in `inspect_export.py` nachziehen** — löst **Befund 6**. Das Werkzeug zählt sämtliche `files`-Einträge als „content NOT in the export" und überzeichnet den Verlust um mehr als das Doppelte (524 gegen 205). Das ist mehr als eine irreführende Ausgabe: Doku 4.2 kündigt als kalte Prüfung den „Anteil der `files`-Einträge mit Namenspartner" an, und diese Zahl berechnet kein Werkzeug — der Prüfpunkt ist so nicht durchführbar, und wer ihn mit `inspect_export.py` abarbeitet, schlägt falschen Alarm. Beide Zahlen getrennt ausgeben. Die Logik hat der Konverter in `file_references()`, sie darf aber nicht importiert werden (Vorgabe 2.9).
-
-**Prüfung:** Für (d) eine Erwartung in `tests/test_inspect_export.py` — das Fixture trägt eine Datei, die als inhaltsloser `files`-Eintrag *und* als `attachment` mit Inhalt vorkommt; sie darf nicht als Verlust gezählt werden. Für (a) bis (c) genügt der Docstring-Wächter bzw. das Lesen.
-
-## 2. Vier Doku-Präzisierungen
-
-Ein Arbeitsgang, alles Formulierung ohne Codeänderung. Jeder Punkt hält eine Grenze fest, die heute stärker klingt, als sie ist.
-
-- **Befund 4:** Vorgabe 2.4 stuft `created_after` als „exakt" ein. Belastbar ist nur „exakt, sofern die vorherige Liste vollständig war" — betroffen praktisch nur der `--map`-Pfad, weil der Web-Weg deterministisch über `pagination.has_more` blättert.
-- **Befund 9:** Vorgabe 2.2 definiert `turns` als „Anzahl importierter Redebeiträge". Bei einer Hülle schreibt der Code die Skelettlänge, während `messages` leer bleibt. Die Zahl ist nützlich — sie sagt, wie groß der Chat vor der Löschung war —, also die **Definition** nachziehen, nicht den Code.
-- **Befund 11:** `report` läuft bewusst über den Verzeichnisinhalt, `diff` über das Protokoll. Dass eine Waise in den Summen von `report` mitzählt, ist deshalb konsequent, steht aber nirgends. Ein Satz in 3.1.6.
-- **Befund 8:** Der Fallback auf das flache `text`-Feld existiert nur auf der ZIP-Seite; die Web-Form hat dieses Feld nicht. Heute rein latent (0 von 10.779 Nachrichten), aber es ist die eine Stelle, an der die bauliche Gleichheit von einem Feld abhängt, das nur eine Quelle hat. Als bekannte Grenze in 2.5 festhalten, nicht als Fehler.
 
 ---
 
@@ -43,6 +18,14 @@ Diese Befunde sind geprüft und zutreffend, aber ohne heutige Fehlfunktion. Sie 
 - **Befund 14** — `render()` dedupliziert Verlustverweise je Nachricht über das Label; zwei verschiedene namenlose Dateien gleichen Typs erscheinen als einer, die Verlustzählung untertreibt dann um eins.
 
 ## Erledigt am 22. August 2026
+
+**Befunde 3, 6 und Randnotiz 1 gelöst — Texte auf das Belegte zurückgenommen, kein Codeverhalten geändert außer bei Befund 6.** Die „Umfang"-Spalte ist aus beiden SKILL-Tabellen entfernt, mit einem Satz, warum es sie nicht gibt: Die Chatliste trägt den Nachrichtenumfang nicht, das Protokoll kennt `turns` erst nach dem Umwandeln, und eine geschätzte Zahl ist verboten. Der Denkschritte-Absatz beider Skill-READMEs sagt jetzt, was gemessen ist — die Überlegungen *können* fehlen, es wechselte innerhalb eines Chats von Tag zu Tag, die Ursache ist unbekannt —, statt ein Datum zu versprechen.
+
+`inspect_export.py` zählt den Verlust nicht mehr pauschal: Es gibt drei Zahlen getrennt aus — `files` mit Inhaltspartner in derselben Nachricht samt Anteil, `files` ohne Partner, `attachments` ohne extrahierten Inhalt. Damit ist der Prüfpunkt aus Doku 4.2 erstmals ablesbar statt nur angekündigt. Die Join-Regel ist bewusst zweimal gehalten statt importiert (Vorgabe 2.9).
+
+**Dabei ein Fund im Prüfmaterial:** Das Fixture des Selbsttests deckte den Paar-Fall gar nicht ab — `attachments` trug `code.py`, `files` trug `nur-name.bin`, also verschiedene Namen. Der Fahrplan hatte das Gegenteil behauptet. Jetzt kommt `code.py` in beiden Arrays vor, wie im echten Export, und zwei Prüfungen messen den Anteil. Leerprobe bestanden.
+
+**Befunde 4, 8, 9 und 11 als Doku-Präzisierung**, ohne Codeänderung: `created_after` ist „exakt, **sofern die vorherige Liste vollständig war**", mit einem Absatz, was bei einer unvollständigen Liste geschieht und warum praktisch nur `--map` betroffen ist. Die Felddefinition von `turns` sagt jetzt, dass bei einer Hülle die Gerüstlänge stehen bleibt. `report` liest ausdrücklich das Verzeichnis, `diff` das Protokoll — deshalb zählt eine Waise dort mit. Und 2.5 nennt die bekannte Grenze der baulichen Gleichheit: Der `text`-Fallback hat nur eine Quelle.
 
 **Befund 1 gelöst, in zwei Hälften.** Die Hüllen-Erkennung prüft jetzt auf *alles*, was mitwandert — Gesprächstext, Anhang mit Inhalt, Erzeugnis, behaltener Denkblock —, statt nur auf den Gesprächstext; ein Chat aus einem Upload ohne Begleitworte und einer fehlgeschlagenen Antwort gilt damit nicht mehr als gelöscht. Und ein `deleted`-Eintrag, den eine frische Liste mit **neuerem** Stand führt, geht zurück auf `stale`: Weil ein an der Quelle gelöschter Chat aus der Liste herausfällt (Doku 1.6), ist diese Kombination ein Widerspruch und kann nur eine Fehlklassifikation sein — so heilt sie sich selbst. Ein unveränderter Stand lässt den Eintrag `deleted`, sonst würde jeder Listenlauf jeden gelöschten Chat erneut holen.
 

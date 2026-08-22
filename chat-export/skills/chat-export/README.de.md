@@ -189,6 +189,6 @@ Nicht alles, was in einem Chat zu sehen war, steht hinterher auch im Archiv — 
 
 **Werkzeugaufrufe und ihre Ergebnisse** werden gezählt, aber nicht gespeichert. Das ist der weitaus größte Posten und besteht überwiegend aus Material, das ohnehin woanders steht — Dateiinhalte, Suchergebnisse, Zwischenschritte.
 
-**Bei neueren Chats fehlen die Überlegungen.** Das ist keine Eigenheit dieses Skills: Anthropic schreibt sie seit Ende Juli 2026 nicht mehr aus, weder im Export noch in der Weboberfläche. Bei älteren Chats sind sie vollständig vorhanden. Es lohnt sich also nicht, danach zu suchen — sie sind an der Quelle nicht da.
+**Die Überlegungen können fehlen.** Das ist keine Eigenheit dieses Skills: Claude legt sie manchmal offen und manchmal nicht, und zwar in derselben Quelle — gemessen wechselte es innerhalb eines einzigen Chats von Tag zu Tag. Woran es hängt, ist nicht bekannt. Praktisch heißt das: Ein Archiv ohne Überlegungen ist eine Stichprobe, kein Defekt des Werkzeugs, und mehr als vorhanden ist kann niemand holen. Anhänge und Erzeugnisse sind davon unberührt.
 
 **Gelöschte Chats** erscheinen im Export noch als leere Hülle, ohne Text. Der Skill erkennt und kennzeichnet sie; wiederherstellen kann sie niemand.

@@ -89,11 +89,16 @@ CONVERSATIONS = [
      "updated_at": "2026-05-01T12:00:00.000000Z",
      "account": {"uuid": "acc"},
      "chat_messages": [
+         # 'code.py' appears in BOTH arrays under the same name -- the real
+         # export records a text upload exactly like this, and counting the
+         # 'files' side as lost would overstate the loss. 'nur-name.bin' has
+         # no partner and is a genuine loss candidate.
          msg("m0", ROOT, "human", GEHEIM + " Frage", "2026-05-01T10:00:00Z",
              attachments=[{"file_name": "code.py", "file_type": "text/x-python",
                            "file_size": 30,
                            "extracted_content": GEHEIM + " print()"}],
-             files=[{"file_uuid": "f1", "file_name": "nur-name.bin"}]),
+             files=[{"file_uuid": "f0", "file_name": "code.py"},
+                    {"file_uuid": "f1", "file_name": "nur-name.bin"}]),
          msg("m1", "m0", "assistant", "MISLEADING " + GEHEIM,
              "2026-05-01T10:01:00Z", blocks=[
                  {"type": "thinking", "thinking": GEHEIM + " Abwaegung",
@@ -158,8 +163,14 @@ check("it names the hollowed chat as deleted at the source",
       and "DELETED at the source" in out, out)
 check("it counts the fork", "1 branch(es)" in out, out)
 check("it separates carried attachments from name-only references",
-      "attachments WITH extracted_content: 1" in out
-      and "name only" in out, out)
+      "attachments WITH extracted_content: 1" in out, out)
+# The distinction the converter was rebuilt for, and the one doku 4.2 asks to
+# measure: a 'files' entry whose content sits in the same message is not a
+# loss. Counting all of them together overstated it by more than double.
+check("a files entry with its content beside it is not counted as a loss",
+      "content sits in the same message: 1 of 2 (50%)" in out, out)
+check("and the one without a partner is named as the loss candidate",
+      "with no such partner: 1" in out, out)
 check("it reports the text/blocks divergence",
       "'text' != the text blocks" in out, out)
 check("the schema watch lists all three key sets",
