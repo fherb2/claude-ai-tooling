@@ -76,10 +76,8 @@ Diese Befunde sind geprüft und zutreffend, aber ohne heutige Fehlfunktion. Sie 
 - **Befund 13** — Die Dubletten-Erkennung vergleicht nur den Text; ein Resend mit gleichem Text und abweichendem Anhang würde samt Anhang verworfen. Konstruierter Fall.
 - **Befund 14** — `render()` dedupliziert Verlustverweise je Nachricht über das Label; zwei verschiedene namenlose Dateien gleichen Typs erscheinen als einer, die Verlustzählung untertreibt dann um eins.
 
-## Dauerhaft: Kommandonamen, Flags und Feldnamen gehören mit geprüft
+## Erledigt am 22. August 2026
 
-**Bei einer Doku-Prüfung sind Kommandonamen, Flags und Feldnamen genauso gegen den Code zu halten wie Kapitelverweise.** Die Prüfung vom 22. August hatte alle 198 Kapitelverweise und 72 Code-Verweise inhaltlich abgearbeitet und **Randnotiz 2 trotzdem übersehen**, weil ein Kommandoname kein Verweis ist.
+**Kommandonamen, Flags und Feldnamen einmal vollständig gegen den Code gehalten**, über alle Dokumente des Bereichs und in beiden Richtungen. Zwei echte Funde, beide behoben: die Kommandonamen in 1.4 (Randnotiz 2, Schritt 4b) und das undokumentierte Metadatenfeld `imported_at`; dazu `chats` als fehlende Strukturangabe in 2.4. Beide Feldmengen sind seither deckungsgleich, maschinell geprüft.
 
-**Einmal vollständig durchgeführt am 22. August 2026**, über `implementation_doku.md`, beide READMEs, beide SKILL-Dateien und beide `chrome-*`-Dateien, in **beiden** Richtungen — Doku gegen Code und Code gegen Doku. Ergebnis: zwei echte Funde, beide sofort behoben (die Kommandonamen in 1.4 und das undokumentierte Metadatenfeld `imported_at`), dazu eine fehlende Strukturangabe (`chats` als Protokollschlüssel in 2.4). Alles übrige waren Falsch-Positive: fremde Werkzeuge (`--chrome`, `--add-dir`, `--dry-run`, `--teleport`), Felder der claude.ai-Weboberfläche (`capabilities`, `pagination`, `is_private`) und Namen aus den Messungen (`bash_tool`, `web_search`).
-
-**So geht die Prüfung:** Kommandos und Flags per Regex aus `sub.add_parser(...)` und `add_argument("--...")` ziehen; die Feldnamen beider Seiten aus dem laufenden Code holen (`chat_document()` für die Chatdatei, `load_protocol()` und der Eintragsaufbau für das Protokoll) und gegen die Backtick-Begriffe in Vorgabe 2.2 bzw. 2.4 halten. Die Gegenrichtung ist die wichtigere: Ein Feld, das der Code schreibt und die Doku nicht nennt, fällt beim Lesen nie auf — genau so war `imported_at` durchgerutscht.
+**Das Verfahren und die typischen Falsch-Positiven stehen jetzt in Vorgabe 2.9**, nicht hier — diese Datei verschwindet mit den Befunden, die Regel gilt weiter.
