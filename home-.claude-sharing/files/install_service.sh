@@ -33,6 +33,12 @@ UNIT_NAME="claude-sync-watch.service"
 UNIT_TARGET_DIR="$HOME/.config/systemd/user"
 WATCH_DIR="$HOME/.claude"
 
+# Absolute on purpose -- a service starts with a sparse PATH and would not find
+# "claude" (doku 3.3). It is a variable rather than a literal so that the login
+# check below can be exercised against a stand-in; the checks themselves are
+# the one thing here that must not go untested (doku 3.5).
+CLAUDE_BIN="/usr/bin/claude"
+
 fail() {
     printf 'Abbruch: %s\n' "$1" >&2
     if [ $# -gt 1 ]; then
@@ -154,8 +160,8 @@ fi
 
 # --- 3. Prerequisites -----------------------------------------------------
 
-[ -x /usr/bin/claude ] || fail \
-    "/usr/bin/claude ist nicht vorhanden oder nicht ausführbar." \
+[ -x "$CLAUDE_BIN" ] || fail \
+    "$CLAUDE_BIN ist nicht vorhanden oder nicht ausführbar." \
 "Ohne Claude Code kann keine Konfliktsitzung starten. Bitte Claude Code
 installieren und sicherstellen, dass es unter /usr/bin/claude erreichbar
 ist."
