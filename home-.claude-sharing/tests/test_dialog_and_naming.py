@@ -1242,6 +1242,69 @@ def check_launch_failure(w: types.ModuleType, tmp_root: Path) -> None:
         w.set_tool_dir(original_dir)
 
 
+def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
+    """How the session invocation is assembled (doku 3.3).
+
+    ``--add-dir`` is variadic, so it swallows every following argument as
+    another directory. With the handover text behind it the session once
+    started with NO prompt at all and showed the welcome screen instead of
+    working -- observed in the operating test, and the reason 3.3 calls this
+    order load-bearing. Nothing checked it until now.
+
+    No terminal is started: ``spawn_detached`` is replaced by a recorder, which
+    keeps the assurance that this script runs without a screen and without a
+    real process. That the recorder returns a pid and the pid comes back out of
+    ``launch_session`` is itself a check -- it proves the stub was reached
+    rather than a real ``Popen`` failing quietly.
+    """
+    print("Aufbau des Sitzungsaufrufs:")
+    original_dir = w.TOOL_DIR
+    original_spawn = w.spawn_detached
+    w.set_tool_dir(tmp_root / "argv")
+    watch_dir = tmp_root / "beobachtet"
+    aufruf: dict[str, object] = {}
+    pair = w.ConflictPair(copy=watch_dir / "a.sync-conflict-x.txt",
+                          original=watch_dir / "a.txt", device="DEV")
+    try:
+        w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
+        w.INSTRUCTION_FILE.write_text("egal", encoding="utf-8")
+        watch_dir.mkdir(parents=True, exist_ok=True)
+
+        def aufzeichnen(argv, cwd):
+            aufruf["argv"] = argv
+            aufruf["cwd"] = cwd
+            return 4711
+
+        w.spawn_detached = aufzeichnen
+        pid = w.launch_session(["faketerm", "-e"], [pair], watch_dir)
+        argv = aufruf.get("argv") or []
+
+        check("der Aufzeichner wurde erreicht", pid, 4711)
+        check("Terminalbefehl steht vorn", argv[:2], ["faketerm", "-e"])
+        check("Programmpfad absolut, unmittelbar hinter dem Terminal",
+              len(argv) > 2 and argv[2] == w.claude_binary()
+              and argv[2].startswith("/"), True)
+        check("--add-dir genau einmal", argv.count("--add-dir"), 1)
+        check("--add-dir vor der Arbeitsanweisung",
+              argv.index("--add-dir")
+              < argv.index("--append-system-prompt-file"), True)
+        check("--add-dir zeigt auf den Werkzeugordner",
+              argv[argv.index("--add-dir") + 1], str(w.TOOLS_DIR))
+        # The value must sit directly behind its own option: anything between
+        # them would be read as the file name, and the session would refuse to
+        # start (doku 3.3).
+        check("Arbeitsanweisung folgt unmittelbar auf ihre Option",
+              argv[argv.index("--append-system-prompt-file") + 1],
+              str(w.INSTRUCTION_FILE))
+        check("Übergabetext ist das letzte Argument",
+              argv[-1], w.build_handover([pair], watch_dir))
+        check("Arbeitsverzeichnis ist der überwachte Ordner",
+              aufruf.get("cwd"), watch_dir)
+    finally:
+        w.spawn_detached = original_spawn
+        w.set_tool_dir(original_dir)
+
+
 def check_pass_guard(w: types.ModuleType, tmp_root: Path) -> None:
     """One failing pass must not take the observation with it (doku 3.1).
 
@@ -1421,6 +1484,128 @@ def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
     check("Prompt-Antwort bricht nichts mehr ab", code, 0)
     check("sie wird nur gezeigt",
           "WARNUNG" in output and "Not logged in" in output, True)
+
+
+def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
+    """The exclusion list is offered, not just named (doku 3.5, 2.8).
+
+    Two marked regions of install_service.sh are cut out of the file itself and
+    run: the question helper and the exclusion-list block.
+
+    The helper is exercised WITHOUT a terminal on purpose, which is the state a
+    test process is in anyway: the read from /dev/tty fails, the default takes
+    its place, and the default then runs through the very same case statement
+    an entered answer would. That covers the whole mapping table without a
+    pseudo terminal -- what stays uncovered is only the reading itself.
+
+    For the block the helper is replaced by a stand-in, so the answer is set
+    from here and no question is ever asked.
+    """
+    print("Ausschlussliste anbieten (3.5, 2.8):")
+    source = INSTALL.read_text(encoding="utf-8").splitlines()
+
+    def region(name: str) -> str:
+        start = next(i for i, line in enumerate(source)
+                     if line.startswith(f"# --- {name}: Anfang"))
+        end = next(i for i, line in enumerate(source)
+                   if line.startswith(f"# --- {name}: Ende"))
+        check(f"markierte Strecke {name} ist auffindbar", start < end, True)
+        return "\n".join(source[start:end + 1])
+
+    ask_region = region("Frage")
+    list_region = region("Ausschlussliste")
+
+    def ask(default: str) -> tuple[int, str]:
+        script = f'{ask_region}\nask_yes_no "Frage?" "{default}"\n'
+        result = subprocess.run(["bash", "-c", script], capture_output=True,
+                                text=True, stdin=subprocess.DEVNULL)
+        return result.returncode, result.stdout + result.stderr
+
+    # The new convention, and the one thing most easily got wrong: an empty
+    # answer follows the default, and for the exclusion list that default is
+    # YES -- leaving it diverging is the worse of the two answers (doku 2.8).
+    code, output = ask("j")
+    check("leere Antwort folgt der Vorgabe ja", code, 0)
+    check("und die Vorgabe steht groß im Text", "[J/n]" in output, True)
+    code, output = ask("n")
+    check("leere Antwort folgt der Vorgabe nein", code, 1)
+    check("auch dort sichtbar", "[j/N]" in output, True)
+    # Same case statement an entered answer would run through.
+    check("ausgeschriebenes Ja zählt", ask("ja")[0], 0)
+    check("englisches Y zählt", ask("Y")[0], 0)
+    check("alles andere ist ein Nein", ask("quatsch")[0], 1)
+
+    stage = tmp_root / "ausschluss"
+    quelle = stage / "quelle"
+    ziel = stage / "ziel"
+    quelle.mkdir(parents=True, exist_ok=True)
+    ziel.mkdir(parents=True, exist_ok=True)
+    (quelle / ".stignore").write_text("/telemetry\n/ide\n", encoding="utf-8")
+
+    def run_block(antwort: int, vorhanden: str | None) -> str:
+        wirksam = ziel / ".stignore"
+        if vorhanden is None:
+            wirksam.unlink(missing_ok=True)
+        else:
+            wirksam.write_text(vorhanden, encoding="utf-8")
+        script = ("set -euo pipefail\n"
+                  'warn () { printf "WARN: %s\\n" "$1"; }\n'
+                  # The stand-in records the default as well: it is the whole
+                  # point of the offer, and it would otherwise be the one thing
+                  # here that nothing pins.
+                  'ask_yes_no () { printf "FRAGE[%s]: %s\\n" "$2" "$1"; return '
+                  f'{antwort}; }}\n'
+                  f'SCRIPT_DIR="{quelle}"\n'
+                  f'WATCH_DIR="{ziel}"\n'
+                  'SYNCTHING_GUI="http://beispiel:8384"\n'
+                  + list_region)
+        # Both streams into one, in the order they are really written: the diff
+        # goes to stderr, the question to stdout, and a check on which came
+        # first is worthless if the two are concatenated afterwards. On one
+        # terminal the user sees exactly this single stream.
+        result = subprocess.run(["bash", "-c", script], text=True,
+                                stdin=subprocess.DEVNULL,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT)
+        check("der Block läuft ohne Fehler durch", result.returncode, 0)
+        return result.stdout
+
+    massgeblich = (quelle / ".stignore").read_text(encoding="utf-8")
+
+    output = run_block(antwort=0, vorhanden=None)
+    check("fehlende Liste wird angeboten", "FRAGE[" in output, True)
+    # Where nothing is excluded at all, leaving it as it is is the worse
+    # of the two answers -- so the offer defaults to yes (doku 2.8).
+    check("und zwar mit Vorgabe ja", "FRAGE[j]:" in output, True)
+    check("und bei Zustimmung übernommen",
+          (ziel / ".stignore").read_text(encoding="utf-8"), massgeblich)
+    check("mit Empfehlung zum Neueinlesen",
+          "beispiel:8384" in output, True)
+
+    output = run_block(antwort=1, vorhanden=None)
+    check("abgelehnt: nichts entsteht", (ziel / ".stignore").exists(), False)
+    check("aber der Befehl steht da", "WARN:" in output and "cp " in output,
+          True)
+    # The recommendation must hang on the copy, not on the block being run --
+    # otherwise it appears where nothing changed and gets ignored everywhere.
+    check("und keine Empfehlung ohne Kopie", "beispiel:8384" in output, False)
+
+    output = run_block(antwort=0, vorhanden=massgeblich)
+    check("bei Gleichheit wird nicht gefragt", "FRAGE[" in output, False)
+    check("sondern die Gleichheit gemeldet", "überein" in output, True)
+
+    abweichend = "/telemetry\n/etwas-anderes\n"
+    output = run_block(antwort=0, vorhanden=abweichend)
+    check("Abweichung wird übernommen",
+          (ziel / ".stignore").read_text(encoding="utf-8"), massgeblich)
+    # The answer is about the differences, so they have to be readable first.
+    check("auch hier mit Vorgabe ja", "FRAGE[j]:" in output, True)
+    check("und der Unterschied stand vor der Frage",
+          output.index("/etwas-anderes") < output.index("FRAGE["), True)
+
+    output = run_block(antwort=1, vorhanden=abweichend)
+    check("abgelehnte Abweichung bleibt stehen",
+          (ziel / ".stignore").read_text(encoding="utf-8"), abweichend)
 
 
 def check_clock(w: types.ModuleType, tmp_root: Path) -> None:
@@ -1667,9 +1852,11 @@ def main() -> int:
         check_precondition_exit(w, Path(tmp))
         check_free_text_terminal(w, Path(tmp))
         check_launch_failure(w, Path(tmp))
+        check_launch_argv(w, Path(tmp))
         check_pass_guard(w, Path(tmp))
         check_uninstall_guard(w, Path(tmp))
         check_login_check(w, Path(tmp))
+        check_stignore_offer(w, Path(tmp))
         check_clock(w, Path(tmp))
         check_dry_run(w, Path(tmp))
         check_folder_check(w, Path(tmp))

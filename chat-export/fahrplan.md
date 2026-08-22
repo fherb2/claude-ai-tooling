@@ -2,22 +2,38 @@
 
 Grundlage sind zwei Dateien: `befunde_logikpruefung_2026-08-22.md` (Befunde einer unabhängigen Prüfung durch eine fremde Instanz) und `befund_pruefung_2026-08-22.md` (meine Nachprüfung jedes einzelnen Befundes gegen Code und Doku, mit Empfehlung). **Kein Befund beruhte auf einem Missverständnis** — alle sind technisch zutreffend, weshalb hier nur noch die Reihenfolge und der Zuschnitt der Arbeitsgänge zu klären waren.
 
-**Alle Befunde sind abgearbeitet.** Was blieb, steht unter „Nur vermerkt“ — geprüft, zutreffend, ohne heutige Fehlfunktion — und unter „Erledigt“, wie es gelöst wurde. Diese Datei kann fallen, sobald du das für richtig hältst: Ihr bleibender Teil steht in der Doku und in den Docstrings.
+**Ein Schritt ist offen** — Schritt 7. Er kam durch eine Neubewertung zurück in den Fahrplan, nicht durch einen neuen Befund: Befund 13 lag als „konstruierter Fall" ab, bis Befund 1 zeigte, dass **textlose Nachrichten mit Anhang real sind** — 22 von 10.779 in den vorliegenden Exporten. Bei denen ist Textgleichheit trivial erfüllt. Erledigt (Schritt 6).
 
-**Die Befundnummern werden nicht neu vergeben** (Repo-`CLAUDE.md`): Ein Rückblick auf „Befund 5" muss eindeutig bleiben. Nummer 12 ist **kein Befund** und in der Befundliste als solcher kommentiert.
+**Die Befundnummern werden nicht neu vergeben** (Repo-`CLAUDE.md`): Ein Rückblick auf „Befund 5" muss eindeutig bleiben. Nummer 12 ist **kein Befund** und in der Befundliste als solcher kommentiert. Die **Schrittnummern** dieser Datei wurden entgegen derselben Regel unterwegs zweimal neu vergeben (1–5 → 1–3 → 1–2); „Schritt 3" ist im Chatverlauf dadurch schon zweideutig. Deshalb zählen die neuen Schritte ab 6 weiter, damit keine Nummer ein drittes Mal kollidiert.
 
 ---
 
-## Nur vermerkt, nichts zu tun
+## 7. Zwei kleine Zusagen einhalten
 
-Diese Befunde sind geprüft und zutreffend, aber ohne heutige Fehlfunktion. Sie stehen hier, damit ein späterer Review sie nicht erneut meldet; die Begründung je Fall in `befund_pruefung_2026-08-22.md`.
+**Befunde 7 und 10 in einem Zug** — beide klein, beide Robustheit, beide ohne heutigen Inhaltsverlust.
 
-- **Befund 7** — Die Waisen-Warnung ist praktisch toter Code: Eine Nachricht mit fremdem Elternteil wird als Zweigkopf eingesammelt, `orphans` bleibt leer. Inhaltlich geht nichts verloren. Wer die Meldung je reparieren will, muss zuerst den Test schärfen, dessen „oder" den Verlust verdeckt.
-- **Befund 10** — `save_protocol()` stempelt eine fremde, auch höhere `protocol_version` kommentarlos auf 1 zurück. Ohne Wirkung, solange es keine Version 2 gibt.
-- **Befund 13** — Die Dubletten-Erkennung vergleicht nur den Text; ein Resend mit gleichem Text und abweichendem Anhang würde samt Anhang verworfen. Konstruierter Fall.
-- **Befund 14** — `render()` dedupliziert Verlustverweise je Nachricht über das Label; zwei verschiedene namenlose Dateien gleichen Typs erscheinen als einer, die Verlustzählung untertreibt dann um eins.
+- **Befund 7:** Die Waisen-Warnung ist toter Code. Eine Nachricht mit fremdem Elternteil fällt in `split_branches()` unter den Zweig `parent not in path_uuids and parent in {…}` und wird als Zweigkopf eingesammelt, bevor sie je in `orphans` landen könnte. Inhaltlich geht nichts verloren — verletzt ist nur eine Zusage: Die Doku kündigt eine Meldung an, die nie kommt. Zu klären ist dabei zuerst, ob die Warnung überhaupt bleiben soll oder ob die richtige Reaktion ist, sie samt Doku-Zusage zu **entfernen**; ein Code-Doku-Widerspruch lässt sich in beide Richtungen auflösen. Wer sie behält, muss den Prüffall schärfen, dessen „oder" den Verlust heute verdeckt.
+- **Befund 10:** `save_protocol()` stempelt eine fremde, auch höhere `protocol_version` kommentarlos auf 1 zurück. Ohne Version 2 ohne Wirkung — aber das Protokoll ist die zentrale Zustandsdatei, und ein stilles Zurückstempeln wäre teuer. Eine Warnung bei unbekannter Version, kein Abbruch.
+
+---
+
+## Nur vermerkt
+
+Geprüft und zutreffend, aber ohne heutige Fehlfunktion. Steht hier, damit ein späterer Review es nicht erneut meldet; die Begründung in `befund_pruefung_2026-08-22.md`.
+
+- **Befund 14** — `render()` dedupliziert Verlustverweise je Nachricht über das Label; zwei verschiedene namenlose Dateien gleichen Typs erscheinen als einer, die Verlustzählung untertreibt dann um eins. **Kein Inhaltsverlust** — es geht nichts weg, was ohne den Befund mitgekommen wäre; zu klein ist allein die *gemeldete* Verlustzahl.
+
+  Gemessen über alle vorliegenden Archive: **13 solche Kollisionen**, bei 49 namenlosen von 463 `attachments` und 65 namenlosen von 667 `files`-Verweisen. Namenlose Verweise sind also **nicht** selten — eine frühere Fassung dieser Notiz behauptete das mit einer Zahl, die ich nicht gemessen hatte. Der Befund bleibt hier stehen, weil er den Bericht betrifft und nicht das Archiv; bei 13 zu wenig gezählten Verweisen ist das aber eine Entscheidung und keine Selbstverständlichkeit.
 
 ## Erledigt am 22. August 2026
+
+**Befund 13 gelöst — eine Dublette ist nur, was in allem gleich ist (Schritt 6).** Neu ist `is_resend()`, das der Reihe nach Text, Anhänge, Erzeugnisse und behaltene Denkblöcke vergleicht; `split_branches()` ruft es statt des Textvergleichs. Verglichen werden bewusst die **ganzen** Rückgabewerte der vier bestehenden Funktionen, nicht nur ihre ersten Elemente: Damit fallen die Verlustnotizen und die verworfenen Blockzahlen mit in die Gleichheit, und der Code wird dabei kürzer statt länger. Vorgabe 2.5 ist nicht berührt — `wegegleichheit_referenz.py` trägt den Web-Weg, keinen Nachrichtenbaum, die Regel steht also nur an einer Stelle.
+
+Drei neue Prüfungen (259 in der Datei), Leerprobe bestanden: mit dem alten Textvergleich fallen genau die zwei neuen Verlustprüfungen, die Gegenprobe „echter Resend wird weiter verworfen" hält — die Erweiterung schaltet die Regel also nicht ab. Datei per Prüfsumme wiederhergestellt.
+
+**Zwei Fehler in meinen eigenen neuen Texten, beide beim Nachmessen gefunden:** Ich hatte „22 von 10.779" dem Drei-Monats-Export zugeschrieben; es sind 22 über **alle** vorliegenden Archive, davon 9 im Drei-Monats-Export und 13 in einem weiteren. Korrigiert in Doku 3.1.2, im Docstring und im Prüfmaterial-Kommentar. Und in der Notiz zu Befund 14 stand eine Zahl, die ich gar nicht gemessen hatte; die echte Messung steht jetzt dort. Die Befundliste selbst hatte beide Zahlen richtig — die Fehlzuordnung war meine.
+
+**Mitgezogen, weil es sonst stehengeblieben wäre:** Die Rezepttabelle in 4.1 führte „Sendewiederholung — kein bekanntes Rezept" und schloss daraus, der Codeweg bleibe ungeprüft. Für die neu abgedeckte Hälfte von Regel 2 gibt es jetzt sehr wohl ein Rezept — eine textlose Upload-Nachricht nachbearbeiten und die Datei tauschen —, weil dafür nur eine Gabelung nötig ist und die ist erprobt. Zeile ergänzt, der Absatz darunter auf die verwerfende Hälfte eingeschränkt.
 
 **Befunde 3, 6 und Randnotiz 1 gelöst — Texte auf das Belegte zurückgenommen, kein Codeverhalten geändert außer bei Befund 6.** Die „Umfang"-Spalte ist aus beiden SKILL-Tabellen entfernt, mit einem Satz, warum es sie nicht gibt: Die Chatliste trägt den Nachrichtenumfang nicht, das Protokoll kennt `turns` erst nach dem Umwandeln, und eine geschätzte Zahl ist verboten. Der Denkschritte-Absatz beider Skill-READMEs sagt jetzt, was gemessen ist — die Überlegungen *können* fehlen, es wechselte innerhalb eines Chats von Tag zu Tag, die Ursache ist unbekannt —, statt ein Datum zu versprechen.
 

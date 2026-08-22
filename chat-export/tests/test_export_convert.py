@@ -345,6 +345,43 @@ check("a duplicate with descendants is kept as a branch",
 check("the kept branch holds the duplicate and its child",
       len(result["branches"][0]["messages"]) == 2)
 
+# Two siblings that are an upload and nothing else. Equal text decides nothing
+# between them -- both are empty -- so a text-only test called one of them a
+# resend and dropped its attachment with it, counted as a duplicate and named
+# in no other number. Editing an upload to swap the file produces exactly this
+# pair, and a message with an attachment and no text is real: 22 of 10,779
+# messages across the archives at hand.
+SWAPPED_UPLOAD = conv("swp-1", "Datei ausgetauscht", [
+    msg("w0", ROOT, "human", "", "2026-05-08T09:00:00Z",
+        attachments=[{"file_name": "erste.py", "file_type": "text/x-python",
+                      "file_size": 5, "extracted_content": "ERSTE FASSUNG"}]),
+    msg("w1", ROOT, "human", "", "2026-05-08T09:00:40Z",
+        attachments=[{"file_name": "zweite.py", "file_type": "text/x-python",
+                      "file_size": 6, "extracted_content": "ZWEITE FASSUNG"}]),
+])
+result = cec.conversation_record(SWAPPED_UPLOAD)
+carried = sorted(f["name"] for entry in result["attachments"]
+                 for f in entry["files"])
+check("a swapped upload is no resend just because neither side carries text",
+      result["dropped_duplicates"] == 0, str(result["dropped_duplicates"]))
+check("both uploads reach the archive",
+      carried == ["erste.py", "zweite.py"], str(carried))
+
+# The counter-test to the widening: the rule must still fire. Same text, same
+# attachment -- a genuine resend, and it has to stay counted and unstored.
+SAME_UPLOAD = conv("swp-2", "Dieselbe Datei zweimal", [
+    msg("v0", ROOT, "human", "", "2026-05-08T11:00:00Z",
+        attachments=[{"file_name": "a.py", "file_type": "text/x-python",
+                      "file_size": 5, "extracted_content": "GLEICH"}]),
+    msg("v1", ROOT, "human", "", "2026-05-08T11:00:20Z",
+        attachments=[{"file_name": "a.py", "file_type": "text/x-python",
+                      "file_size": 5, "extracted_content": "GLEICH"}]),
+])
+result = cec.conversation_record(SAME_UPLOAD)
+check("the same upload sent twice is still a resend",
+      result["dropped_duplicates"] == 1 and result["branches"] == [],
+      f"dups={result['dropped_duplicates']} branches={result['branches']}")
+
 
 # ---------------------------------------------------------------------------
 # Hollow, empty, losses
