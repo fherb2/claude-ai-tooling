@@ -129,6 +129,24 @@ Wenn du in Claude Code im Projekt darauf hinweisen willst, dass er frühere Chat
 
 Was leider nicht geht: Diese Chats in Claude Code fortzusetzen. Aber sag einfach Claude, was er lesen soll und dass du den Chat hier wieder aufgreifen möchtest. So kennt Claude den Kontext des alten Chats und du kannst unmittelbar darauf aufbauen.
 
+### Wenn du später weitere Chats nachreichen willst
+
+Der Skill kann jederzeit nachlegen: neue Chats holen und weitergelaufene ersetzen. Damit das auch in einem halben Jahr noch funktioniert, gibt es vier Dinge, die du beim ersten Mal richtig machen solltest. Sie kosten nichts, und keines davon lässt sich nachträglich reparieren, ohne von Hand einzugreifen.
+
+**Ein Ordner je claude.ai-Projekt.** Wirf nicht die Chats mehrerer Projekte in denselben Ordner. Die `protokoll.json` dort führt den Stand für **ein** Projekt; ein zweites Projekt überschreibt dessen Anlegedatum, und danach reicht ein angeforderter Export nicht mehr weit genug zurück. Die Chats, die schon im Ordner liegen, bleiben vollständig — falsch wird nur die Rechnung, was noch fehlt. Und die kannst du dann nicht mehr benutzen.
+
+**Behalte den Ordner samt `protokoll.json`.** Das ist der Zustand, aus dem der Skill weiß, was er schon hat. Lädst du die Chats zusätzlich in das Projektwissen einer claude.ai-Instanz, ist das eine **Kopie** — nachgereicht wird immer aus dem lokalen Ordner. Löschst du ihn, fängt der Skill von vorn an und holt alles erneut.
+
+**Leg das Archiv nicht unter `~/.claude/projects/` ab, wenn es dauerhaft halten soll.** Claude Code räumt dort nach einer Frist auf (Standard 30 Tage), und `claude project purge` nimmt den Ordner mit. Wenn du diesen Ort trotzdem willst — er ist sinnvoll für Chats, die nicht ins geteilte Repo dürfen —, dann setze vorher die Frist hoch.
+
+**Eine einzelne Chatdatei sagt nicht, aus welchem Projekt sie kommt.** Das steht im Ordnernamen und im Protokoll, nicht in der Datei. Gibst du eine Datei einzeln weiter, schreib dazu, woher sie stammt.
+
+### Ein Hinweis, der nichts mit diesem Skill zu tun hat
+
+Deine **Claude-Code-Sitzungen** kann der Skill nicht lesen — er holt Chats aus claude.ai, nicht aus Claude Code. Die lokalen Sitzungen werden aber nach `cleanupPeriodDays` weggeräumt, standardmäßig nach 30 Tagen.
+
+Wenn du dir vorstellen kannst, irgendwann auf den Kontext einer alten Claude-Code-Sitzung zurückzugreifen: **setze diese Frist jetzt hoch**, in `~/.claude/settings.json`. Später ist es wirkungslos — was weg ist, ist weg. Die Frist kostet nichts als Plattenplatz, und man weiß nie rechtzeitig, welchen Chat man später braucht.
+
 ## Hintergrund
 
 Dieser Teil erklärt, warum der Skill wonach fragt und was er aus deinen Angaben macht. Zum Bedienen brauchst du ihn nicht.
