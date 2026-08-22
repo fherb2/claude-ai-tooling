@@ -129,7 +129,7 @@ Checked at the user's request: the left sidebar of the claude.ai interface, with
 
 ## Stage 7: first real test run of the skill flow — Team account with no self-serve export, aborted on a code gap
 
-**Starting point.** At the user's request, the planned skill flow was run for real for the first time — not merely simulated —, with `chat_export_convert.py` from `chat-export/source/` as the executing tool, against the Team account (`HZDR - FWF`) that was actively logged into Chrome.
+**Starting point.** At the user's request, the planned skill flow was run for real for the first time — not merely simulated —, with `chat_export_convert.py` as the executing tool, against the Team account (`HZDR - FWF`) that was actively logged into Chrome.
 
 **An important secondary finding, not stated anywhere before:** the Team account has **no self-serve export** — unlike what had so far been stated in the target template/roadmap ("web route for small top-ups, otherwise the account export"), the web route here is **the only option at all**, not just the more convenient one. This matches the already-documented account-type restriction (doku 1.2/1.6: Team/Enterprise members without Primary Owner rights have no export). **Consequence for the skill:** it has to be able to recognize (or be told) that no export exists for an account, and must then not even offer the export route as an alternative.
 

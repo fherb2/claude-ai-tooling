@@ -25,12 +25,15 @@ Two layers, because they catch different kinds of drift:
     python3 tests/test_docstrings.py
     python3 -O tests/test_docstrings.py
 
-The four scripts it covers live in three places, by what each one is for, and
-the ``SCRIPTS`` mapping below records which is where: the converter with the
-skill it ships in, ``inspect_export.py`` in the project root as a maintenance
-tool, and the two uploadable scripts beside the tests -- nothing but tests
-exercises those two any more. Moving a script therefore means editing that
-mapping, and this test failing to find a file is the reminder.
+The two scripts it covers live in two places, by what each one is for, and the
+``SCRIPTS`` mapping below records which is where: the converter with the skill
+it ships in, and ``inspect_export.py`` in the project root as a maintenance
+tool. Moving a script therefore means editing that mapping, and this test
+failing to find a file is the reminder.
+
+``tests/wegegleichheit_referenz.py`` is deliberately *not* covered: it is a
+comparison yardstick, not a tool anyone operates, and it has no command line
+whose symbols could drift out of a manual.
 """
 
 import ast
@@ -80,11 +83,6 @@ def parser_symbols(path: str) -> tuple[list[str], list[str]]:
 # ---------------------------------------------------------------------------
 
 REQUIRED_CONCEPTS = {
-    "chat_read_store.py": [
-        "listed_at", "created_after", "project_created_at", "window_start",
-        "VANISHED_NOTE",
-        "protokoll.json",
-    ],
     "chat_export_convert.py": [
         "attachments", "creations", "thinking", "protokoll.json",
         "window_start", "MAPPING_PROMPT", "INSTRUCTION_BLOCKS",
@@ -102,15 +100,12 @@ REQUIRED_CONCEPTS = {
 # Run both layers over every script this guard covers
 # ---------------------------------------------------------------------------
 
-# Script name -> the directory it lives in. Three homes, by what each script is
+# Script name -> the directory it lives in. Two homes, by what each script is
 # for: the converter ships with the skill; inspect_export is a maintenance tool
-# of this project and sits in its root; the two uploadable scripts are only
-# exercised by tests now and sit beside them.
+# of this project and sits in its root.
 SCRIPTS = {
-    "chat_read_store.py":      TESTS_DIR,
     "chat_export_convert.py":  SKILL_DIR,
     "inspect_export.py":       PROJECT_DIR,
-    "chat_crawl_store.py":     TESTS_DIR,
 }
 
 for name, directory in SCRIPTS.items():

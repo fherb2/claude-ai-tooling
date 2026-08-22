@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Read a claude.ai account data export and make sense of its conversations.
 
-Runs locally, never uploaded, so the first half of doku 2.9 does not bind it:
-unlike ``chat_read_store.py`` it may import freely and need not hold small
-helpers twice.  The second half does bind it -- this docstring is the whole
-operating manual, because Claude Code reads it and not necessarily the
-implementation doc, and ``tests/test_docstrings.py`` guards that.  Chapter 3.1
+Doku 2.9 binds it: this docstring is the whole operating manual, because
+Claude Code reads it and not necessarily the implementation doc, and
+``tests/test_docstrings.py`` guards that.  Chapter 3.1
 of ``implementation_doku.md`` holds the determinations this implements, chapter
 2 the repo-wide ones; the numbers quoted below come from there.
 
@@ -53,7 +51,8 @@ fresh list no longer offers is counted, named and explained by
 ``VANISHED_NOTE`` -- deleted at the source, moved to another project, or a
 list that was not paged to the end. The three cannot be told apart from here,
 so **nothing is removed**; the protocol keeps the chat and its files. The same
-sentence stands in ``chat_read_store.py`` and is guarded against drift by
+sentence stands in the comparison yardstick
+``tests/wegegleichheit_referenz.py`` and is guarded against drift by
 ``tests/test_wegegleichheit.py``.
 ``report`` says what could not be carried over. ``analyse`` describes what the
 reader makes of an archive without writing anything, which is a different
@@ -189,10 +188,10 @@ CREATION_SUFFIX    = ".creations.json"
 CREATION_TOOLS = ("artifacts", "create_file", "str_replace")
 
 # What both routes say when the protocol knows a chat the fresh list no longer
-# offers. Held word for word in chat_read_store.py too and guarded by
-# tests/test_wegegleichheit.py: the two scripts cannot import from each other
-# (vorgabe 2.9), and this project has twice watched one side of such a pair
-# grow while the other stood still.
+# offers. Held word for word in tests/wegegleichheit_referenz.py too and
+# guarded by tests/test_wegegleichheit.py: the yardstick must not import from
+# this file (vorgabe 2.5), and this project has twice watched one side of such
+# a pair grow while the other stood still.
 VANISHED_NOTE = """\
 NOTE: {count} chat(s) in the protocol are not in this list.
   Deleted at the source, moved out of the project -- or the list was not paged
