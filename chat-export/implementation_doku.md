@@ -70,7 +70,7 @@ Eine Datei je Quellprojekt, neben den Chatdateien. Sie wird **bei der Erstellung
 
 Warum ein Protokoll und nicht der Verzeichnisinhalt: **Innerhalb von claude.ai gibt es kein Verzeichnis zum Ablesen**, dort existiert nur Hochgeladenes. Eine kleine Datei kann eine Instanz lesen, N Chatdateien durchzählen nicht. Die `metadata` in jeder Chatdatei bleibt trotzdem, damit eine einzeln weitergegebene Datei für sich verständlich ist; bei Widerspruch gilt das Protokoll.
 
-**Gezählt wird im Skript, nicht im Kopf der Instanz** — und das ist keine Vorsicht, sondern eine Messung. Am hochgeladenen Protokoll gefragt, gab eine Instanz einen einzelnen Wert zeichengenau wieder, bis auf die Mikrosekunden eines Zeitstempels, nannte aber **zehn** Chats, wo neun eingetragen waren. Nachschlagen gelingt, Aufsummieren nicht. Deshalb rechnen `plan`, `overview` und `map` in dem Skript, das die JSON parst; die Instanz führt es aus, statt das Protokoll zu überschlagen. Hinge die Entscheidung „was fehlt noch" daran, dass sie richtig zählt, wäre der Fehler still.
+**Gezählt wird im Skript, nicht im Kopf der Instanz** — und das ist keine Vorsicht, sondern eine Messung. Am hochgeladenen Protokoll gefragt, gab eine Instanz einen einzelnen Wert zeichengenau wieder, bis auf die Mikrosekunden eines Zeitstempels, nannte aber **zehn** Chats, wo neun eingetragen waren. Nachschlagen gelingt, Aufsummieren nicht. Deshalb rechnen `list` und `diff` in dem Skript, das die JSON parst; die Instanz führt es aus, statt das Protokoll zu überschlagen. Hinge die Entscheidung „was fehlt noch" daran, dass sie richtig zählt, wäre der Fehler still.
 
 Das Protokoll liegt **beim Archiv**, im Zielverzeichnis neben den Chatdateien — dort braucht es jeder Abgleich. Es **zusätzlich** ins Projektwissen des Quellprojekts zu laden, ist möglich und kein Schritt des Ablaufs (1.5): Das Quellprojekt trägt dann selbst die Auskunft, was von ihm archiviert wurde.
 
@@ -219,6 +219,7 @@ Zusätzliche Metadatenfelder, in dieser Reihenfolge:
 | Feld | Wozu |
 | --- | --- |
 | `chat_uuid`, `url`, `title` | Identität und Auffindbarkeit |
+| `imported_at` | Zeitpunkt dieses Laufs — sagt, wie alt die Fassung im Archiv ist, und unterscheidet sie vom Stand der Quelle (`last_updated_at`) |
 | `source` | `account-export` oder `web-api` — der Behälter, aus dem der Chat kam |
 | `last_updated_at` | Stand der Quelle beim Import — macht Veralten erkennbar; **die** für Historie und Sortierung entscheidende Angabe, s. den Absatz zu `predecessor`/`successor` oben |
 | `turns` | Anzahl importierter Redebeiträge |
@@ -273,7 +274,7 @@ Statuswerte: `listed` (aus der Chatliste bekannt), `started` (teilweise gelesen 
 
 **Ein Chat, den die frische Liste nicht mehr führt, wird gemeldet und nie automatisch entfernt.** Die Meldung nennt ihn samt Status; das Protokoll behält ihn, und seine Dateien bleiben liegen. Der Grund ist, dass drei sehr verschiedene Fälle von hier aus ununterscheidbar sind: Löschung an der Quelle, Verschieben in ein anderes Projekt — oder eine Chatliste, die der Nutzer nicht bis zum Ende geblättert hat. Beim letzten Fall wäre jede Entfernung ein Datenverlust aus einem Bedienfehler. Die Regel bindet **beide** Wege. Derselbe Wortlaut steht als Konstante `VANISHED_NOTE` auch im Maßstab aus 2.5, der nichts aus dem Konverter importieren darf und ihn deshalb zweimal hält; `tests/test_wegegleichheit.py` sichert die zwei Fassungen gegen Auseinanderdriften.
 
-Auf oberster Ebene trägt das Protokoll `protocol_version`, `project`, `project_created_at` (Beginn des Quellprojekts — aus dem Projekt-Endpunkt des Web-Wegs oder aus den Projektdateien eines Exports, eingetragen über `list --project-created`), `listed_at` (Zeitpunkt des letzten Listenabgleichs, gesetzt von `list` bzw. `map`) und `order` — eine Bearbeitungsrichtung, die kein heutiger Weg setzt und beide unangetastet erhalten: ein Protokoll, ein Schema.
+Auf oberster Ebene trägt das Protokoll `chats` — die Einträge oben, nach Chat-UUID gestellt —, dazu `protocol_version`, `project`, `project_created_at` (Beginn des Quellprojekts — aus dem Projekt-Endpunkt des Web-Wegs oder aus den Projektdateien eines Exports, eingetragen über `list --project-created`), `listed_at` (Zeitpunkt des letzten Listenabgleichs, gesetzt von `list` bzw. `map`) und `order` — eine Bearbeitungsrichtung, die kein heutiger Weg setzt und beide unangetastet erhalten: ein Protokoll, ein Schema.
 
 **Die Fenstergrenze, in einer Tabelle.** Wie weit ein Export zurückreichen muss, damit er einen Chat erfasst, ergibt sich aus drei Quellen unterschiedlicher Güte — genommen wird das Minimum über alle zu holenden Chats:
 

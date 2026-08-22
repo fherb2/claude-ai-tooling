@@ -48,7 +48,7 @@ Ein Arbeitsgang, weil alle vier denselben Kern haben: Sie behaupten mehr, als di
 
 **a) Die „Umfang"-Spalte aus beiden SKILL-Dateien entfernen** — löst **Befund 3**. Die Statistik-Vorlage verlangt eine Nachrichtenzahl, die vor dem Abruf niemand kennt, während dieselbe Datei zweimal verbietet, eine Zahl selbst zu bilden. Beide echten Läufe haben deshalb von der Vorlage abweichen müssen. Ersatzlos streichen; die Anwender-READMEs führen die Tabelle längst richtig ohne diese Spalte.
 
-**b) Die Kommandonamen in Doku 1.4 richtigstellen** — löst **Randnotiz 2**. Dort stehen `plan`, `overview` und `map`; das Skript hat `list`, `convert`, `diff`, `report`, `analyse`. Die ersten beiden waren Kommandos des entfallenen Lese-Wegs, `map` existiert nur als Flag `list --map`.
+**b) Die Kommandonamen in Doku 1.4 richtigstellen** — **erledigt am 22. August 2026** im Zug der mechanischen Prüfung unten, weil sie genau dieser Fund war. Dort standen `plan`, `overview` und `map`; jetzt stehen die Kommandos, die tatsächlich rechnen (`list` und `diff`).
 
 **c) Den Denkschritte-Absatz beider Skill-READMEs zurücknehmen** — löst **Randnotiz 1**. Sie behaupten kategorisch, Anthropic schreibe die Überlegungen „seit Ende Juli 2026 nicht mehr" aus und bei älteren Chats seien sie „vollständig vorhanden". Doku 3.1.1 sagt dagegen, das Verhältnis schwanke „innerhalb eines einzigen Chats von Tag zu Tag" und die Ursache sei „nicht ermittelt". Die brauchbarere Auskunft für den Nutzer: Überlegungen können fehlen, die Ursache ist unbekannt, ein leeres Ergebnis ist kein Defekt des Werkzeugs.
 
@@ -76,6 +76,10 @@ Diese Befunde sind geprüft und zutreffend, aber ohne heutige Fehlfunktion. Sie 
 - **Befund 13** — Die Dubletten-Erkennung vergleicht nur den Text; ein Resend mit gleichem Text und abweichendem Anhang würde samt Anhang verworfen. Konstruierter Fall.
 - **Befund 14** — `render()` dedupliziert Verlustverweise je Nachricht über das Label; zwei verschiedene namenlose Dateien gleichen Typs erscheinen als einer, die Verlustzählung untertreibt dann um eins.
 
-## Dauerhaft, aus dieser Prüfung gelernt
+## Dauerhaft: Kommandonamen, Flags und Feldnamen gehören mit geprüft
 
-**Bei einer Doku-Prüfung sind Kommandonamen, Flags und Feldnamen genauso gegen den Code zu halten wie Kapitelverweise.** Die Prüfung vom 22. August hat alle 198 Kapitelverweise und 72 Code-Verweise inhaltlich abgearbeitet und **Randnotiz 2 trotzdem übersehen**, weil ein Kommandoname kein Verweis ist. Mechanisch geht das: `tests/test_docstrings.py` zieht Kommandos und Flags per Regex aus dem Quelltext und hält sie gegen den Docstring — dasselbe Verfahren ist auf die Implementierungsdoku anwendbar.
+**Bei einer Doku-Prüfung sind Kommandonamen, Flags und Feldnamen genauso gegen den Code zu halten wie Kapitelverweise.** Die Prüfung vom 22. August hatte alle 198 Kapitelverweise und 72 Code-Verweise inhaltlich abgearbeitet und **Randnotiz 2 trotzdem übersehen**, weil ein Kommandoname kein Verweis ist.
+
+**Einmal vollständig durchgeführt am 22. August 2026**, über `implementation_doku.md`, beide READMEs, beide SKILL-Dateien und beide `chrome-*`-Dateien, in **beiden** Richtungen — Doku gegen Code und Code gegen Doku. Ergebnis: zwei echte Funde, beide sofort behoben (die Kommandonamen in 1.4 und das undokumentierte Metadatenfeld `imported_at`), dazu eine fehlende Strukturangabe (`chats` als Protokollschlüssel in 2.4). Alles übrige waren Falsch-Positive: fremde Werkzeuge (`--chrome`, `--add-dir`, `--dry-run`, `--teleport`), Felder der claude.ai-Weboberfläche (`capabilities`, `pagination`, `is_private`) und Namen aus den Messungen (`bash_tool`, `web_search`).
+
+**So geht die Prüfung:** Kommandos und Flags per Regex aus `sub.add_parser(...)` und `add_argument("--...")` ziehen; die Feldnamen beider Seiten aus dem laufenden Code holen (`chat_document()` für die Chatdatei, `load_protocol()` und der Eintragsaufbau für das Protokoll) und gegen die Backtick-Begriffe in Vorgabe 2.2 bzw. 2.4 halten. Die Gegenrichtung ist die wichtigere: Ein Feld, das der Code schreibt und die Doku nicht nennt, fällt beim Lesen nie auf — genau so war `imported_at` durchgerutscht.
