@@ -93,7 +93,7 @@ vollständig — nicht nur die Sektion, die zur Aufgabe gehört.
 Der Grund steckt in der Natur dieser Vorgaben: Sie halten fest, was man der
 einzelnen Datei nicht ansieht. Dass etwa die `description` eines Skills
 gegen eine Vorgabe verstößt, erkennt man nicht beim Lesen der `SKILL.md`,
-sondern nur gegen `skills/skill_vorgaben.md`. Wer die Vorgaben nicht kennt,
+sondern nur gegen `skills/implementation_doku.md`. Wer die Vorgaben nicht kennt,
 schreibt den Verstoß gutgläubig hin — und der nächste Review meldet ihn zu
 Recht.
 

@@ -1,10 +1,10 @@
-# Vorgaben und Empfehlungen für die Skills in diesem Verzeichnis
+# Implementierungsdoku des Vorhabens `skills/`
 
-Diese Datei ist die einzige übergreifende Dokumentation des Vorhabens `skills/`. Sie enthält, was beim Schreiben **jedes** Skills gilt: die technischen Voraussetzungen, die Regeln für Trigger und Dateien, die Messbefunde, auf denen diese Regeln beruhen, und das Verfahren, mit dem sich beides nachprüfen lässt.
+Diese Datei ist die übergreifende Dokumentation des Vorhabens `skills/` und trägt zweierlei. **Kapitel 1–7 sind die Vorgaben**, die beim Schreiben **jedes** Skills gelten: die technischen Voraussetzungen, die Regeln für Trigger und Dateien, die Messbefunde, auf denen diese Regeln beruhen, und das Verfahren, mit dem sich beides nachprüfen lässt. Sie standen vormals in `skill_vorgaben.md`; wo eine Skill-README kurz „Vorgaben, Kapitel n" schreibt, ist dieses Dokument gemeint. **Kapitel 8** hält die übergreifenden Feststellungen und Festlegungen der Neuordnung der Arbeitsanweisungen fest — was recherchiert und belegt ist, und nach welchem Modell die Anweisungen auf Skills und CLAUDE.md-Ebenen verteilt werden. Dem offiziellen Segmentschema der Arbeitsanweisungen (§2.3) folgt die Datei bewusst nicht; die Begründung steht zwei Absätze weiter.
 
-Was hier **nicht** steht: der Arbeitsstand einzelner Skills. Die Skills stehen einzeln nebeneinander und werden nicht aufeinander aufbauend entwickelt — ein gemeinsamer Fahrplan und eine Protokollierung der Umsetzung würden mehr Pflege kosten, als sie einbringen. Was an einem Skill fertig und was offen ist und was er dem Nutzer bietet, steht deshalb in dessen eigener `README.md` (Kapitel 6.1); die Gesamt-`README.md` dieses Ordners nennt ihn nur in ihrer Übersichtstabelle (Kapitel 6.2).
+Was hier **nicht** steht: der Arbeitsstand einzelner Skills. Die Skills stehen einzeln nebeneinander und werden nicht aufeinander aufbauend entwickelt — ein gemeinsamer Fahrplan und eine Protokollierung der Umsetzung würden mehr Pflege kosten, als sie einbringen. Was an einem Skill fertig und was offen ist und was er dem Nutzer bietet, steht deshalb in dessen eigener `README.md` (Kapitel 6.1); die Gesamt-`README.md` dieses Ordners nennt ihn nur in ihrer Übersichtstabelle (Kapitel 6.2). Ebenfalls nicht Gegenstand dieses Vorhabens ist `chat-export`: Er ist zwar als Skill implementiert, aber erheblich komplexer als das Definieren einer `SKILL.md` und wird deshalb als eigenes Vorhaben geführt.
 
-**Dieses Vorhaben folgt bewusst anderen Regeln als der Rest des Repositories.** Die Arbeitsweise mit Konzept- und Implementierungsdoku, dreigeteilter Segmentstruktur, Fahrplan und Statusdatei (globale `CLAUDE.md`, Abschnitt 2) ist auf Softwareentwicklung zugeschnitten: auf einen zusammenhängenden Code, dessen Teile voneinander abhängen und dessen Entstehung nachvollziehbar bleiben muss. Hier entsteht kein Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte. Jeder Skill ist für sich fertig oder unfertig, keiner baut auf einem anderen auf, und keiner wird später gegen eine Konzeptfassung geprüft. Ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen, und eine Protokollierung der Umsetzung nichts zu belegen. Was diese Datei an Vorgaben trägt, entspricht der Sache nach Segment 2 — projektweite Festlegungen, an denen sich jeder einzelne Skill messen lassen muss.
+**Dieses Vorhaben folgt bewusst anderen Regeln als der Rest des Repositories.** Die Arbeitsweise mit Konzept- und Implementierungsdoku, dreigeteilter Segmentstruktur, Fahrplan und Statusdatei (globale `CLAUDE.md`, Abschnitt 2) ist auf Softwareentwicklung zugeschnitten: auf einen zusammenhängenden Code, dessen Teile voneinander abhängen und dessen Entstehung nachvollziehbar bleiben muss. Hier entsteht kein Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte. Jeder Skill ist für sich fertig oder unfertig, keiner baut auf einem anderen auf, und keiner wird später gegen eine Konzeptfassung geprüft. Ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen, und eine Protokollierung der Umsetzung nichts zu belegen. Was Kapitel 1–7 an Vorgaben tragen, entspricht der Sache nach Segment 2 — projektweite Festlegungen, an denen sich jeder einzelne Skill messen lassen muss.
 
 Belegte Aussagen tragen ihre Quelle. **Beobachtung am laufenden System** und **Messung** sind als solche gekennzeichnet und von der offiziellen Dokumentation getrennt — Anthropic baut an diesen Werkzeugen laufend um, und die Doku schweigt zu einem Teil dessen, was hier zählt.
 
@@ -218,3 +218,33 @@ Dazu ein **Lizenzabschnitt**: CC0, mit einer Aufzählung dessen, was das für de
 Daneben gilt die allgemeine Empfehlung derselben Quelle, einen Begriff einmal zu wählen und durchzuhalten: *„Choose one term and use it throughout the Skill."*
 
 Prüfbar: Auf jede Stelle, an der „Nutzer" allein steht, obwohl der Mensch vor der fertigen Software gemeint ist, lässt sich zeigen — das ist der Verstoß. Ebenso auf jeden Absatz, der Rollen oder Begriffe erst erklärt, statt sie zu benutzen.
+
+---
+
+## 8 Allgemeine Festlegungen der Neuordnung
+
+### 8.1 Description-Budget der Skill-Listung — belegt und parametrierbar
+
+Feststellung, recherchiert am 22. August 2026 gegen die offizielle Dokumentation ([Extend Claude with skills](https://code.claude.com/docs/en/skills)). Diese Grenzen stammen von Anthropic und sind keine Eigen-Festlegung dieses Repos; Kapitel 2.2 gibt sie nur wieder.
+
+**Wie der Mechanismus arbeitet:** Claude Code lädt eine Listung aller Skill-Namen samt Beschreibungen in den Kontext. Die Namen sind darin **immer vollständig** enthalten; gekürzt werden nur die Beschreibungen. Das Budget dafür „scales at 1% of the model's context window". Läuft die Listung über, entfernt Claude Code Beschreibungen beginnend bei den am seltensten aufgerufenen Skills — „drops descriptions starting with the skills you invoke least, so the skills you use most keep their full text". Unabhängig vom Budget gilt je Skill eine Kappung von 1.536 Zeichen für `description` und `when_to_use` zusammen.
+
+**Stellschrauben, alle offiziell dokumentiert:**
+
+- `skillListingBudgetFraction` (Setting): hebt das Budget an, z. B. `0.02` = 2 % des Kontextfensters.
+- `SLASH_COMMAND_TOOL_CHAR_BUDGET` (Umgebungsvariable): setzt stattdessen einen festen Zeichenwert.
+- `skillListingMaxDescChars` (Setting): ändert die 1.536-Zeichen-Kappung je Skill.
+- `skillOverrides` mit `"name-only"`: listet nachrangige Skills ohne Beschreibung und gibt so Budget für andere frei.
+
+**Diagnose:** `/doctor` schätzt die Kontextkosten der Listung und nennt die größten Posten; beim Überlauf schreibt Claude Code zusätzlich eine Warnung ins Debug-Log (`--debug`). Die Skills-Zeile in `/context` zeigt die Größe der Listung **nach** Anwendung des Budgets (ab v2.1.196; davor zählte sie den vollen Text und konnte ein Mehrfaches des Budgets anzeigen).
+
+**Folgerung für dieses Vorhaben:** Viele Skills sind kein hartes Hindernis, sondern eine Stellschraubenfrage. Es bleibt die Formulierungsregel aus Kapitel 2.2: Der Hauptanwendungsfall steht vorn, denn gekürzt wird von hinten.
+
+### 8.2 Arbeitsmodell für die Verteilung der Anweisungen
+
+Festlegung, vom Entwickler am 22. August 2026 bestätigt. Sie ist der Maßstab, nach dem jede Anweisung ihrem Ort zugeordnet wird:
+
+1. **Skills sind der Normalfall.** Praktisch jede Anweisung ist zweckgebunden und bekommt ein Skill-Zuhause mit stillem Trigger.
+2. **Die zentrale `~/.claude/CLAUDE.md` bleibt minimal:** Chat auf Deutsch, Duzen, und die Trigger-Tafel (die stillen Trigger der Skills). Zieht ein Skill nicht, ist das der Notfall — der Entwickler wiederholt den Auftrag mit Hinweis auf den zu beachtenden Skill.
+3. **Die Projekt-`CLAUDE.md` ist der Ausnahmefall:** nur für irreversible projektspezifische Schutzfälle und für wirklich Nicht-Wiederverwendbares, das sich nicht über Kontext oder Skills abfangen lässt.
+4. **claude.ai ist zweite Zielwelt, kein Sonderfall:** Auch dort gibt es zentrale und projektlokale Anweisungen sowie hochladbare Skills. Manche Skills gelten beidseitig, manche nur auf einer Seite — entwickelt werden alle in diesem Vorhaben.

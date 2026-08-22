@@ -74,7 +74,7 @@ import zipfile
 _HERE = os.path.dirname(os.path.abspath(__file__))
 # The converter lives with the skill, not under source/: it is the one script
 # the skill ships, and the skill folder carries exactly the structure it will
-# have at its destination (skills/skill_vorgaben.md 1.1). One maintained copy,
+# have at its destination (skills/implementation_doku.md 1.1). One maintained copy,
 # so nothing can drift.
 SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
 sys.path.insert(0, SOURCE_DIR)

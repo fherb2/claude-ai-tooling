@@ -1,6 +1,6 @@
 # Noch geplant: Fahrplan, Planungsablage und die Dateien eines Entwicklungsvorhabens
 
-*Diese Datei ist Arbeitsmaterial zum Skill, nicht Teil von ihm. Die `SKILL.md` verweist nicht auf sie, sie wird also nie geladen (`skill_vorgaben.md` 1.2). Sie hält fest, was an diesem Skill noch zu tun ist, bevor er installiert werden kann.*
+*Diese Datei ist Arbeitsmaterial zum Skill, nicht Teil von ihm. Die `SKILL.md` verweist nicht auf sie, sie wird also nie geladen (`implementation_doku.md` 1.2). Sie hält fest, was an diesem Skill noch zu tun ist, bevor er installiert werden kann.*
 
 ## Anlass
 
@@ -48,7 +48,7 @@ Daraus die Frage, die diese Recherche ausgelöst hat: Liegt es daran, dass die R
 
 ### 5 Die eine Stelle, die den Fahrplan bewusst abwählt
 
-`skills/skill_vorgaben.md` begründet, warum das Vorhaben `skills/` keinen Fahrplan führt: Es entsteht kein zusammenhängender Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte; „ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen". An seine Stelle tritt nach 6.1 eine **„Offen"-Liste in der README des jeweiligen Skills** — „Diese Liste ersetzt den früheren Gesamt-Fahrplan" —, und dort steht dann auch der Plan des nächsten Schritts, höchstens einer, deutlich als unausgeführt gekennzeichnet. Das ist bereits heute ein vierter Ablageort für Planungen, der in keiner der drei anderen Quellen vorkommt.
+`skills/implementation_doku.md` begründet, warum das Vorhaben `skills/` keinen Fahrplan führt: Es entsteht kein zusammenhängender Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte; „ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen". An seine Stelle tritt nach 6.1 eine **„Offen"-Liste in der README des jeweiligen Skills** — „Diese Liste ersetzt den früheren Gesamt-Fahrplan" —, und dort steht dann auch der Plan des nächsten Schritts, höchstens einer, deutlich als unausgeführt gekennzeichnet. Das ist bereits heute ein vierter Ablageort für Planungen, der in keiner der drei anderen Quellen vorkommt.
 
 ### 6 Anwendungen ohne Regelcharakter
 
@@ -70,7 +70,7 @@ Quellen, aus denen der Inhalt herausgelöst wird, und was dort zurückbleibt:
 
 - **`~/.claude/CLAUDE.md` §2.1 bis §2.6** — der gesamte Abschnitt 2 ist der Sache nach dieser Skill. Zurück bleibt der stille Trigger nach `CLAUDE-snippet.md` und, soweit weiterhin gebraucht, die Abgrenzung aus der Präambel, wann Abschnitt 2 überhaupt gilt.
 - **`<projekt>/.claude/CLAUDE.md`** — „Wo ein Plan steht", „Fahrplan-Nummerierung" und der Abschnitt über die entwicklungszeitlichen Dateien. Zurück bleibt nur, was **repo-spezifisch** ist und nicht verallgemeinert werden kann.
-- **`skills/skill_vorgaben.md` 6.1** — die Abwahl des Fahrplans für das Vorhaben `skills/` bleibt dort, sie ist projektspezifisch. Der Skill sollte diesen Fall aber **kennen** und benennen: Ein Vorhaben ohne zusammenhängenden Quellcode darf die Dateistruktur ersetzen, und wo das geschieht, gehört die Abweichung in die Vorgaben des Vorhabens.
+- **`skills/implementation_doku.md` 6.1** — die Abwahl des Fahrplans für das Vorhaben `skills/` bleibt dort, sie ist projektspezifisch. Der Skill sollte diesen Fall aber **kennen** und benennen: Ein Vorhaben ohne zusammenhängenden Quellcode darf die Dateistruktur ersetzen, und wo das geschieht, gehört die Abweichung in die Vorgaben des Vorhabens.
 - **`konzept-segmentierung` und `konsistenzpruefung`** — beide dürfen den Fahrplan weiter **benutzen**, aber nicht mehr **definieren**. Ihre Sätze sind daraufhin durchzusehen; wo sie eine Eigenschaft des Fahrplans behaupten, wird daraus ein Verweis.
 
 Nach dem Umzug gilt für jede Fundstelle die Probe: Sie nennt den Fahrplan, oder sie beschreibt ihn — beides zugleich darf keine mehr.
@@ -97,8 +97,8 @@ Vorschlag für den Umbau dieses Skills, in der Reihenfolge der Wirkung.
 
 **T2.7 Unberührt bleiben** die Nummernregel, „Erledigtes fliegt raus" und die Trennung von Status und Entscheidung. Sie waren nie das Problem.
 
-**T2.8 Ohne Installation wirkt nichts davon.** Der Skill muss an einen Ladeort kopiert und der stille Trigger aus `CLAUDE-snippet.md` in die `CLAUDE.md` des Zielorts übernommen werden, die Datei danach am Zielort gelöscht (`skill_vorgaben.md` 5). Erst dann ist die Frage überhaupt beantwortbar, ob er auslöst. Mit dem Umzug aus T1 wächst außerdem sein Gegenstand: Die `description` nennt heute „Fahrplan und Status" beiläufig am Ende — sie ist daraufhin durchzusehen, ob sie den erweiterten Inhalt noch trägt.
+**T2.8 Ohne Installation wirkt nichts davon.** Der Skill muss an einen Ladeort kopiert und der stille Trigger aus `CLAUDE-snippet.md` in die `CLAUDE.md` des Zielorts übernommen werden, die Datei danach am Zielort gelöscht (`implementation_doku.md` 5). Erst dann ist die Frage überhaupt beantwortbar, ob er auslöst. Mit dem Umzug aus T1 wächst außerdem sein Gegenstand: Die `description` nennt heute „Fahrplan und Status" beiläufig am Ende — sie ist daraufhin durchzusehen, ob sie den erweiterten Inhalt noch trägt.
 
 ### T3 — Diese Datei hat am Ende zu verschwinden
 
-`skill_vorgaben.md` 5 lässt Zusatzdateien nur zu, wenn die `SKILL.md` auf sie verweist, und 6.1 weist offene Punkte der `README.md` des Skills unter „Offen" zu. Diese Datei steht also neben der Vorgabe; sie ist Arbeitsmaterial für einen Umbau, der mehrere Dateien außerhalb dieses Ordners betrifft, und dafür in der README am falschen Platz. Ist der Umbau ausgeführt, wandert das Verbliebene unter „Offen" in die `README.md`, und diese Datei wird gelöscht.
+`implementation_doku.md` 5 lässt Zusatzdateien nur zu, wenn die `SKILL.md` auf sie verweist, und 6.1 weist offene Punkte der `README.md` des Skills unter „Offen" zu. Diese Datei steht also neben der Vorgabe; sie ist Arbeitsmaterial für einen Umbau, der mehrere Dateien außerhalb dieses Ordners betrifft, und dafür in der README am falschen Platz. Ist der Umbau ausgeführt, wandert das Verbliebene unter „Offen" in die `README.md`, und diese Datei wird gelöscht.

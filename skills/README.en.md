@@ -25,7 +25,7 @@ This project develops and maintains skills for general use with Claude (web and 
 
 It introduces and implements a concept of "silent triggers" that allows even weaker models to start a skill very early out of the context.
 
-The rules for this area, `skills/`, and the findings from the accompanying test series are in `skill_vorgaben.md`. This README describes only the result: what there is and how to use it. On top of that, every skill has a README file of its own carrying its particular notes and its current state of development.
+The rules for this area, `skills/`, and the findings from the accompanying test series are in `implementation_doku.md`. This README describes only the result: what there is and how to use it. On top of that, every skill has a README file of its own carrying its particular notes and its current state of development.
 
 ## 3 Obtaining and installing skills
 
@@ -63,7 +63,7 @@ Three rules — two of them from measurements rather than taste, the third from 
 
 **The skill's `description` decides first.** It begins with the main use case and uses the words a user would say unprompted. Putting a classification in front of it ("Test skill…", "Internal version…") or using project-internal jargon that appears in no request can render the trigger ineffective — measured: the very same trigger text fired with a good description and did not with a weak one.
 
-**A trigger should be bound to an event or an action,** not merely to a property of the task. "Keep an eye on whether this task is complex" does not carry itself; "before you change a file for the first time, check …" or "if a file turns up that you have not touched, then …" fire reliably. The test series behind this are in `skill_vorgaben.md`, chapter 3.
+**A trigger should be bound to an event or an action,** not merely to a property of the task. "Keep an eye on whether this task is complex" does not carry itself; "before you change a file for the first time, check …" or "if a file turns up that you have not touched, then …" fire reliably. The test series behind this are in `implementation_doku.md`, chapter 3.
 
 **The `description` is written in the third person.** It describes the skill — "Translates documents …", "Use as soon as …" — and addresses nobody, neither Claude nor the user. This is not a matter of style: the description is injected into the system prompt, and a shifting point of view disturbs the selection among many skills there. Anthropic says so explicitly — *"Always write in third person […] inconsistent point-of-view can cause discovery problems"* ([Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 
