@@ -8,7 +8,7 @@ Wie Befundlisten abgearbeitet werden, wo ein Plan steht und wie ein Review nachb
 
 ## Schritte
 
-1. **Die Befunde des Code-Abgleichs abarbeiten.** Review und Bearbeitung: Anhang B der Doku — 33 Befunde, erhoben am 13. August 2026 von einer getrennten, rein lesenden Sitzung gegen den Stand `192fede`. Neunundzwanzig sind erledigt (1 bis 24, 25, 26, 27, 29, 32) — Abschnitt I vollständig, darunter alle drei als gravierend gekennzeichneten Befunde. Kein Plan offen; als nächstes Befund 28. Abschnitt VI des Reviews betrifft Sitzungsprotokolle und gehört nicht hierher, sondern zu Schritt 4.
+1. **Die Befunde des Code-Abgleichs abarbeiten.** Review und Bearbeitung: Anhang B der Doku — 33 Befunde, erhoben am 13. August 2026 von einer getrennten, rein lesenden Sitzung gegen den Stand `192fede`. Dreißig sind erledigt (1 bis 29, 32) — Abschnitt I vollständig, darunter alle drei als gravierend gekennzeichneten Befunde. Kein Plan offen; als nächstes Befund 30. Abschnitt VI des Reviews betrifft Sitzungsprotokolle und gehört nicht hierher, sondern zu Schritt 4.
 
 2. **Anwenderdokumentation und README** aus Segment 1 ableiten (1.11 ist dafür als Vorlage angelegt). **Bedingung, die diesen Schritt auslöst, und der Grund für den Warnhinweis in der README:** Das Werkzeug läuft bisher ausschließlich beim Entwickler, als Quasi-Testbetrieb. Der Hinweis „Nicht benutzen" bleibt so lange stehen und entfällt erst, wenn es auch Kollegen benutzen dürfen — dieser Zeitpunkt ist der Anlass für die Anwenderdokumentation, nicht ein Restposten am Ende.
 
