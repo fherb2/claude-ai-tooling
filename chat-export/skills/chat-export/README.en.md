@@ -130,6 +130,24 @@ If you want to point Claude Code, within the project, toward searching earlier c
 
 What unfortunately doesn't work: continuing these chats in Claude Code. But just tell Claude what to read and that you want to pick that chat back up here. That way Claude knows the context of the old chat and you can build on it right away.
 
+### If you want to top up with more chats later
+
+The skill can add to an archive at any time: fetch new chats and replace ones that have grown. For that to still work half a year from now, there are four things to get right the first time. None of them costs anything, and none can be repaired afterwards without editing by hand.
+
+**One folder per claude.ai project.** Do not put the chats of several projects into the same folder. The `protokoll.json` there tracks the state of **one** project; a second project overwrites its start date, and after that a requested export no longer reaches far enough back. The chats already in the folder stay complete — what goes wrong is only the calculation of what is still missing. And that calculation is then unusable.
+
+**Keep the folder, `protokoll.json` included.** That is the state the skill reads to know what it already has. If you additionally upload the chats into the project knowledge of a claude.ai instance, that is a **copy** — topping up always happens from the local folder. Delete it and the skill starts over and fetches everything again.
+
+**Do not put the archive under `~/.claude/projects/` if it is meant to last.** Claude Code cleans up there after a retention period (30 days by default), and `claude project purge` takes the folder with it. If you want that location anyway — it makes sense for chats that must not go into a shared repo — raise the retention period first.
+
+**A single chat file does not say which project it came from.** That lives in the folder name and in the protocol, not in the file. If you pass one file on by itself, say where it came from.
+
+### One note that has nothing to do with this skill
+
+The skill cannot read your **Claude Code sessions** — it fetches chats from claude.ai, not from Claude Code. Those local sessions are cleaned up after `cleanupPeriodDays`, by default after 30 days.
+
+If you can imagine ever wanting the context of an old Claude Code session: **raise that period now**, in `~/.claude/settings.json`. Later it has no effect — what is gone is gone. The period costs nothing but disk space, and you never know in time which chat you will need.
+
 ## Background
 
 This part explains why the skill asks for what, and what it does with your answers. You don't need it to use the skill.

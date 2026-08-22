@@ -196,6 +196,34 @@ Die Wege, die versucht wurden und nicht getragen haben — damit niemand sie ern
 
 **Und eine Lehre über das Prüfen selbst**, die mehr wert ist als die Einzelbefunde: Zweimal wurde die Abwesenheit eines Werkzeugs falsch geprüft — einmal, indem eine Instanz nach ihrem Werkzeugsatz *gefragt* wurde statt ein Werkzeug *benutzen* zu lassen, einmal mit einer Frage, deren Antwort auch anderswo bereitlag. **Eine Probe taugt nur, wenn allein das geprüfte Werkzeug die Antwort hervorbringen kann.**
 
+## 1.8 Grenzen dieser Fassung
+
+Was die produktive Fassung **nicht** leistet. Anders als 1.6, das die Grenzen der Umgebung nennt, geht es hier um die eigenen.
+
+Fast alles hängt an einer einzigen Frage: **Willst du später weitere Chats desselben Quellprojekts nachreichen?** Wer einmal umzieht und fertig ist, ist von wenig davon betroffen — das Archiv selbst ist in allen Fällen vollständig und durchsuchbar. Begrenzt ist der **Fortschreibungszustand**, nicht der Inhalt.
+
+| Fall | Wie es steht |
+| --- | --- |
+| Ein Verzeichnis, ein claude.ai-Projekt, Ziel Repo | Der entworfene Fall. Keine Einschränkung |
+| Mehrere Export-ZIPs verschiedener Zeiträume in dasselbe Verzeichnis | Geht, erprobt. Ein Lauf aus einem **älteren** ZIP setzt den Stand nicht zurück, sondern bleibt `stale` und sagt es (2.4) |
+| Chats **mehrerer** Projekte in **ein** Verzeichnis | Der erste Durchgang schreibt vollständig, das Nachreichen bricht — s. u. |
+| Ziel Projektwissen einer claude.ai-Instanz | Geht. Aber nur die Gesprächsdateien wandern hinauf (2.2), das Protokoll bleibt liegen: Im Ziel ist nicht mehr ablesbar, aus welchem Projekt ein Chat kam |
+| Dritter Zielort `~/.claude/projects/<projekt>/` | Geht, aber das Archiv **selbst** unterliegt dort der Aufräumfrist und `claude project purge` (1.3). Mit ihm fällt das Protokoll und damit das Nachreichen |
+| Chats eines anderen Kontos | Geht. Zum Nachreichen braucht es erneut Zugang zu jenem Konto — keine Grenze des Werkzeugs, aber eine der Planung |
+| Claude-Code-Sitzungen als Quelle | Nicht angebunden (1.7). Die Aufbewahrungsfrist läuft in der Zwischenzeit weiter |
+
+**Ein Verzeichnis trägt genau ein Quellprojekt.** `project` und `project_created_at` stehen **einmal** je Protokoll, nicht je Chat. Zeigt ein zweiter Listenlauf mit anderem `--project` auf dasselbe Verzeichnis, überschreibt er beide Werte ohne Prüfung. Die Chatdateien bleiben davon unberührt und vollständig; falsch wird die **Fenstergrenze**: Chats ohne eigenes `created_at` fallen auf das Projektdatum zurück (2.4), und das ist dann das des letzten Laufs. Ist jenes Projekt jünger, reicht kein Export mehr weit genug zurück, die Chats bleiben `listed`, und die Meldung „fehlt noch" wiederholt sich bei jedem Lauf ohne dass ein Export sie einholt.
+
+Betroffen ist praktisch nur der `--map`-Pfad: Über `list --web` trägt jeder Chat sein eigenes `created_at`, dann wird das Projektdatum gar nicht gebraucht. Und ein Teilnetz gibt es: `project_start_warnings()` meldet, wenn ein Chat älter ist als das eingetragene Projektdatum, und nennt als Ursache ausdrücklich das falsche Projekt. Es feuert nur nicht, wenn die Chats überhaupt kein Datum tragen. **Bis dahin gilt: ein Verzeichnis je Quellprojekt.**
+
+**Die Chatdatei nennt ihr Projekt nicht.** Ihre 18 Metadatenfelder tragen Identität, Herkunftsweg und Verlustzahlen, aber keinen Projektbezug; der steckt allein im Verzeichnisnamen und im Protokoll. Das steht im Widerspruch zur Begründung in 1.4, die `metadata` je Chatdatei behält, „damit eine einzeln weitergegebene Datei für sich verständlich ist" — gerade diese Angabe fehlt ihr. Der Widerspruch ist hier benannt und nicht aufgelöst.
+
+**Der Weg dahin ist erkannt**, damit eine Wiederaufnahme ihn nicht neu herleiten muss: Das Protokoll müsste Name, Anlegedatum und Listenstand **je Projekt** führen statt je Datei, und jeder Chateintrag sein Projekt nennen; die Chatdatei bekommt dasselbe Feld. Dann rechnet ein gemischtes Verzeichnis richtig — die Mechanik trägt es, ein Verbot wird nicht gebraucht —, und eine einzeln weitergegebene Datei ist selbsterklärend. Ein Protokoll heutiger Form liest sich dabei als genau ein Projekteintrag. Das Feld heißt nicht nach claude.ai: Ein Projekt kann ebenso ein Arbeitsverzeichnis sein, und welches, sagt `source`.
+
+**Was heute schon gilt und nicht wartet:** Wer Claude-Code-Sitzungen je retten will, muss `cleanupPeriodDays` **jetzt** hochsetzen, nicht wenn das Werkzeug dafür existiert (Frist und Belege in 1.3). Danach ist die Einstellung wirkungslos — die dreißig Tage sind dann schon vergangen. Die Frist kostet nichts als Plattenplatz, und man weiß nie rechtzeitig, welcher Chat später gebraucht wird.
+
+**Und der Maßstab für alles Weitere:** Einmal geschriebene Chatdateien bleiben durchsuchbar, auch wenn eine künftige Fassung ihr Format ändert. Was sie dann verlieren können, ist die **Fortschreibbarkeit** — nicht der Inhalt. Deshalb ist das Ablegen nie zu früh und die Frage nach der perfekten Struktur nie ein Grund zu warten.
+
 ---
 
 # 2 Vorgaben
@@ -547,10 +575,6 @@ Die `home`-Fassung trägt zusätzlich die Zugänglichkeitsbedingung aus 1.3 und 
 - Lauf gegen ein echtes ZIP: **erledigt**. 211 Chats in gut einer Sekunde, 37 MB — davon 13 MB Gespräch, 9,9 MB Denkschritte, 9,9 MB Anhänge, 4,9 MB Erzeugnisse; 211 Gesprächs-, 145 Denk-, 62 Anhang- und 71 Erzeugnisdateien. Die Verteilung bestätigt die Rechnung aus Vorgabe 2.2 am geschriebenen Ergebnis: Wer nur das Gespräch liest, trägt gut ein Drittel statt des Ganzen. Alle Summen deckungsgleich mit unabhängig gemessenen: 5 Hüllen, 29 Sendewiederholungen, 1.367 verworfene Denkblöcke, 18 Nebenzweige, 341 Anhänge mit Inhalt, 524 reine Namensverweise.
 - Lauf gegen ein **Quellprojekt**: das FreeCAD-Projekt mit 22 Chats, aus **zwei** ZIPs verschiedener Zeiträume zu einem Verzeichnis zusammengeführt. Die Stichprobe hat der Nutzer inhaltlich abgenommen.
 - **Realdaten-Großlauf (21. August 2026):** vier echte claude.ai-Projekte, 171 Chats, über den Export-Weg geholt. Alle 171 Protokoll-UUIDs gegen die tatsächliche Export-ZIP gehalten — 171 von 171 gefunden, keine Abweichung. Trägt die Wegegleichheit (2.5) und die Integritätsrechnung an echten Daten.
-
-### 3.1.8 Offen
-
-- **Gehört die Projektzuordnung in die Chatdatei oder nur in den Verzeichnisbaum?** Offene Entwurfsfrage, aus dem Vorhandenen nicht entscheidbar: Sie braucht den Kontext eines echten Ablaufs. Sinnvoll am mehrstufigen Test zu klären, der beide Varianten praktisch vorführt.
 
 ## 3.2 `inspect_export.py` — Diagnose eines Export-ZIP
 

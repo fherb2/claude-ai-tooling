@@ -17,4 +17,6 @@ Kopiert wird ausschließlich der Ordner `skills/chat-export/` — alles andere h
 
 **Am 22. August 2026 hat eine unabhängige Instanz die Logik gegen die Ziele der Doku geprüft; alle Befunde sind behoben.**
 
+Was diese Fassung **nicht** leistet, steht in [`implementation_doku.md`](implementation_doku.md), Kapitel 1.8 — die praktischen Folgen für die Bedienung im Abschnitt „Wenn du später weitere Chats nachreichen willst" der Skill-README. Kurz gefasst: ein Ordner je Quellprojekt, und der Ordner samt Protokoll ist der Zustand.
+
 Alle Fakten, Belege und Prüfpunkte zu diesem Vorhaben stehen in [`implementation_doku.md`](implementation_doku.md); die Mechanik der Chrome-Anbindung samt ihrer Fallstricke in [`chrome-zugriff.de.md`](chrome-zugriff.de.md) / [`chrome-access.en.md`](chrome-access.en.md).
