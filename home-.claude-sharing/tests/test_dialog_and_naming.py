@@ -549,7 +549,8 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         text, _ = w.build_notice(state(), 0, folder)
         check("Rückstand in der Pausenform",
               text.startswith("Abgleich für diesen Ordner angehalten")
-              and text.endswith("; Rückstand: 5 Datei(en)"), True)
+              and text.endswith(w.CLAUSE_BREAK + "Rückstand: 5 Datei(en)"),
+              True)
 
         # With conflicts open, pause and backlog are named alongside, not
         # instead: both change what the user has to do (doku 1.8).
@@ -574,7 +575,7 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         conflict_text, _ = w.build_notice(state(), 2, folder)
         stub(need=4, paused=True)
         paused_text, _ = w.build_notice(state(), 0, folder)
-        clause_text = "; Rückstand: 4 Datei(en)"
+        clause_text = w.CLAUSE_BREAK + "Rückstand: 4 Datei(en)"
         check("Rückstands-Wortlaut in drei Formen identisch",
               all(form.endswith(clause_text)
                   for form in (quiet_text, conflict_text, paused_text)), True)
@@ -584,8 +585,8 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         # IS the message (doku 3.1, point 4).
         check("zwei Pausenfassungen, nicht eine",
               w.PAUSE_CLAUSE_SHORT != w.PAUSE_SENTENCE
-              and w.PAUSE_CLAUSE_SHORT.startswith("; ")
-              and not w.PAUSE_SENTENCE.startswith(";"), True)
+              and w.PAUSE_CLAUSE_SHORT.startswith(w.CLAUSE_BREAK)
+              and not w.PAUSE_SENTENCE.startswith(w.CLAUSE_BREAK), True)
 
         # Both notices draw from the constants instead of carrying their own
         # literal: swapping the constants must swap the notices. Comparing the
@@ -593,7 +594,8 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         # copy of the same words would pass just as well.
         original_short = w.PAUSE_CLAUSE_SHORT
         original_sentence = w.PAUSE_SENTENCE
-        w.PAUSE_CLAUSE_SHORT, w.PAUSE_SENTENCE = "; KURZ", "LANG"
+        w.PAUSE_CLAUSE_SHORT = w.CLAUSE_BREAK + "KURZ"
+        w.PAUSE_SENTENCE = "LANG"
         try:
             stub(paused=True)
             marked_quiet, _ = w.build_notice(state(), 0, folder)
@@ -604,7 +606,22 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         check("lange Pausenfassung kommt aus der Konstante",
               marked_quiet.startswith("LANG"), True)
         check("kurze Pausenfassung kommt aus der Konstante",
-              marked_conflict.endswith("; KURZ"), True)
+              marked_conflict.endswith(w.CLAUSE_BREAK + "KURZ"), True)
+
+        # The separator itself, pinned here and nowhere else. Every check above
+        # derives from the constant, so a silent slide back to "; " would pass
+        # them all -- and that is exactly the regression to catch: on one line
+        # the daemon wraps the appended clause mid-phrase (doku 1.8). The value
+        # is measured, not specified (doku 3.8).
+        check("Klauseln werden umgebrochen, nicht mit Semikolon getrennt",
+              w.CLAUSE_BREAK, "\n")
+        stub(need=4)
+        text, _ = w.build_notice(state(), 0, folder)
+        lines = text.split("\n")
+        check("Ruheform bricht vor jeder Klausel um",
+              lines[0].startswith("abgeglichen:")
+              and any(line.startswith("Rückstand:") for line in lines[1:])
+              and ";" not in text, True)
 
         # A paused DEVICE is a different case and needs no own wording: it
         # shows up as no connection (verified against the real configuration,

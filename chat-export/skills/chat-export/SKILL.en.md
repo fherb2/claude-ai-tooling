@@ -62,9 +62,11 @@ Here you do the work, not the script. Three cases:
 For each chosen project, fetch the chat list across **all** pages, then run `list --web --project "<project name>"` and `diff`. **Always** pass `--project` — otherwise the field stays empty in the protocol even though the folder name has long carried the project name. With several projects, show **one** table with one row per project, so the checkpoints stay at two:
 
 ```
-Project                 Archive Source   new  grown  vanished  Scope    Recommendation
-Modellbahn-Fahrpult         34      39     5      2         1   ~310 msg.  Web
+Project                 Archive Source   new  grown  vanished  Recommendation
+Modellbahn-Fahrpult         34      39     5      2         1  Web
 ```
+
+**No column for message volume.** The chat list does not carry it, and the protocol only knows `turns` after conversion -- any such number would be an estimate, which is exactly what is forbidden. The route recommendation rests on the number of chats, not on their size.
 
 **A chat the fresh list no longer carries is reported and never removed automatically.** Its files stay put. From here, deletion at the source cannot be told apart from a move to another project, and neither can be told apart from a list that was not paged to the end. Any automatic removal would be data loss from a usage mistake in the third case.
 

@@ -62,9 +62,11 @@ Hier arbeitest du, nicht das Skript. Drei Fälle:
 Je gewähltes Projekt die Chatliste über **alle** Seiten holen, dann `list --web --project "<Projektname>"` und `diff` laufen lassen. Gib **immer** `--project` mit — sonst bleibt das Feld im Protokoll leer, obwohl der Ordnername den Projektnamen längst trägt. Bei mehreren Projekten steht **eine** Tabelle mit einer Zeile je Projekt, damit die Haltepunkte bei zwei bleiben:
 
 ```
-Projekt                 Archiv  Quelle   neu  gewachsen  verschw.  Umfang   Empfehlung
-Modellbahn-Fahrpult         34      39     5          2         1   ~310 N.  Web
+Projekt                 Archiv  Quelle   neu  gewachsen  verschw.  Empfehlung
+Modellbahn-Fahrpult         34      39     5          2         1  Web
 ```
+
+**Keine Spalte für den Nachrichtenumfang.** Die Chatliste trägt ihn nicht, und das Protokoll kennt `turns` erst nach dem Umwandeln — eine solche Zahl wäre also geschätzt, und genau das ist verboten. Die Wegempfehlung hängt an der Zahl der Chats, nicht an ihrem Umfang.
 
 **Ein Chat, den die frische Liste nicht mehr führt, wird gemeldet und nie automatisch entfernt.** Seine Dateien bleiben liegen. Von hier aus lässt sich Löschung an der Quelle nicht von einem Verschieben in ein anderes Projekt unterscheiden, und beides nicht von einer Liste, die nicht zu Ende geblättert wurde. Jede automatische Entfernung wäre im dritten Fall Datenverlust aus einem Bedienfehler.
 

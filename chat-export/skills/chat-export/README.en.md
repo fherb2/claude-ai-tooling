@@ -190,6 +190,6 @@ Not everything that was visible in a chat ends up in the archive afterward — p
 
 **Tool calls and their results** are counted but not stored. This is by far the largest item and consists mostly of material that's already available elsewhere anyway — file contents, search results, intermediate steps.
 
-**In newer chats, the reasoning is missing.** This isn't a quirk of this skill: Anthropic has stopped writing it out since late July 2026, neither in the export nor on the web interface. In older chats it is fully present. So it's not worth searching for it — it simply isn't there at the source.
+**The reasoning may be missing.** This isn't a quirk of this skill: Claude sometimes writes it out and sometimes doesn't, within the very same source — measured, it switched from one day to the next inside a single chat. What it depends on is not known. In practice this means an archive without reasoning is a sample, not a defect of the tool, and nobody can fetch more than is there. Attachments and creations are unaffected.
 
 **Deleted chats** still appear in the export as an empty shell, with no text. The skill recognizes and marks them; nobody can bring them back.

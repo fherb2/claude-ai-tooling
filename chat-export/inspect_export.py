@@ -143,7 +143,7 @@ def report(path: str) -> None:
     flags = collections.defaultdict(collections.Counter)
     divergent = truncated = 0
     attachments_with = attachment_chars = 0
-    files_name_only = 0
+    attachments_empty = files_paired = files_alone = 0
     for c in conversations:
         for m in c["chat_messages"]:
             for block in (m.get("content") or []):
@@ -158,14 +158,31 @@ def report(path: str) -> None:
                              if b.get("type") == "text")
             if (m.get("text") or "").strip() != joined.strip():
                 divergent += 1
+            # The two arrays are NOT disjoint: a text upload is recorded once
+            # under 'files' as the file object and once under 'attachments'
+            # with its extracted text. Counting every 'files' entry as lost
+            # overstates the loss by more than double -- on a three-month
+            # export, 319 of 524 have their content sitting right beside them.
+            # The join is by name, the only key the two share ('files' has a
+            # file_uuid, 'attachments' has none), so an attachment without a
+            # name cannot be paired and its partner is reported anyway. Same
+            # rule as file_references() in the converter, deliberately held
+            # twice (doku 2.9) rather than imported.
+            covered = set()
             for entry in (m.get("attachments") or []):
                 content = entry.get("extracted_content") or ""
                 if content:
                     attachments_with += 1
                     attachment_chars += len(content)
+                    if entry.get("file_name"):
+                        covered.add(entry["file_name"])
                 else:
-                    files_name_only += 1
-            files_name_only += len(m.get("files") or [])
+                    attachments_empty += 1
+            for entry in (m.get("files") or []):
+                if (entry.get("file_name") or "") in covered:
+                    files_paired += 1
+                else:
+                    files_alone += 1
 
     print()
     print("=== content blocks:", dict(types.most_common()))
@@ -177,8 +194,15 @@ def report(path: str) -> None:
           f"the thinking)")
     print(f"    attachments WITH extracted_content: {attachments_with} "
           f"({attachment_chars} chars) -- these travel")
-    print(f"    file references by name only (content NOT in the export): "
-          f"{files_name_only}")
+    files_total = files_paired + files_alone
+    share = f"{files_paired / files_total:.0%}" if files_total else "n/a"
+    print(f"    'files' entries whose content sits in the same message: "
+          f"{files_paired} of {files_total} ({share}) -- NOT a loss, the "
+          f"attachment beside them carries the text")
+    print(f"    'files' entries with no such partner: {files_alone} -- these "
+          f"are the loss candidates")
+    print(f"    attachments without extracted_content: {attachments_empty} "
+          f"-- lost as well, and nameless ones cannot be paired at all")
 
     # ---- schema watch ----------------------------------------------------
     conv_keys, msg_keys, block_keys = set(), set(), set()
