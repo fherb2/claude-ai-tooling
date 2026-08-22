@@ -2,25 +2,13 @@
 
 Grundlage sind zwei Dateien: `befunde_logikpruefung_2026-08-22.md` (Befunde einer unabhängigen Prüfung durch eine fremde Instanz) und `befund_pruefung_2026-08-22.md` (meine Nachprüfung jedes einzelnen Befundes gegen Code und Doku, mit Empfehlung). **Kein Befund beruhte auf einem Missverständnis** — alle sind technisch zutreffend, weshalb hier nur noch die Reihenfolge und der Zuschnitt der Arbeitsgänge zu klären waren.
 
-Reihenfolge nach Schwere. Schritt 1 ist die verbliebene echte Fehlfunktion, Schritt 2 bringt Texte auf das zurück, was belegt ist, Schritt 3 ist Doku-Präzisierung ohne Codeänderung.
+Reihenfolge nach Schwere. Die echten Fehlfunktionen sind erledigt; es bleiben Schritt 1 — Texte auf das zurücknehmen, was belegt ist — und Schritt 2, Doku-Präzisierung ohne Codeänderung. Beide ändern kein Codeverhalten.
 
 **Die Befundnummern werden nicht neu vergeben** (Repo-`CLAUDE.md`): Ein Rückblick auf „Befund 5" muss eindeutig bleiben. Nummer 12 ist **kein Befund** und in der Befundliste als solcher kommentiert.
 
 ---
 
-## 1. Hüllen-Erkennung: Anhänge, Erzeugnisse und Denkschritte sind Lebenszeichen
-
-**Löst Befund 1.**
-
-`conversation_record()` erklärt jeden Chat mit Nachrichten, aber ohne gerenderten Gesprächstext zur Hülle. Ein Chat, dessen Nachrichten nur Anhänge tragen, wird als gelöscht archiviert — und weil `update_from_list()` nur `exported`-Einträge nach `stale` befördert, wird er **nie wieder geholt**, ohne Meldung. Die Absicht in Doku 3.1.3 war „kein Inhalt irgendwo", umgesetzt ist „kein Gesprächstext".
-
-**Zu ändern:** Die `deleted`-Entscheidung um die übrigen Inhaltsträger erweitern — ein Anhang mit `extracted_content`, ein Erzeugnis oder ein behaltener Denkblock schließt die Hüllen-These aus. Das ist ein **strukturelles** Merkmal und verletzt Vorgabe 2.7 nicht. Die Messung stützt es: Die 15 echten Hüllen in den vorliegenden ZIPs tragen keine Anhänge.
-
-**Zu entscheiden ist dabei eine zweite Frage**, die der Befund aufwirft: Soll ein `deleted`-Eintrag überhaupt für immer aus der Aktualisierung fallen? Ein an der Quelle gelöschter Chat kann nicht wiederkehren — ein fälschlich so markierter schon. Ein Weg wäre, `deleted` bei einem neueren `listed_updated_at` ebenfalls nach `stale` zu befördern; dann heilt sich der Fehler selbst. **Vor dem Kodieren zu klären.**
-
-**Prüfung:** Prüfstück in `tests/test_export_convert.py` — ein Chat, dessen einzige Nachricht einen Anhang mit Inhalt und keinen Text trägt, darf nicht als Hülle gelten. Dazu die Gegenprobe, dass eine echte Hülle weiterhin erkannt wird.
-
-## 2. Vier Texte auf das zurücknehmen, was belegt ist
+## 1. Vier Texte auf das zurücknehmen, was belegt ist
 
 Ein Arbeitsgang, weil alle vier denselben Kern haben: Sie behaupten mehr, als die Messung oder der Code hergibt. Kein Codeverhalten ändert sich.
 
@@ -34,7 +22,7 @@ Ein Arbeitsgang, weil alle vier denselben Kern haben: Sie behaupten mehr, als di
 
 **Prüfung:** Für (d) eine Erwartung in `tests/test_inspect_export.py` — das Fixture trägt eine Datei, die als inhaltsloser `files`-Eintrag *und* als `attachment` mit Inhalt vorkommt; sie darf nicht als Verlust gezählt werden. Für (a) bis (c) genügt der Docstring-Wächter bzw. das Lesen.
 
-## 3. Vier Doku-Präzisierungen
+## 2. Vier Doku-Präzisierungen
 
 Ein Arbeitsgang, alles Formulierung ohne Codeänderung. Jeder Punkt hält eine Grenze fest, die heute stärker klingt, als sie ist.
 
@@ -56,12 +44,18 @@ Diese Befunde sind geprüft und zutreffend, aber ohne heutige Fehlfunktion. Sie 
 
 ## Erledigt am 22. August 2026
 
+**Befund 1 gelöst, in zwei Hälften.** Die Hüllen-Erkennung prüft jetzt auf *alles*, was mitwandert — Gesprächstext, Anhang mit Inhalt, Erzeugnis, behaltener Denkblock —, statt nur auf den Gesprächstext; ein Chat aus einem Upload ohne Begleitworte und einer fehlgeschlagenen Antwort gilt damit nicht mehr als gelöscht. Und ein `deleted`-Eintrag, den eine frische Liste mit **neuerem** Stand führt, geht zurück auf `stale`: Weil ein an der Quelle gelöschter Chat aus der Liste herausfällt (Doku 1.6), ist diese Kombination ein Widerspruch und kann nur eine Fehlklassifikation sein — so heilt sie sich selbst. Ein unveränderter Stand lässt den Eintrag `deleted`, sonst würde jeder Listenlauf jeden gelöschten Chat erneut holen.
+
+Sechs neue Prüfungen, beide Leerproben bestanden (alte Erkennung → der Anhang-Chat gilt wieder als gelöscht; Beförderung ausgeschaltet → die Selbstheilung entfällt), Datei danach per Prüfsumme wiederhergestellt. Die Hilfsfunktion `msg()` im Prüfmaterial nimmt jetzt Anhänge an, analog zu `files`.
+
+**Was das nicht leistet und bewusst offen bleibt:** Eine bestehende Fehlklassifikation heilt nur, wenn der Chat noch einmal wächst. Bleibt er unverändert, liegt die leere Archivdatei weiter da. Das Protokoll ist lesbares JSON, der Status lässt sich von Hand auf `stale` setzen; ein eigenes Kommando dafür wurde absichtlich **nicht** gebaut — verlangt hat es niemand, und in den 211 echten Chats der vorliegenden Exporte ist kein solcher Fall aufgetreten.
+
 **Befunde 2 und 5 in einem Zug gelöst** — sie mussten zusammen, weil der neue Standvergleich in `cmd_convert()` genau das Wertepaar aus Befund 5 benutzt und den Fehler sonst geerbt hätte. Eingeführt sind `utc_key()` als Sortierschlüssel und `is_newer()` als einzige Stelle, an der ein Zeitstempelvergleich entschieden wird — in **beiden** Umsetzungen, weil der Maßstab nichts importieren darf. Drei Aufrufstellen laufen jetzt darüber: der `stale`-Vergleich in `update_from_list()`, die Sortierung in `window_start()` und die neue Standprüfung in `cmd_convert()`. Eine Quelle, die älter ist als die Chatliste, lässt den Eintrag `stale` und wird unter Nennung beider Zeitstempel gemeldet; die Datei wird trotzdem geschrieben, denn sie ist, was diese Quelle hergibt.
 
 Sechs neue Prüfungen in `tests/test_export_convert.py`, ein Formatfall in der gemeinsamen Falltabelle von `tests/test_wegegleichheit.py` (75 Prüfungen dort). Beide Leerproben bestanden: Mit deaktivierter Standprüfung fallen drei Prüfungen, mit deaktivierter Normalisierung zusätzlich bestehende — die Datei wurde per Prüfsumme wiederhergestellt.
 
 **Nebenbefund aus dem Lauf:** Der neue Vergleich hat einen Fehler im Prüfmaterial aufgedeckt. Das Fixture `OLD_WINS` trug als `updated_at` den Standardwert vom 1. Mai, während seine Nachrichten und die Chatliste den 2. Mai nennen — eine Konversation, deren letzte Nachricht jünger ist als ihr eigener Änderungsstand. Korrigiert und im Fixture kommentiert.
 
-**Kommandonamen, Flags und Feldnamen einmal vollständig gegen den Code gehalten**, über alle Dokumente des Bereichs und in beiden Richtungen. Zwei echte Funde, beide behoben: die Kommandonamen in 1.4 (Randnotiz 2, Schritt 2b) und das undokumentierte Metadatenfeld `imported_at`; dazu `chats` als fehlende Strukturangabe in 2.4. Beide Feldmengen sind seither deckungsgleich, maschinell geprüft.
+**Kommandonamen, Flags und Feldnamen einmal vollständig gegen den Code gehalten**, über alle Dokumente des Bereichs und in beiden Richtungen. Zwei echte Funde, beide behoben: die Kommandonamen in 1.4 (Randnotiz 2, Schritt 1b) und das undokumentierte Metadatenfeld `imported_at`; dazu `chats` als fehlende Strukturangabe in 2.4. Beide Feldmengen sind seither deckungsgleich, maschinell geprüft.
 
 **Das Verfahren und die typischen Falsch-Positiven stehen jetzt in Vorgabe 2.9**, nicht hier — diese Datei verschwindet mit den Befunden, die Regel gilt weiter.

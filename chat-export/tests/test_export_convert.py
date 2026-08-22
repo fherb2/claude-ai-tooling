@@ -100,14 +100,15 @@ def check(name: str, condition: bool, detail: str = "") -> None:
 ROOT = "00000000-0000-4000-8000-000000000000"
 
 
-def msg(uuid, parent, sender, text, when, blocks=None, files=None):
+def msg(uuid, parent, sender, text, when, blocks=None, files=None,
+        attachments=None):
     """Build one message the way the export writes them."""
     content = blocks if blocks is not None else (
         [{"type": "text", "text": text}] if text else [])
     return {"uuid": uuid, "parent_message_uuid": parent, "sender": sender,
             "text": text, "content": content,
             "created_at": when, "updated_at": when,
-            "files": files or [], "attachments": []}
+            "files": files or [], "attachments": attachments or []}
 
 
 def conv(uuid, name, messages, created="2026-05-01T10:00:00.000000Z",
@@ -1618,6 +1619,100 @@ with open(os.path.join(SAME_DIR, "protokoll.json"), encoding="utf-8") as handle:
 check("the same instant written 'Z' and '+00:00' counts as up to date",
       SAME_ENTRY["status"] == "exported", SAME_ENTRY["status"])
 check("no stale warning for it", "OLDER than the chat list" not in SAME_RUN.stdout)
+
+
+# ---------------------------------------------------------------------------
+# A chat is only hollow when nothing at all travelled (befund 1)
+# ---------------------------------------------------------------------------
+# The conversation text alone is too narrow a test: an upload with no covering
+# words plus a failed answer leaves no text but carries its attachment in full.
+# Calling that deleted archives a living chat as gone -- and a 'deleted' entry
+# only returns to the fetch queue when the list reports a newer state.
+
+ATTACH_ONLY = conv("att-1", "Nur ein Anhang", [
+    msg("a0", ROOT, "human", "", "2026-05-01T10:00:00Z",
+        attachments=[{"file_name": "regler.py", "file_type": "text/x-python",
+                      "file_size": 42,
+                      "extracted_content": "def regeln():\n    return 1\n"}]),
+    msg("a1", "a0", "assistant", "", "2026-05-01T10:01:00Z"),
+])
+TRUE_SHELL = conv("shell-2", "Wirklich geloescht", [
+    msg("s0", ROOT, "human", "", "2026-05-01T10:00:00Z"),
+    msg("s1", "s0", "assistant", "", "2026-05-01T10:01:00Z"),
+])
+
+LIFE_ZIP = os.path.join(WORK, "lebenszeichen.zip")
+with zipfile.ZipFile(LIFE_ZIP, "w") as archive:
+    archive.writestr("conversations.json",
+                     json.dumps([ATTACH_ONLY, TRUE_SHELL]))
+LIFE_LIST = os.path.join(WORK, "liste-lebenszeichen.txt")
+with open(LIFE_LIST, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/att-1' "
+                 "updated_at='2026-05-01T12:00:00.000000Z'>Content:\n"
+                 "Title: Nur ein Anhang\n</chat>\n"
+                 "<chat url='https://claude.ai/chat/shell-2' "
+                 "updated_at='2026-05-01T12:00:00.000000Z'>Content:\n"
+                 "Title: Wirklich geloescht\n</chat>\n")
+LIFE_DIR = os.path.join(WORK, "lebenszeichen")
+run("list", "--map", LIFE_LIST, "--out", LIFE_DIR)
+run("convert", "--zip", LIFE_ZIP, "--out", LIFE_DIR,
+    "--now", "2026-05-02T00:00:00+00:00")
+
+
+def life_entry(uuid):
+    """The protocol entry for one of the two chats."""
+    with open(os.path.join(LIFE_DIR, "protokoll.json"),
+              encoding="utf-8") as handle:
+        return json.load(handle)["chats"][uuid]
+
+
+check("an attachment with content keeps a chat out of the hollow class",
+      life_entry("att-1")["status"] == "exported",
+      life_entry("att-1")["status"])
+check("and its attachment file is written",
+      any(name.endswith(cec.ATTACHMENT_SUFFIX)
+          for name in life_entry("att-1")["side_files"]),
+      str(life_entry("att-1")["side_files"]))
+check("a chat with nothing at all is still recognised as hollow",
+      life_entry("shell-2")["status"] == "deleted",
+      life_entry("shell-2")["status"])
+
+# The self-healing half: a chat deleted at the source drops out of the list, so
+# a 'deleted' entry that the list still reports -- with a newer state -- can
+# only be a misfire of the hollow test. It goes back to stale.
+HEAL_LIST = os.path.join(WORK, "liste-heilung.txt")
+with open(HEAL_LIST, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/shell-2' "
+                 "updated_at='2026-06-01T12:00:00.000000+00:00'>Content:\n"
+                 "Title: Wirklich geloescht\n</chat>\n")
+HEAL_RUN = run("list", "--map", HEAL_LIST, "--out", LIFE_DIR)
+check("a deleted entry the list reports again with a newer state goes stale",
+      life_entry("shell-2")["status"] == "stale",
+      life_entry("shell-2")["status"])
+check("the list run counts it as newly stale",
+      "1 now stale" in HEAL_RUN.stdout, HEAL_RUN.stdout)
+
+# The counter-check for that: an unchanged state must leave it deleted, or
+# every list run would re-fetch every deleted chat forever.
+STAY_LIST = os.path.join(WORK, "liste-unveraendert.txt")
+with open(STAY_LIST, "w", encoding="utf-8") as handle:
+    handle.write("<chat url='https://claude.ai/chat/shell-3' "
+                 "updated_at='2026-05-01T12:00:00.000000Z'>Content:\n"
+                 "Title: Bleibt geloescht\n</chat>\n")
+STAY_ZIP = os.path.join(WORK, "bleibt.zip")
+with zipfile.ZipFile(STAY_ZIP, "w") as archive:
+    archive.writestr("conversations.json", json.dumps([conv(
+        "shell-3", "Bleibt geloescht",
+        [msg("t0", ROOT, "human", "", "2026-05-01T10:00:00Z")])]))
+STAY_DIR = os.path.join(WORK, "bleibt-geloescht")
+run("list", "--map", STAY_LIST, "--out", STAY_DIR)
+run("convert", "--zip", STAY_ZIP, "--out", STAY_DIR,
+    "--now", "2026-05-02T00:00:00+00:00")
+run("list", "--map", STAY_LIST, "--out", STAY_DIR)
+with open(os.path.join(STAY_DIR, "protokoll.json"), encoding="utf-8") as handle:
+    STAY_ENTRY = json.load(handle)["chats"]["shell-3"]
+check("an unchanged state leaves a deleted chat deleted",
+      STAY_ENTRY["status"] == "deleted", STAY_ENTRY["status"])
 
 
 shutil.rmtree(WORK, ignore_errors=True)

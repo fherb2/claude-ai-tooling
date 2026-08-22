@@ -472,7 +472,10 @@ def update_state(store_dir: str, records: list[dict[str, str]],
             entry["listed_updated_at"] = record["updated_at"]
         if record.get("title"):
             entry["title"] = record["title"]
-        if (entry["status"] == "exported"
+        # 'deleted' belongs here too: a chat deleted at the source drops out
+        # of the list, so a deleted entry the list still reports contradicts
+        # itself -- see the converter's comment on the same decision.
+        if (entry["status"] in ("exported", "deleted")
                 and is_newer(entry["listed_updated_at"],
                              entry["exported_updated_at"] or "")):
             entry["status"] = "stale"
