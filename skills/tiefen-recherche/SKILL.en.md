@@ -16,6 +16,12 @@ An exhaustive search costs noticeable time and context. So settle the depth brie
 - **Thorough** — the loop below, until found or until the obvious search paths are exhausted. The normal case for an explicit research assignment.
 - **Exhaustive** — the loop runs until the frontier is empty or the user stops it; at the end there is always the full frontier report.
 
+For every further search request from the user:
+
+- Remember the user's choice between quick answer, thorough and exhaustive once they make it, and apply it as the default for their further search requests as well, as long as the user does not want it changed.
+- With every new search request, however, tell the user which level (quick answer, thorough, exhaustive) is selected, and tell them to interrupt you if they want to adjust the depth of the research.
+- Additionally register, from the course of the conversation and from the context, whether the user might after all want or ought to choose a different level. In that case, propose at the start of the search that they pick the level anew. If you have a concrete reason for it, tell the user what it is.
+
 ## The iron rule: verify before adopting
 
 It holds at every depth level, including the quick answer.
