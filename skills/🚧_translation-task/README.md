@@ -1,4 +1,4 @@
-# translation-task — Übersetzung software-entwicklungsnaher Dokumente
+# 🚧 translation-task — Übersetzung software-entwicklungsnaher Dokumente
 
 **🚧 In Arbeit.** Einsetzbar, aber noch nicht abgenommen: Fünf Festlegungen in der `SKILL.md` sind noch offen (siehe „Stand und Offenes" am Ende).
 

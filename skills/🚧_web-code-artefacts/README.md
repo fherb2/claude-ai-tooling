@@ -1,4 +1,4 @@
-# web-code-artefacts — Umgang mit Code-Artefakten im Web-Frontend
+# 🚧 web-code-artefacts — Umgang mit Code-Artefakten im Web-Frontend
 
 Regelt, wann Code als Artefakt entsteht und wann als Änderungsanweisung im Chat, und in welcher Form Änderungen an bereits übernommenem Code mitgeteilt werden (Vorher-/Ersetzen-mit-Codeblock, keine Zeilennummern).
 

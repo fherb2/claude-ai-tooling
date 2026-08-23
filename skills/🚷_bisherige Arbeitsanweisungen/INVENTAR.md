@@ -1,4 +1,4 @@
-## Inventar der bisherigen Arbeitsanweisungen (claude.ai, Sonnet 4.5/4.6)
+## 🚷 Inventar der bisherigen Arbeitsanweisungen (claude.ai, Sonnet 4.5/4.6)
 
 Dieses Inventar erschließt die sieben Textdateien dieses Ordners — die Projektanweisungen, die im vergangenen Jahr auf claude.ai (Projektwissen bzw. Chat-Anfang) verwendet wurden. Zweck: Alle enthaltenen Anweisungen so nebeneinanderzustellen, dass sich die Aussagen quellenübergreifend vergleichen lassen und entschieden werden kann, was für welche künftigen Einsatzfälle (Claude Code, Skills, Projekt-CLAUDE.md, weiterhin claude.ai) in welcher Form neu zusammengestellt wird.
 
@@ -114,7 +114,7 @@ Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und ein
 
 ### B Artefakt-Arbeitsweise (claude.ai-Web-Frontend)
 
-Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind sämtlich Reaktionen auf zwei Eigenheiten des Web-Frontends: Artefakt-Änderungen konnten das Artefakt zerstören, und der Nutzer übernahm den Inhalt per Hand in seinen Code. Für eine künftige claude.ai-Nutzung existiert dafür bereits das Vorhaben `skills/web-code-artefacts/` (in Arbeit) — die Einträge hier sind dessen Rohmaterial.
+Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind sämtlich Reaktionen auf zwei Eigenheiten des Web-Frontends: Artefakt-Änderungen konnten das Artefakt zerstören, und der Nutzer übernahm den Inhalt per Hand in seinen Code. Für eine künftige claude.ai-Nutzung existiert dafür bereits das Vorhaben `skills/🚧_web-code-artefacts/` (in Arbeit) — die Einträge hier sind dessen Rohmaterial.
 
 #### T6 Ankündigen und Freigabe vor jedem Artefakt
 
@@ -309,7 +309,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedient werden soll, sind diese Einträge das Rohmaterial für `skills/web-code-artefacts/` — dabei T11/SCH‑A als Warnung mitnehmen: Diese Regeln altern mit dem Web-Frontend und sind vor einer Neuauflage gegen dessen aktuellen Stand zu prüfen.
+T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedient werden soll, sind diese Einträge das Rohmaterial für `skills/🚧_web-code-artefacts/` — dabei T11/SCH‑A als Warnung mitnehmen: Diese Regeln altern mit dem Web-Frontend und sind vor einer Neuauflage gegen dessen aktuellen Stand zu prüfen.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 

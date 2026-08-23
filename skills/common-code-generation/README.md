@@ -17,7 +17,7 @@ Die Regeln gelten, sobald in einer Sitzung Code entsteht oder geändert wird —
    | Persönlich  | `~/.claude/skills/common-code-generation/`     | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/common-code-generation/`       | nur dieses Projekt        |
 
-2. **Ordner `common-code-generation/` unter seinem unveränderten Namen kopieren, Sprachfassung wählen.** Er enthält von jeder Datei zwei Fassungen. Mitkopiert wird nur die gewünschte, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`. Bleibt das Kürzel stehen, findet Claude Code den Skill nicht.
+2. **Ordner `common-code-generation/` unter seinem unveränderten Namen kopieren, Sprachfassung wählen.** `SKILL.md` und `CLAUDE-snippet.md` liegen je zweimal vor (`.de`/`.en`); mitkopiert wird nur die gewünschte Fassung, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`. Bleibt das Kürzel stehen, findet Claude Code den Skill nicht. Die `README.md` ist schon die deutsche Fassung ohne Kürzel; nur wer die englische will, benennt `README.en.md` am Zielort in `README.md` um.
 
 3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` — passend zur gewählten Sprachfassung — kommt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts, danach wird die Snippet-Datei dort gelöscht.
 

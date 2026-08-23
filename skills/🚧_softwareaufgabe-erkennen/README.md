@@ -1,4 +1,4 @@
-# softwareaufgabe-erkennen — Idee, noch kein Skill
+# 🚧 softwareaufgabe-erkennen — Idee, noch kein Skill
 
 Erkennen, dass die Anfrage des Nutzers auf eine zu schreibende oder zu ändernde Software hinausläuft — auch wenn sie das nicht mit Wörtern wie „Code", „programmieren" oder „Software" ausdrückt — und daraufhin die einschlägigen Entwicklungsregeln nachladen.
 

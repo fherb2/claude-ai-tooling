@@ -1,4 +1,4 @@
-# zotero-use — Idee, noch kein Skill
+# 🚧 zotero-use — Idee, noch kein Skill
 
 Claude direkt mit der eigenen Zotero-Bibliothek arbeiten lassen: neue Einträge samt PDF anlegen, gezielt in Metadaten und Volltext suchen, Sammlungen umsortieren — ausgehend vom ursprünglichen Wunsch, Literaturfunde schon während der Recherche in einer zotero-fertigen Form festzuhalten, statt sie nachträglich aus einem Chat-Export herauszuklauben.
 

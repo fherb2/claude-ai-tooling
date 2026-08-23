@@ -56,7 +56,7 @@ Daraus die Frage, die diese Recherche ausgelöst hat: Liegt es daran, dass die R
 
 ### 7 Nebenbefund zum Trigger-Entwurf
 
-`skills/softwareaufgabe-erkennen/README.md` hält die Messreihe vom 14. August 2026 fest: Eine **eigenschaftsförmige** Trigger-Fassung feuerte auf Sonnet in keiner von drei Eskalationsstufen. Daraus stammt die Regel, den Trigger an eine Ankerhandlung zu binden. Das `CLAUDE-snippet.md` dieses Skills ist bereits so formuliert („Bevor du in einer Sitzung zum ersten Mal einen Lösungsweg vorschlägst oder zum ersten Mal eine Datei änderst …") und damit vorgabenkonform — es ist nur nie übernommen worden.
+`skills/🚧_softwareaufgabe-erkennen/README.md` hält die Messreihe vom 14. August 2026 fest: Eine **eigenschaftsförmige** Trigger-Fassung feuerte auf Sonnet in keiner von drei Eskalationsstufen. Daraus stammt die Regel, den Trigger an eine Ankerhandlung zu binden. Das `CLAUDE-snippet.md` dieses Skills ist bereits so formuliert („Bevor du in einer Sitzung zum ersten Mal einen Lösungsweg vorschlägst oder zum ersten Mal eine Datei änderst …") und damit vorgabenkonform — es ist nur nie übernommen worden.
 
 ## TODO
 
