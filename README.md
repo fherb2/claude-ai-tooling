@@ -10,7 +10,7 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | Baustein                                                      | Anliegen                                                                                                                                                                                                                                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.md)<br>✅ | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
-| [`chat-export/`](chat-export/README.de.md)<br>✅ | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.                                            |
+| [`chat-export/`](chat-export/README.md)<br>✅ | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.                                            |
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
 | [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen:**Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit "stillem" Trigger**.                                                   |
 
@@ -38,7 +38,7 @@ Die vorhandene Datenexport-Schnittstelle ist dazu nicht unmittelbar geeignet und
 
 Bedient wird es über den Claude-Code-Skill `chat-export`, der durch beide Wege führt — den Kontoexport und die internen Web-Endpunkte von Claude.ai über den angemeldeten Chrome.
 
-**Stand:** Einsatzbereit. An echten Daten in mehreren unabhängigen Sitzungen erprobt, zuletzt an vier realen Projekten mit 171 Chats — Ergebnis gegen die tatsächliche Export-ZIP verifiziert. Am 22. August 2026 zusätzlich von einer unabhängigen Instanz gegen die Doku-Ziele geprüft; alle Befunde behoben. Näheres in der [README des Bausteins](chat-export/README.de.md).
+**Stand:** Einsatzbereit. An echten Daten in mehreren unabhängigen Sitzungen erprobt, zuletzt an vier realen Projekten mit 171 Chats — Ergebnis gegen die tatsächliche Export-ZIP verifiziert. Am 22. August 2026 zusätzlich von einer unabhängigen Instanz gegen die Doku-Ziele geprüft; alle Befunde behoben. Näheres in der [README des Bausteins](chat-export/README.md).
 
 ## home-.claude-sharing
 

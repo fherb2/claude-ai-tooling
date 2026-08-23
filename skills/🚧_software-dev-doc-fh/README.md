@@ -1,4 +1,4 @@
-# software-dev-doc-fh — Dokumentationsstandard für Planung und laufende Mitschrift
+# 🚧 software-dev-doc-fh — Dokumentationsstandard für Planung und laufende Mitschrift
 
 **🚧 In Arbeit.** Einsetzbar, aber noch nicht abgenommen: Offen ist, wie die beiden Werkzeug-Skills dieses Standards eingebunden werden (siehe „Stand und Offenes" am Ende).
 

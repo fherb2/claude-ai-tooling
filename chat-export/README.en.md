@@ -6,7 +6,7 @@
 
 This is used via the `chat-export` skill. Installation and usage are fully described in its own README:
 
-- [`skills/chat-export/README.de.md`](skills/chat-export/README.de.md) (German)
+- [`skills/chat-export/README.md`](skills/chat-export/README.md) (German)
 - [`skills/chat-export/README.en.md`](skills/chat-export/README.en.md) (English)
 
 Only the folder `skills/chat-export/` is meant to be copied — everything else here belongs to development.

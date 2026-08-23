@@ -17,7 +17,7 @@ The second part of the skill is the cleaning up: before a cause found is reporte
    | Personal | `~/.claude/skills/temp-debug-code/`  | all of the user's projects |
    | Project  | `.claude/skills/temp-debug-code/`    | this project only          |
 
-2. **Copy the folder `temp-debug-code/` under its unchanged name and choose the language version.** It holds two versions of every file — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md` and `README.de.md`/`README.en.md`. Only the desired one comes along, and its language marker is dropped in the process: `SKILL.en.md` becomes `SKILL.md` at the target location. If the marker stays, Claude Code will not find the skill.
+2. **Copy the folder `temp-debug-code/` under its unchanged name and choose the language version.** `SKILL.md` and `CLAUDE-snippet.md` each exist in two versions — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Only the desired one comes along, and its language marker is dropped in the process: `SKILL.en.md` becomes `SKILL.md` at the target location. If the marker stays, Claude Code will not find the skill. The German `README.md` already carries no marker; only those who want the English version rename `README.en.md` to `README.md` at the target location.
 
 3. **Adopt the silent trigger.** The content of the `CLAUDE-snippet.md` — the one matching the chosen language version — goes **below the separator line** into the `CLAUDE.md` of the target location: for a personal installation into `~/.claude/CLAUDE.md`, for a project installation into the project's `CLAUDE.md`. The italic text above the separator line is not copied along. The snippet file is then deleted at the target location, so that the trigger does not exist twice.
 

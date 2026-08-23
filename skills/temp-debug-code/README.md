@@ -17,7 +17,7 @@ Der zweite Teil des Skills ist das Aufräumen: Bevor eine gefundene Ursache geme
    | Persönlich  | `~/.claude/skills/temp-debug-code/`   | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/temp-debug-code/`     | nur dieses Projekt        |
 
-2. **Ordner `temp-debug-code/` unter seinem unveränderten Namen kopieren, Sprachfassung wählen.** Er enthält von jeder Datei zwei Fassungen — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md` und `README.de.md`/`README.en.md`. Mitkopiert wird nur die gewünschte, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`. Bleibt das Kürzel stehen, findet Claude Code den Skill nicht.
+2. **Ordner `temp-debug-code/` unter seinem unveränderten Namen kopieren, Sprachfassung wählen.** `SKILL.md` und `CLAUDE-snippet.md` liegen je zweimal vor — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Mitkopiert wird nur die gewünschte Fassung, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`. Bleibt das Kürzel stehen, findet Claude Code den Skill nicht. Die `README.md` ist schon die deutsche Fassung ohne Kürzel; nur wer die englische will, benennt `README.en.md` am Zielort in `README.md` um.
 
 3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` — passend zur gewählten Sprachfassung — kommt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts — bei persönlicher Installation in `~/.claude/CLAUDE.md`, bei einer Projektinstallation in die `CLAUDE.md` des Projekts. Der kursive Text oberhalb der Trennlinie wird nicht mitkopiert. Danach die `CLAUDE-snippet.md` am Zielort löschen, damit der Trigger nicht zweimal existiert.
 

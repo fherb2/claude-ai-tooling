@@ -152,17 +152,18 @@ Jeder Skill liegt unter `skills/<skill-name>/`. Der Ordnername trägt **kein** S
 
 **Solange es nur eine Fassung gibt, trägt sie kein Sprachkürzel.** Die Dateien heißen dann schlicht `SKILL.md`, `README.md` und `CLAUDE-snippet.md`, und beim Installieren ist an den Namen nichts zu tun.
 
-Liegen mehrere Fassungen vor, liegen sie im **selben** Ordner. Unterschieden werden sie durch ein Sprachkürzel unmittelbar vor der Endung `.md`:
+Liegen mehrere Fassungen von `SKILL.md` oder `CLAUDE-snippet.md` vor, liegen sie im **selben** Ordner und werden durch ein Sprachkürzel unmittelbar vor der Endung `.md` unterschieden:
 
 | Deutsch                  | Englisch                 |
 | ------------------------ | ------------------------ |
 | `SKILL.de.md`            | `SKILL.en.md`            |
-| `README.de.md`           | `README.en.md`           |
 | `CLAUDE-snippet.de.md`   | `CLAUDE-snippet.en.md`   |
 
-Das Kürzel tragen dann **alle** Dateien des Skill-Ordners, die Prosa enthalten — nicht nur die `SKILL.md`. Wo dieses Dokument die bloßen Namen `SKILL.md`, `README.md` oder `CLAUDE-snippet.md` verwendet, ist die Datei unabhängig von ihrer Sprachfassung gemeint.
+Das Kürzel tragen dann beide Fassungen dieser Dateien. Wo dieses Dokument die bloßen Namen `SKILL.md` oder `CLAUDE-snippet.md` verwendet, ist die Datei unabhängig von ihrer Sprachfassung gemeint.
 
-**Beim Installieren wird das Sprachkürzel entfernt.** Kopiert wird genau eine der beiden Fassungen; sie heißt am Zielort `SKILL.md`. Claude Code erkennt keinen anderen Namen — eine `SKILL.de.md` am Zielort ist kein Skill. Der Ordnername bleibt dabei unverändert, denn er trug nie ein Kürzel.
+**Die `README.md` ist davon ausgenommen — bewusst asymmetrisch.** Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel. Grund (recherchiert 23. August 2026): GitHub und GitLab zeigen automatisch nur eine Datei namens exakt `README.md` an, sobald jemand einen Ordner im Web-Interface öffnet — ein Sprachkürzel verhindert das, unabhängig davon, für welche Sprache es steht. Da die Arbeitssprache dieses Repositories Deutsch ist (siehe unten), bekommt die deutsche Fassung deshalb den Vorrang: Sie ist es, die beim Browsen ohne einen Klick sichtbar wird.
+
+**Beim Installieren wird das verbliebene Sprachkürzel entfernt.** Für `SKILL.md`/`CLAUDE-snippet.md` wird genau eine der beiden Fassungen kopiert; sie heißt am Zielort `SKILL.md` bzw. `CLAUDE-snippet.md`. Claude Code erkennt keinen anderen Namen — eine `SKILL.de.md` am Zielort ist kein Skill. Für die deutsche `README.md` entfällt dieser Schritt von vornherein, da sie schon so heißt; nur bei der englischen Fassung wird `README.en.md` beim Kopieren zu `README.md`. Der Ordnername bleibt in jedem Fall unverändert, denn er trug nie ein Kürzel.
 
 Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 
