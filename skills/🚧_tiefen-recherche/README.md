@@ -24,7 +24,7 @@ Der gefundene Fachartikel wurde übrigens nicht über eine Themensuche entdeckt,
 - **Sechs Operatoren** als fachgebietsunabhängiges Repertoire: Reformulieren (Synonyme, Sprachen, alte Bezeichnungen), Eingrenzen (ergiebige Domäne direkt durchsuchen), Ebene wechseln (Register/Kataloge/Bibliographien statt Dokumente), Entitäten verfolgen (Autor → Werke, Zeitschrift → Register), Kanal wechseln (allgemeine Suche → Fachdatenbank → Direktabruf → URL-Konstruktion), Verifizieren (Primärabruf vor Übernahme).
 - **Zwei Scheiter-Modi als Umschaltsignal.** „Viele Treffer, aber keiner beantwortet die Frage" → eingrenzen oder Ebene wechseln. „Gar keine brauchbaren Treffer" → reformulieren. Das Signal ist die Form des Fehlschlags, keine Vorab-Klassifikation des Themas.
 - **Verifikationspflicht:** Behauptungen aus Suchzusammenfassungen gelten als unbestätigt, bis sie am Primärdokument geprüft sind, und werden im Ergebnis entsprechend gekennzeichnet — die Verallgemeinerung der §1.10-Dreiteilung (belegt / Beobachtung / Community-Wissen) auf alle Recherchen.
-- **Quellenkarte:** eine wachsende Zusatzdatei (`quellenkarte.md`) mit Nischenquellen, die sich bewährt haben. Sie ist der Lernkanal über Sitzungen hinweg, den weder Training noch Websuche bieten. Nur in Claude Code nutzbar (Dateizugriff).
+- **Quellenkarte:** eine wachsende Datei `quellenkarte.md` mit bewährten Nischenquellen — **projektgebunden, nicht Teil des Skills** (Festlegung des Entwicklers vom 23. August 2026). Sie liegt im jeweiligen Projekt und ist dadurch automatisch themenrein; im projektlosen Chat entfällt sie ersatzlos. Vor der Nutzung wird sie dem Nutzer vorgelegt, Neueinträge nur mit seiner Zustimmung. Bewusst **nicht** im Skill-Ordner: Eine globale Karte trüge fachfremde Quellen in jede neue Recherche (verwässert) und erzeugte nach einer Installation zwei auseinanderdriftende Fassungen. Preis der Entscheidung: kein automatischer Lerntransfer über Projektgrenzen — verschmerzbar, weil wiederkehrende Themen ohnehin im selben Projekt wohnen. Beispiel-Einträge, wie sie im ersten Test verdient wurden (Format-Muster): „zobodat.at — zoologisch-botanische Literatur Mitteleuropas; PDFs nach Schema `zobodat.at/pdf/<Zeitschrift>_<Band>_<Seiten>.pdf`; weist automatisierte PDF-Abrufe teils mit HTTP 403 ab" und „og-bayern.de — Register des Ornithologischen Anzeigers; HTML-Register besser durchsuchbar als die Register-PDFs".
 - **Tiefen-Verabredung:** Vor einer größeren Recherche wird die Suchtiefe kurz geklärt (Schnellauskunft / gründlich / erschöpfend mit Frontier-Bericht), denn eine Frontier-Recherche kostet spürbar Zeit und Kontext.
 
 ## Prüffälle und Messergebnis
@@ -49,13 +49,22 @@ Aufbau: vier headless-Läufe (`claude -p`, Modell Sonnet, freigegeben nur WebSea
 
 Deutung: Prüffall A trennt schwach — die Frageformulierung liegt nahe am Titel, beide Bedingungen fanden die Quelle; der Skill brachte dort Effizienz und Verifikationstiefe. Prüffall B ist der eigentliche Beleg: Fund statt Nichts, dazu nachgewiesene Konfabulationsfestigkeit und ein regelkonformer Frontier-Bericht. Das übertrifft die Erwartung (erwartet war für B nur der saubere Frontier-Bericht). Nebenbefund: Der Trigger feuerte in beiden mit-Läufen ungefragt auf Sonnet — das ersetzt aber keine Negativkontrolle.
 
+### Zweiter Test vom 23. August 2026: fremdes Fachgebiet, offene Sammelaufgabe
+
+Ein Einzellauf (headless Sonnet, mit Skill; zusätzlich Write freigegeben) zu einer Sammelrecherche in fremdem Feld und fremder Sprache: Gartenbahnen in Tschechien, Spur-1-Anlagen, Gartenbahn-/„Großbahn"-Treffen; Ergebnis als Markdown-Liste mit Erklärtext und Link je Fund. Dauer 731 s, 59 Züge, 22 Suchen, 26 Abrufe.
+
+**Was funktionierte:** Der Sprachwechsel ins Tschechische kam mit der allerersten Suche („zahradní železnice", „rozchod", „sraz"), durchgehend dreisprachig weitergeführt; Entitätenverfolgung und `site:`-Eingrenzung nachweisbar; das Ergebnisdokument unterschied fachlich sauber Spur G von Spur 1 (gleiche 45-mm-Schiene, anderer Maßstab) und Modell- von befahrbaren Parkbahnen; Widersprüche in Quellen (Maßstab „1:29" vs. „1:32") wurden benannt statt geglättet; die Frontier nannte konkrete nächste Schritte (Kontaktadresse, Facebook als nicht durchsuchter Kanal, G1MRA-Anfrage). Nebenbefund zur Umgebung: WebFetch rüstet HTTP zwingend auf HTTPS auf — reine HTTP-Altseiten (hier `steamer.cz`) sind damit unerreichbar; der Lauf hat das erkannt, erklärt und den Fund korrekt herabgestuft statt ihn zu verlieren.
+
+**Gefundene Schwäche — Etiketten-Inflation bei „belegt":** Ein mechanischer Abgleich aller 23 Dokument-Links gegen die tatsächlich abgerufenen URLs zeigt: 8 Links wurden nie abgerufen, und bei etwa 4 Einträgen (u. a. Drásov, Zásmuky, G1MRA) steht trotzdem „belegt" — die Angaben stammen dort nur aus Suchtreffer-Zusammenfassungen. Erfunden war nichts, und viele Einträge waren korrekt konservativ gekennzeichnet; aber die Kennzeichnungsdisziplin lässt bei Sammellisten messbar nach. Möglicher Fix (noch nicht beschlossen, siehe Offen): eine Selbsttest-Klausel analog zum Marken-Selbsttest von temp-debug-code — vor Abgabe prüft die Instanz für jeden als „belegt" markierten Fund, ob dessen Quelle in diesem Lauf tatsächlich abgerufen wurde.
+
 ## Stand und Offenes
 
-**Status:** Modell dokumentiert, `SKILL.md`-Erstfassung geschrieben, Inhaltstest bestanden (siehe Messergebnis), Quellenkarte um die dabei gewonnenen Befunde ergänzt.
+**Status:** Modell dokumentiert, `SKILL.md`-Erstfassung geschrieben, zwei Inhaltstests gelaufen (Auffinde-Härtefall bestanden; Sammelrecherche gut mit einer gefundenen Schwäche). Quellenkarte per Festlegung vom 23. August 2026 aus dem Skill-Ordner entfernt und auf Projektbindung umgestellt.
 
 **Offen:**
 
-- Trigger-Messung nach Kapitel 4.2 vervollständigen: Negativkontrolle (themenfremder Prompt darf nicht feuern) und implizite Stufe (Rechercheauftrag ohne Wortlaut-Nähe zur Description). Die beiden Positivfälle sind durch den Inhaltstest bereits abgedeckt.
+- Entscheidung über die Selbsttest-Klausel gegen Etiketten-Inflation (siehe zweiter Test): „belegt" nur, wenn die Quelle im Lauf abgerufen wurde — mechanisch prüfbar vor Abgabe.
+- Trigger-Messung nach Kapitel 4.2 vervollständigen: Negativkontrolle (themenfremder Prompt darf nicht feuern) und implizite Stufe (Rechercheauftrag ohne Wortlaut-Nähe zur Description). Die Positivfälle sind durch die Inhaltstests bereits abgedeckt.
 - Danach Installationsentscheidung (Zielort, Emoji-Präfix entfällt beim Fertigwerden) und Entscheidung, ob ein stiller Trigger nötig ist oder die Description trägt.
 
 **Bewusst offen gelassen:**
