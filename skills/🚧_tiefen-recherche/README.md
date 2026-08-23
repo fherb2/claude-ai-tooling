@@ -1,6 +1,6 @@
 # 🚧 tiefen-recherche — Recherche, die nicht zu früh aufgibt
 
-🚧 Erstfassung der `SKILL.md` geschrieben, aber **ungetestet** — nicht zur Installation freigegeben. Was zum Test aussteht, steht unter „Stand und Offenes".
+🚧 Erstfassung der `SKILL.md` geschrieben und am 23. August 2026 im **Inhaltstest bestanden** (A/B-Vergleich, headless auf Sonnet — Ergebnis unten). Noch nicht zur Installation freigegeben: Die Trigger-Messung mit Negativkontrolle steht aus, siehe „Stand und Offenes".
 
 ## Überblick
 
@@ -27,7 +27,7 @@ Der gefundene Fachartikel wurde übrigens nicht über eine Themensuche entdeckt,
 - **Quellenkarte:** eine wachsende Zusatzdatei (`quellenkarte.md`) mit Nischenquellen, die sich bewährt haben. Sie ist der Lernkanal über Sitzungen hinweg, den weder Training noch Websuche bieten. Nur in Claude Code nutzbar (Dateizugriff).
 - **Tiefen-Verabredung:** Vor einer größeren Recherche wird die Suchtiefe kurz geklärt (Schnellauskunft / gründlich / erschöpfend mit Frontier-Bericht), denn eine Frontier-Recherche kostet spürbar Zeit und Kontext.
 
-## Prüffälle für den Test
+## Prüffälle und Messergebnis
 
 Die Sitzung vom 23. August 2026 liefert zwei Messfälle nach dem Verfahren aus `implementation_doku.md` Kapitel 4:
 
@@ -36,11 +36,27 @@ Die Sitzung vom 23. August 2026 liefert zwei Messfälle nach dem Verfahren aus `
 
 **Kontaminationswarnung:** Beide Prüffälle samt Lösungen stehen in dieser README. Ein gültiger Test läuft deshalb in einem isolierten Wegwerf-Projekt (Verfahren nach Kapitel 4.2), in dessen Kontext diese README nicht liegt — nie in einer Sitzung, die diesen Ordner gelesen hat.
 
+### Messergebnis vom 23. August 2026 (Beobachtung am laufenden System)
+
+Aufbau: vier headless-Läufe (`claude -p`, Modell Sonnet, freigegeben nur WebSearch/WebFetch) in vier isolierten Wegwerf-Projekten im Scratchpad; „mit Skill" heißt `SKILL.md` samt `quellenkarte.md` als Projekt-Skill installiert. Ausgewertet wurde am `stream-json`-Transkript, nicht an der Selbstauskunft. Je Bedingung ein Lauf — Richtungsbefund, kein Beweis.
+
+| Lauf | Ergebnis | Aufwand |
+| --- | --- | --- |
+| A ohne Skill | Quelle gefunden (nach zehn Suchanläufen samt Autoren-Irrweg schließlich über das Register); Zitat aus dem Register abgeschrieben, Inhalt eingestandenermaßen nicht verifiziert | 207 s, 15 Züge |
+| A mit Skill | Trigger feuerte von selbst über die Description; Quelle gefunden **und am gescannten Original verifiziert** — vollständigeres Zitat (Wink, Ursula 2008, Ornithol. Anz. 47, S. 66–76) samt Abstract-Inhalt; Status „belegt" korrekt gekennzeichnet | 154 s, 13 Züge |
+| B ohne Skill | **kein Ergebnis**: 22 hartnäckige Suchanläufe, dann Sackgasse — der Lauf endete mit einer Rückfrage nach einer Bash-Freigabe, die headless niemand beantworten kann. Immerhin: nichts erfunden | 280 s, 36 Züge |
+| B mit Skill | Trigger feuerte; **Studie gefunden**: Wink, U., „Bestandsabnahmen beim Neuntöter …, Langzeitstudie 2002–2016", Ornithol. Anz. Bd. 55, Heft 2/3 (2016/2017), belegt am Inhaltsverzeichnis des Herausgebers. Fundweg über die Operatoren: Autorin des 2008er-Artikels als Faden verfolgt, Herausgeber-Inhaltsverzeichnisse durchsucht, Zobodat-URLs nach Schema konstruiert. Kursierende Revierzahlen („81→34") wurden gesehen und korrekt als **unbestätigt** gekennzeichnet statt übernommen; Rest-Frontier sauber benannt (fehlende Seitenzahl; Zobodat weist automatisierte PDF-Abrufe mit HTTP 403 ab) | 523 s, 62 Züge |
+
+Deutung: Prüffall A trennt schwach — die Frageformulierung liegt nahe am Titel, beide Bedingungen fanden die Quelle; der Skill brachte dort Effizienz und Verifikationstiefe. Prüffall B ist der eigentliche Beleg: Fund statt Nichts, dazu nachgewiesene Konfabulationsfestigkeit und ein regelkonformer Frontier-Bericht. Das übertrifft die Erwartung (erwartet war für B nur der saubere Frontier-Bericht). Nebenbefund: Der Trigger feuerte in beiden mit-Läufen ungefragt auf Sonnet — das ersetzt aber keine Negativkontrolle.
+
 ## Stand und Offenes
 
-**Status:** Modell hergeleitet und dokumentiert, `SKILL.md`-Erstfassung und Keimzelle der Quellenkarte geschrieben — alles ungetestet.
+**Status:** Modell dokumentiert, `SKILL.md`-Erstfassung geschrieben, Inhaltstest bestanden (siehe Messergebnis), Quellenkarte um die dabei gewonnenen Befunde ergänzt.
 
-**Offen — Plan des nächsten Schritts (noch nicht ausgeführt):** Inhaltstest als A/B-Vergleich in einem Wegwerf-Projekt im Scratchpad: je Prüffall ein headless-Lauf (`claude -p` mit freigegebener Websuche) ohne Skill und einer mit installierter `SKILL.md`; Bewertung von Prüffall A am Fund der Quelle, von Prüffall B an der Form der Antwort (Frontier-Bericht statt Konfabulation). Erst nach bestandenem Inhaltstest: Trigger-Messung nach Kapitel 4.2 und Entscheidung über die Installation.
+**Offen:**
+
+- Trigger-Messung nach Kapitel 4.2 vervollständigen: Negativkontrolle (themenfremder Prompt darf nicht feuern) und implizite Stufe (Rechercheauftrag ohne Wortlaut-Nähe zur Description). Die beiden Positivfälle sind durch den Inhaltstest bereits abgedeckt.
+- Danach Installationsentscheidung (Zielort, Emoji-Präfix entfällt beim Fertigwerden) und Entscheidung, ob ein stiller Trigger nötig ist oder die Description trägt.
 
 **Bewusst offen gelassen:**
 
