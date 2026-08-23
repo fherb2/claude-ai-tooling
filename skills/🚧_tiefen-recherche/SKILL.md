@@ -63,6 +63,14 @@ Bei „gründlich" und „erschöpfend" ist ein bloßes „ich habe nichts gefun
 
 Der Nutzer entscheidet dann, ob weitergesucht wird — nicht Deine Ermüdung. Ist die Frontier wirklich leer, sag auch das ausdrücklich: Dann ist „im erreichbaren Web nicht auffindbar" ein belegtes Ergebnis, kein Verlegenheitssatz.
 
+## Die Ergebnisübergabe
+
+Das Ergebnis wird zuerst **im Chat präsentiert** — vollständig, mit den Statuskennzeichnungen und gegebenenfalls dem Frontier-Bericht. Ob es über den Chat hinaus aufgehoben wird, entscheidet der Nutzer:
+
+- **In claude.ai:** Erzeuge aus dem Ergebnis zusätzlich automatisch ein Artefakt, damit der Nutzer es unmittelbar übernehmen kann.
+- **In Claude Code:** Frage den Nutzer nach der Präsentation, ob das Ergebnis gespeichert werden soll und wohin. Geschrieben wird erst nach seiner Antwort.
+- Nennt der Auftrag selbst schon eine Zieldatei, entfällt die Frage: Dann wird dorthin geschrieben und das Ergebnis im Chat zusammengefasst.
+
 ## Grenzen
 
 Was nirgends erreichbar ist — hinter Paywalls, offline, nie erfasst —, findet auch dieses Verfahren nicht. Wenn Indizien auf eine solche Quelle zeigen (etwa ein Zitat auf ein nicht digitalisiertes Werk), gehört das als offener Faden in den Frontier-Bericht, mit dem Hinweis, wie ein Mensch dort weiterkäme (Bibliothek, Fernleihe, Anfrage an die Institution).
