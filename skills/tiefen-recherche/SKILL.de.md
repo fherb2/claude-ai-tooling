@@ -50,7 +50,7 @@ Die Quellenkarte ist eine Arbeitsdatei des **Projekts**, in dem recherchiert wir
 
 - Läuft die Recherche in einem Projekt, prüfe zu Beginn einer gründlichen oder erschöpfenden Recherche, ob dort eine `quellenkarte.md` liegt. Wenn ja: Lege sie dem Nutzer mit einem Satz vor (Themenfeld, Zahl der Einträge) und lass **ihn** entscheiden, ob sie genutzt wird — nicht stillschweigend laden, nicht stillschweigend übergehen.
 - Wird sie genutzt, sind passende Einträge ein früher Kanal (Operator 5), nicht der letzte.
-- Hat die Recherche eine neue ergiebige Nischenquelle zutage gefördert, schlage dem Nutzer am Ende vor, sie einzutragen — Domain, Themenfeld und ein Satz dazu, was sie besser findet als die allgemeine Suche. Der Eintrag und, beim ersten Mal, der Ablageort im Projekt geschehen nur mit seiner Zustimmung.
+- Hat die Recherche eine neue ergiebige Nischenquelle zutage gefördert, schlage dem Nutzer am Ende vor, sie einzutragen — Domain, Themenfeld und ein Satz dazu, was sie besser findet als die allgemeine Suche. Der Eintrag und, beim ersten Mal, der Ablageort der `quellenkarte.md` im Projekt geschehen nur mit seiner Zustimmung.
 - Außerhalb eines Projekts entfällt die Datei ersatzlos; die Fundwege stehen dann im Chat selbst.
 
 ## Der Frontier-Bericht: „nichts gefunden" gibt es nicht
@@ -73,4 +73,4 @@ Das Ergebnis wird zuerst **im Chat präsentiert** — vollständig, mit den Stat
 
 ## Grenzen
 
-Was nirgends erreichbar ist — hinter Paywalls, offline, nie erfasst —, findet auch dieses Verfahren nicht. Wenn Indizien auf eine solche Quelle zeigen (etwa ein Zitat auf ein nicht digitalisiertes Werk), gehört das als offener Faden in den Frontier-Bericht, mit dem Hinweis, wie ein Mensch dort weiterkäme (Bibliothek, Fernleihe, Anfrage an die Institution).
+Was nirgends erreichbar ist — hinter Paywalls, offline, nie erfasst —, findet auch dieses Verfahren nicht. Wenn Indizien auf eine solche Quelle zeigen (etwa ein Zitat auf ein nicht digitalisiertes Werk), gehört das als offener Faden in den Frontier-Bericht, mit dem Hinweis, wie ein Mensch dort weiterkäme (Bibliothek, Fernleihe, Anfrage an die Institution). Sofern im Web auffindbar: Gib die bibliografischen Daten dazu mit an.
