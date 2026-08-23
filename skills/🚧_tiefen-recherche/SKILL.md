@@ -44,9 +44,12 @@ Das ist Dein Repertoire. Bei „gründlich" und „erschöpfend" müssen vor ein
 
 ## Die Quellenkarte
 
-Wenn Dir Dateizugriff zur Verfügung steht, prüfe zu Beginn einer gründlichen oder erschöpfenden Recherche, ob `${CLAUDE_SKILL_DIR}/quellenkarte.md` existiert, und lies sie: Sie listet Nischenquellen, die sich in früheren Recherchen bewährt haben, mit ihrem Themenfeld. Passt eine zur Frage, ist sie ein früher Kanal (Operator 5), nicht der letzte.
+Die Quellenkarte ist eine Arbeitsdatei des **Projekts**, in dem recherchiert wird — nicht des Skills. Im Skill-Ordner liegt keine, denn eine global wachsende Karte trüge fachfremde Quellen in jede neue Recherche und verwässerte sie.
 
-Hat eine Recherche eine neue ergiebige Nischenquelle zutage gefördert, schlage dem Nutzer am Ende vor, sie in die Quellenkarte aufzunehmen — mit Domain, Themenfeld und einem Satz dazu, was sie besser findet als die allgemeine Suche. Ergänze sie erst nach seiner Zustimmung.
+- Läuft die Recherche in einem Projekt, prüfe zu Beginn einer gründlichen oder erschöpfenden Recherche, ob dort eine `quellenkarte.md` liegt. Wenn ja: Lege sie dem Nutzer mit einem Satz vor (Themenfeld, Zahl der Einträge) und lass **ihn** entscheiden, ob sie genutzt wird — nicht stillschweigend laden, nicht stillschweigend übergehen.
+- Wird sie genutzt, sind passende Einträge ein früher Kanal (Operator 5), nicht der letzte.
+- Hat die Recherche eine neue ergiebige Nischenquelle zutage gefördert, schlage dem Nutzer am Ende vor, sie einzutragen — Domain, Themenfeld und ein Satz dazu, was sie besser findet als die allgemeine Suche. Der Eintrag und, beim ersten Mal, der Ablageort im Projekt geschehen nur mit seiner Zustimmung.
+- Außerhalb eines Projekts entfällt die Datei ersatzlos; die Fundwege stehen dann im Chat selbst.
 
 ## Der Frontier-Bericht: „nichts gefunden" gibt es nicht
 

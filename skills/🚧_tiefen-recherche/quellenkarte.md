@@ -1,6 +1,0 @@
-# Quellenkarte
-
-Nischenquellen, die sich in Recherchen bewährt haben und die die allgemeine Websuche schlecht oder gar nicht erfasst. Je Eintrag: Domain, Themenfeld, ein Satz zum Warum. Neue Einträge nur nach Zustimmung des Nutzers.
-
-- **zobodat.at** — Zoologisch-botanische Literatur (Schwerpunkt Mitteleuropa, viele regionale Fachzeitschriften als PDF). Enthält Artikel, die über allgemeine Websuche selbst mit exaktem Titel nicht auffindbar sind; die interne Suche der Datenbank direkt nutzen. PDFs folgen dem Schema `zobodat.at/pdf/<Zeitschrift>_<Band>_<Seiten>.pdf`. Achtung (Stand 23.08.2026): Der Server weist automatisierte PDF-Abrufe teils mit HTTP 403 ab — dann über die Serien- und Bandübersichten gehen (`publikation_series.php`, `publikation_volumes.php`) oder die Fundstelle am Inhaltsverzeichnis des Herausgebers belegen.
-- **og-bayern.de** — Ornithologische Gesellschaft in Bayern; Register und Inhaltsverzeichnisse des „Ornithologischen Anzeigers". Registerseiten (HTML) sind ergiebiger durchsuchbar als die Register-PDFs derselben Inhalte. Je Band gibt es eine Inhaltsverzeichnis-Seite (`og-bayern.de/ornithol-anz-<band>-<jahre>/`); ganze Hefte liegen als gescannte PDFs unter `og-bayern.de/PDF/…` und lassen sich per Seitenzahl gezielt lesen.
