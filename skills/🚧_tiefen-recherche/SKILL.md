@@ -24,6 +24,8 @@ Sie gilt auf jeder Tiefenstufe, auch bei der Schnellauskunft.
 
 Kennzeichne in Deiner Antwort jeden Fund mit seinem Status: **belegt** (am Primärdokument geprüft, mit Quelle), **unbestätigt** (nur aus einer Zusammenfassung oder einem Sekundärtreffer) oder **eigenes Modellwissen** (aus den Trainingsdaten, ohne aktuelle Quelle). Vermische die drei nie.
 
+**Selbsttest vor der Abgabe, verpflichtend:** Gehe unmittelbar vor der Abgabe jeden Fund durch, den Du als **belegt** gekennzeichnet hast, und prüfe: Hast Du die Quelle, die ihn tragen soll, in diesem Lauf tatsächlich abgerufen und die Aussage dort gesehen? Wenn nein: Hole den Abruf nach oder stufe den Fund auf **unbestätigt** herab. Gerade bei Sammellisten mit vielen Einträgen lässt die Kennzeichnungsdisziplin sonst unbemerkt nach — ein Suchtreffer-Schnipsel fühlt sich nach Beleg an, ist aber keiner.
+
 ## Das Umschaltsignal: die Form des Fehlschlags lesen
 
 Beurteile nach jeder Suche, *wie* sie gescheitert ist — daraus folgt der nächste Zug:
