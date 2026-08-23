@@ -55,7 +55,7 @@ Ein Einzellauf (headless Sonnet, mit Skill; zusätzlich Write freigegeben) zu ei
 
 **Was funktionierte:** Der Sprachwechsel ins Tschechische kam mit der allerersten Suche („zahradní železnice", „rozchod", „sraz"), durchgehend dreisprachig weitergeführt; Entitätenverfolgung und `site:`-Eingrenzung nachweisbar; das Ergebnisdokument unterschied fachlich sauber Spur G von Spur 1 (gleiche 45-mm-Schiene, anderer Maßstab) und Modell- von befahrbaren Parkbahnen; Widersprüche in Quellen (Maßstab „1:29" vs. „1:32") wurden benannt statt geglättet; die Frontier nannte konkrete nächste Schritte (Kontaktadresse, Facebook als nicht durchsuchter Kanal, G1MRA-Anfrage). Nebenbefund zur Umgebung: WebFetch rüstet HTTP zwingend auf HTTPS auf — reine HTTP-Altseiten (hier `steamer.cz`) sind damit unerreichbar; der Lauf hat das erkannt, erklärt und den Fund korrekt herabgestuft statt ihn zu verlieren.
 
-**Gefundene Schwäche — Etiketten-Inflation bei „belegt":** Ein mechanischer Abgleich aller 23 Dokument-Links gegen die tatsächlich abgerufenen URLs zeigt: 8 Links wurden nie abgerufen, und bei etwa 4 Einträgen (u. a. Drásov, Zásmuky, G1MRA) steht trotzdem „belegt" — die Angaben stammen dort nur aus Suchtreffer-Zusammenfassungen. Erfunden war nichts, und viele Einträge waren korrekt konservativ gekennzeichnet; aber die Kennzeichnungsdisziplin lässt bei Sammellisten messbar nach. Möglicher Fix (noch nicht beschlossen, siehe Offen): eine Selbsttest-Klausel analog zum Marken-Selbsttest von temp-debug-code — vor Abgabe prüft die Instanz für jeden als „belegt" markierten Fund, ob dessen Quelle in diesem Lauf tatsächlich abgerufen wurde.
+**Gefundene Schwäche — Etiketten-Inflation bei „belegt":** Ein mechanischer Abgleich aller 23 Dokument-Links gegen die tatsächlich abgerufenen URLs zeigt: 8 Links wurden nie abgerufen, und bei etwa 4 Einträgen (u. a. Drásov, Zásmuky, G1MRA) steht trotzdem „belegt" — die Angaben stammen dort nur aus Suchtreffer-Zusammenfassungen. Erfunden war nichts, und viele Einträge waren korrekt konservativ gekennzeichnet; aber die Kennzeichnungsdisziplin lässt bei Sammellisten messbar nach. Fix am 23. August 2026 beschlossen und in die `SKILL.md` übernommen: eine verpflichtende Selbsttest-Klausel analog zum Marken-Selbsttest von temp-debug-code — vor Abgabe prüft die Instanz für jeden als „belegt" markierten Fund, ob dessen Quelle in diesem Lauf tatsächlich abgerufen und die Aussage dort gesehen wurde; sonst wird nachgeholt oder herabgestuft. Wirksamkeit noch ungemessen — ein Wiederholungslauf der Sammelrecherche wäre der passende Prüffall.
 
 ## Stand und Offenes
 
@@ -63,7 +63,7 @@ Ein Einzellauf (headless Sonnet, mit Skill; zusätzlich Write freigegeben) zu ei
 
 **Offen:**
 
-- Entscheidung über die Selbsttest-Klausel gegen Etiketten-Inflation (siehe zweiter Test): „belegt" nur, wenn die Quelle im Lauf abgerufen wurde — mechanisch prüfbar vor Abgabe.
+- Wirksamkeit der neuen Selbsttest-Klausel messen (Wiederholungslauf einer Sammelrecherche mit anschließendem Link-Abgleich).
 - Trigger-Messung nach Kapitel 4.2 vervollständigen: Negativkontrolle (themenfremder Prompt darf nicht feuern) und implizite Stufe (Rechercheauftrag ohne Wortlaut-Nähe zur Description). Die Positivfälle sind durch die Inhaltstests bereits abgedeckt.
 - Danach Installationsentscheidung (Zielort, Emoji-Präfix entfällt beim Fertigwerden) und Entscheidung, ob ein stiller Trigger nötig ist oder die Description trägt.
 
