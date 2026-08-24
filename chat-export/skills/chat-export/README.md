@@ -1,5 +1,7 @@
 # chat-export — Chats aus claude.ai in dein Projekt holen
 
+*Stand: 2026-08-23*
+
 **Dieser Skill holt Chats aus deinen claude.ai-Projekten und legt sie als durchsuchbare JSON-Dateien in dem Projekt ab, in dem Claude Code gerade läuft.** Gedacht sind sie zum Wiederfinden früheren Zusammenhangs: Was in einem Chat einmal besprochen wurde, steht danach im Projekt und ist auffindbar, statt nur im Konto zu liegen.
 
 Auch weiter wachsende Chats und neue Chats können aktualisiert / ergänzt werden.

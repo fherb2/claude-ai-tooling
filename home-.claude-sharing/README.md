@@ -1,5 +1,7 @@
 # Syncthing-Sync für `~/.claude`
 
+*Stand: 2026-08-14*
+
 **Hält den Arbeitszustand von Claude Desktop und Claude Code — Konfiguration, Sitzungsprotokolle, Projektgedächtnis — automatisch zwischen mehreren Rechnern synchron, damit derselbe Kontext überall zur Verfügung steht.**
 
 # Stand: Noch in Überarbeitung. Nicht benutzen!

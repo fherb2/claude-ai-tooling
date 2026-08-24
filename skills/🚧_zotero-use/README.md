@@ -1,5 +1,7 @@
 # 🚧 zotero-use — Idee, noch kein Skill
 
+*Stand: 2026-08-23*
+
 Claude direkt mit der eigenen Zotero-Bibliothek arbeiten lassen: neue Einträge samt PDF anlegen, gezielt in Metadaten und Volltext suchen, Sammlungen umsortieren — ausgehend vom ursprünglichen Wunsch, Literaturfunde schon während der Recherche in einer zotero-fertigen Form festzuhalten, statt sie nachträglich aus einem Chat-Export herauszuklauben.
 
 **Status:** Nur diese README, keine `SKILL.md`. Architektur und Werkzeugkandidaten sind recherchiert und grob geklärt (Chat vom 22. August 2026); das Thema ist derzeit nicht akut, nichts ist implementiert.

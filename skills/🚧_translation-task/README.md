@@ -1,5 +1,7 @@
 # 🚧 translation-task — Übersetzung software-entwicklungsnaher Dokumente
 
+*Stand: 2026-08-23*
+
 **🚧 In Arbeit.** Einsetzbar, aber noch nicht abgenommen: Fünf Festlegungen in der `SKILL.md` sind noch offen (siehe „Stand und Offenes" am Ende).
 
 Übersetzt Dokumente mit softwareentwicklungsnahem Inhalt — README-Dateien, Konzept- und Implementierungsdokumente, Anleitungen. Kein allgemeiner Übersetzer: Er ist auf Texte ausgelegt, in denen Fachbegriffe, Codeblöcke, Dateinamen und Software-Produktnamen zwischen Prosa stehen und je eigenen Regeln folgen. Auf eine Sprachrichtung ist er nicht festgelegt.

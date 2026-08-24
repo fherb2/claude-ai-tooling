@@ -1,6 +1,9 @@
+*Stand: 2026-08-24*
+
 *Diese Datei ist kein Teil des Skills. Sie enthält den stillen Trigger, der
 den Skill auslöst. Beim Installieren: alles unterhalb der Trennlinie in die
-`CLAUDE.md` des Zielorts übernehmen, danach diese Datei löschen. Der Skill
+`CLAUDE.md` des Zielorts übernehmen; diese Datei bleibt dort
+liegen, wirksam ist allein die `CLAUDE.md`. Der Skill
 läuft ohne den Trigger nur bei ausdrücklichem
 `/common-code-generation`-Aufruf.*
 

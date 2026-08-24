@@ -1,5 +1,7 @@
 # 🚧 software-dev-doc-fh — Dokumentationsstandard für Planung und laufende Mitschrift
 
+*Stand: 2026-08-24*
+
 **🚧 In Arbeit.** Einsetzbar, aber noch nicht abgenommen: Offen ist, wie die beiden Werkzeug-Skills dieses Standards eingebunden werden (siehe „Stand und Offenes" am Ende).
 
 **Gibt einen Standard für die entwicklungsbegleitende Dokumentation vor** — für alles, was vor der Kodierung geplant und während der Umsetzung mitgeschrieben wird: was umgesetzt wird, welche Festlegungen getroffen wurden und, wo es nicht selbstverständlich ist, warum so und nicht anders.
@@ -19,7 +21,7 @@ Das Kürzel `-fh` ist Absicht: Das ist die Arbeitsweise eines bestimmten Entwick
 
 2. **Ordner `software-dev-doc-fh/` unter seinem unveränderten Namen kopieren.** Er enthält `SKILL.md`, `CLAUDE-snippet.md` und diese `README.md`. Ein Sprachkürzel trägt bisher keine der Dateien, weil es nur die deutsche Fassung gibt.
 
-3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` **unterhalb der Trennlinie** kommt in die `CLAUDE.md` des Zielorts, danach wird die Snippet-Datei dort gelöscht. Sein Wortlaut ist an eine Handlung gebunden („Bevor du in einer Sitzung zum ersten Mal einen Lösungsweg vorschlägst oder zum ersten Mal eine Datei änderst …") — dieser Anker darf beim Anpassen an ein Projekt verschoben, aber nicht weggelassen werden, sonst löst der Trigger nicht mehr aus.
+3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` **unterhalb der Trennlinie** kommt in die `CLAUDE.md` des Zielorts; die Snippet-Datei bleibt am Zielort liegen, wirksam ist allein die `CLAUDE.md`. Sein Wortlaut ist an eine Handlung gebunden („Bevor du in einer Sitzung zum ersten Mal einen Lösungsweg vorschlägst oder zum ersten Mal eine Datei änderst …") — dieser Anker darf beim Anpassen an ein Projekt verschoben, aber nicht weggelassen werden, sonst löst der Trigger nicht mehr aus.
 
 ## Details
 

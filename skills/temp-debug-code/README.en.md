@@ -1,5 +1,7 @@
 # temp-debug-code — Marking of temporary debug code
 
+*Last updated: 2026-08-24*
+
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, silent trigger present, German and English version available.
 
 **Gives every line that comes into being purely for tracking down a fault a fixed, searchable mark** — inserted debug and `print` output as well as original code disabled for the duration of the search. All marks begin with the same character sequence, so a single search run finds, without exception, every change that came into being for debugging. The entire purpose rests on that: the original state stays fully restorable — without memory, by someone who was not there, and by script if need be.
@@ -17,9 +19,9 @@ The second part of the skill is the cleaning up: before a cause found is reporte
    | Personal | `~/.claude/skills/temp-debug-code/`  | all of the user's projects |
    | Project  | `.claude/skills/temp-debug-code/`    | this project only          |
 
-2. **Copy the folder `temp-debug-code/` under its unchanged name and choose the language version.** `SKILL.md` and `CLAUDE-snippet.md` each exist in two versions — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Only the desired one comes along, and its language marker is dropped in the process: `SKILL.en.md` becomes `SKILL.md` at the target location. If the marker stays, Claude Code will not find the skill. The German `README.md` already carries no marker; only those who want the English version rename `README.en.md` to `README.md` at the target location.
+2. **Copy the folder `temp-debug-code/` in full under its unchanged name.** `SKILL.md` and `CLAUDE-snippet.md` each exist in two versions — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. The folder is copied completely, and the desired SKILL version is **additionally** placed as `SKILL.md` at the target location — Claude Code recognizes that name and no other. Everything else, both READMEs included, remains unchanged; the date lines later show which state the installation is from.
 
-3. **Adopt the silent trigger.** The content of the `CLAUDE-snippet.md` — the one matching the chosen language version — goes **below the separator line** into the `CLAUDE.md` of the target location: for a personal installation into `~/.claude/CLAUDE.md`, for a project installation into the project's `CLAUDE.md`. The italic text above the separator line is not copied along. The snippet file is then deleted at the target location, so that the trigger does not exist twice.
+3. **Adopt the silent trigger.** The content of the `CLAUDE-snippet.md` — the one matching the chosen language version — goes **below the separator line** into the `CLAUDE.md` of the target location: for a personal installation into `~/.claude/CLAUDE.md`, for a project installation into the project's `CLAUDE.md`. The italic text above the separator line is not copied along. The snippet files stay at the target location; only the `CLAUDE.md` is effective, their date lines show the state of the adopted trigger.
 
    Without this step the skill only takes effect when called explicitly with `/temp-debug-code`. That matters especially here: the cause is Claude's own action — the user asks "why does this come out as 3?", and the decision to add a `print` line is Claude's. There is no request the `description` could be matched against.
 

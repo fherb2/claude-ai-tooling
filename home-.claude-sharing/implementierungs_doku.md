@@ -454,8 +454,8 @@ Zusätzlich zur Konfliktsuche stellt der Wächter einmal je Stunde die Betriebsm
 | Aufruf                        | liefert                                                                      |
 | ----------------------------- | ---------------------------------------------------------------------------- |
 | `/rest/system/config`         | je Freigabe `id`, `path` und `paused` — Grundlage der Freigabe-Zuordnung     |
-| `/rest/system/connections`    | je Gerät`inBytesTotal`, `outBytesTotal`, `startedAt`, `connected`, `type`   |
-| `/rest/db/status?folder=<id>` | Bestandszahlen sowie`needFiles`/`needBytes` — der noch offene Rückstand    |
+| `/rest/system/connections`    | je Gerät `inBytesTotal`, `outBytesTotal`, `startedAt`, `connected`, `type`   |
+| `/rest/db/status?folder=<id>` | Bestandszahlen sowie `needFiles`/`needBytes` — der noch offene Rückstand    |
 
 **Fünf Punkte, die bei der Umsetzung zu beachten sind:**
 

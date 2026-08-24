@@ -1,5 +1,7 @@
 # 🚧 softwareaufgabe-erkennen — Idee, noch kein Skill
 
+*Stand: 2026-08-23*
+
 Erkennen, dass die Anfrage des Nutzers auf eine zu schreibende oder zu ändernde Software hinausläuft — auch wenn sie das nicht mit Wörtern wie „Code", „programmieren" oder „Software" ausdrückt — und daraufhin die einschlägigen Entwicklungsregeln nachladen.
 
 **Status:** Nur diese README, keine `SKILL.md`. Die Idee ist festgehalten samt dem, was die Testreihe darüber ergeben hat.

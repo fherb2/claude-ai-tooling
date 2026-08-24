@@ -1,5 +1,7 @@
 # Pack Source for AI
 
+*Stand: 2026-08-24*
+
 Ein **Shell-Skript, das die Quelldateien eines Projekts in einer einzigen, strukturierten Textdatei bündelt** – bereit zum Hochladen in die Knowledge Base eines KI-Agenten.
 
 Nützlich für die Arbeit über Web-KI-Agenten bzw. in einer unsicheren Umgebung, in der der KI-Agent keinen direkten Zugriff auf den Rechner haben soll.
@@ -65,9 +67,9 @@ Das Textfile ist **mit Meta-Prefixen** `#!PKSRC: ...` **strukturiert**, und durc
 | Anforderung | Hinweise                                             |
 | ----------- | ---------------------------------------------------- |
 | Bash ≥ 4.0 | Standard unter Linux                                 |
-| GNU`find`   | Standard unter Linux; macOS:`brew install findutils` |
-| GNU`stat`   | Standard unter Linux; macOS:`brew install coreutils` |
-| GNU`date`   | Standard unter Linux; macOS:`brew install coreutils` |
+| GNU `find`   | Standard unter Linux; macOS: `brew install findutils` |
+| GNU `stat`   | Standard unter Linux; macOS: `brew install coreutils` |
+| GNU `date`   | Standard unter Linux; macOS: `brew install coreutils` |
 
 > **Hinweis für macOS:** Das Skript verwendet `stat -c` und `date -d`, beides GNU-Erweiterungen. Installiere unter macOS [coreutils](https://formulae.brew.sh/formula/coreutils) über Homebrew und stelle sicher, dass die GNU-Tools im `PATH` liegen (die Homebrew-Formel erklärt, wie das geht).
 
@@ -114,8 +116,8 @@ EXPLICIT_FILES=("Dockerfile.watchdog" "./docker-compose.yml" "~/.config/foo.conf
 
 | Variable          | Standard                   | Beschreibung                                                                                                                                                                                        |
 | ----------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SOURCE_DIRS`     | `("source")`               | Zu scannende Verzeichnisse. Relative Pfade, ohne führendes`./`. `"./"` scannt das gesamte Projekt-Wurzelverzeichnis rekursiv. Nicht existierende Einträge werden mit einer Warnung übersprungen. |
-| `BASE_EXTENSIONS` | `("py" "cu")`              | Immer eingeschlossene Dateiendungen.`""` erfasst Dateien, die überhaupt keinen Punkt im Namen haben.                                                                                               |
+| `SOURCE_DIRS`     | `("source")`               | Zu scannende Verzeichnisse. Relative Pfade, ohne führendes `./`. `"./"` scannt das gesamte Projekt-Wurzelverzeichnis rekursiv. Nicht existierende Einträge werden mit einer Warnung übersprungen. |
+| `BASE_EXTENSIONS` | `("py" "cu")`              | Immer eingeschlossene Dateiendungen. `""` erfasst Dateien, die überhaupt keinen Punkt im Namen haben.                                                                                               |
 | `EXCLUDE_DIRS`    | `("backup" "__pycache__")` | Verzeichnisnamen, die in jedem gescannten Baum in beliebiger Tiefe ausgeschlossen werden.                                                                                                           |
 | `EXPLICIT_FILES`  | `()`                       | Einzelne Dateien, die anhand des exakten Namens/Pfads eingeschlossen werden — siehe unten.                                                                                                         |
 
@@ -124,7 +126,7 @@ EXPLICIT_FILES=("Dockerfile.watchdog" "./docker-compose.yml" "~/.config/foo.conf
 
 | Form                             | Beispiel                 | Bedeutung                                                                                                                                                                                |
 | -------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reiner Name (kein führendes`/`) | `"Dockerfile.watchdog"`  | Wird anhand des exakten Dateinamens irgendwo innerhalb von`SOURCE_DIRS` gesucht. `EXCLUDE_DIRS` gilt weiterhin; der standardmäßige Punkt-Ausschluss wird für diesen Eintrag umgangen. |
+| Reiner Name (kein führendes `/`) | `"Dockerfile.watchdog"`  | Wird anhand des exakten Dateinamens irgendwo innerhalb von `SOURCE_DIRS` gesucht. `EXCLUDE_DIRS` gilt weiterhin; der standardmäßige Punkt-Ausschluss wird für diesen Eintrag umgangen. |
 | `./relative/path`                | `"./docker-compose.yml"` | Exakt eine Datei, relativ zum Projekt-Wurzelverzeichnis.                                                                                                                                 |
 | `/absolute/path`                 | `"/etc/hosts"`           | Exakt eine Datei, absoluter Pfad auf dem Rechner.                                                                                                                                        |
 | `~/path`                         | `"~/.config/foo.conf"`   | Exakt eine Datei, relativ zum Home-Verzeichnis des Benutzers.                                                                                                                            |
