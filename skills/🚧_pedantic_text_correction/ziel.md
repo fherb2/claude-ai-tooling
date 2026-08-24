@@ -1,0 +1,3 @@
+Ziel des Skills ist, bei Textbearbeitungen jeglicher Art, wo der Nutzer einen hohen Wert auf Fehlerfreiheit aber for allem Detailtreue legt, die Korrekturmechanismen so auszuführen, dass der Inhalt unverändert bleibt und jegliche automatische Korrekturen über git so getrackt sind, dass sich Einzelschritte der Korrektur im Notfall wieder aufgefunden und zurückgeholt oder korrigiert werden können.
+
+Wie das im Detail passieren soll muss erst noch herausgefunden werden. 

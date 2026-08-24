@@ -1,6 +1,9 @@
+*Last updated: 2026-08-24*
+
 *This file is not part of the skill. It holds the silent trigger that
 activates the skill. When installing: copy everything below the separator
-line into the `CLAUDE.md` of the target location, then delete this file.
+line into the `CLAUDE.md` of the target location; this file
+stays there, only the `CLAUDE.md` is effective.
 Without the trigger, the skill only runs when `/common-code-generation` is
 called explicitly.*
 

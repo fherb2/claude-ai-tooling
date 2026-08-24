@@ -1,5 +1,7 @@
 # tiefen-recherche — research that does not give up too early
 
+*Last updated: 2026-08-24*
+
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version available. No silent trigger needed (reasons under "Details").
 
 **Turns a web search into a procedure: Claude systematically varies search terms, channels and search levels, checks every claim against the primary source, and reports the search paths still open instead of "nothing found".** The occasion for it is a recurring experience: the general web search reliably finds mass-content sites, but specialist articles, association publications and regional sources in particular disappear behind whatever is linked most often — and the summaries the search engines supply along the way invent details that appear on none of the linked pages.
@@ -19,7 +21,7 @@ The skill applies to **every kind of research** — literature, facts, documents
    | Personal | `~/.claude/skills/tiefen-recherche/`   | all of the user's projects |
    | Project  | `.claude/skills/tiefen-recherche/`     | this project only          |
 
-2. **Copy the folder `tiefen-recherche/` under its unchanged name and choose the language version.** The `SKILL.md` exists twice — `SKILL.de.md` and `SKILL.en.md`. Only the desired version comes along, and its language marker is dropped in the process: `SKILL.en.md` becomes `SKILL.md` at the target location. If the marker stays, Claude Code will not find the skill. The `README.md` is already the German version without a marker; only those who want the English one rename `README.en.md` to `README.md` at the target location.
+2. **Copy the folder `tiefen-recherche/` in full under its unchanged name.** The `SKILL.md` exists twice — `SKILL.de.md` and `SKILL.en.md`. The folder is copied completely, and the desired version is **additionally** placed as `SKILL.md` at the target location — Claude Code recognizes that name and no other. Both READMEs travel along unchanged; their date lines later show which state the installation is from.
 
 The skill also works in claude.ai and in Claude Desktop: the same `SKILL.md` runs in every Claude product it is bound into. The source map is dropped wherever there is no file access.
 

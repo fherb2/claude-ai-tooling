@@ -102,7 +102,7 @@ Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und ein
 
 **Fundstellen:** BIRD, SCH‑A, SCH‑B wortgleich, jeweils als vorangestellter Einzelpunkt.
 
-**Einordnung:** **[claude.ai-Mechanik]**. In Claude Code ist der Projektkontext strukturell das Repository; für historische Chats gelten §1.11/§1.12 und das Vorhaben `chats-export/`. Der dahinterstehende Grundsatz — nur den Kontext des Projekts als Vorwissen zulassen — ist damit strukturell erfüllt. Bleibt claude.ai im Einsatz, gehört der Punkt in die dortige Projektanweisung.
+**Einordnung:** **[claude.ai-Mechanik]**. In Claude Code ist der Projektkontext strukturell das Repository; für historische Chats gelten §1.11/§1.12 und das Vorhaben `chat-export/`. Der dahinterstehende Grundsatz — nur den Kontext des Projekts als Vorwissen zulassen — ist damit strukturell erfüllt. Bleibt claude.ai im Einsatz, gehört der Punkt in die dortige Projektanweisung.
 
 #### T5 Definition des Vorwissens
 

@@ -1,5 +1,7 @@
 # tiefen-recherche — Recherche, die nicht zu früh aufgibt
 
+*Stand: 2026-08-24*
+
 **✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Kein stiller Trigger nötig (Begründung unter „Details").
 
 **Macht aus einer Websuche ein Verfahren: Claude wechselt systematisch Suchbegriffe, Kanäle und Suchebenen, prüft jede Behauptung an der Primärquelle und meldet statt „nichts gefunden" die noch offenen Suchwege.** Der Anlass ist eine wiederkehrende Erfahrung: Die allgemeine Websuche findet Massenseiten zuverlässig, aber gerade Fachartikel, Vereinsschriften und regionale Quellen verschwinden hinter dem, was oft verlinkt ist — und die von Suchmaschinen mitgelieferten Zusammenfassungen erfinden dabei Details, die auf keiner der verlinkten Seiten stehen.
@@ -19,7 +21,7 @@ Der Skill gilt für **jede Art von Recherche** — Literatur, Fakten, Dokumente,
    | Persönlich  | `~/.claude/skills/tiefen-recherche/`   | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/tiefen-recherche/`     | nur dieses Projekt        |
 
-2. **Ordner `tiefen-recherche/` unter seinem unveränderten Namen kopieren, Sprachfassung wählen.** Die `SKILL.md` liegt zweimal vor — `SKILL.de.md` und `SKILL.en.md`. Mitkopiert wird nur die gewünschte Fassung, und ihr Sprachkürzel entfällt dabei: Aus `SKILL.de.md` wird am Zielort `SKILL.md`. Bleibt das Kürzel stehen, findet Claude Code den Skill nicht. Die `README.md` ist schon die deutsche Fassung ohne Kürzel; nur wer die englische will, benennt `README.en.md` am Zielort in `README.md` um.
+2. **Ordner `tiefen-recherche/` vollständig unter seinem unveränderten Namen kopieren.** Die `SKILL.md` liegt zweimal vor — `SKILL.de.md` und `SKILL.en.md`. Der Ordner wird komplett kopiert, und die gewünschte Fassung wird am Zielort **zusätzlich** als `SKILL.md` abgelegt — Claude Code erkennt ausschließlich diesen Namen. Beide READMEs wandern unverändert mit; ihre Datumszeilen zeigen später, von welchem Stand die Installation ist.
 
 Der Skill wirkt auch in claude.ai und im Claude-Desktop: Dieselbe `SKILL.md` läuft in jedem Claude-Produkt, in das sie eingebunden wird. Die Quellenkarte entfällt dort, wo kein Dateizugriff besteht.
 

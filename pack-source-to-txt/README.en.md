@@ -1,5 +1,7 @@
 # Pack Source for AI
 
+*Last updated: 2026-08-24*
+
 A **shell script that bundles project source files into a single, structured text file** ready for upload to an AI agent's knowledge base.
 
 Useful for working via web AI agents, or in an insecure environment where the AI agent is not meant to have direct access to the computer.
@@ -66,9 +68,9 @@ The text file is **structured using meta-prefixesstructured using meta-prefixes*
 | Requirement | Notes                                             |
 | ----------- | ------------------------------------------------- |
 | Bash ≥ 4.0 | Standard on Linux                                 |
-| GNU`find`   | Standard on Linux; macOS:`brew install findutils` |
-| GNU`stat`   | Standard on Linux; macOS:`brew install coreutils` |
-| GNU`date`   | Standard on Linux; macOS:`brew install coreutils` |
+| GNU `find`   | Standard on Linux; macOS: `brew install findutils` |
+| GNU `stat`   | Standard on Linux; macOS: `brew install coreutils` |
+| GNU `date`   | Standard on Linux; macOS: `brew install coreutils` |
 
 > **macOS note:** The script uses `stat -c` and `date -d`, which are GNU extensions. On macOS, install [coreutils](https://formulae.brew.sh/formula/coreutils) via Homebrew and ensure the GNU tools are on your `PATH` (the Homebrew formula explains how).
 
@@ -115,8 +117,8 @@ EXPLICIT_FILES=("Dockerfile.watchdog" "./docker-compose.yml" "~/.config/foo.conf
 
 | Variable          | Default                    | Description                                                                                                                                             |
 | ----------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SOURCE_DIRS`     | `("source")`               | Directories to scan. Relative paths, no leading`./`. `"./"` scans the entire project root recursively. Non-existent entries are skipped with a warning. |
-| `BASE_EXTENSIONS` | `("py" "cu")`              | Always-included file suffixes.`""` matches files with no dot in their name at all.                                                                      |
+| `SOURCE_DIRS`     | `("source")`               | Directories to scan. Relative paths, no leading `./`. `"./"` scans the entire project root recursively. Non-existent entries are skipped with a warning. |
+| `BASE_EXTENSIONS` | `("py" "cu")`              | Always-included file suffixes. `""` matches files with no dot in their name at all.                                                                      |
 | `EXCLUDE_DIRS`    | `("backup" "__pycache__")` | Directory names excluded at any depth in every scanned tree.                                                                                            |
 | `EXPLICIT_FILES`  | `()`                       | Individual files included by exact name/path — see below.                                                                                              |
 
@@ -125,7 +127,7 @@ EXPLICIT_FILES=("Dockerfile.watchdog" "./docker-compose.yml" "~/.config/foo.conf
 
 | Form                      | Example                  | Meaning                                                                                                                                          |
 | ------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| bare name (no leading`/`) | `"Dockerfile.watchdog"`  | Searched for by exact filename anywhere inside`SOURCE_DIRS`. `EXCLUDE_DIRS` still applies; the default dot-exclusion is bypassed for this entry. |
+| bare name (no leading `/`) | `"Dockerfile.watchdog"`  | Searched for by exact filename anywhere inside `SOURCE_DIRS`. `EXCLUDE_DIRS` still applies; the default dot-exclusion is bypassed for this entry. |
 | `./relative/path`         | `"./docker-compose.yml"` | Exact single file, relative to the project root.                                                                                                 |
 | `/absolute/path`          | `"/etc/hosts"`           | Exact single file, absolute machine path.                                                                                                        |
 | `~/path`                  | `"~/.config/foo.conf"`   | Exact single file, relative to the user's home directory.                                                                                        |

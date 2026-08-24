@@ -1,5 +1,7 @@
 # Claude-AI-Tooling
 
+*Stand: 2026-08-24*
+
 *[English version](README.en.md)*
 
 Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Claude Desktop und Claude Code. Eigenständige Bausteine, jeder mit eigener Dokumentation in seinem Ordner. Diese Seite ist nur die Übersicht. Nutze die verlinkten READMEs in den Bausteinen.
@@ -10,9 +12,11 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | Baustein                                                      | Anliegen                                                                                                                                                                                                                                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.md)<br>✅ | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
-| [`chat-export/`](chat-export/README.md)<br>✅ | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.                                            |
+| [`chat-export/`](chat-export/README.md)<br>✅ | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.                                            |
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
-| [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen:**Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit "stillem" Trigger**.                                                   |
+| [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit "stillem" Trigger**.                                                   |
+
+| [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
 
 (✅ einsatzbereit · 🚧 in Arbeit · ⚠️ mit Vorbehalt · ☑ abh. vom Skill)
 
@@ -57,6 +61,16 @@ Wiederverwendbare Skills für Claude Code: Anweisungen, die nicht dauerhaft in `
 Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Situationen, die niemand ausspricht. Der Anthropic-Standard, einen Skill aktiv vom Nutzer zu starten oder im Skill über `description:` per Trigger-Wörter im Chat automatisch zu starten, erweitert das Konzept der stillen Trigger auch ein Start aus dem Kontext des Chats heraus. Das ist keine Claude-Code-Erweiterung, sondern wird über besondere Formulierungsregeln in CLAUDE.md erreicht. Details zur Nachnutzung in diesem Baustein.
 
 **Stand:** Der Stand der einzelnen Skills wird in der [zugehörigen README](skills/README.md) einzeln ausgewiesen.
+
+## CLAUDE.md-Snippets
+
+**Zweck: Wiederkehrende Anweisungen nicht jedes Mal neu formulieren.** Fertig ausformulierte Textbausteine, die einzeln in eine Anweisungsdatei kopiert werden — in die `CLAUDE.md` einer lokalen Claude-Code-Installation oder an die Stellen, an denen claude.ai Anweisungen aufnimmt.
+
+Der Schnitt zwischen den drei Dateien ist der **Wirkungsort**, nicht das Thema: Was in beiden Umgebungen wortgleich taugt, steht in `common-snippets`; was nur bei claude.ai oder nur lokal gilt, in der jeweils eigenen Datei. Ein Thema kann deshalb planmäßig in mehreren Dateien vorkommen — beim Memory etwa die Frage, *ob* etwas gespeichert werden darf, getrennt von der Frage, *wohin*.
+
+Nicht zu verwechseln mit den `CLAUDE-snippet.md`-Dateien im Baustein `skills/`: Die sind der stille Trigger eines bestimmten Skills und ohne ihn wirkungslos. Hier stehen Anweisungen, die für sich wirken und keinen Skill hinter sich haben.
+
+**Stand:** Einsatzbereit, in beiden Sprachfassungen — Näheres in der [README des Bausteins](CLAUDE.md-Snippets/README.md).
 
 ## Anwendungshinweise
 

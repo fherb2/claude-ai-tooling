@@ -1,5 +1,7 @@
 # Chats-Export
 
+*Stand: 2026-08-23*
+
 **Holt Chats aus claude.ai-Projekten und legt sie als durchsuchbare JSON-Dateien in einem Claude-Code-Projekt ab** — zum Wiederfinden früheren Zusammenhangs, nicht zum Fortsetzen an dieser Stelle. (Auf claude.ai lassen sie sich natüprlich fortsetzen und dann im Claude-Code-Projekt wieder aktualisieren.) Anthropic bietet dafür bislang keinen eigenen Weg: Chats lassen sich weder zwischen Konten noch zwischen claude.ai, Claude Desktop und Claude Code verschieben. Dieser Ordner baut die beiden Wege nach, die dafür tatsächlich funktionieren — der Kontoexport und die internen Web-Endpunkte von claude.ai — und ein Skript, das beide gleich behandelt.
 
 ## Der Skill

@@ -1,9 +1,23 @@
 # Arbeitsanweisungen für dieses Repo
 
 Ergänzung zu `~/.claude/CLAUDE.md` (im Folgenden „Arbeitsanweisungen"),
-**keine Kopie**: Hier steht nur, was dort nicht steht — und nur, was für
+**keine Kopie**: Hier steht nur, was dort nicht steht oder dazu in diesem
+Projekt abändernd wirken soll — und nur, was für
 **alle Vorhaben** dieses Repos gilt. Was nur eines betrifft, gehört in
 dessen eigene Doku oder README — nicht hierher.
+
+# Sprachen
+
+Abweichend zum sonst üblichen Verfahren, die README-Files in englisch anzulegen
+wir in diesem Projekt vorgegeben: Die README.md ist immer in deutscher Sprache
+und zusätzlich wird eine README.en.md angelegt, auf die die deutschprachige
+README ganz oben verweist. Bei Änderungen an READMEs ist die andere Sprachversion
+nachzuziehen. Welche die "vorgebende" Version ist ergibt sich aus dem Zeitpunkt
+der Änderungen: Die neusten Änderungen ergänzen / ersetzen / entfernen Bereiche
+in der anderen Sprache. Ausnahme: Fälle wo beim Übersetzen bewußt ein Begriff
+weggelassen oder nicht oder anders übersetzt wurde, um keine linguistischen
+Probleme erzeugen sind keine Änderungen, die in die andere Sprache rückübertragen
+werden müssen.
 
 **Und es bleibt bei diesen zwei Ebenen.** Eine dritte — eine `CLAUDE.md` in
 einem Unterordner oder eine pfadgebundene Regel unter `.claude/rules/` — ist
@@ -16,6 +30,25 @@ einem Kontexthaushalt, der Kompaktierung als Normalfall einplant
 verschwunden. Was ein einzelnes Vorhaben dauerhaft binden soll, steht
 deshalb in seiner Doku oder README — nicht in einer Datei, die mit dem Ende
 der Entwicklung entfällt (siehe unten).
+
+# Datumszeilen in READMEs und CLAUDE-Snippets
+
+Jede README dieses Repos (deutsch wie englisch, von der Top-Level-README
+bis in jeden Unterordner) und jede Datei, deren Inhalt zum Übernehmen in
+eine CLAUDE.md bestimmt ist (die `CLAUDE-snippet.md` der Skills ebenso wie
+die Sammlungen unter `CLAUDE.md-Snippets/`), trägt ganz oben eine
+Datumszeile mit dem Datum der letzten inhaltlichen Bearbeitung: in READMEs
+kursiv unmittelbar unter der Hauptüberschrift (`*Stand: JJJJ-MM-TT*`,
+englisch `*Last updated: JJJJ-MM-TT*`), in Snippet-Dateien als erste Zeile
+— bei Skill-Snippets damit oberhalb der Trennlinie, sie wandert also nie in
+eine CLAUDE.md mit. Wer eine dieser Dateien inhaltlich ändert, zieht die
+Zeile im selben Arbeitsgang nach.
+
+Zweck: Diese Dateien werden an andere Orte kopiert (etwa nach
+`~/.claude/skills/` oder in fremde CLAUDE.md-Dateien). Ohne Datumszeile ist
+einer installierten Kopie nicht anzusehen, ob sie dem Stand des Repos
+entspricht; das Datum ist hier die Versionsangabe (Festlegung des
+Entwicklers vom 24. August 2026).
 
 ## Zuerst lesen: `.claude/arbeitsdaten.json`
 
@@ -54,10 +87,6 @@ nichts über Ordnergrenzen hinweg**, und leite aus dem Aufbau eines Vorhabens
 nichts für ein anderes ab. Welche Struktur eines hat, sagt seine eigene
 README; welche Regeln darin gelten, sein eigener Vorgabenteil (siehe nächster
 Abschnitt).
-
-**Nicht zur Weitergabe freigegeben ist `home-.claude-sharing`** — die README
-trägt den Hinweis „Nicht benutzen!“. Bei jedem anderen Vorhaben entscheidet
-seine README.
 
 ## `fahrplan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich
 
