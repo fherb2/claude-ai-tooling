@@ -1,3 +1,0 @@
-Chat auf Deutsch und Dokumente, sofern nicht anders gefordert, auf Deutsch; Code-Identifier, Kommentare und Docstrings auf Englisch.
-
-Bei Software-Konzeptarbeit: wenn vorhanden, dann Konzeptdokumente und Implementationsdokumente (auch ein Fahrplan- und Entwicklungsstatusdokument) enthalten keinen Implementierungscode. Genau zwei Ausnahmen: final beschlossene API-Signaturen, Nutzungs- und Code-Style-Beispiele. Die Sprache (Deutsch oder Englisch) legen wir projektabhängig fest. Existiert das Dokument schon, kannst Du die Sprache selbst erkennen.
