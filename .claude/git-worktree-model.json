@@ -1,0 +1,14 @@
+{
+  "integration_branch": "dev",
+  "release_branch": "master",
+  "workbench_prefix": "claude-wb/",
+  "worktree_dir": "../claude-ai-tooling-worktrees",
+  "infra_branch": "infra",
+  "infra_files": [
+    ".claude/CLAUDE.md",
+    ".claude/settings.json",
+    ".vscode/",
+    ".gitignore",
+    ".markdownlint.jsonc"
+  ]
+}
