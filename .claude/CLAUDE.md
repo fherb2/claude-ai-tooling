@@ -50,34 +50,13 @@ einer installierten Kopie nicht anzusehen, ob sie dem Stand des Repos
 entspricht; das Datum ist hier die Versionsangabe (Festlegung des
 Entwicklers vom 24. August 2026).
 
-## Zuerst lesen: `.claude/arbeitsdaten.json`
+## Arbeitsmodell: Git-Worktrees
 
-Diese Datei wird **nicht** automatisch in den Kontext geladen — anders als
-diese CLAUDE.md. Sie trägt den Namen des Hauptpfads, den der Werkbank und
-den vereinbarten Commit-Umfang (Arbeitsanweisungen §1.2, §1.7). Wer sie
-nicht liest, kennt den Hauptpfad nicht. Die Rückfrage aus §1.7 Punkt 2
-entfällt dadurch nicht, hat aber einen dokumentierten Ausgangspunkt.
-
-Weil Adds und Commits immer das **Gesamtprojekt** umfassen, wandert
-parallele Arbeit des Entwicklers regelmäßig mit — er arbeitet an anderen
-Ordnern des Repos weiter, während hier committet wird, und hält das für
-den besseren Weg als einen eigenen Worktree. Das ist so gewollt und
-**nicht** zu melden. Ein **kurzer Satz** am Ende des Commit-Texts, dass fremde
-Änderungen mitgewandert sind, genügt — ohne Ordner oder Dateien aufzuzählen.
-Mehr wäre verschenkte Mühe: Die Checkpoint-Nachrichten der Werkbank
-verschwinden beim Squash in den Hauptpfad ohnehin, der Vermerk hilft also nur
-im Ausnahmefall, in dem jemand die Historie der Werkbank selbst durchsucht.
-
-## Mehrere Instanzen, Schreibrechte für Git
-
-Weil mehrere Vorhaben in einem Repo gebündelt sind, kann es vorkommen, dass
-mehrere Claude-Instanzen und der Nutzer gleichzeitig arbeiten. Jede Instanz
-klärt **vorab** mit dem Nutzer, welche Instanz eigenständig mit
-schreibenden Git-Kommandos (`commit`, `push`, …) arbeiten darf. Ist das
-einmal entschieden, kann der Nutzer die Rechte im weiteren Verlauf eines
-Chats umverteilen — dann meldet er sich **aktiv**. Hat eine Instanz die
-Rechte einmal vom Nutzer erhalten, muss sie nicht bei jedem Commit erneut
-nachfragen.
+Dieses Repo arbeitet nach dem Worktree-Modell: Jede Claude-Sitzung
+arbeitet auf einer eigenen Werkbank (`claude-wb/<topic>`) in einem eigenen
+Worktree; die Vereinbarungen stehen in `.claude/git-worktree-model.json`.
+Verfahren und Regeln: Skill `parallel-sessions` (Quelle:
+`skills/parallel-sessions/`).
 
 ## Jedes Vorhaben ist eigenständig aufgebaut
 
