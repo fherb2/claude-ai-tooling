@@ -1,0 +1,42 @@
+// Regelkonfiguration für markdownlint (VS-Code-Erweiterung
+// davidanson.vscode-markdownlint). Sie gilt für das gesamte Repo: Die
+// Erweiterung sucht eine solche Datei im Verzeichnis der geprüften Datei und
+// in jedem darüberliegenden -- die Wurzel deckt damit beide Vorhaben ab.
+//
+// Warum hier und nicht in einem Unterordner, obwohl Arbeitsanweisungen §1.2
+// die Wurzel aufgeräumt halten will: Die Erweiterung sucht nur nach oben, nie
+// nach unten. Aus einem Unterordner wäre die Datei nur über den zusätzlichen
+// Schalter markdownlint.configFile in .vscode/settings.json erreichbar --
+// eine zweite Stelle, an der dasselbe geregelt wird, für keinen Gewinn.
+//
+// Hier stehen ausschließlich Regeln, die den eigenen Festlegungen dieses
+// Projekts widersprechen. Alles andere bleibt eingeschaltet, auch wo es
+// gerade anschlägt: Doppelte Leerzeilen, fehlende Sprachangaben an
+// Codeblöcken und unausgerichtete Tabellen sind echte Schlampigkeiten und
+// sollen weiter gemeldet werden.
+{
+    // Arbeitsanweisungen §2.3: "Die Segmente sind Überschriften 1. Ordnung,
+    // nummeriert 1-3." Das ist keine Nachlässigkeit, sondern Bedingung dafür,
+    // dass das Verketten der Dokumentdateien in Dateireihenfolge ein gültiges
+    // Gesamtdokument ergibt. MD025 verlangt genau eine Überschrift erster
+    // Ordnung und würde jede Segmentüberschrift als Fehler melden -- in
+    // home-.claude-sharing dreimal, in chat-export fünfmal.
+    "MD025": false,
+
+    // Arbeitsanweisungen §2.4: Segment 1 beschreibt den Zusammenhang, Segment 3
+    // die Einheit -- dasselbe Thema erscheint also planmäßig zweimal, unter
+    // verschiedenen Kapiteln und mit verschiedener Aufgabe. "Stündliche
+    // Betriebsmeldung" steht deshalb in 1.8 und in 3.1. Nicht abgeschaltet,
+    // sondern eingeengt: Eine Dublette unter DEMSELBEN Kapitel bleibt ein
+    // Befund, weil sie dort wirklich einer ist.
+    "MD024": { "siblings_only": true },
+
+    // Arbeitsanweisungen §1.1: "Ein Absatz verwendet immer eine Zeile."
+    // Damit ist eine Zeilenlängengrenze für unsere Dokumente gegenstandslos --
+    // ein Absatz von tausend Zeichen ist hier die Vorschrift, nicht der
+    // Ausrutscher. Die Regel würde in beiden Implementierungsdokus praktisch
+    // jede Zeile melden. Für CLAUDE.md-Dateien, die §1.1 ausdrücklich anders
+    // behandelt (von Hand auf sinnvolle Länge umbrochen), entfällt damit auch
+    // die Prüfung; dort ist der Umbruch Sache des Schreibenden.
+    "MD013": false
+}
