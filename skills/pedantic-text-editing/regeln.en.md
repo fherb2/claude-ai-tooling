@@ -115,7 +115,7 @@ Reason: word doubled.
 
 - **The before-fragment is verbatim and unique within the file.** If it is not, extend it until it is.
 - The file holds the **approved** state, including the rejected entries with their decision.
-- **It is not deleted by itself.** It may go once its durable parts stand in the decisions file (section 9). If the user orders it deleted, check that first and enter what is missing, rather than deleting and losing it.
+- **It is not deleted by itself.** It may go once its durable parts stand in the decisions file (section 9). If the user orders it deleted, check that first and enter what is missing, rather than deleting and losing it. The impulse to clean up comes from the user — the files lie visibly next to the text. (A reminder by the skill stood here at first, did not fire in practice and would have been due in every round from the second on; removed on 25 August 2026.)
 
 ## 9 The decisions file
 
@@ -136,7 +136,7 @@ Three rules carry the procedure:
 
 **Which decisions files are consulted must be laid open.** Consulted are **all** `editing-data_*` files in the folder the text file sits in — whether two files really belong to one text or merely lie side by side cannot be told for certain from outside, and too narrow a cut would let the glossary fall apart. Tell the user which files you use; they can explicitly include or exclude individual ones.
 
-**At the start of a round**, and sparingly: search **specifically for the wording** of each individual finding instead of reading the files in full — otherwise the effort grows with every round. If findings files of earlier rounds lie in the folder, say so and propose clearing them away.
+**At the start of a round**, and sparingly: search **specifically for the wording** of each individual finding instead of reading the files in full — otherwise the effort grows with every round.
 
 ## 10 Carrying it out
 
