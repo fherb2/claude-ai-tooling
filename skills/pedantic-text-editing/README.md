@@ -53,13 +53,9 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 **Dateinamen und Commit-Marken sind sprachunabhängig.** `editing-findings_`, `editing-data_`, `Findings:` und `Text correction:` stehen wörtlich so in beiden Fassungen. Würden sie mit der Sprache wechseln, fände eine später installierte Fassung die Runden der früheren nicht mehr wieder. Frei in der Sprache sind nur die Beschriftungen innerhalb der Dateien.
 
-## Stand und Offenes
+## Stand
 
-**Status:** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs. Der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben (25. August 2026). Die Erprobung im Betrieb läuft; die ersten Betriebsbefunde (Tabellenformat der Vorlage, Behandlung zurückgestellter inhaltlicher Funde) sind in den Regeltext eingearbeitet (25. August 2026).
-
-**Offen:**
-
-- **Nacharbeit aus dem Betrieb.** Ob Rundengröße, Ausschnittlängen und die Form der Vorlage in der Praxis tragen, zeigt erst die Arbeit an einem echten Text.
+**Status: abgeschlossen.** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs; der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben. Die Erprobung im Betrieb ist abgeschlossen: Rundengröße, Teilung, Ausschnittlängen und die Form der Vorlage haben an einem echten Text getragen, und die Betriebsbefunde (Tabellenformat der Vorlage, Behandlung zurückgestellter inhaltlicher Funde, Aufräum-Erinnerung) sind in den Regeltext eingearbeitet (25. August 2026). Offene Punkte gibt es nicht.
 
 **Bewusst offen gelassene Entscheidungen:**
 
