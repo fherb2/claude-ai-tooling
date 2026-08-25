@@ -47,7 +47,7 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 **Kopf und Protokoll sind kein Beiwerk.** Im Kopf steht, was **nicht** untersucht wurde. Das beantwortet später die Frage, warum eine Stelle damals nicht auffiel — ohne ihn ist das nicht mehr zu rekonstruieren.
 
-**In der Datei stehen Blöcke, keine Tabellenzeilen.** Die Textstücke müssen zeichengenau sein, und manche Editoren richten Markdown-Tabellenzeilen beim Speichern neu aus und fressen dabei Leerraum. Im Chat wird tabellarisch vorgelegt, weil sich das leichter überblicken lässt — dort wird innerhalb einer Zelle mit `<br>` umbrochen, nie mit einem echten Zeilenumbruch.
+**In der Datei stehen Blöcke, keine Tabellenzeilen.** Die Textstücke müssen zeichengenau sein, und manche Editoren richten Markdown-Tabellenzeilen beim Speichern neu aus und fressen dabei Leerraum. Im Chat wird tabellarisch vorgelegt, weil sich das leichter überblicken lässt — dort bekommt ein Fund so viele Tabellenzeilen, wie er braucht, und die Folgezeilen lassen ID und Zeilennummer leer. Ein `<br>` in der Zelle wäre der naheliegende Weg, wird aber nicht überall umgesetzt: Im Frontend von Claude Code erscheint es als sichtbarer Text (beobachtet am 25. August 2026, beim ersten Einsatz des Skills).
 
 **Angezeigter und gespeicherter Ausschnitt sind zwei Dinge.** Der angezeigte richtet sich nach der Entscheidung: Der Nutzer muss die Stelle finden und über sie befinden können, ohne den Kontext selbst zusammenzusuchen. Der gespeicherte richtet sich nach der Eindeutigkeit in der Datei, denn er ist die Vorlage für eine exakte Ersetzung. Beide dürfen sich in der Länge unterscheiden; wer das zusammenzieht, bekommt entweder unklare Vorlagen oder verrutschende Ersetzungen.
 
