@@ -51,13 +51,9 @@ To that end it separates three kinds of finding — rule violation, matter of fa
 
 **File names and commit markers are language-independent.** `editing-findings_`, `editing-data_`, `Findings:` and `Text correction:` appear verbatim like that in both versions. If they changed with the language, a later installed version would no longer find the earlier one's rounds. Free in their language are only the labels inside the files.
 
-## State and open points
+## State
 
-**Status:** Both language versions of `SKILL` and rules file are finished, as are both READMEs. The rules text has been talked through with the developer and approved (25 August 2026). Trying it out in practice is underway; the first operational findings (table format of the review list, handling of deferred substantive findings) have been worked into the rules text (25 August 2026).
-
-**Open:**
-
-- **Follow-up from practice.** Whether round size, excerpt lengths and the form of presentation hold up in practice will only show once real text is worked on.
+**Status: complete.** Both language versions of `SKILL` and rules file are finished, as are both READMEs; the rules text has been talked through with the developer and approved. Trying it out in practice is concluded: round size, splitting, excerpt lengths and the form of presentation held up on a real text, and the operational findings (table format of the review list, handling of deferred substantive findings, cleanup reminder) have been worked into the rules text (25 August 2026). There are no open points.
 
 **Deliberately left open:**
 
