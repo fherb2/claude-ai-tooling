@@ -6,7 +6,7 @@ license: CC0-1.0
 
 # Parallele Claude-Sitzungen über Git-Worktrees
 
-Dieser Skill trägt nur die Abläufe und Regeln. Begründungen und Feinheiten stehen in der `README.md` seines Ordners (`${CLAUDE_SKILL_DIR}/README.md`) — zieh sie bei Nachfragen des Nutzers heran, statt zu rekonstruieren.
+Dieser Skill trägt nur die Abläufe und Regeln. Begründungen und Feinheiten stehen in der README seines Ordners (`${CLAUDE_SKILL_DIR}`) — zieh sie bei Nachfragen des Nutzers heran, statt zu rekonstruieren. Der Dateiname ist dabei nicht verlässlich: Beim Installieren kann umbenannt worden sein. Sieh im Ordner nach; findest Du sie nicht, antworte ohne sie.
 
 ## Die Lage feststellen
 

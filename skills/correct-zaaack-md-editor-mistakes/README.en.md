@@ -1,6 +1,6 @@
 # correct-zaaack-md-editor-mistakes — find and repair damaged whitespace in Markdown tables
 
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-25*
 
 *[Deutsche Fassung](README.md)*
 
@@ -25,7 +25,7 @@ The skill does three things. It lets Claude recognize the artifacts as soon as t
 
 Whoever uses that editor at all uses it just about everywhere — the personal location is therefore the obvious one. The single argument against it is `SKIP` (see "The scope"): the exception list is project-related, and a personal installation carries the same one for all projects.
 
-**2. Copy the folder in full and choose the language version.** The folder name stays as it is; the folder is copied completely. `SKILL.md` and `CLAUDE-snippet.md` are kept here in two languages; the desired SKILL version is **additionally** placed as `SKILL.md` at the target location — Claude Code recognizes that name and no other, so a `SKILL.de.md` on its own is not a skill. Everything else, both READMEs and the snippet files included, remains unchanged; the date lines show the state of the installation.
+**2. Copy one language version of the folder.** The folder name stays as it is. `SKILL` and `CLAUDE-snippet` are kept here in two languages; all files of the chosen language come along, README and tools included. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other, so a `SKILL.de.md` on its own is not a skill. The date lines show the state of the installation.
 
 ```text
 SKILL.de.md  or  SKILL.en.md            ->  additionally place as SKILL.md

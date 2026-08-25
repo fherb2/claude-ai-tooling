@@ -1,6 +1,6 @@
 # temp-debug-code — Kennzeichnung von temporärem Debug-Code
 
-*Stand: 2026-08-24*
+*Stand: 2026-08-25*
 
 **✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung vorhanden.
 
@@ -19,7 +19,7 @@ Der zweite Teil des Skills ist das Aufräumen: Bevor eine gefundene Ursache geme
    | Persönlich  | `~/.claude/skills/temp-debug-code/`   | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/temp-debug-code/`     | nur dieses Projekt        |
 
-2. **Ordner `temp-debug-code/` vollständig unter seinem unveränderten Namen kopieren.** `SKILL.md` und `CLAUDE-snippet.md` liegen je zweimal vor — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Der Ordner wird komplett kopiert, und die gewünschte SKILL-Fassung wird am Zielort **zusätzlich** als `SKILL.md` abgelegt — Claude Code erkennt ausschließlich diesen Namen. Alles Übrige, beide READMEs eingeschlossen, bleibt unverändert liegen; die Datumszeilen zeigen später, von welchem Stand die Installation ist.
+2. **Eine Sprachversion des Ordners `temp-debug-code/` kopieren.** `SKILL` und `CLAUDE-snippet` liegen je zweimal vor — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeilen zeigen später, von welchem Stand die Installation ist.
 
 3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` — passend zur gewählten Sprachfassung — kommt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts — bei persönlicher Installation in `~/.claude/CLAUDE.md`, bei einer Projektinstallation in die `CLAUDE.md` des Projekts. Der kursive Text oberhalb der Trennlinie wird nicht mitkopiert. Die Snippet-Dateien bleiben am Zielort liegen; wirksam ist allein die `CLAUDE.md`, ihre Datumszeilen zeigen den Stand des übernommenen Triggers.
 

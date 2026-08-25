@@ -19,7 +19,7 @@
    | Personal | `~/.claude/skills/parallel-sessions/` | all of the user's projects |
    | Project  | `.claude/skills/parallel-sessions/`   | this project only          |
 
-2. **Copy the folder `parallel-sessions/` in full under its unchanged name.** It holds `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`, this `README.en.md` and the German `README.md`; everything travels along. The desired SKILL version is **additionally** placed as `SKILL.md` at the target location — Claude Code recognizes that name and no other. The date lines of README and snippet show at the target location which state the installation is from.
+2. **Copy one language version of the folder `parallel-sessions/`.** It holds `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`, this `README.en.md` and the German `README.md`; all files of the chosen language come along. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other. The date lines of README and snippet show at the target location which state the installation is from.
 
 3. **Adopt the silent trigger.** The content of the `CLAUDE-snippet` file matching the chosen language, **below the separator line**, goes into the `CLAUDE.md` of the target location; the snippet files stay at the target location, only the `CLAUDE.md` is effective. Without this step the skill does not notice the situation: nobody says of their own accord "a second instance is working here right now".
 

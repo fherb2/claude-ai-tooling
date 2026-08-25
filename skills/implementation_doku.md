@@ -23,7 +23,7 @@ Der Ordner `skills/` in diesem Repository wird von Claude Code nicht erkannt. Ei
 
 (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills))
 
-Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5). Installieren ist dann im Kern das Kopieren des ganzen Ordners; nur bei mehreren Sprachfassungen kommt ein Handgriff hinzu (5.1).
+Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5). Installiert wird dann eine vollständige Sprachversion des Ordners; der einzige zwingende Handgriff ist der Name der `SKILL.md` (5.1).
 
 ### 1.2 Ladeverhalten
 
@@ -138,9 +138,13 @@ Jeder Skill liegt unter `skills/<skill-name>/`. Der Ordnername trägt **kein** S
 
 **Ein Ordner darf vorübergehend nur die `README.md` enthalten.** Das ist der Zustand einer festgehaltenen Idee: Sie hat einen Namen, einen Platz und eine Stelle, an der ihr Stand nachlesbar ist, aber noch keine Anweisungen. Erst wenn entschieden ist, dass daraus ein Skill wird, kommt die `SKILL.md` dazu.
 
-**Installiert wird durch Kopieren des gesamten Skill-Ordners** — die `CLAUDE-snippet.md` eingeschlossen. Sie darf am Zielort liegen bleiben, nachdem ihr Inhalt unterhalb der Trennlinie in die `CLAUDE.md` übernommen wurde: Wirksam ist allein die `CLAUDE.md`, die Datei selbst ist dort inert. Die frühere Pflicht, sie am Zielort zu löschen, schützte vor unbemerkt driftenden Trigger-Doppeln; diesen Schutz leistet jetzt die Datumszeile — an ihr ist ablesbar, von welchem Stand die installierte Kopie ist (Festlegung des Entwicklers vom 24. August 2026).
+**Installiert wird eine vollständige Sprachversion des Skill-Ordners** — `README` und `CLAUDE-snippet` eingeschlossen. Verpflichtend ist daran allein die `SKILL.md` unter diesem Namen; alles Weitere ist Empfehlung.
 
-**Die `README.md` gehört mit an den Zielort.** Sie ist die Anwenderdokumentation des Skills (6.1), und die `SKILL.md` darf für Begründungen und Nachfragen des Nutzers auf sie verweisen (`${CLAUDE_SKILL_DIR}/README.md`) — so bleibt der Skilltext schlank, ohne dass Begründungen verloren gehen. Fehlt die README am Zielort, funktioniert der Skill trotzdem; nur Antworten auf Warum-Fragen fallen dünner aus. Ihr Vorhandensein wird nicht geprüft.
+**Die `CLAUDE-snippet`-Datei wandert mit,** und zwar in der Sprache, in der ihr Inhalt in die `CLAUDE.md` übernommen wurde. Wirksam ist allein die `CLAUDE.md`; die Datei am Zielort dient dem Nutzer als Vergleichsstück: An ihrer Datumszeile und ihrem Wortlaut sieht er, ob der übernommene Trigger noch dem Stand der Quelle entspricht. Die frühere Pflicht, sie am Zielort zu löschen, schützte vor unbemerkt driftenden Trigger-Doppeln; diesen Schutz leistet jetzt die Datumszeile (Festlegung des Entwicklers vom 24./25. August 2026).
+
+**Die `README` gehört mit an den Zielort.** Sie ist die Anwenderdokumentation des Skills (6.1), und die `SKILL.md` darf für Begründungen und Nachfragen des Nutzers auf sie verweisen — so bleibt der Skilltext schlank, ohne dass Begründungen verloren gehen. **Ein solcher Verweis darf sich nicht auf den Dateinamen verlassen:** Beim Installieren kann umbenannt worden sein, eine `README.md` am Zielort kann also englisch sein und eine deutsche Fassung unter anderem Namen liegen. Wer aus ihr zitieren will, sieht im Skill-Ordner nach, statt einen Namen vorauszusetzen. Findet er sie nicht, ist das kein Fehlerfall — die Antwort auf eine Warum-Frage fällt dann eben dünner aus.
+
+**Die Installation ist Sache des Nutzers; Claude unterstützt sie, überwacht sie aber nicht.** Weder wird ungefragt geprüft, ob eine Installation vollständig oder aktuell ist, noch, ob der Inhalt einer `CLAUDE.md` zum mitgelieferten Snippet passt. Fällt beiläufig etwas auf, ist das höchstens einen Hinweis wert. Nur wenn der Nutzer ausdrücklich eine Prüfung verlangt, wird geprüft und benannt, was fehlt — und auch dann nicht mehr als das.
 
 **Zusatzdateien, die zur Laufzeit gelesen oder geschrieben werden,** spricht der Skill über `${CLAUDE_SKILL_DIR}` an. Der Platzhalter wird laut offizieller Doku nur in Claude Code tatsächlich ersetzt; in claude.ai bliebe ein solcher Verweis wörtlicher Text bzw. die nötigen Datei-Werkzeuge fehlen ganz (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein Skill, der in beiden Umgebungen laufen soll, kann daraus seine Umgebung erkennen: Gelingt der Zugriff auf einen echten, aufgelösten Pfad, läuft er lokal.
 
@@ -163,7 +167,9 @@ Das Kürzel tragen dann beide Fassungen dieser Dateien. Wo dieses Dokument die b
 
 **Die `README.md` ist davon ausgenommen — bewusst asymmetrisch.** Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel. Grund (recherchiert 23. August 2026): GitHub und GitLab zeigen automatisch nur eine Datei namens exakt `README.md` an, sobald jemand einen Ordner im Web-Interface öffnet — ein Sprachkürzel verhindert das, unabhängig davon, für welche Sprache es steht. Da die Arbeitssprache dieses Repositories Deutsch ist (siehe unten), bekommt die deutsche Fassung deshalb den Vorrang: Sie ist es, die beim Browsen ohne einen Klick sichtbar wird.
 
-**Beim Installieren sorgt ein Zusatzschritt für den Namen, den Claude Code erwartet.** Der Ordner wird vollständig kopiert; trägt die `SKILL.md` Sprachkürzel, wird die gewählte Fassung am Zielort zusätzlich als `SKILL.md` abgelegt — Claude Code erkennt keinen anderen Namen, eine `SKILL.de.md` allein ist kein Skill. Die Fassungen mit Kürzel sind am Zielort wirkungslos und dürfen liegen bleiben. Die `CLAUDE-snippet.md` braucht keinen Namensschritt: Ihr Inhalt wird ohnehin in die `CLAUDE.md` übernommen, die Datei selbst ist am Zielort inert (Kapitel 5). Der Ordnername bleibt in jedem Fall unverändert, denn er trug nie ein Kürzel.
+**Installiert wird genau eine Sprachversion, und die `SKILL` trägt dabei zwingend den Namen `SKILL.md`.** Claude Code erkennt keinen anderen — eine `SKILL.de.md` allein ist kein Skill. Ob die gewählte Fassung dafür **umbenannt** oder **zusätzlich** unter diesem Namen abgelegt wird, ist gleichgültig: Beides ergibt eine vollständige Installation. Ebenso darf eine `README.en.md` am Zielort zu `README.md` werden, wenn dort englisch installiert wurde. Die `CLAUDE-snippet`-Datei braucht keinen Namensschritt, wandert aber in der übernommenen Sprache mit (Kapitel 5). Der Ordnername bleibt in jedem Fall unverändert, denn er trug nie ein Kürzel.
+
+Daraus folgt, was ein installierter Ordner **nicht** verrät: Aus einem Dateinamen lässt sich die Sprache seines Inhalts nicht ableiten. Wer den Inhalt braucht, sieht hinein, statt aus dem Namen zu schließen.
 
 Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 

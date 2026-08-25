@@ -1,6 +1,6 @@
 # temp-debug-code — Marking of temporary debug code
 
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-25*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, silent trigger present, German and English version available.
 
@@ -19,7 +19,7 @@ The second part of the skill is the cleaning up: before a cause found is reporte
    | Personal | `~/.claude/skills/temp-debug-code/`  | all of the user's projects |
    | Project  | `.claude/skills/temp-debug-code/`    | this project only          |
 
-2. **Copy the folder `temp-debug-code/` in full under its unchanged name.** `SKILL.md` and `CLAUDE-snippet.md` each exist in two versions — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. The folder is copied completely, and the desired SKILL version is **additionally** placed as `SKILL.md` at the target location — Claude Code recognizes that name and no other. Everything else, both READMEs included, remains unchanged; the date lines later show which state the installation is from.
+2. **Copy one language version of the folder `temp-debug-code/`.** `SKILL` and `CLAUDE-snippet` each exist in two versions — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. All files of the chosen language come along, README included. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other. The date lines later show which state the installation is from.
 
 3. **Adopt the silent trigger.** The content of the `CLAUDE-snippet.md` — the one matching the chosen language version — goes **below the separator line** into the `CLAUDE.md` of the target location: for a personal installation into `~/.claude/CLAUDE.md`, for a project installation into the project's `CLAUDE.md`. The italic text above the separator line is not copied along. The snippet files stay at the target location; only the `CLAUDE.md` is effective, their date lines show the state of the adopted trigger.
 
