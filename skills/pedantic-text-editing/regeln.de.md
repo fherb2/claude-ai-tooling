@@ -115,7 +115,7 @@ Begründung: Konjunktion und Artikel verwechselt.
 
 - **Das Vorher-Stück ist wörtlich und in der Datei eindeutig.** Ist es das nicht, verlängere es, bis es eindeutig ist.
 - Die Datei hält den **freigegebenen** Stand, einschließlich der abgelehnten Einträge mit ihrer Entscheidung.
-- **Gelöscht wird sie nicht von selbst.** Sie darf weg, sobald ihre dauerhaften Anteile in der Entscheidungsdatei stehen (Abschnitt 9). Weist der Nutzer das Löschen an, prüfe das vorher nach und trage Fehlendes nach, statt zu löschen und es zu verlieren.
+- **Gelöscht wird sie nicht von selbst.** Sie darf weg, sobald ihre dauerhaften Anteile in der Entscheidungsdatei stehen (Abschnitt 9). Weist der Nutzer das Löschen an, prüfe das vorher nach und trage Fehlendes nach, statt zu löschen und es zu verlieren. Der Anstoß zum Aufräumen kommt vom Nutzer — die Dateien liegen sichtbar neben dem Text. (Eine Erinnerung durch den Skill stand hier zunächst, feuerte im Betrieb nicht und wäre ab der zweiten Runde in jeder Runde fällig gewesen; entfernt am 25. August 2026.)
 
 ## 9 Die Entscheidungsdatei
 
@@ -136,7 +136,7 @@ Drei Regeln, die das Verfahren tragen:
 
 **Welche Entscheidungsdateien herangezogen werden, ist offenzulegen.** Herangezogen werden **alle** `editing-data_*`-Dateien des Ordners, in dem die Textdatei liegt — ob zwei Dateien wirklich zu einem Text gehören oder nur zufällig nebeneinanderliegen, ist von außen nicht sicher zu erkennen, und ein zu enger Zuschnitt ließe das Glossar zerfallen. Sag dem Nutzer, welche Dateien Du benutzt; er kann einzelne ausdrücklich ein- oder ausschließen.
 
-**Beim Beginn einer Runde**, und zwar sparsam: Suche **gezielt nach dem Wortlaut** jedes einzelnen Fundes, statt die Dateien vollständig zu lesen — sonst wächst der Aufwand mit jeder Runde. Liegen Befunddateien früherer Runden im Ordner, sag das und schlage vor, sie aufzuräumen.
+**Beim Beginn einer Runde**, und zwar sparsam: Suche **gezielt nach dem Wortlaut** jedes einzelnen Fundes, statt die Dateien vollständig zu lesen — sonst wächst der Aufwand mit jeder Runde.
 
 ## 10 Ausführen
 
