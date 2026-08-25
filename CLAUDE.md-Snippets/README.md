@@ -1,6 +1,6 @@
 # CLAUDE.md-Snippets
 
-*Stand: 2026-08-24*
+*Stand: 2026-08-25*
 
 *[English version](README.en.md)*
 
@@ -30,6 +30,8 @@ Jede Datei liegt in zwei Sprachfassungen vor — `.de.md` deutsch, `.en.md` engl
 ## Verwendung
 
 Nichts hier lädt sich von selbst. Ein Baustein wirkt erst, wenn sein Text an der Zielstelle steht.
+
+**Einen Baustein übernimmt man immer: „Vorrang der Anweisungsebenen“ aus `common-snippets`.** Er klärt, welche Ebene gilt, wenn zwei Anweisungen einander widersprechen — und dieser Fall tritt früher ein, als man denkt. Ohne ihn wird sonst willkürlich eine der beiden Regeln gewählt, was sich als Rückfrage oder als überraschendes Verhalten zeigt. Er ist vier Zeilen lang, kostet kaum Kontext, und falsch machen kann man mit ihm nichts: Er ordnet nur, was ohnehin geregelt sein müsste.
 
 1. **Sprachfassung wählen.** Eingefügt wird genau **eine**. Zwei wären eine Dublette, die beim nächsten Anpassen auseinanderdriftet.
 2. **Baustein samt Überschrift herauskopieren.** Die Überschrift benennt an der Zielstelle das Thema und macht später wiederfindbar, worum es geht.

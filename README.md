@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-08-24*
+*Stand: 2026-08-25*
 
 *[English version](README.en.md)*
 
@@ -14,7 +14,7 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | [`pack-source-to-txt/`](pack-source-to-txt/README.md)<br>✅ | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
 | [`chat-export/`](chat-export/README.md)<br>✅ | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.                                            |
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
-| [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit "stillem" Trigger**.                                                   |
+| [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit „stillem“ Trigger**.                                                   |
 
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
 
@@ -38,7 +38,7 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 
 **Zweck:** **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert und in lokale Claude-Instanzen (Claude Code) zu importieren**, unterstützt Anthropic derzeit (08/2026) nicht. – Mit diesem Tooling geht's doch.
 
-Die vorhandene Datenexport-Schnittstelle ist dazu nicht unmittelbar geeignet und wird mit diesem Tooling nur mittelbar benutzt. Das Hilfsmittel unterstützt den Import nach Projekten getrennt und erlaubt auch das "Nachladen" bereits beim letzten Import begonnener Chats. Keine simple 1-klick-Lösung. – Statt dessen überhaupt erst mal eine Lösung.
+Die vorhandene Datenexport-Schnittstelle ist dazu nicht unmittelbar geeignet und wird mit diesem Tooling nur mittelbar benutzt. Das Hilfsmittel unterstützt den Import nach Projekten getrennt und erlaubt auch das „Nachladen“ bereits beim letzten Import begonnener Chats. Keine simple 1-klick-Lösung. – Statt dessen überhaupt erst mal eine Lösung.
 
 Bedient wird es über den Claude-Code-Skill `chat-export`, der durch beide Wege führt — den Kontoexport und die internen Web-Endpunkte von Claude.ai über den angemeldeten Chrome.
 
@@ -54,7 +54,7 @@ Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche 
 
 ## skills
 
-**Zweck: Anweisungen aus CLAUDE.md raus und Aufgabenbeschreibungen wiederverwendbar machen.** Skills starten auch ohne ein passendes "Trigger-Wort".
+**Zweck: Anweisungen aus CLAUDE.md raus und Aufgabenbeschreibungen wiederverwendbar machen.** Skills starten auch ohne ein passendes „Trigger-Wort“.
 
 Wiederverwendbare Skills für Claude Code: Anweisungen, die nicht dauerhaft in `CLAUDE.md`-Dateien Kontext kosten, sondern erst geladen werden, wenn sie gebraucht werden.
 
@@ -69,6 +69,8 @@ Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Sit
 Der Schnitt zwischen den drei Dateien ist der **Wirkungsort**, nicht das Thema: Was in beiden Umgebungen wortgleich taugt, steht in `common-snippets`; was nur bei claude.ai oder nur lokal gilt, in der jeweils eigenen Datei. Ein Thema kann deshalb planmäßig in mehreren Dateien vorkommen — beim Memory etwa die Frage, *ob* etwas gespeichert werden darf, getrennt von der Frage, *wohin*.
 
 Nicht zu verwechseln mit den `CLAUDE-snippet.md`-Dateien im Baustein `skills/`: Die sind der stille Trigger eines bestimmten Skills und ohne ihn wirkungslos. Hier stehen Anweisungen, die für sich wirken und keinen Skill hinter sich haben.
+
+**Einen Baustein sollte man immer übernehmen: „Vorrang der Anweisungsebenen“.** Er klärt, welche Ebene gilt, wenn zwei Anweisungen einander widersprechen. Ohne ihn wird in diesem Fall willkürlich eine der beiden Regeln gewählt — belegt für Claude Code, das alle gefundenen `CLAUDE.md`-Dateien aneinanderhängt, statt sie einander überschreiben zu lassen ([memory](https://code.claude.com/docs/en/memory)). Bemerkbar macht sich das als Rückfrage an einer Stelle, an der keine nötig wäre, oder als überraschendes Verhalten. Der Baustein ist vier Zeilen lang und kann nichts kaputt machen.
 
 **Stand:** Einsatzbereit, in beiden Sprachfassungen — Näheres in der [README des Bausteins](CLAUDE.md-Snippets/README.md).
 
