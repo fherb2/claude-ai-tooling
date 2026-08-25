@@ -19,7 +19,7 @@
    | Persönlich | `~/.claude/skills/parallel-sessions/` | alle Projekte des Nutzers |
    | Projekt    | `.claude/skills/parallel-sessions/`   | nur dieses Projekt        |
 
-2. **Ordner `parallel-sessions/` vollständig unter seinem unveränderten Namen kopieren.** Er enthält `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`, diese `README.md` und `README.en.md`; alles wandert mit. Die gewünschte SKILL-Fassung wird am Zielort **zusätzlich** als `SKILL.md` abgelegt — Claude Code erkennt ausschließlich diesen Namen. Die Datumszeilen von READMEs und Snippets zeigen am Zielort, von welchem Stand die Installation ist.
+2. **Eine Sprachversion des Ordners `parallel-sessions/` kopieren.** Er enthält `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`, diese `README.md` und `README.en.md`; mit gehören alle Dateien der gewählten Sprache. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeilen von README und Snippet zeigen am Zielort, von welchem Stand die Installation ist.
 
 3. **Stillen Trigger übernehmen.** Der Inhalt der zur gewählten Sprache passenden `CLAUDE-snippet`-Datei **unterhalb der Trennlinie** kommt in die `CLAUDE.md` des Zielorts; die Snippet-Dateien bleiben am Zielort liegen, wirksam ist allein die `CLAUDE.md`. Ohne diesen Schritt bemerkt der Skill die Situation nicht: Niemand sagt von sich aus „hier arbeitet gerade eine zweite Instanz".
 

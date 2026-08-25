@@ -1,6 +1,6 @@
 # common-code-generation — Allgemeine Regeln für das Erzeugen und Ändern von Code
 
-*Stand: 2026-08-24*
+*Stand: 2026-08-25*
 
 **✅ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung vorhanden.
 
@@ -19,7 +19,7 @@ Die Regeln gelten, sobald in einer Sitzung Code entsteht oder geändert wird —
    | Persönlich  | `~/.claude/skills/common-code-generation/`     | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/common-code-generation/`       | nur dieses Projekt        |
 
-2. **Ordner `common-code-generation/` vollständig unter seinem unveränderten Namen kopieren.** `SKILL.md` und `CLAUDE-snippet.md` liegen je zweimal vor (`.de`/`.en`); der Ordner wird komplett kopiert, und die gewünschte SKILL-Fassung wird am Zielort **zusätzlich** als `SKILL.md` abgelegt — Claude Code erkennt ausschließlich diesen Namen. Alles Übrige, beide READMEs eingeschlossen, bleibt unverändert liegen; die Datumszeilen zeigen später, von welchem Stand die Installation ist.
+2. **Eine Sprachversion des Ordners `common-code-generation/` kopieren.** `SKILL` und `CLAUDE-snippet` liegen je zweimal vor (`.de`/`.en`); mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeilen zeigen später, von welchem Stand die Installation ist.
 
 3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` — passend zur gewählten Sprachfassung — kommt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts. Die Snippet-Dateien bleiben am Zielort liegen; wirksam ist allein die `CLAUDE.md`.
 

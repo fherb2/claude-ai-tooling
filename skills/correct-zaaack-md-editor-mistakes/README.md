@@ -1,6 +1,6 @@
 # correct-zaaack-md-editor-mistakes — beschädigten Leerraum in Markdown-Tabellen finden und beheben
 
-*Stand: 2026-08-24*
+*Stand: 2026-08-25*
 
 *[English version](README.en.md)*
 
@@ -25,7 +25,7 @@ Drei Dinge leistet der Skill. Er lässt Claude die Artefakte erkennen, sobald si
 
 Wer den Editor überhaupt benutzt, benutzt ihn in aller Regel überall — der persönliche Ort ist deshalb der naheliegende. Dagegen spricht einzig `SKIP` (siehe „Der Geltungsbereich"): Die Ausnahmeliste ist projektbezogen, und eine persönliche Installation trägt für alle Projekte dieselbe.
 
-**2. Ordner vollständig kopieren und die Sprachfassung wählen.** Der Ordnername bleibt unverändert, der Ordner wird komplett kopiert. `SKILL.md` und `CLAUDE-snippet.md` liegen hier zweisprachig; die gewünschte SKILL-Fassung wird am Zielort **zusätzlich** als `SKILL.md` abgelegt — Claude Code erkennt ausschließlich diesen Namen, eine `SKILL.de.md` allein ist kein Skill. Alles Übrige, beide READMEs und die Snippet-Dateien eingeschlossen, bleibt unverändert liegen; die Datumszeilen zeigen den Stand der Installation.
+**2. Eine Sprachversion des Ordners kopieren.** Der Ordnername bleibt unverändert. `SKILL` und `CLAUDE-snippet` liegen hier zweisprachig; mit gehören alle Dateien der gewählten Sprache, README und Werkzeuge eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen, eine `SKILL.de.md` allein ist kein Skill. Die Datumszeilen zeigen den Stand der Installation.
 
 ```text
 SKILL.de.md  oder  SKILL.en.md          ->  zusätzlich als SKILL.md ablegen

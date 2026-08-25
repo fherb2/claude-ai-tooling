@@ -6,7 +6,7 @@ license: CC0-1.0
 
 # Parallel Claude sessions via Git worktrees
 
-This skill carries only the procedures and rules. Reasons and finer points live in the `README.md` of its folder (`${CLAUDE_SKILL_DIR}/README.md`) — consult it when the user asks follow-up questions, instead of reconstructing.
+This skill carries only the procedures and rules. Reasons and finer points live in the README of its folder (`${CLAUDE_SKILL_DIR}`) — consult it when the user asks follow-up questions, instead of reconstructing. The file name is not reliable for this: it may have been renamed during installation. Look inside the folder; if you do not find it, answer without it.
 
 ## Establish the situation
 
