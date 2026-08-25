@@ -2,9 +2,9 @@
 
 Diese Datei ist die übergreifende Dokumentation des Vorhabens `skills/` und trägt zweierlei. **Kapitel 1–7 sind die Vorgaben**, die beim Schreiben **jedes** Skills gelten: die technischen Voraussetzungen, die Regeln für Trigger und Dateien, die Messbefunde, auf denen diese Regeln beruhen, und das Verfahren, mit dem sich beides nachprüfen lässt. Sie standen vormals in `skill_vorgaben.md`; wo eine Skill-README kurz „Vorgaben, Kapitel n" schreibt, ist dieses Dokument gemeint. **Kapitel 8** hält die übergreifenden Feststellungen und Festlegungen der Neuordnung der Arbeitsanweisungen fest — was recherchiert und belegt ist, und nach welchem Modell die Anweisungen auf Skills und CLAUDE.md-Ebenen verteilt werden. Dem offiziellen Segmentschema der Arbeitsanweisungen (§2.3) folgt die Datei bewusst nicht; die Begründung steht zwei Absätze weiter.
 
-Was hier **nicht** steht: der Arbeitsstand einzelner Skills. Die Skills stehen einzeln nebeneinander und werden nicht aufeinander aufbauend entwickelt — ein gemeinsamer Fahrplan und eine Protokollierung der Umsetzung würden mehr Pflege kosten, als sie einbringen. Was an einem Skill fertig und was offen ist und was er dem Nutzer bietet, steht deshalb in dessen eigener `README.md` (Kapitel 6.1); die Gesamt-`README.md` dieses Ordners nennt ihn nur in ihrer Übersichtstabelle (Kapitel 6.2). Ebenfalls nicht Gegenstand dieses Vorhabens ist `chat-export`: Er ist zwar als Skill implementiert, aber erheblich komplexer als das Definieren einer `SKILL.md` und wird deshalb als eigenes Vorhaben geführt.
+Was hier **nicht** steht: der Arbeitsstand einzelner Skills und die anstehende Arbeit. Was an einem Skill fertig ist und was er dem Nutzer bietet, steht in dessen eigener `README.md` (Kapitel 6.1); die Gesamt-`README.md` dieses Ordners nennt ihn nur in ihrer Übersichtstabelle (Kapitel 6.2). Die anstehenden Schritte samt ihrer Reihenfolge trägt `fahrplan.md` (Kapitel 6.3). Eine `status.md` führt dieses Vorhaben nicht: Die Skills stehen einzeln nebeneinander und werden nicht aufeinander aufbauend entwickelt, eine Protokollierung der Umsetzung hätte also nichts zu belegen. Ebenfalls nicht Gegenstand dieses Vorhabens ist `chat-export`: Er ist zwar als Skill implementiert, aber erheblich komplexer als das Definieren einer `SKILL.md` und wird deshalb als eigenes Vorhaben geführt.
 
-**Dieses Vorhaben folgt bewusst anderen Regeln als der Rest des Repositories.** Die Arbeitsweise mit Konzept- und Implementierungsdoku, dreigeteilter Segmentstruktur, Fahrplan und Statusdatei (globale `CLAUDE.md`, Abschnitt 2) ist auf Softwareentwicklung zugeschnitten: auf einen zusammenhängenden Code, dessen Teile voneinander abhängen und dessen Entstehung nachvollziehbar bleiben muss. Hier entsteht kein Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte. Jeder Skill ist für sich fertig oder unfertig, keiner baut auf einem anderen auf, und keiner wird später gegen eine Konzeptfassung geprüft. Ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen, und eine Protokollierung der Umsetzung nichts zu belegen. Was Kapitel 1–7 an Vorgaben tragen, entspricht der Sache nach Segment 2 — projektweite Festlegungen, an denen sich jeder einzelne Skill messen lassen muss.
+**Dieses Vorhaben folgt bewusst anderen Regeln als der Rest des Repositories.** Die Arbeitsweise mit Konzept- und Implementierungsdoku, dreigeteilter Segmentstruktur, Fahrplan und Statusdatei (globale `CLAUDE.md`, Abschnitt 2) ist auf Softwareentwicklung zugeschnitten: auf einen zusammenhängenden Code, dessen Teile voneinander abhängen und dessen Entstehung nachvollziehbar bleiben muss. Hier entsteht kein Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte. Jeder Skill ist für sich fertig oder unfertig, keiner baut auf einem anderen auf, und keiner wird später gegen eine Konzeptfassung geprüft. Eine Protokollierung der Umsetzung hätte deshalb nichts zu belegen; einen Fahrplan führt das Vorhaben dagegen sehr wohl, weil auch nebeneinanderstehende Arbeiten eine Reihenfolge und einen benannten nächsten Schritt brauchen (Kapitel 6.3). Was Kapitel 1–7 an Vorgaben tragen, entspricht der Sache nach Segment 2 — projektweite Festlegungen, an denen sich jeder einzelne Skill messen lassen muss.
 
 Belegte Aussagen tragen ihre Quelle. **Beobachtung am laufenden System** und **Messung** sind als solche gekennzeichnet und von der offiziellen Dokumentation getrennt — Anthropic baut an diesen Werkzeugen laufend um, und die Doku schweigt zu einem Teil dessen, was hier zählt.
 
@@ -202,9 +202,9 @@ Prüfbar: Auf jede `SKILL.md`, die beide Bedingungen erfüllt und trotzdem ihren
 
 ---
 
-## 6 Die beiden README-Arten
+## 6 READMEs und Fahrplan
 
-Sie überschneiden sich nicht: Die README **am Skill** trägt alles, was über diesen einen Skill zu sagen ist — die Beschreibung dessen, was er leistet, seine Installation, seine Feinheiten und seinen Arbeitsstand. Sie ist damit zugleich seine Anwenderdokumentation und darf am Zielort liegen bleiben (Kapitel 5). Die **Gesamt-README** führt in das Vorhaben ein und listet die Skills, beschreibt aber keinen davon: Jeder Skill steht dort ausschließlich als Zeile der Übersichtstabelle. Damit gibt es zu einem Skill nur eine beschreibende Stelle, und sie liegt dort, wo auch gearbeitet wird.
+Drei Dateiarten, die sich nicht überschneiden. Die README **am Skill** trägt alles, was über diesen einen Skill zu sagen ist — die Beschreibung dessen, was er leistet, seine Installation, seine Feinheiten und seinen Arbeitsstand. Sie ist damit zugleich seine Anwenderdokumentation und darf am Zielort liegen bleiben (Kapitel 5). Die **Gesamt-README** führt in das Vorhaben ein und listet die Skills, beschreibt aber keinen davon: Jeder Skill steht dort ausschließlich als Zeile der Übersichtstabelle. Damit gibt es zu einem Skill nur eine beschreibende Stelle, und sie liegt dort, wo auch gearbeitet wird. Der **Fahrplan** (6.3) beschreibt gar nichts, sondern trägt die anstehenden Schritte des Vorhabens.
 
 ### 6.1 README je Skill
 
@@ -217,10 +217,10 @@ Sie ist die vollständige Dokumentation dieses einen Skills und liest sich von �
 5. **Kapitel „Details"** — alles Weitere: Anwenderhinweise, Feinheiten des Verhaltens und die Hinweise, die dem weiteren Ausbau dienen, insbesondere die Regeln, deren Vereinfachung die Funktion zerstören würde.
 6. **Kapitel „Stand und Offenes"** — zum Schluss und in dieser Folge:
    - **Status** — was fertig ist, in einem Satz.
-   - **Offen** — die noch anstehenden Punkte als Liste. Diese Liste ersetzt den früheren Gesamt-Fahrplan des Vorhabens: Sie steht dort, wo die Arbeit stattfindet, und ist damit beim Öffnen des Skills sofort sichtbar. Erledigtes fliegt raus.
+   - **Offen** — was an diesem Skill noch aussteht, knapp, mit Verweis auf den Fahrplan (6.3). Die README sagt, *dass* etwas offen ist; der Fahrplan sagt, *was zu tun ist und in welcher Reihenfolge*. Was zwar geplant, aber noch nicht auf der Tagesordnung ist, bleibt dagegen hier und wird als solches gekennzeichnet — der Fahrplan trägt keine Zukunftsvisionen.
    - **Bewusst offen gelassene Entscheidungen**, sofern es welche gibt — Festlegungen, die der Skill absichtlich nicht trifft, weil sie ins Zielprojekt gehören. Das ist Vorwissen für die Weiterentwicklung, kein Versäumnis, und muss als solches erkennbar sein.
 
-Steht ein Plan für den nächsten Schritt an einem Skill an, steht er hier — ausdetailliert unter „Offen", höchstens einer gleichzeitig, deutlich als noch nicht ausgeführt gekennzeichnet. Nach der Ausführung wird er ersetzt, nicht ergänzt.
+Der ausdetaillierte Plan eines anstehenden Schrittes steht im Fahrplan (6.3), nicht hier. Einzige Ausnahme ist ein Plan, der den Inhalt des Skills selbst betrifft und mit ihm zusammen übernommen wird: Der steht unter „Offen", höchstens einer gleichzeitig, deutlich als noch nicht ausgeführt gekennzeichnet, und wird nach der Ausführung ersetzt, nicht ergänzt.
 
 ### 6.2 Gesamt-README
 
@@ -229,11 +229,26 @@ Die `README.md` dieses Ordners ist der Einstieg in das Vorhaben: Sie sagt, wozu 
 1. **Die Skills im Einzelnen** — eine Tabelle über **alle** Skills des Ordners, auch die unfertigen und die, von denen bisher nur die Idee festgehalten ist. Je Zeile: der Ordnername, verlinkt auf die README des Skills; die Statussymbole; ein Satz zum Zweck. Darunter die Legende der Symbole. Mehr steht hier nicht — jede weitere Beschreibung gehört in die README des Skills (6.1). Diese Tabelle steht **vorn**: Wer die Gesamt-README öffnet, sucht in aller Regel einen Skill, nicht eine Begründung.
 2. **Zweck des Vorhabens** — kurz und prägnant, ohne Herleitung.
 3. **Skills beschaffen und installieren** — beginnt mit einem knappen Verweis auf die offizielle Doku zu Skills als Mechanismus, gefolgt vom Hinweis, dass die vorgesehene Trigger- und Ladetechnik hier um stille Trigger erweitert wurde (1.3). Danach die Zielorte, der Kopiervorgang und die Behandlung der `CLAUDE-snippet.md`: Trigger-Inhalt in die `CLAUDE.md` übernehmen; die Datei bleibt am Zielort liegen, ihre Datumszeile zeigt den Stand der Installation. Dazu die Regeln aus Kapitel 2 dieser Vorgaben in der Kurzfassung, damit niemand einen Trigger beim Anpassen unwirksam macht. Das alles im allgemeinen Fall — die auf den einzelnen Skill heruntergebrochene Anleitung steht in dessen eigener README (6.1).
-4. **Offene Punkte des Vorhabens** — nur, was keinem einzelnen Skill zuzuordnen ist. Alles Skillbezogene steht in dessen README (6.1); eine zweite Liste hier würde sofort auseinanderdriften.
+4. **Offene Punkte des Vorhabens** — ein Verweis auf den Fahrplan (6.3) und auf die READMEs der einzelnen Skills, keine eigene Liste. Zwei Listen driften sofort auseinander.
 
 Dazu ein **Lizenzabschnitt**: CC0, mit einer Aufzählung dessen, was das für den Nutzer konkret bedeutet.
 
 **Sprachfassungen.** Auch hier entscheidet der Nutzer, in welchen Sprachen die Gesamt-README vorliegt (5.1). Ihre Benennung folgt aber der Konvention der Wurzel-READMEs dieses Repositories, nicht dem Kürzel-Schema der Skill-Ordner: Die deutsche Fassung heißt `README.md`, jede weitere trägt ihr Kürzel (`README.en.md`).
+
+### 6.3 Fahrplan
+
+`fahrplan.md` liegt neben der Gesamt-README und trägt die **anstehenden Schritte in der Reihenfolge ihrer Bearbeitung**. Er ist eine Entwicklungsdatei, keine README: Er trägt keine Sprachfassung, wird nicht mit an einen Zielort kopiert und entfällt, wenn das Vorhaben fertig ist.
+
+Die Grenze zu den READMEs ist scharf und wird gebraucht, sonst entstehen zwei Listen, die auseinanderdriften:
+
+- **Die README beschreibt den Zustand** — was fertig ist, was der Skill leistet, was an ihm noch aussteht, und was zwar geplant, aber noch nicht auf der Tagesordnung ist. Letzteres wird als solches gekennzeichnet und bleibt dort.
+- **Der Fahrplan beschreibt die Schritte** — was als Nächstes zu tun ist, in welcher Reihenfolge und mit welchem Plan. Er trägt keine Zukunftsvisionen: Was noch niemand vorhat, ist kein Schritt.
+
+Je Schritt so viel Detail, wie eine neue Sitzung zur Wiederaufnahme braucht, ohne den Chat zu kennen. Erledigte Schritte fliegen raus; die Nummern der übrigen werden dabei **nicht** neu vergeben (Projekt-`CLAUDE.md`, „Fahrplan-Nummerierung").
+
+Eine `status.md` führt dieses Vorhaben nicht (siehe Einleitung).
+
+Prüfbar: Auf jeden Fahrplaneintrag, der nur einen Zustand beschreibt statt einer Handlung, lässt sich zeigen — und ebenso auf jede README, die einen ausdetaillierten Plan trägt, obwohl er in den Fahrplan gehört (Ausnahme in 6.1).
 
 ---
 

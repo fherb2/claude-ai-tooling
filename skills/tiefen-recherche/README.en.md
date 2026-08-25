@@ -45,9 +45,6 @@ The skill also works in claude.ai and in Claude Desktop: the same `SKILL.md` run
 
 **Status:** Finished and ready for use. The German version was written on 23 August 2026 and tried out in two content tests — a hard case of finding (a specialist article the general search does not deliver) and an open collection search in an unfamiliar subject field and an unfamiliar language; both passed, and from the second came the self-test against slipping labelling discipline. The English version was written on 24 August 2026 as a translation of the German one.
 
-**Open:**
-
-- The effectiveness of the self-test has not yet been measured; the fitting test case would be a repetition of the collection search followed by checking all links against the pages actually fetched.
-- The claude.ai branch of the result handover (automatic artifact) has not yet been tried out there.
+**Open:** Two trials are still outstanding — measuring the effectiveness of the self-test, and the claude.ai branch of the result handover. The steps for them are kept in the [roadmap](../fahrplan.md) (in German). Both concern the safeguards, not usability: the skill is finished and ready for use.
 
 **Deliberately left open:** Whether a source map is kept, where it lies within the project, and whether a project keeps several of them, is decided by the user in the target project — the skill prescribes neither location nor cut. Splitting into several maps is only worthwhile once a project demonstrably houses two subject-foreign strands of research.

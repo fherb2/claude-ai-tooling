@@ -1,6 +1,6 @@
 # 🚧 translation-task — Übersetzung software-entwicklungsnaher Dokumente
 
-*Stand: 2026-08-23*
+*Stand: 2026-08-25*
 
 **🚧 In Arbeit.** Einsetzbar, aber noch nicht abgenommen: Fünf Festlegungen in der `SKILL.md` sind noch offen (siehe „Stand und Offenes" am Ende).
 
@@ -36,8 +36,6 @@ Vor der Arbeit klärt er Zielsprache und Fachjargon-Grad und legt eine Arbeitspr
 
 **Status:** Anweisungen vollständig, Frontmatter gesetzt. Die Erprobung am Zielort findet statt, wenn der Skill dort gebraucht wird.
 
-**Offen:**
-
-- Die fünf Punkte unter „Noch nicht festgelegt" in der `SKILL.md` einzeln besprechen und dort festschreiben: Namenskonvention für Zieldateien, Sync-Workflow zwischen zwei Sprachfassungen, Umgang mit Lizenz- und Rechtstexten, Ein-Absatz-pro-Zeile-Formatierung, Ton und Anrede.
+**Offen:** Fünf Festlegungen stehen noch aus; sie sind in der `SKILL.md` unter „Noch nicht festgelegt" benannt. Der Schritt dazu steht im [Fahrplan](../fahrplan.md).
 
 **Bewusst offen gelassen:** Das Glossar wird nicht mitgeliefert. Es entsteht im Betrieb und ist projektabhängig; eine leere Vorlage würde nur suggerieren, es gäbe einen Startbestand.
