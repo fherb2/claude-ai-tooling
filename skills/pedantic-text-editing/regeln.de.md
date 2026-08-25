@@ -66,14 +66,15 @@ Gliedere die Ausgabe nach **Fundort und Kategorie** — als Zwischenüberschrift
 
 | ID | Zeile | Änderung |
 | --- | --- | --- |
-| 1 | 42 | Vorher: `dass er dass sagte`;<br>Nachher: `dass er das sagte` |
+| 1 | 42 | Vorher: `dass er dass sagte` |
+|  |  | Nachher: `dass er das sagte` |
 
-**Innerhalb einer Zelle wird mit `<br>` umbrochen, nie mit einem echten Zeilenumbruch** — der zerlegt die Tabelle im Frontend des Nutzers.
+**Ein Fund bekommt so viele Tabellenzeilen, wie er braucht.** Die erste trägt ID, Zeilennummer und das Vorher-Stück; die folgenden lassen ID und Zeilennummer leer und tragen das Nachher-Stück und, falls nötig, die Begründung. **Kein `<br>` und kein echter Zeilenumbruch in einer Zelle:** Ein echter Umbruch zerlegt die Tabelle, und `<br>` wird nicht überall umgesetzt — im Frontend von Claude Code erscheint es als sichtbarer Text (beobachtet am laufenden System, 25. August 2026). Über mehrere Zeilen verbundene Zellen kennt Markdown nicht; die leeren Zellen sind deshalb die einzige Form, die überall gleich aussieht.
 
 - **Die ID** ist je Runde fortlaufend und wird nicht neu vergeben. Über sie spricht der Nutzer die Zeilen an.
 - **Die Zeilennummer** ist zulässig und hilfreich, weil die Datei bis zur Freigabe unverändert bleibt. Enthält eine Zeile einen ganzen Absatz, findet der Nutzer die Stelle über die Suchfunktion seines Editors — dafür genügt das Vorher-Stück.
-- **„Vorher:“ und „Nachher:“** stehen so in der Zelle, immer in dieser Reihenfolge und mit diesen Wörtern, getrennt durch Semikolon und `<br>`.
-- **Eine Begründung** nur, wo sie nicht auf der Hand liegt — in derselben Zelle, mit dem Wort „Begründung: “ und ebenso durch Semikolon und `<br>` abgesetzt.
+- **„Vorher:“ und „Nachher:“** stehen so am Anfang ihrer Zelle, immer in dieser Reihenfolge und mit diesen Wörtern.
+- **Eine Begründung** nur, wo sie nicht auf der Hand liegt — dann als weitere Zeile, die mit „Begründung: “ beginnt.
 - **Bei längeren Passagen keine Tabelle.** Dort ist eine Aufzählung geeigneter: je Eintrag beginne immer mit „<ID> – <ZEILENNUMMER><ZEILENUMBRUCH>Vorher: “  und „Nachher:“ ebenfalls nach einem Zeilenumbruch. Sind viele kleine Passagen mit einzelnen längeren Passagen vermischt, so unterbrich die Tabellendarstellung für die längere Passage(n) und setze danach die Tabelle fort.
 - **Zeige nur so viel Text, wie die Entscheidung braucht** — nicht den ganzen Absatz, wenn drei Wörter reichen.
 - **Höchstens 30 Änderungsstellen je Runde**, sofern der Nutzer keinen anderen Wert genannt hat. Wird es mehr, teile die Arbeit und sage vorher, wie Du teilst. Ergibt sich die Teilung schon aus dem Abschnitt, in dem Du gerade bist, folge dieser.
