@@ -2,9 +2,9 @@
 
 # Precedence of the instruction levels
 
-This file supplements the instruction file above it and overrides it wherever it contradicts it.
+The more specific level holds: this file supplements the instruction files above it and overrides them wherever it contradicts them. Organization-wide managed instructions stand above all of them and always hold.
 
-A loaded skill governs the task it applies to and takes precedence there over a general instruction of this file. Where it contradicts a project-specific protective rule, this file holds — and the contradiction is named, not resolved silently.
+A loaded skill governs the task it applies to and takes precedence there over a general instruction. Where it contradicts a project-specific protective rule, the protective rule holds — and the contradiction is named, not resolved silently.
 
 Reason: instruction files are concatenated, not weighed against each other, and where rules contradict each other one of them is otherwise picked arbitrarily (documented for Claude Code, [memory](https://code.claude.com/docs/en/memory)). Without this ruling, chance decides.
 

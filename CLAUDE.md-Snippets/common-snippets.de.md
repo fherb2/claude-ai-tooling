@@ -2,9 +2,9 @@
 
 # Vorrang der Anweisungsebenen
 
-Diese Datei ergänzt die übergeordnete Anweisungsdatei und überschreibt sie dort, wo sie ihr widerspricht.
+Es gilt die speziellere Ebene: Diese Datei ergänzt die übergeordneten Anweisungsdateien und überschreibt sie dort, wo sie ihnen widerspricht. Organisationsweit verwaltete Vorgaben stehen über allen und gelten immer.
 
-Ein geladener Skill regelt die Aufgabe, für die er gilt, und geht dort einer allgemeinen Anweisung dieser Datei vor. Widerspricht er einer projektspezifischen Schutzregel, gilt diese Datei — der Widerspruch wird benannt, nicht stillschweigend aufgelöst.
+Ein geladener Skill regelt die Aufgabe, für die er gilt, und geht dort einer allgemeinen Anweisung vor. Widerspricht er einer projektspezifischen Schutzregel, gilt die Schutzregel — der Widerspruch wird benannt, nicht stillschweigend aufgelöst.
 
 Grund: Die Anweisungsdateien werden aneinandergehängt, nicht gegeneinander verrechnet, und bei widersprüchlichen Regeln wird sonst willkürlich eine ausgewählt (für Claude Code belegt, [memory](https://code.claude.com/docs/en/memory)). Ohne diese Festlegung entscheidet der Zufall.
 
