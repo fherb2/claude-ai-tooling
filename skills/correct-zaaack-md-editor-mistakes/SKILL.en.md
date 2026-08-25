@@ -6,7 +6,7 @@ license: CC0-1.0
 
 # Artifacts of the zaaack Markdown editor in tables
 
-This skill's folder holds a `README.md`. It explains the editor, how the tools are built, how to set up the hook, and where the limits are. Read it when you need one of those — not beforehand.
+This skill's folder holds a README. It explains the editor, how the tools are built, how to set up the hook, and where the limits are. Read it when you need one of those — not beforehand. Its file name is not reliable, since it may have been renamed during installation: look inside the folder instead of assuming a name.
 
 ## What this applies to
 
@@ -22,7 +22,7 @@ If it has not been settled yet whether this project is affected, then check at t
 
 **If you find none:** ask the user whether they use this editor as a matter of course, and whether you should check and repair without asking in future. Put their answer on record — **the refusal as well**. Without that you will ask again next time.
 
-**If no hook is set up** — look in `.claude/settings.json` —, say so when you first report, and describe the setup to the user. The section "Verlässlichkeit: der Hook" of the `README.md` in this folder carries it, ready-made entry included. Only a hook makes the check before every commit reliable; this skill on its own merely gets loaded with some probability.
+**If no hook is set up** — look in `.claude/settings.json` —, say so when you first report, and describe the setup to the user. The section "Verlässlichkeit: der Hook" of the README in this folder carries it, ready-made entry included. Only a hook makes the check before every commit reliable; this skill on its own merely gets loaded with some probability.
 
 ## Standing authorization
 

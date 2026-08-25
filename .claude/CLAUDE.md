@@ -240,3 +240,20 @@ sitzungsgebunden und beim nächsten Neustart weg. Was über die Sitzung
 hinaus gebraucht wird, kommt deshalb **sofort** ins Repo. Was dort abgelegt
 wurde und sich als entbehrlich erweist, wird bewusst gelöscht und das
 gesagt, statt es liegenzulassen.
+
+# Skills: dünne `SKILL.md`, nachgeladener Regelteil
+
+Entsteht in `skills/` ein neuer Skill oder wächst ein bestehender, prüfe, ob
+sein Regelteil aus der `SKILL.md` heraus in eine nachgeladene Datei desselben
+Ordners gehört, und schlage die Teilung vor. Wann sie sich lohnt und wie sie
+gebaut wird, steht in `skills/implementation_doku.md`, Kapitel 5.2 — hier
+absichtlich kein zweites Mal.
+
+# Baustellenschilder in Ordnernamen
+
+Die Baustellenschilder in den Ordnernamen erlauben dem Nutzer beim Start des
+Projekts sofort zu erkennen, welche Skills noch unfertig sind. Nach der
+Fertigstellung und vor dem ersten Einsatz (Kopie an das Installationsziel)
+wird dieser Prä-Teil dann entfernt und bleibt entfernt. Somit kollidiert der
+Ordnername nicht mit anderen Vorgaben und den Bedingungen an der
+Installationsstelle.
