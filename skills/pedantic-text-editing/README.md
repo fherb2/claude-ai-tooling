@@ -4,7 +4,7 @@
 
 *[English version](README.en.md)*
 
-**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Ein stiller Trigger fehlt noch (siehe „Offen“); bis dahin löst der Skill über seine `description` aus oder wird mit `/pedantic-text-editing` aufgerufen.
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Ein stiller Trigger ist nicht nötig: Der Skill löst zuverlässig über seine `description` aus — im Betrieb auch mit Sonnet bestätigt (25. August 2026) — oder wird mit `/pedantic-text-editing` aufgerufen.
 
 **Der Skill begrenzt den Eingriff in einen Text auf genau die Stellen, die der Nutzer freigegeben hat — und weist hinterher nach, dass sich nichts anderes geändert hat.** Er gilt für Texte, deren Wortlaut selbst das Produkt ist: Aufsätze, Anträge, Vorträge, Briefe, Buchkapitel, Gutachten. Der Schwerpunkt liegt nicht auf dem Finden von Fehlern — das kann Claude auch ohne Skill —, sondern auf der Begrenzung des Eingriffs: dass beim Korrigieren einer Kommastelle nicht nebenbei ein Halbsatz umgeschrieben, ein „vermutlich“ getilgt, zwei Sätze verschmolzen oder die Anführungszeichen im ganzen Text vereinheitlicht werden.
 
@@ -59,7 +59,6 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 **Offen:**
 
-- **Stiller Trigger.** Es fehlen `CLAUDE-snippet.de.md` und `CLAUDE-snippet.en.md`. Der Anker liegt am frühestmöglichen Moment — bevor in einer Sitzung zum ersten Mal ein Text geändert wird, dessen Wortlaut selbst das Produkt ist —, nicht erst beim Vorschlagen einer Korrektur: Der Skillkörper wird nach dem Laden nicht neu gelesen.
 - **Nacharbeit aus dem Betrieb.** Ob Rundengröße, Ausschnittlängen und die Form der Vorlage in der Praxis tragen, zeigt erst die Arbeit an einem echten Text.
 
 **Bewusst offen gelassene Entscheidungen:**
