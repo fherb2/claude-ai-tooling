@@ -53,7 +53,7 @@ To that end it separates three kinds of finding — rule violation, matter of fa
 
 ## State and open points
 
-**Status:** Both language versions of `SKILL` and rules file are finished, as are both READMEs. The rules text has been talked through with the developer and approved (25 August 2026). Trying it out in practice is still ahead — that happens while the skill is being used.
+**Status:** Both language versions of `SKILL` and rules file are finished, as are both READMEs. The rules text has been talked through with the developer and approved (25 August 2026). Trying it out in practice is underway; the first operational findings (table format of the review list, target count of deferred findings) have been worked into the rules text (25 August 2026).
 
 **Open:**
 
