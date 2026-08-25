@@ -64,18 +64,18 @@ Betroffen sind Werte in Tabellen, Bildunterschriften und Beispielen, Verweise in
 
 Gliedere die Ausgabe nach **Fundort und Kategorie** — als Zwischenüberschriften, nicht als Tabellenspalten. Die Tabelle selbst bleibt schmal, sonst wird die Freigabe zur Zumutung:
 
-| ID | Zeile | Änderung |
-| --- | --- | --- |
-| 1 | 42 | Vorher: `dass er dass sagte` |
-|  |  | Nachher: `dass er das sagte` |
+| ID | Zeile |  | Änderung |
+| --- | --- | --- | --- |
+| 1 | 42 | Vorh | `dass er dass sagte` |
+|  |  | Nach | `dass er das sagte` |
 
-**Ein Fund bekommt so viele Tabellenzeilen, wie er braucht.** Die erste trägt ID, Zeilennummer und das Vorher-Stück; die folgenden lassen ID und Zeilennummer leer und tragen das Nachher-Stück und, falls nötig, die Begründung. **Kein `<br>` und kein echter Zeilenumbruch in einer Zelle:** Ein echter Umbruch zerlegt die Tabelle, und `<br>` wird nicht überall umgesetzt — im Frontend von Claude Code erscheint es als sichtbarer Text (beobachtet am laufenden System, 25. August 2026). Über mehrere Zeilen verbundene Zellen kennt Markdown nicht; die leeren Zellen sind deshalb die einzige Form, die überall gleich aussieht.
+**Ein Fund bekommt so viele Tabellenzeilen, wie er braucht.** Die erste trägt ID, Zeilennummer und das Vorher-Stück; die folgenden lassen ID und Zeilennummer leer und tragen das Nachher-Stück und, falls nötig, die Begründung. Die Beschriftung steht in einer **eigenen, schmalen Spalte** und abgekürzt — `Vorh`, `Nach`, `Begr` —, damit der Text darunter überall an derselben Stelle beginnt und sich die Unterschiede mit einem Blick erfassen lassen. Die Spalte trägt keine Überschrift. **Kein `<br>` und kein echter Zeilenumbruch in einer Zelle:** Ein echter Umbruch zerlegt die Tabelle, und `<br>` wird nicht überall umgesetzt — im Frontend von Claude Code erscheint es als sichtbarer Text (beobachtet am laufenden System, 25. August 2026). Über mehrere Zeilen verbundene Zellen kennt Markdown nicht; die leeren Zellen sind deshalb die einzige Form, die überall gleich aussieht.
 
 - **Die ID** ist je Runde fortlaufend und wird nicht neu vergeben. Über sie spricht der Nutzer die Zeilen an.
 - **Die Zeilennummer** ist zulässig und hilfreich, weil die Datei bis zur Freigabe unverändert bleibt. Enthält eine Zeile einen ganzen Absatz, findet der Nutzer die Stelle über die Suchfunktion seines Editors — dafür genügt das Vorher-Stück.
-- **„Vorher:“ und „Nachher:“** stehen so am Anfang ihrer Zelle, immer in dieser Reihenfolge und mit diesen Wörtern.
-- **Eine Begründung** nur, wo sie nicht auf der Hand liegt — dann als weitere Zeile, die mit „Begründung: “ beginnt.
-- **Bei längeren Passagen keine Tabelle.** Dort ist eine Aufzählung geeigneter: je Eintrag beginne immer mit „<ID> – <ZEILENNUMMER><ZEILENUMBRUCH>Vorher: “  und „Nachher:“ ebenfalls nach einem Zeilenumbruch. Sind viele kleine Passagen mit einzelnen längeren Passagen vermischt, so unterbrich die Tabellendarstellung für die längere Passage(n) und setze danach die Tabelle fort.
+- **`Vorh` und `Nach`** stehen so in der Beschriftungsspalte, immer in dieser Reihenfolge und mit diesen Kürzeln.
+- **Eine Begründung** nur, wo sie nicht auf der Hand liegt — dann als weitere Zeile mit `Begr` in der Beschriftungsspalte.
+- **Bei längeren Passagen keine Tabelle.** Dort entfällt die Beschriftungsspalte und die Wörter werden ausgeschrieben, weil sich ohne Spalten nichts ausrichten lässt: je Eintrag beginne immer mit „<ID> – <ZEILENNUMMER><ZEILENUMBRUCH>Vorher: “  und „Nachher:“ ebenfalls nach einem Zeilenumbruch. Sind viele kleine Passagen mit einzelnen längeren Passagen vermischt, so unterbrich die Tabellendarstellung für die längere Passage(n) und setze danach die Tabelle fort.
 - **Zeige nur so viel Text, wie die Entscheidung braucht** — nicht den ganzen Absatz, wenn drei Wörter reichen.
 - **Höchstens 30 Änderungsstellen je Runde**, sofern der Nutzer keinen anderen Wert genannt hat. Wird es mehr, teile die Arbeit und sage vorher, wie Du teilst. Ergibt sich die Teilung schon aus dem Abschnitt, in dem Du gerade bist, folge dieser.
 

@@ -64,18 +64,18 @@ Affected are values in tables, captions and examples, cross-references inside th
 
 Structure the output by **place and category** — as intermediate headings, not as table columns. The table itself stays narrow, otherwise approving becomes an imposition:
 
-| ID | Line | Change |
-| --- | --- | --- |
-| 1 | 42 | Before: `the the same day` |
-|  |  | After: `the same day` |
+| ID | Line |  | Change |
+| --- | --- | --- | --- |
+| 1 | 42 | Bef | `the the same day` |
+|  |  | Aft | `the same day` |
 
-**A finding gets as many table rows as it needs.** The first carries the ID, the line number and the before-fragment; the following ones leave ID and line number empty and carry the after-fragment and, where needed, the reason. **No `<br>` and no real newline inside a cell:** a real newline takes the table apart, and `<br>` is not rendered everywhere — in the Claude Code frontend it shows up as visible text (observed on the running system, 25 August 2026). Markdown has no cells spanning several rows; the empty cells are therefore the only form that looks the same everywhere.
+**A finding gets as many table rows as it needs.** The first carries the ID, the line number and the before-fragment; the following ones leave ID and line number empty and carry the after-fragment and, where needed, the reason. The label sits in a **narrow column of its own** and abbreviated — `Bef`, `Aft`, `Rsn` — so that the text beside it starts at the same place throughout and the differences can be taken in at a glance. That column carries no header. **No `<br>` and no real newline inside a cell:** a real newline takes the table apart, and `<br>` is not rendered everywhere — in the Claude Code frontend it shows up as visible text (observed on the running system, 25 August 2026). Markdown has no cells spanning several rows; the empty cells are therefore the only form that looks the same everywhere.
 
 - **The ID** runs consecutively within a round and is not reassigned. It is how the user addresses the rows.
 - **The line number** is permitted and helpful, because the file stays unchanged until approval. Where one line holds a whole paragraph, the user finds the spot with their editor's search function — the before-fragment suffices for that.
-- **"Before:" and "After:"** appear like that at the start of their cell, always in this order and with these words.
-- **A reason** only where it is not obvious — then as a further row starting with "Reason: ".
-- **For longer passages, no table.** An itemized list serves better there: start every entry with `<ID> – <LINE NUMBER>`, then a line break, then "Before: ", and "After:" after a line break as well. Where many short passages are mixed with the occasional long one, interrupt the table for the long passage and resume it afterwards; the IDs run on across the interruption.
+- **`Bef` and `Aft`** appear like that in the label column, always in this order and with these abbreviations.
+- **A reason** only where it is not obvious — then as a further row with `Rsn` in the label column.
+- **For longer passages, no table.** There the label column falls away and the words are written out, because without columns nothing can be aligned. An itemized list serves better there: start every entry with `<ID> – <LINE NUMBER>`, then a line break, then "Before: ", and "After:" after a line break as well. Where many short passages are mixed with the occasional long one, interrupt the table for the long passage and resume it afterwards; the IDs run on across the interruption.
 - **Show only as much text as the decision needs** — not the whole paragraph when three words will do.
 - **At most 30 places of change per round**, unless the user has named another figure. Beyond that, split the work and say beforehand how you split it. Where the section you are in already implies the split, follow that.
 
