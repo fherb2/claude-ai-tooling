@@ -1,6 +1,6 @@
 # 🚧 softwareaufgabe-erkennen — Idee, noch kein Skill
 
-*Stand: 2026-08-23*
+*Stand: 2026-08-25*
 
 Erkennen, dass die Anfrage des Nutzers auf eine zu schreibende oder zu ändernde Software hinausläuft — auch wenn sie das nicht mit Wörtern wie „Code", „programmieren" oder „Software" ausdrückt — und daraufhin die einschlägigen Entwicklungsregeln nachladen.
 
@@ -10,7 +10,4 @@ Erkennen, dass die Anfrage des Nutzers auf eine zu schreibende oder zu ändernde
 
 **Teilweise überholt.** `common-code-generation` trägt inzwischen einen Teil dessen, was hier als Idee steht: Er wird ausgelöst, wenn Code entsteht, auch ohne dass die Anfrage von Code spricht.
 
-**Offen:**
-
-- Entscheiden, ob daraus ein eigenständiger Skill wird, ob er die Vorstufe von `software-dev-doc-fh` ist — oder ob er sich mit `common-code-generation` erledigt hat. Erst danach lohnt Arbeit am Inhalt.
-- Fällt die Entscheidung für einen eigenen Skill: den Trigger nach Kapitel 2 der Vorgaben geankert neu formulieren, nicht als Hintergrund-Beobachtung.
+**Offen:** Ob aus der Idee überhaupt ein eigener Skill wird, ist nicht entschieden. Der Schritt dazu steht im [Fahrplan](../fahrplan.md).

@@ -1,6 +1,6 @@
 # 🚧 zotero-use — Idee, noch kein Skill
 
-*Stand: 2026-08-23*
+*Stand: 2026-08-25*
 
 Claude direkt mit der eigenen Zotero-Bibliothek arbeiten lassen: neue Einträge samt PDF anlegen, gezielt in Metadaten und Volltext suchen, Sammlungen umsortieren — ausgehend vom ursprünglichen Wunsch, Literaturfunde schon während der Recherche in einer zotero-fertigen Form festzuhalten, statt sie nachträglich aus einem Chat-Export herauszuklauben.
 
@@ -40,7 +40,6 @@ Dies ist das erste konkrete Beispiel für ein „Thema jenseits des Codens" im S
 
 ## Offen
 
-- Probelauf gegen das echte Konto: Lesen sofort, Schreiben mit frisch erzeugtem Zotero-Web-API-Key gegen eine Wegwerf-Testsammlung (nichts Echtes riskieren).
-- Dabei klären, ob `zotero-cli-cc` Sammlungs-Management schon kann oder ob ein dünner Zusatz nötig ist (der API-Aufruf dafür ist trivial, siehe oben).
-- Danach erst: Werkzeug-Entscheidung (`zotero-cli-cc` vs. `zotero-mcp` vs. Plugin-Variante `cookjohn/zotero-mcp`) und Verpackung als Skill.
+Probelauf, Klärung des Sammlungs-Managements und die anschließende Werkzeug-Entscheidung stehen als Schritte im [Fahrplan](../fahrplan.md). Nicht auf der Tagesordnung, aber festgehalten:
+
 - Frühere Nebenidee, noch unentschieden: Markdown-Chat-Zusammenfassungen als Zotero-Quelle ablegen, um sie später wiederzufinden. Zotero indiziert `.md`-Anhänge derzeit **nicht** (dokumentierter Fehler, [Zotero-Forum](https://forums.zotero.org/discussion/94637/indexing-of-markdown-plain-text-attachments-with-md-extension)) — Workaround: dieselbe Datei als `.txt` anhängen. Eine „Weiterchatten"-Funktion kennt Zotero nicht; das bliebe reine Konvention (Notiz-/Extra-Feld mit Rückverweis).
