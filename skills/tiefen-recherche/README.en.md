@@ -1,6 +1,6 @@
 # tiefen-recherche — research that does not give up too early
 
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-25*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version available. No silent trigger needed (reasons under "Details").
 
@@ -21,7 +21,7 @@ The skill applies to **every kind of research** — literature, facts, documents
    | Personal | `~/.claude/skills/tiefen-recherche/`   | all of the user's projects |
    | Project  | `.claude/skills/tiefen-recherche/`     | this project only          |
 
-2. **Copy the folder `tiefen-recherche/` in full under its unchanged name.** The `SKILL.md` exists twice — `SKILL.de.md` and `SKILL.en.md`. The folder is copied completely, and the desired version is **additionally** placed as `SKILL.md` at the target location — Claude Code recognizes that name and no other. Both READMEs travel along unchanged; their date lines later show which state the installation is from.
+2. **Copy one language version of the folder `tiefen-recherche/`.** The `SKILL` exists twice — `SKILL.de.md` and `SKILL.en.md`. All files of the chosen language come along, README included. The chosen version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other. The date line later shows which state the installation is from.
 
 The skill also works in claude.ai and in Claude Desktop: the same `SKILL.md` runs in every Claude product it is bound into. The source map is dropped wherever there is no file access.
 

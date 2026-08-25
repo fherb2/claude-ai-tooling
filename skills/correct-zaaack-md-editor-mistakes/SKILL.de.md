@@ -6,7 +6,7 @@ license: CC0-1.0
 
 # Artefakte des zaaack-Markdown-Editors in Tabellen
 
-Im Ordner dieses Skills liegt eine `README.md`. Sie erklärt den Editor, den Aufbau der Werkzeuge, die Hook-Einrichtung und die Grenzen im Einzelnen. Lies sie, wenn Du eines davon brauchst — nicht vorsorglich.
+Im Ordner dieses Skills liegt eine README. Sie erklärt den Editor, den Aufbau der Werkzeuge, die Hook-Einrichtung und die Grenzen im Einzelnen. Lies sie, wenn Du eines davon brauchst — nicht vorsorglich. Ihr Dateiname ist nicht verlässlich, weil beim Installieren umbenannt worden sein kann: Sieh im Ordner nach, statt einen Namen vorauszusetzen.
 
 ## Wofür das gilt
 
@@ -22,7 +22,7 @@ Ist noch nicht geklärt, ob dieses Projekt betroffen ist, dann prüfe bei der er
 
 **Findest Du keine:** Frage den Nutzer, ob er diesen Editor grundsätzlich benutzt und ob Du künftig ungefragt prüfen und korrigieren sollst. Halte seine Antwort fest — **auch die Absage**. Ohne das fragst Du beim nächsten Mal wieder.
 
-**Ist kein Hook eingerichtet** — nachzusehen in `.claude/settings.json` —, sage das beim ersten Melden und beschreibe dem Nutzer die Einrichtung. Der Abschnitt „Verlässlichkeit: der Hook" der `README.md` in diesem Ordner trägt sie samt fertigem Eintrag. Nur ein Hook macht die Prüfung vor jedem Commit verlässlich; dieser Skill allein wird bloß wahrscheinlich geladen.
+**Ist kein Hook eingerichtet** — nachzusehen in `.claude/settings.json` —, sage das beim ersten Melden und beschreibe dem Nutzer die Einrichtung. Der Abschnitt „Verlässlichkeit: der Hook" der README in diesem Ordner trägt sie samt fertigem Eintrag. Nur ein Hook macht die Prüfung vor jedem Commit verlässlich; dieser Skill allein wird bloß wahrscheinlich geladen.
 
 ## Dauerfreigabe
 
