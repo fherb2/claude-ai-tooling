@@ -1,6 +1,6 @@
 # CLAUDE.md-Snippets
 
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-25*
 
 *[Deutsche Fassung](README.md)*
 
@@ -29,6 +29,8 @@ Every file comes in two language versions — `.de.md` German, `.en.md` English.
 ## Use
 
 Nothing here loads itself. A block takes effect only once its text sits at the target place.
+
+**One block is always worth taking: "Precedence of the instruction levels" from `common-snippets`.** It settles which level holds when two instructions contradict each other — and that case arrives sooner than one expects. Without it, one of the two rules is otherwise picked arbitrarily, which shows up as a needless question or as surprising behavior. It is four lines long, costs hardly any context, and nothing can go wrong with it: it only orders what would have to be settled anyway.
 
 1. **Choose the language version.** Exactly **one** gets inserted. Two would be a duplicate that drifts apart at the next change.
 2. **Copy the block out along with its heading.** At the target place, the heading names the topic and keeps it findable later on.

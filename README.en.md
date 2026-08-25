@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-25*
 
 *[Deutsche Fassung](README.md)*
 
@@ -69,6 +69,8 @@ Along with that, the concept of **silent triggers** developed here — triggers 
 What separates the three files is the **place they take effect**, not the topic: whatever serves word for word in both environments sits in `common-snippets`; whatever holds only for claude.ai or only locally sits in its own file. One topic can therefore appear in several files by design — with memory, for instance, the question of *whether* something may be stored is kept apart from the question of *where*.
 
 Not to be confused with the `CLAUDE-snippet.md` files in the `skills/` component: those are the silent trigger of one particular skill and have no effect without it. What is kept here are instructions that take effect on their own and have no skill behind them.
+
+**One block should always be taken over: "Precedence of the instruction levels".** It settles which level holds when two instructions contradict each other. Without it, one of the two rules is picked arbitrarily in that case — documented for Claude Code, which concatenates all discovered `CLAUDE.md` files instead of letting them override each other ([memory](https://code.claude.com/docs/en/memory)). It shows up as a question asked where none would be needed, or as surprising behavior. The block is four lines long and nothing can go wrong with it.
 
 **Status:** ready to use, in both language versions — more in the [component's README](CLAUDE.md-Snippets/README.en.md).
 
