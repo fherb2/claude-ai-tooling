@@ -11,6 +11,11 @@ __pycache__/
 *.tmp.*
 *.tmp
 
+# Werkbaenke des Worktree-Arbeitsmodells. Sie liegen bewusst im Repository,
+# damit der Editor sie mitbeobachtet; versioniert wird ihr Inhalt ueber ihre
+# eigenen Branches, nie ueber den Haupt-Checkout.
+/.claude/worktrees/
+
 # Wegwerf-Testkopie des Skills; die gepflegte Fassung liegt in chat-export/skills/
 /.claude/skills/chat-export/
 /.claude/test_chat_imports/
