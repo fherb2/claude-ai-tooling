@@ -55,7 +55,7 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 ## Stand und Offenes
 
-**Status:** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs. Der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben (25. August 2026). Die Erprobung im Betrieb steht noch aus — sie findet statt, während mit dem Skill gearbeitet wird.
+**Status:** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs. Der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben (25. August 2026). Die Erprobung im Betrieb läuft; die ersten Betriebsbefunde (Tabellenformat der Vorlage, Sollzahl zurückgestellter Funde) sind in den Regeltext eingearbeitet (25. August 2026).
 
 **Offen:**
 
