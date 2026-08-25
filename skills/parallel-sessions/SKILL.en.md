@@ -39,6 +39,8 @@ Four branch roles, whose concrete names `.claude/git-worktree-model.json` define
 git fetch origin
 # Integration branch up to date? Otherwise fast-forward first:
 git rev-list --count <integration>..origin/<integration>
+# Any orphaned workbenches lying around? (see below)
+git worktree list
 # Create workbench plus worktree (location from git-worktree-model.json):
 git worktree add <worktree-dir>/<topic> -b <workbench-prefix><topic> <integration>
 ```
@@ -52,6 +54,26 @@ git -C <worktree> restore --source=<infra> -- <infra-files>
 ```
 
 If it changes anything, report that to the user in one sentence; the changes ride along with the next checkpoint commit. After the sync, heed the session's then-valid CLAUDE.md.
+
+### Report orphaned workbenches
+
+A session ends, its worktree stays behind — nobody clears it away. Claude Code's own sweep touches only worktrees of subagents and background sessions and never the ones created with `--worktree` or by hand. So at session start check what `git worktree list` shows besides the main checkout and your own workbench, and **report every find** instead of passing over it. Two questions belong to each:
+
+```bash
+git -C <worktree> status --short          # unversioned or changed work?
+git log --oneline <integration>..<branch> # unmerged commits?
+```
+
+A clean working tree does **not** mean there is nothing to save: the work then sits in the branch. If anything there is unmerged, it comes before your own work — otherwise a later workbench touches the same files and the old work goes under in the squash. The user decides; remove worktree and branch only after their consent.
+
+### Working in the worktree — or from the main checkout
+
+Two ways lead into your own workbench, and they differ in what Claude Code enforces itself:
+
+- **Via absolute paths**, while the session stays in the main checkout. Nothing is enforced; only this skill's rules apply.
+- **With `EnterWorktree`** the session really moves in. The chat continues, only the transcript's storage follows the working directory. From then on Claude Code blocks every write into the main checkout, every redirect of Git into it (`git -C`, `--git-dir`, `GIT_DIR`, a preceding `cd`), and every command whose target it cannot verify — including heredocs with unquoted delimiters.
+
+The second way is the safer one, the first the more mobile. Whoever works isolated leaves the worktree with `ExitWorktree` before the squash merge: the merge happens in the main checkout and would otherwise be blocked.
 
 ### Continuing a workbench on another machine
 
@@ -104,12 +126,12 @@ Fixed checklist, in this order:
 1. **Infra sync**: `git diff <infra> -- <infra-files>` must be empty; otherwise `restore` — which also ends every experiment.
 2. **Experiment search**: `grep -rn "INFRA-EXPERIMENT" <worktree>` must be empty.
 3. **Fetch the integration state**: `git fetch`; if the integration branch has moved on, merge it into the workbench and resolve conflicts here — not only at squash time.
-4. **Propose the squash merge**; the user determines the commit text. Execution in the main checkout on the integration branch: `git merge --squash <workbench>`, then `git commit` **without `-a`** — committed is only what the squash put into the index, the user's unversioned hand work remains untouched. Show `git status` beforehand.
+4. **Propose the squash merge**; the user determines the commit text. If the session sits isolated in the worktree, `ExitWorktree` first — otherwise the main checkout is blocked. Execution in the main checkout on the integration branch: `git merge --squash <workbench>`, then `git commit` **without `-a`** — committed is only what the squash put into the index, the user's unversioned hand work remains untouched. Show `git status` beforehand.
 5. **Clean up** after consent: remove the worktree (`git worktree remove`), delete the workbench branch. For a follow-up task, derive freshly from the integration branch.
 
 ### Initial setup of the model
 
-Only at the user's explicit request, as a presented plan. Steps: settle the names (integration, release and infra branch, workbench prefix, storage location — as the storage location, absent any other instruction, the sibling folder `<repo>-worktrees` next to the repository is proposed, because it derives deterministically from the repo path on every machine) and fix the infra file list; create the integration branch if it does not exist; create the infra branch as an orphan (`git worktree add --orphan -b <infra> <tmp>`, requires Git >= 2.42) and take the infra files over via `git checkout <integration> -- <file…>`; write `.claude/git-worktree-model.json` with the fields above; check this skill's silent trigger in the project CLAUDE.md — which afterwards lives on the infra branch itself.
+Only at the user's explicit request, as a presented plan. Steps: settle the names (integration, release and infra branch, workbench prefix, storage location — as the storage location, absent any other instruction, `.claude/worktrees/` **inside** the repository is proposed: that is where Claude Code creates its own worktrees, moving there with `EnterWorktree` needs no separate approval, the path derives from the repo path on every machine, and above all the worktree then lies inside the folder the user's editor has open — outside it they cannot see the work. The folder belongs in the `.gitignore`, otherwise its content shows up as unversioned in the main checkout) and fix the infra file list; create the integration branch if it does not exist; create the infra branch as an orphan (`git worktree add --orphan -b <infra> <tmp>`, requires Git >= 2.42) and take the infra files over via `git checkout <integration> -- <file…>`; write `.claude/git-worktree-model.json` with the fields above; check this skill's silent trigger in the project CLAUDE.md — which afterwards lives on the infra branch itself.
 
 ## Approval tiers
 

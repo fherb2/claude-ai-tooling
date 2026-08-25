@@ -39,6 +39,8 @@ Vier Branch-Rollen, deren konkrete Namen `.claude/git-worktree-model.json` festl
 git fetch origin
 # Integrationsbranch aktuell? Sonst erst vorspulen (nur Fast-Forward):
 git rev-list --count <integration>..origin/<integration>
+# Liegen verwaiste Werkbaenke herum? (siehe unten)
+git worktree list
 # Werkbank samt Worktree anlegen (Ablageort aus git-worktree-model.json):
 git worktree add <worktree-dir>/<topic> -b <workbench-prefix><topic> <integration>
 ```
@@ -52,6 +54,26 @@ git -C <worktree> restore --source=<infra> -- <infra-files>
 ```
 
 Ändert er etwas, melde das dem Nutzer in einem Satz; die Änderungen wandern mit dem nächsten Checkpoint-Commit mit. Nach dem Abgleich die dann gültige CLAUDE.md der Sitzung beachten.
+
+### Verwaiste Werkbänke melden
+
+Eine Sitzung endet, ihr Worktree bleibt liegen — niemand räumt ihn weg. Claude Codes eigener Sweep fasst nur Worktrees von Subagenten und Hintergrundsitzungen an und rührt die per `--worktree` oder von Hand angelegten nie an. Prüfe deshalb zu Sitzungsbeginn, was `git worktree list` außer dem Haupt-Checkout und der eigenen Werkbank noch zeigt, und **melde jeden Fund**, statt ihn zu übergehen. Zu jedem gehören zwei Fragen:
+
+```bash
+git -C <worktree> status --short          # unversionierte oder geaenderte Arbeit?
+git log --oneline <integration>..<branch> # unverschmolzene Commits?
+```
+
+Ein sauberer Arbeitsbaum heißt **nicht**, dass nichts zu retten ist: Die Arbeit steckt dann im Branch. Ist dort etwas unverschmolzen, gehört es vor die eigene Arbeit — sonst fasst eine spätere Werkbank dieselben Dateien an und die alte Arbeit geht beim Squash unter. Entschieden wird das vom Nutzer; Worktree und Branch entfernst du erst nach seiner Zustimmung.
+
+### Im Worktree arbeiten — oder aus dem Haupt-Checkout heraus
+
+Zwei Wege führen in die eigene Werkbank, und sie unterscheiden sich darin, was Claude Code selbst durchsetzt:
+
+- **Über absolute Pfade**, während die Sitzung im Haupt-Checkout steht. Nichts wird erzwungen; es gelten allein die Regeln dieses Skills.
+- **Mit `EnterWorktree`** wechselt die Sitzung wirklich hinein. Der Chat läuft weiter, es wandert nur die Ablage des Transkripts mit dem Arbeitsverzeichnis. Ab dann blockiert Claude Code jede Schreiboperation in den Haupt-Checkout, jede Umleitung von Git dorthin (`git -C`, `--git-dir`, `GIT_DIR`, ein vorangestelltes `cd`) und jedes Kommando, dessen Ziel es nicht verifizieren kann — darunter Heredocs mit nicht gequoteten Begrenzern.
+
+Der zweite Weg ist der sicherere, der erste der beweglichere. Wer isoliert arbeitet, verlässt den Worktree vor dem Squash-Merge mit `ExitWorktree`: Der Merge findet im Haupt-Checkout statt und wäre sonst gesperrt.
 
 ### Werkbank auf anderem Rechner fortsetzen
 
@@ -104,12 +126,12 @@ Feste Checkliste, in dieser Reihenfolge:
 1. **Infra-Abgleich**: `git diff <infra> -- <infra-files>` muss leer sein; sonst `restore` — damit endet auch jedes Experiment.
 2. **Experiment-Suche**: `grep -rn "INFRA-EXPERIMENT" <worktree>` muss leer sein.
 3. **Integrationsstand holen**: `git fetch`; ist der Integrationsbranch weitergewandert, ihn in die Werkbank mergen und Konflikte hier auflösen — nicht erst beim Squash.
-4. **Squash-Merge vorschlagen**; den Commit-Text legt der Nutzer fest. Ausführung im Haupt-Checkout auf dem Integrationsbranch: `git merge --squash <workbench>`, dann `git commit` **ohne `-a`** — committet wird nur, was der Squash in den Index gelegt hat, unversionierte Handarbeit des Nutzers bleibt unberührt. Vorher `git status` zeigen.
+4. **Squash-Merge vorschlagen**; den Commit-Text legt der Nutzer fest. Steht die Sitzung isoliert im Worktree, zuerst `ExitWorktree` — sonst ist der Haupt-Checkout gesperrt. Ausführung im Haupt-Checkout auf dem Integrationsbranch: `git merge --squash <workbench>`, dann `git commit` **ohne `-a`** — committet wird nur, was der Squash in den Index gelegt hat, unversionierte Handarbeit des Nutzers bleibt unberührt. Vorher `git status` zeigen.
 5. **Aufräumen** nach Zustimmung: Worktree entfernen (`git worktree remove`), Werkbank-Branch löschen. Für eine Folgeaufgabe wird frisch vom Integrationsbranch abgeleitet.
 
 ### Ersteinrichtung des Modells
 
-Nur auf ausdrücklichen Wunsch des Nutzers, als vorgelegter Plan. Schritte: Namen klären (Integrations-, Release-, Infra-Branch, Werkbank-Präfix, Ablageort — als Ablageort wird ohne anderslautende Vorgabe der Geschwisterordner `<repo>-worktrees` neben dem Repository vorgeschlagen, weil er sich auf jedem Rechner deterministisch aus dem Repo-Pfad ergibt) und Infra-Dateiliste festlegen; Integrationsbranch anlegen, falls es ihn nicht gibt; Infra-Branch als orphan anlegen (`git worktree add --orphan -b <infra> <tmp>`, benötigt Git ≥ 2.42) und die Infra-Dateien per `git checkout <integration> -- <datei…>` übernehmen; `.claude/git-worktree-model.json` mit den Feldern von oben schreiben; den stillen Trigger dieses Skills in der Projekt-CLAUDE.md prüfen — die liegt danach selbst auf dem Infra-Branch.
+Nur auf ausdrücklichen Wunsch des Nutzers, als vorgelegter Plan. Schritte: Namen klären (Integrations-, Release-, Infra-Branch, Werkbank-Präfix, Ablageort — als Ablageort wird ohne anderslautende Vorgabe `.claude/worktrees/` **innerhalb** des Repositories vorgeschlagen: Dort legt auch Claude Code seine eigenen Worktrees an, ein Wechsel dorthin per `EnterWorktree` braucht keine gesonderte Freigabe, der Pfad ergibt sich auf jedem Rechner aus dem Repo-Pfad, und vor allem liegt der Worktree damit innerhalb des Ordners, den der Editor des Nutzers geöffnet hat — außerhalb sieht er die Arbeit nicht. Der Ordner gehört in die `.gitignore`, sonst erscheint sein Inhalt im Haupt-Checkout als unversioniert) und Infra-Dateiliste festlegen; Integrationsbranch anlegen, falls es ihn nicht gibt; Infra-Branch als orphan anlegen (`git worktree add --orphan -b <infra> <tmp>`, benötigt Git ≥ 2.42) und die Infra-Dateien per `git checkout <integration> -- <datei…>` übernehmen; `.claude/git-worktree-model.json` mit den Feldern von oben schreiben; den stillen Trigger dieses Skills in der Projekt-CLAUDE.md prüfen — die liegt danach selbst auf dem Infra-Branch.
 
 ## Freigabestufen
 
