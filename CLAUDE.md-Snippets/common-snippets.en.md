@@ -1,4 +1,12 @@
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-25*
+
+# Precedence of the instruction levels
+
+This file supplements the instruction file above it and overrides it wherever it contradicts it.
+
+A loaded skill governs the task it applies to and takes precedence there over a general instruction of this file. Where it contradicts a project-specific protective rule, this file holds — and the contradiction is named, not resolved silently.
+
+Reason: instruction files are concatenated, not weighed against each other, and where rules contradict each other one of them is otherwise picked arbitrarily (documented for Claude Code, [memory](https://code.claude.com/docs/en/memory)). Without this ruling, chance decides.
 
 # Languages
 
