@@ -179,6 +179,27 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 
 **Was für eine weitere Fassung spricht.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können — `skills/` unterliegt anders als `chat-export/` und `home-.claude-sharing/` keiner Weitergabebeschränkung. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
 
+### 5.2 Zweiteilung: dünne `SKILL.md`, nachgeladener Regelteil
+
+**Ein Skill, der nach dem Auslösen erst klärt, ob er überhaupt angewendet wird, trägt seine Regeln nicht in der `SKILL.md`.** Sie enthält dann nur dreierlei: den Geltungsbereich, die Klärung samt Absage, und die Anweisung, bei Zustimmung eine zweite Datei desselben Ordners zu lesen (`${CLAUDE_SKILL_DIR}/<datei>.md`). Alles Weitere steht in dieser zweiten Datei.
+
+Der Grund steckt im Ladeverhalten (1.2): Weitere Dateien im Skill-Ordner lädt Claude nur, wenn die `SKILL.md` ausdrücklich auf sie verweist — und was einmal geladen ist, bleibt für den Rest der Sitzung im Kontext. Ein Skill, der auf eine Lage auslöst, in der er oft doch nicht zum Zug kommt, schleppt seinen vollen Text sonst in jeder dieser Sitzungen mit, ohne je benutzt zu werden. Mit der Teilung kostet er dann nur die Klärungsseite.
+
+**Zwei Skills wären der falsche Weg** — sie müssten gemeinsam installiert werden, und 2.3 verbietet ohnehin, dass ein Skill auf einen anderen verweist. Die zweite Datei im selben Ordner löst beides.
+
+**Vorgeschlagen wird die Teilung, wenn beide Bedingungen zutreffen:**
+
+1. **Die Abwahl ist ein realistischer Ausgang** — der Skill löst auf eine Lage aus, die er nicht sicher trifft, und der Nutzer verneint die Anwendung erwartbar häufig.
+2. **Der Regelteil ist deutlich länger als die Klärung.**
+
+Trifft nur eines zu, bringt die Teilung nichts: Ein Skill, der immer gilt, sobald er auslöst, spart nichts, und ein kurzer Regelteil rechtfertigt den zusätzlichen Ladeschritt nicht. Entsteht ein neuer Skill oder wächst ein bestehender, wird diese Prüfung vorgenommen und die Teilung vorgeschlagen; entschieden wird sie vom Nutzer.
+
+**In der `SKILL.md` bleibt außerdem der Satz, der die Teilung begründet.** Ohne ihn liest sich die dünne Datei wie ein unfertiger Skill und wird beim nächsten Aufräumen wieder zusammengelegt.
+
+Die zweite Datei folgt der Sprachregel aus 5.1 wie die `SKILL` selbst und wandert bei der Installation in der gewählten Sprache mit.
+
+Prüfbar: Auf jede `SKILL.md`, die beide Bedingungen erfüllt und trotzdem ihren ganzen Regeltext trägt, lässt sich zeigen — das ist der Verstoß. Ebenso auf jede Zusatzdatei, auf die keine `SKILL.md` verweist: Sie wird nie geladen.
+
 ---
 
 ## 6 Die beiden README-Arten

@@ -2,7 +2,7 @@
   "integration_branch": "dev",
   "release_branch": "master",
   "workbench_prefix": "claude-wb/",
-  "worktree_dir": "../claude-ai-tooling-worktrees",
+  "worktree_dir": ".claude/worktrees",
   "infra_branch": "infra",
   "infra_files": [
     ".claude/CLAUDE.md",
