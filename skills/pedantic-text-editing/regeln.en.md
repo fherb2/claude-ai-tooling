@@ -95,6 +95,8 @@ It sits **next to the text file** and is called `editing-findings_<basename of t
 
 **The head stands above a `---` separator and carries the mandate** the findings came out of: which file was examined, which ruleset and variety applied, which classes were included — and explicitly **what was not examined**, such as substantive matters of fact under section 3. Below that, date and time. Only below the separator do the findings stand. The head is the part that later answers the question why a place did not catch anyone's eye back then; without it, that cannot be reconstructed.
 
+**Deferred findings from excluded classes** may be noted in the head — but only what caught the eye during the pass anyway: no separate search pass, **no target count**, zero is a normal result. Note them completely or not at all — a shortened list would look like an inventory it is not. (Three consecutive rounds with exactly two deferred findings each: a template carried forward, not an observation; seen on the live system, 25 August 2026.)
+
 One **block** per finding, not a table row. Reason: the text fragments must be exact to the character, and editors realign Markdown table rows on saving and eat whitespace doing it — a record that gets falsified unnoticed is no record. "Before" and "After" therefore sit in code blocks of their own, which preserve whitespace:
 
 ```markdown

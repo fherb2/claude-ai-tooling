@@ -95,6 +95,8 @@ Sie liegt **neben der Textdatei** und heißt `editing-findings_<basisname der te
 
 **Der Kopf steht vor einer Trennlinie `---` und trägt den Auftrag**, aus dem die Befunde hervorgegangen sind: welche Datei untersucht wurde, welches Regelwerk und welche Varietät galten, welche Klassen einbezogen waren — und ausdrücklich, **was nicht untersucht wurde**, etwa inhaltliche Sachfragen nach Abschnitt 3. Darunter Datum und Uhrzeit. Erst unter der Trennlinie stehen die Befunde. Der Kopf ist der Teil, der später die Frage beantwortet, warum eine Stelle damals nicht auffiel; ohne ihn ist das nicht mehr zu rekonstruieren.
 
+**Zurückgestellte Funde aus ausgeschlossenen Klassen** dürfen im Kopf notiert werden — aber nur, was beim Durchgang ohnehin aufgefallen ist: kein eigener Suchdurchgang, **keine Sollzahl**, null ist ein normales Ergebnis. Notiert wird vollständig oder gar nicht — eine gekürzte Liste sähe wie ein Inventar aus, das sie nicht ist. (Drei Runden in Folge mit exakt zwei zurückgestellten Funden: fortgeschriebene Vorlage statt Befund, beobachtet am laufenden System, 25. August 2026.)
+
 Je Fund ein **Block**, keine Tabellenzeile. Grund: Die Textstücke müssen zeichengenau sein, und Editoren richten Markdown-Tabellenzeilen beim Speichern neu aus und fressen dabei Leerraum — ein Nachweis, der unbemerkt verfälscht wird, ist keiner. „Vorher“ und „Nachher“ stehen deshalb in eigenen Codeblöcken, die den Leerraum bewahren:
 
 ```markdown
