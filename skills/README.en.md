@@ -14,6 +14,7 @@ Reusable skills for Claude Code, together with the triggers that fire them. This
 | [`common-code-generation/`](common-code-generation/README.en.md)<br>✅☑ | **General rules for the cooperation on, and the carrying out of, writing and changing code, apart from code style rules**: e.g. no unrequested extension of the functional scope, careful use of processing time and memory |
 | [`correct-zaaack-md-editor-mistakes/`](correct-zaaack-md-editor-mistakes/README.en.md)<br>✅☑ | **Finding and repairing damaged whitespace in Markdown tables** — spaces swallowed in front of inline code or bold text, and no-break spaces that defeat any search over the wording without being visible. Some WYSIWYG editors cause this on save. |
 | [`parallel-sessions/`](parallel-sessions/README.en.md)<br>✅☑ | **Several Claude sessions at the same time in the same repository, separated via Git worktrees** — one workbench in its own worktree per session, central files via an infra branch, completion by squash merge; without an agreed model, settling Git write authority remains as the fallback. |
+| [`pedantic-text-editing/`](pedantic-text-editing/README.en.md)<br>✅☑ | **Text editing with fidelity to detail** — every change presented individually for approval, not a character changed outside the approved spots, and afterwards the proof through the diff. For texts whose wording is itself the product; not for source code or documentation accompanying software. |
 | [`temp-debug-code/`](temp-debug-code/README.en.md)<br>✅☑ | **Unambiguous marking of code added or changed for an ongoing debugging session only** — not for debug code meant to stay in the source permanently.                                                                                               |
 | [`tiefen-recherche/`](tiefen-recherche/README.en.md)<br>✅☑ | **Thorough source and literature research that does not give up too early** — systematic variation of search terms, channels and search levels, mandatory verification of every search summary, and instead of "nothing found" a report on the search paths still open. |
 
@@ -71,13 +72,7 @@ Three rules — two of them from measurements rather than taste, the third from 
 
 ## 4 Open points of the project
 
-What is open on an individual skill is stated in that skill's own `README.md` in its folder.
-
-Open across the project as a whole is:
-
-- Reorganizing the working instructions into skill homes (working model: `implementation_doku.md`, chapter 8).
-
-**Next step (plan, not yet executed):** The items of the instruction inventory (T1–T27; kept in a temporary working folder that will be removed once this is done) are assigned one by one. Claude hands them over pre-sorted — bundled by proposed skill home, each item with its origin, its variants, and a scope proposal per chapter 8.3 of `implementation_doku.md` (coding only / all kinds of work / other) — and the developer decides or confirms each assignment. The yardstick for the distribution is the working model in chapter 8.2. The confirmed list of homes is then written into `implementation_doku.md`; only after that does the writing of the individual skills begin.
+The upcoming steps and their order are kept in the **[roadmap](fahrplan.md)** (in German). What is finished on an individual skill — and what is planned there but not yet on the agenda — is stated in that skill's own `README.md` in its folder.
 
 ## License
 

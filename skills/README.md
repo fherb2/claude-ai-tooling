@@ -14,6 +14,7 @@ Wiederverwendbare Skills für Claude Code, samt der Trigger, die sie auslösen. 
 | [`common-code-generation/`](common-code-generation/README.md)<br>✅☑ | **Allgemeine Regeln der Zusammenarbeit und Ausführung des Erzeugens und Änderns von Code abseits von Code-Style-Regeln**: z.B.: kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher                                                                                                             |
 | [`correct-zaaack-md-editor-mistakes/`](correct-zaaack-md-editor-mistakes/README.md)<br>✅☑ | **Beschädigten Leerraum in Markdown-Tabellen finden und beheben** — gefressene Leerzeichen vor Inline-Code oder Fettdruck und geschützte Leerzeichen, die jede Suche über den Wortlaut brechen, ohne sichtbar zu sein. Manche WYSIWYG-Editoren richten das beim Speichern an. |
 | [`parallel-sessions/`](parallel-sessions/README.md)<br>✅☑ | **Mehrere Claude-Sitzungen gleichzeitig im selben Repository, getrennt über Git-Worktrees** — je Sitzung eine eigene Werkbank im eigenen Worktree, zentrale Dateien über einen Infra-Branch, Abschluss per Squash-Merge; ohne vereinbartes Modell als Rückfallweg die Klärung der Git-Schreibhoheit. |
+| [`pedantic-text-editing/`](pedantic-text-editing/README.md)<br>✅☑ | **Textbearbeitung mit Detailtreue** — jede Änderung einzeln zur Freigabe, außerhalb der freigegebenen Stellen kein geändertes Zeichen, und hinterher der Nachweis über den Diff. Für Texte, deren Wortlaut selbst das Produkt ist; nicht für Quellcode und softwarebegleitende Dokumentation. |
 | [`temp-debug-code/`](temp-debug-code/README.md)<br>✅☑               | **Eindeutige Kennzeichnung von Code, der nur für einen laufenden Debugging-Vorgang zugefügt oder geändert wird** — nicht für Debug-Code, der dauerhaft im Quelltext bleiben soll.                                                                                                                                                 |
 | [`tiefen-recherche/`](tiefen-recherche/README.md)<br>✅☑ | **Gründliche Quellen- und Literaturrecherche, die nicht zu früh aufgibt** — systematischer Wechsel von Suchbegriffen, Kanälen und Suchebenen, Verifikationspflicht für jede Suchzusammenfassung, und statt „nichts gefunden" ein Bericht über die noch offenen Suchwege. |
 
@@ -71,13 +72,7 @@ Drei Regeln — zwei davon aus Messungen und nicht aus Geschmack, die dritte aus
 
 ## 4 Offene Punkte des Vorhabens
 
-Was an einem einzelnen Skill offen ist, steht in dessen eigener `README.md` im Skill-Ordner.
-
-Übergreifend offen ist:
-
-- Die Neuordnung der Arbeitsanweisungen zu Skill-Zuhausen (Arbeitsmodell: `implementation_doku.md`, Kapitel 8).
-
-**Nächster Schritt (Plan, noch nicht ausgeführt):** Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner, der nach Abschluss entfällt) werden einzeln zugeordnet. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `implementation_doku.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `implementation_doku.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
+Die anstehenden Schritte samt ihrer Reihenfolge stehen im **[Fahrplan](fahrplan.md)**. Was an einem einzelnen Skill fertig ist — und was dort zwar geplant, aber noch nicht auf der Tagesordnung ist —, steht in dessen eigener `README.md` im Skill-Ordner.
 
 ## Lizenz
 
