@@ -8,10 +8,6 @@ Eine `status.md` führt dieses Vorhaben nicht.
 
 Die Reihenfolge ist ab Schritt 4 nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
-## 1 Durchsicht des Regeltextes von `pedantic-text-editing`
-
-Läuft. Der Skill liegt auf der Werkbank `claude-wb/pedantic-text-editing`, noch nicht auf `dev`. Der ausdetaillierte Plan des Schrittes steht dort unter „Offen" in `skills/🚧_pedantic-text-editing/README.md`, weil er den Inhalt des Skills betrifft und mit ihm zusammen übernommen wird. Nach der Durchsicht: beide Sprachfassungen nachziehen, `ziel.md` entfernen, stillen Trigger schreiben, Baustellenschild entfernen.
-
 ## 2 Zweiteilung nachziehen
 
 Ergebnis der Durchsicht vom 25. August 2026: Alle zehn Skills des Repos wurden gegen Kapitel 5.2 der Vorgaben geprüft. Ein Skill ist ein klarer Fall, drei brauchen eine Reaktion anderer Art.
@@ -60,3 +56,9 @@ Der Skill bleibt dabei **benutzbar** — beide Punkte betreffen die Absicherung,
 
 - Die Wirksamkeit des Selbsttests nachmessen. Der passende Prüffall: eine Wiederholung der Sammelrecherche mit anschließendem Abgleich aller Links gegen die tatsächlich abgerufenen Seiten.
 - Den claude.ai-Zweig der Ergebnisübergabe (automatisches Artefakt) dort erproben.
+
+## 10 `pedantic-text-editing`: stillen Trigger schreiben
+
+Es fehlen `CLAUDE-snippet.de.md` und `CLAUDE-snippet.en.md`. Der Anker liegt am frühestmöglichen Moment — bevor in einer Sitzung zum ersten Mal ein Text geändert wird, dessen Wortlaut selbst das Produkt ist. Nicht erst beim Vorschlagen einer Korrektur: Der Skillkörper wird nach dem Laden nicht neu gelesen, ein später greifender Trigger rettet also keine Entscheidung, die vorher gefallen ist. Der Skill ist ohne den Trigger benutzbar, er löst dann über seine `description` aus oder wird ausdrücklich aufgerufen.
+
+Die Nacharbeit aus dem Betrieb — ob Rundengröße, Ausschnittlängen und die Form der Vorlage in der Praxis tragen — steht bewusst **nicht** hier, sondern in der README des Skills: Sie ist noch kein Schritt, sondern eine Beobachtungsaufgabe.
