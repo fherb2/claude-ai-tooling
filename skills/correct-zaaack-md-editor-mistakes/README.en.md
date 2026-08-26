@@ -1,6 +1,6 @@
 # correct-zaaack-md-editor-mistakes — find and repair damaged whitespace in Markdown tables
 
-*Last updated: 2026-08-25*
+*Last updated: 2026-08-26*
 
 *[Deutsche Fassung](README.md)*
 
@@ -179,6 +179,8 @@ A side finding that confirms the limit of the authorization: in the effective ve
 ## Status and open points
 
 **Status.** Finished and usable. Tools verified, skill text and silent trigger written out, frontmatter set, both language versions present.
+
+**Split checked and rejected** (25 August 2026). The division into a thin `SKILL.md` and a rules file loaded on demand (guidelines, chapter 5.2) fails here on the third condition: whether a project is affected only shows after a run of the tools, and their description is the rules part — the clarification would have to load it anyway.
 
 **Open:**
 
