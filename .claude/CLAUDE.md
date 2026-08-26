@@ -31,6 +31,23 @@ verschwunden. Was ein einzelnes Vorhaben dauerhaft binden soll, steht
 deshalb in seiner Doku oder README — nicht in einer Datei, die mit dem Ende
 der Entwicklung entfällt (siehe unten).
 
+# Dateinamen sind englisch
+
+Was für den Nutzer da ist, trägt englische Dateinamen; die Arbeitssprache
+der Inhalte bleibt davon unberührt Deutsch. Ein Sprachkürzel wie `.de.md`
+kennzeichnet eine Sprachfassung und ist kein Verstoß. Ausgenommen sind
+Entwicklungs- und Verwaltungsdateien (`fahrplan.md`, `status.md`,
+`noch-geplant.md` u. Ä.) — international sein muss, was für den Nutzer da
+ist, nicht die Projektverwaltung (Festlegung des Entwicklers vom
+26. August 2026, Abschluss von Fahrplanschritt 11 in `skills/`).
+
+Zwei Präzisierungen: Bei Skill-Ordnern ist der Name die Schnittstelle —
+Ordnername, Frontmatter-Feld `name` und Slash-Aufruf sind dasselbe; eine
+Umbenennung ändert das Verhalten jeder installierten Kopie und wird
+einzeln entschieden. Und Laufzeitmeldungen an den Entwickler dürfen
+deutsch bleiben, wo der Bereich das mit Begründung festgelegt hat
+(belegt: home-sharing, Sprachfestlegung 2.5, suchbare Journal-Anlässe).
+
 # Datumszeilen in READMEs und CLAUDE-Snippets
 
 Jede README dieses Repos (deutsch wie englisch, von der Top-Level-README
