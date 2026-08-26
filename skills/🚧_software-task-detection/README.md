@@ -1,4 +1,4 @@
-# 🚧 softwareaufgabe-erkennen — Idee, noch kein Skill
+# 🚧 software-task-detection — Idee, noch kein Skill
 
 *Stand: 2026-08-25*
 

@@ -59,7 +59,7 @@ Roughly in the order the checks appear:
   flat ``text``, an ``index`` per message), because handing it the archive's
   own objects would prove nothing but that unwrapping works.
 * **A project with zero chats** -- writes a protocol instead of aborting.
-  Found live against a real team account (``chrome-zugriff.md``, Stufe 7).
+  Found live against a real team account (``chrome-access.de.md``, Stufe 7).
 """
 
 import io
@@ -74,7 +74,7 @@ import zipfile
 _HERE = os.path.dirname(os.path.abspath(__file__))
 # The converter lives with the skill, not under source/: it is the one script
 # the skill ships, and the skill folder carries exactly the structure it will
-# have at its destination (skills/implementation_doku.md 1.1). One maintained copy,
+# have at its destination (skills/implementation-doc.md 1.1). One maintained copy,
 # so nothing can drift.
 SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
 sys.path.insert(0, SOURCE_DIR)
@@ -1666,7 +1666,7 @@ check("list refuses to run without --map or --web",
 
 # A genuinely empty project -- a source was given, it just carries no chats --
 # has to write a protocol, not abort. Found live against a real team account
-# with a project that had a chat count of zero (chrome-zugriff.md, Stufe 7).
+# with a project that had a chat count of zero (chrome-access.de.md, Stufe 7).
 EMPTY_BUNDLE = os.path.join(WORK, "leer-bundle.json")
 with open(EMPTY_BUNDLE, "w", encoding="utf-8") as handle:
     json.dump({"fetched_at": "2026-08-21T00:00:00Z", "organization": "org-1",

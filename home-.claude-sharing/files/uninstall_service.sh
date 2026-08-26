@@ -9,7 +9,7 @@
 # leaves the folder, the state file and the working instruction untouched:
 # this unregisters the service, it does not uninstall the project. To get rid
 # of everything, delete ~/.claude-sync-watch afterwards by hand
-# (implementierungs_doku.md, 3.5).
+# (implementation-doc.md, 3.5).
 #
 # Nothing in the synchronised directory is touched either way.
 

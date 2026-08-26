@@ -1,12 +1,12 @@
 # Fahrplan: Syncthing-Sync für `~/.claude`
 
-Reine Abfolge der Arbeitsschritte, keine Inhalte. Details zu jedem Schritt stehen in `implementierungs_doku.md` (Kapitelverweise unten). Abgeschlossene Schritte werden aus dieser Liste vollständig entfernt, nicht nur markiert; sie erscheinen danach als Zeile in `status.md`.
+Reine Abfolge der Arbeitsschritte, keine Inhalte. Details zu jedem Schritt stehen in `implementation-doc.md` (Kapitelverweise unten). Abgeschlossene Schritte werden aus dieser Liste vollständig entfernt, nicht nur markiert; sie erscheinen danach als Zeile in `status.md`.
 
 **Die Liste steht in der Reihenfolge der Dringlichkeit, nicht der Nummern.** Die Nummer ist eine gleichbleibende Referenz, damit ein Rückblick auf „Schritt 5" eindeutig bleibt — sie sagt nichts über die Reihenfolge und nichts über das Alter. Sortiert ist nach der Frage, was Schaden anrichtet, wenn es liegen bleibt: Zuerst das Betriebsrisiko (10, dann 4 mit den beiden riskanten Teilpunkten aus 3), zuletzt Ordnung und Ausbau (5, 2, 6). Die Begründung je Schritt steht dort, wo er steht.
 
 Der Mechanismus selbst ist fertig und seit dem 11. August 2026 auf beiden Rechnern im Betrieb. Die Dokumentation ist in sich geprüft, der Abgleich der Doku gegen den Code hat stattgefunden, und **seine 33 Befunde sind seit dem 22. August 2026 vollständig abgearbeitet** (Anhang B der Doku, Zeile dazu in `status.md`). Was folgt, ist zweierlei: **zuerst noch Nachbesserung** — die Korrekturen sind geschrieben, aber auf FWFE41 nicht ausgerollt (Schritt 10), ein geparkter Fall ist ungelöst (Schritt 4), eine Prüfung fehlt (Schritt 3) —, **danach Ausbau**: Anwenderdokumentation, Ordnung unter `~/.claude`, Windows.
 
-Wie Befundlisten abgearbeitet werden, wo ein Plan steht und wie ein Review nachbearbeitet wird, steht repo-weit in `.claude/CLAUDE.md` — ebenso die Regel, dass Nummern beim Streichen erledigter Schritte nicht neu vergeben werden. **Für dieses Vorhaben heißt das:** Der Review und seine Bearbeitung liegen in `implementierungs_doku.md`, Anhang B; ein Schritt, der kein Review-Befund ist, wird hier im Fahrplan ausdetailliert, sobald er ansteht.
+Wie Befundlisten abgearbeitet werden, wo ein Plan steht und wie ein Review nachbearbeitet wird, steht repo-weit in `.claude/CLAUDE.md` — ebenso die Regel, dass Nummern beim Streichen erledigter Schritte nicht neu vergeben werden. **Für dieses Vorhaben heißt das:** Der Review und seine Bearbeitung liegen in `implementation-doc.md`, Anhang B; ein Schritt, der kein Review-Befund ist, wird hier im Fahrplan ausdetailliert, sobald er ansteht.
 
 ## Schritte
 

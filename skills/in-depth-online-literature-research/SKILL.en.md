@@ -1,6 +1,6 @@
 ---
-name: tiefen-recherche
-description: Thorough source and literature research on the web that does not stop at the first failure — systematically varies search terms, channels and levels (registers, catalogues, following authors), checks every search summary against the primary source, and reports the search paths still open instead of "nothing found". Use as soon as something is to be researched, substantiated or found again — a literature source, a fact, a document — and the first search hits do not answer the question, or when the user invokes /tiefen-recherche.
+name: in-depth-online-literature-research
+description: Thorough source and literature research on the web that does not stop at the first failure — systematically varies search terms, channels and levels (registers, catalogues, following authors), checks every search summary against the primary source, and reports the search paths still open instead of "nothing found". Use as soon as something is to be researched, substantiated or found again — a literature source, a fact, a document — and the first search hits do not answer the question, or when the user invokes /in-depth-online-literature-research.
 license: CC0-1.0
 ---
 

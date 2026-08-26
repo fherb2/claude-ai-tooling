@@ -101,7 +101,7 @@ vollständig — nicht nur die Sektion, die zur Aufgabe gehört.
 Der Grund steckt in der Natur dieser Vorgaben: Sie halten fest, was man der
 einzelnen Datei nicht ansieht. Dass etwa die `description` eines Skills
 gegen eine Vorgabe verstößt, erkennt man nicht beim Lesen der `SKILL.md`,
-sondern nur gegen `skills/implementation_doku.md`. Wer die Vorgaben nicht kennt,
+sondern nur gegen `skills/implementation-doc.md`. Wer die Vorgaben nicht kennt,
 schreibt den Verstoß gutgläubig hin — und der nächste Review meldet ihn zu
 Recht.
 
@@ -246,7 +246,7 @@ gesagt, statt es liegenzulassen.
 Entsteht in `skills/` ein neuer Skill oder wächst ein bestehender, prüfe, ob
 sein Regelteil aus der `SKILL.md` heraus in eine nachgeladene Datei desselben
 Ordners gehört, und schlage die Teilung vor. Wann sie sich lohnt und wie sie
-gebaut wird, steht in `skills/implementation_doku.md`, Kapitel 5.2 — hier
+gebaut wird, steht in `skills/implementation-doc.md`, Kapitel 5.2 — hier
 absichtlich kein zweites Mal.
 
 # Baustellenschilder in Ordnernamen

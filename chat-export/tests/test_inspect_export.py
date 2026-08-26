@@ -34,7 +34,7 @@ WHAT IS COVERED
 * **``attachments`` with content, reported separately from name-only ``files``
   references** -- the distinction that decides how much an archive can keep.
 * **The union of all conversation, message and block keys** -- this is the
-  schema watch proper, to be held against ``implementation_doku.md`` 3.1.1. A
+  schema watch proper, to be held against ``implementation-doc.md`` 3.1.1. A
   *missing* name is the warning sign; a new one is usually just an extension.
 """
 

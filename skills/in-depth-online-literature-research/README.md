@@ -1,6 +1,6 @@
-# tiefen-recherche — Recherche, die nicht zu früh aufgibt
+# in-depth-online-literature-research — Recherche, die nicht zu früh aufgibt
 
-*Stand: 2026-08-25*
+*Stand: 2026-08-26*
 
 **✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Kein stiller Trigger nötig (Begründung unter „Details").
 
@@ -18,10 +18,10 @@ Der Skill gilt für **jede Art von Recherche** — Literatur, Fakten, Dokumente,
 
    | Ort         | Pfad                                   | Gilt für                  |
    | ----------- | -------------------------------------- | ------------------------- |
-   | Persönlich  | `~/.claude/skills/tiefen-recherche/`   | alle Projekte des Nutzers |
-   | Projekt     | `.claude/skills/tiefen-recherche/`     | nur dieses Projekt        |
+   | Persönlich  | `~/.claude/skills/in-depth-online-literature-research/`   | alle Projekte des Nutzers |
+   | Projekt     | `.claude/skills/in-depth-online-literature-research/`     | nur dieses Projekt        |
 
-2. **Eine Sprachversion des Ordners `tiefen-recherche/` kopieren.** Die `SKILL` liegt zweimal vor — `SKILL.de.md` und `SKILL.en.md`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeile zeigt später, von welchem Stand die Installation ist.
+2. **Eine Sprachversion des Ordners `in-depth-online-literature-research/` kopieren.** Die `SKILL` liegt zweimal vor — `SKILL.de.md` und `SKILL.en.md`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeile zeigt später, von welchem Stand die Installation ist.
 
 Der Skill wirkt auch in claude.ai und im Claude-Desktop: Dieselbe `SKILL.md` läuft in jedem Claude-Produkt, in das sie eingebunden wird. Die Quellenkarte entfällt dort, wo kein Dateizugriff besteht.
 
