@@ -60,7 +60,7 @@ from typing import Any
 
 SCHEMA_VERSION       = 1
 
-STATE_FILENAME       = "protokoll.json"
+STATE_FILENAME       = "protocol.json"
 
 PROTOCOL_VERSION     = 1
 

@@ -116,7 +116,7 @@ assistant produced -- artifacts, generated files, code edits) whenever a chat
 has any. All three are linked back to the conversation file by message UUID,
 never by position, because branches make positional linking wrong.
 
-**``protokoll.json`` is the one file that survives between runs.** It carries,
+**``protocol.json`` is the one file that survives between runs.** It carries,
 per chat: status, timestamps, and the file names ``convert`` wrote for it, so a
 second run knows what to replace instead of duplicating. Two fields exist only
 to answer "how far back must the next export reach": ``created_after``, set the
@@ -202,7 +202,7 @@ TEXT_BLOCK_TYPES = ("text",)
 # ``thinking_hidden`` are empty outright.
 THINKING_MIN_CHARS = 200
 
-PROTOCOL_FILENAME  = "protokoll.json"
+PROTOCOL_FILENAME  = "protocol.json"
 PROTOCOL_VERSION   = 1
 
 # What ``attachment_label`` puts in front of a stand-in built from the file type
@@ -1392,7 +1392,7 @@ def instruction_block(target: str, out_dir: str, protocol: dict[str, Any]) -> st
                for suffix, _ in FILE_KIND_WORDS if name.endswith(suffix)}
     parts = ["eine JSON-Datei je Chat mit den Redebeiträgen"]
     parts += [words for suffix, words in FILE_KIND_WORDS if suffix in present]
-    files = ", ".join(parts) + (". Die Datei `protokoll.json` sagt, welche "
+    files = ", ".join(parts) + (". Die Datei `protocol.json` sagt, welche "
                                 "Chats vorliegen und auf welchem Stand.")
     text = INSTRUCTION_BLOCKS[target].format(where=out_dir, files=files)
     # Rewrapped paragraph by paragraph, because the substitutions make the

@@ -84,7 +84,7 @@ def parser_symbols(path: str) -> tuple[list[str], list[str]]:
 
 REQUIRED_CONCEPTS = {
     "chat_export_convert.py": [
-        "attachments", "creations", "thinking", "protokoll.json",
+        "attachments", "creations", "thinking", "protocol.json",
         "window_start", "MAPPING_PROMPT", "INSTRUCTION_BLOCKS",
         "VANISHED_NOTE",
         "load_bundle", "bundle_records", "bundle_conversations",

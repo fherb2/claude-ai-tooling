@@ -355,8 +355,8 @@ check("only the fields that depend on the route differ",
 # ---------------------------------------------------------------------------
 
 def load_protocol(directory):
-    """Read the protokoll.json a route wrote."""
-    with open(os.path.join(directory, "protokoll.json"),
+    """Read the protocol.json a route wrote."""
+    with open(os.path.join(directory, "protocol.json"),
               "r", encoding="utf-8") as handle:
         return json.load(handle)
 
@@ -364,9 +364,9 @@ def load_protocol(directory):
 protocol_zip = load_protocol(out_export)
 protocol_read = load_protocol(out_read)
 
-check("both routes write a file named protokoll.json",
-      os.path.exists(os.path.join(out_export, "protokoll.json"))
-      and os.path.exists(os.path.join(out_read, "protokoll.json")))
+check("both routes write a file named protocol.json",
+      os.path.exists(os.path.join(out_export, "protocol.json"))
+      and os.path.exists(os.path.join(out_read, "protocol.json")))
 check("the protocols carry the same top-level keys",
       set(protocol_zip) == set(protocol_read),
       f"{sorted(protocol_zip)} vs {sorted(protocol_read)}")
