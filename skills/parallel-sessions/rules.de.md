@@ -73,6 +73,7 @@ git worktree add <worktree-dir>/<topic> <workbench>
 
 - Nach jedem abgeschlossenen Arbeitsschritt ein **Checkpoint-Commit** im eigenen Worktree, ohne Nachfrage. Er umfasst den ganzen Baum des Worktrees — der enthält nur die eigene Arbeit.
 - Kein Kommando, das fremde Worktrees, fremde Branches oder den Haupt-Checkout verändert.
+- **Kommandoketten verlassen sich nie auf ein fortwirkendes `cd`.** Jedes Git-Kommando adressiert sein Ziel selbst — `git -C <worktree>` für die Werkbank, `git -C <haupt-checkout>` für den Squash. Und kein Kommando läuft mit Arbeitsverzeichnis in einem Worktree, der im selben Zug entfernt wird.
 - `push` der Werkbank nur nach Zustimmung im Einzelfall.
 
 ### Zentrale Dateien ändern (Infra)
@@ -104,7 +105,7 @@ Feste Checkliste, in dieser Reihenfolge:
 1. **Infra-Abgleich**: `git diff <infra> -- <infra-files>` muss leer sein; sonst `restore` — damit endet auch jedes Experiment.
 2. **Experiment-Suche**: `grep -rn "INFRA-EXPERIMENT" <worktree>` muss leer sein.
 3. **Integrationsstand holen**: `git fetch`; ist der Integrationsbranch weitergewandert, ihn in die Werkbank mergen und Konflikte hier auflösen — nicht erst beim Squash.
-4. **Squash-Merge vorschlagen**; den Commit-Text legt der Nutzer fest. Steht die Sitzung isoliert im Worktree, zuerst `ExitWorktree` — sonst ist der Haupt-Checkout gesperrt. Ausführung im Haupt-Checkout auf dem Integrationsbranch: `git merge --squash <workbench>`, dann `git commit` **ohne `-a`** — committet wird nur, was der Squash in den Index gelegt hat, unversionierte Handarbeit des Nutzers bleibt unberührt. Vorher `git status` zeigen.
+4. **Squash-Merge vorschlagen**; den Commit-Text legt der Nutzer fest. Steht die Sitzung isoliert im Worktree, zuerst `ExitWorktree` — sonst ist der Haupt-Checkout gesperrt. Ausführung im Haupt-Checkout auf dem Integrationsbranch, **ausdrücklich dorthin adressiert** (`git -C <haupt-checkout>`), nie über das Arbeitsverzeichnis einer laufenden Kette — ein `cd` aus einem früheren Kettenglied wirkt fort, und ein Squash im Worktree der Werkbank merged den Branch in sich selbst: „nichts zu committen", die Kette bricht mitten im Ablauf ab (viermal an einem Tag beobachtet, 26. August 2026). Also: `git -C <haupt-checkout> merge --squash <workbench>`, dann dort `git commit` **ohne `-a`** — committet wird nur, was der Squash in den Index gelegt hat, unversionierte Handarbeit des Nutzers bleibt unberührt. Vorher `git status` zeigen.
 5. **Aufräumen** nach Zustimmung: Worktree entfernen (`git worktree remove`), Werkbank-Branch löschen. Für eine Folgeaufgabe wird frisch vom Integrationsbranch abgeleitet.
 
 ### Ersteinrichtung des Modells
