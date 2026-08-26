@@ -4,7 +4,7 @@ Dieses Dokument ist die Konzeption des Vorhabens und wird mit Beginn der Impleme
 
 Es gilt die Prosa-Code-Grenze: Dieses Dokument enthält keinen Implementierungscode. Kommandos, Dialogtexte und Dateinamen sind Schnittstellen-Fakten; endgültig beschlossene Funktionssignaturen werden erst nach ihrer Festlegung hier eingetragen — derzeit gibt es keine.
 
-Arbeitsregeln der Entwicklung: Geschrieben wird ausschließlich im Arbeitsordner des Vorhabens (`home-.claude-sharing/` im Git-Repository `claude-ai-tooling`). Das reale `~/.claude` verändert im Normalbetrieb nur Syncthing; Entwicklungs- und Funktionstests laufen gegen eigene Testordner, nie gegen `~/.claude` (siehe 3.8). Aussagen, die noch nicht geklärt sind, tragen die Markierung **Offen** oder stehen als Frage im Anhang. Die Einrichtung von Server und Geräten ist nicht Teil dieses Dokuments — sie steht in der fortbestehenden `Syncthing-Synology-Konfigurationsanleitung-allgemein.md`.
+Arbeitsregeln der Entwicklung: Geschrieben wird ausschließlich im Arbeitsordner des Vorhabens (`home-.claude-sharing/` im Git-Repository `claude-ai-tooling`). Das reale `~/.claude` verändert im Normalbetrieb nur Syncthing; Entwicklungs- und Funktionstests laufen gegen eigene Testordner, nie gegen `~/.claude` (siehe 3.8). Aussagen, die noch nicht geklärt sind, tragen die Markierung **Offen** oder stehen als Frage im Anhang. Die Einrichtung von Server und Geräten ist nicht Teil dieses Dokuments — sie steht in der fortbestehenden `syncthing-synology-setup-guide.md`.
 
 ---
 
@@ -24,7 +24,7 @@ Die Synchronisation selbst leistet Syncthing vollständig und ereignisgesteuert 
 
 Drei Geräte in Sterntopologie: Die **Synology** als beispielhafter Sync-Server, über den sich die betreffenden Clients synchronisieren, trägt den dauerhaft laufenden Vermittlungsknoten (Installation als SynoCommunity-Paket) mit einer vollständigen Kopie des Ordners. In unserem Beispiel kennen **Rechner A** (Laptop im Home-Office) und **Rechner B** (Büro-Rechner) jeweils nur die Synology, nicht einander; sie müssen nie gleichzeitig eingeschaltet sein — der Datenfluss ist A → Synology → B und umgekehrt. (Server auf Synology: Die Option „Introducer" bleibt überall aus, damit der Knoten die Rechner einander nicht bekannt macht.)
 
-Einrichtung, Ports, Rechte und Betriebsdetails des Knotens: siehe `Syncthing-Synology-Konfigurationsanleitung-allgemein.md`. Dieses Dokument setzt eine danach eingerichtete Umgebung voraus.
+Einrichtung, Ports, Rechte und Betriebsdetails des Knotens: siehe `syncthing-synology-setup-guide.md`. Dieses Dokument setzt eine danach eingerichtete Umgebung voraus.
 
 ## 1.3 Was mitwandert — und was nicht
 
@@ -872,7 +872,7 @@ Erste Befunde aus dem Betrieb, bevor die Wochen gezählt sind: Bei der Erstverbi
 
 # Anhang B: Reviews und ihre Bearbeitung
 
-Dieser Anhang ist Anhang B dieser Doku und bewusst **keine** eigene Datei: Eine Aufspaltung wäre nur mit numerischen Präfixen robust — die Locale-Kollation sortiert `implementierungs_doku_anhang.md` sonst **vor** `implementierungs_doku.md`, das Verketten ergäbe den Anhang vor Kapitel 1 —, und dafür müsste der Hauptdateiname geändert werden, auf den elf Stellen in neun Dateien verweisen, darunter drei Codedateien. Der Preis übersteigt den Gewinn (Arbeitsanweisungen §2.3 lässt beides zu).
+Dieser Anhang ist Anhang B dieser Doku und bewusst **keine** eigene Datei: Eine Aufspaltung wäre nur mit numerischen Präfixen robust — die Locale-Kollation sortiert `implementation-doc-appendix.md` sonst **vor** `implementation-doc.md`, das Verketten ergäbe den Anhang vor Kapitel 1 —, und dafür müsste der Hauptdateiname geändert werden, auf den elf Stellen in neun Dateien verweisen, darunter drei Codedateien. Der Preis übersteigt den Gewinn (Arbeitsanweisungen §2.3 lässt beides zu).
 
 **Was hier steht und was nicht.** In die Kapitel 1 bis 3 gehört, was man zum **Ändern** des Codes braucht — einschließlich der Messwerte, an denen eine Festlegung hängt. Hierher gehört, was man zum **Beurteilen der Bearbeitung** braucht: verworfene Wege, Bewertungen, der Verlauf. Für die Dokumentation ist das uninteressant, für das Verständnis des Programms unnötig — für einen Reviewer ist es die Wissensbasis, mit der er Eigenheiten im Code nachvollziehen kann, statt sie erneut zu melden.
 

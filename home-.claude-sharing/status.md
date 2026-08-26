@@ -1,8 +1,8 @@
 # Status: abgearbeitete Fahrplanschritte
 
-Ausschließlich erledigte Fahrplaneinträge, in der Reihenfolge des Abschlusses. Hier stehen **keine** Entscheidungen — die gehören sofort in das zuständige Kapitel von `implementierungs_doku.md`.
+Ausschließlich erledigte Fahrplaneinträge, in der Reihenfolge des Abschlusses. Hier stehen **keine** Entscheidungen — die gehören sofort in das zuständige Kapitel von `implementation-doc.md`.
 
-- **Abgleich von `~/.claude` eingerichtet** — über einen dauerhaft laufenden Vermittlungsknoten, ohne dass die beteiligten Rechner sich sehen oder gleichzeitig eingeschaltet sein müssen. Einrichtung des Knotens und der Clients in `Syncthing-Synology-Konfigurationsanleitung-allgemein.md`.
+- **Abgleich von `~/.claude` eingerichtet** — über einen dauerhaft laufenden Vermittlungsknoten, ohne dass die beteiligten Rechner sich sehen oder gleichzeitig eingeschaltet sein müssen. Einrichtung des Knotens und der Clients in `syncthing-synology-setup-guide.md`.
 
 - **Ausschlussliste `.stignore` erstellt und wirksam belegt** — Zugangsdaten sind im Index von Syncthing nachweislich nicht vorhanden, die Gegenprobe an derselben Freigabe zeigt reguläre Dateien als abgeglichen (Belege in 3.8, T5).
 
