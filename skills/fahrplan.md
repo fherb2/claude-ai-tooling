@@ -14,6 +14,8 @@ Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeit
 
 Damit erledigt sich zugleich der übergreifend offene Punkt „Neuordnung der Arbeitsanweisungen zu Skill-Zuhausen“.
 
+**Der Schritt ist größer als sein ursprünglicher Zuschnitt und wird bei Beginn untergliedert** (Festlegung des Entwicklers vom 27. August 2026). Dreierlei dazu: T2, T12, T13 und T16 sind erledigt und aus Inventar wie Quelldateien entfernt (abgedeckt durch `common-code-generation` bzw. `temp-debug-code`). Die durch die globale CLAUDE.md abgedeckten Posten (T1, T3, T6, T7, T21, T22) gelten ausdrücklich **nicht** als erledigt — die globale CLAUDE.md wird selbst noch zu dynamisch ladenden Skills durchgearbeitet, und diese Posten sind dafür Referenzmaterial. Und die Zielwelt-Sortierung (Schritt 12) wirkt herein: Je Posten ist auch zu bestimmen, in welche Zielwelt-Gruppe sein Zuhause gehört.
+
 ## 4 `🚧_translation-task`: die fünf offenen Festlegungen
 
 Die fünf Punkte unter „Noch nicht festgelegt“ in der `SKILL.md` einzeln besprechen und dort festschreiben: Namenskonvention für Zieldateien, Sync-Workflow zwischen zwei Sprachfassungen, Umgang mit Lizenz- und Rechtstexten, Ein-Absatz-pro-Zeile-Formatierung, Ton und Anrede.
@@ -47,3 +49,7 @@ Der Skill bleibt dabei **benutzbar** — beide Punkte betreffen die Absicherung,
 
 - Die Wirksamkeit des Selbsttests nachmessen. Der passende Prüffall: eine Wiederholung der Sammelrecherche mit anschließendem Abgleich aller Links gegen die tatsächlich abgerufenen Seiten.
 - Den claude.ai-Zweig der Ergebnisübergabe (automatisches Artefakt) dort erproben.
+
+## 12 Bereiche und Skills nach Zielwelt sortieren
+
+Alle Bereiche und Skills des Repos werden in drei Gruppen sortiert (Festlegung des Entwicklers vom 27. August 2026): **web- und Claude-Code-fähig**, **nur Claude-Code-fähig** und **nur web-fähig** (claude.ai). Manche Skills wird es in beiden Zielwelten in abgewandelter Form geben, weil der Claude-Code-Wortlaut auf claude.ai so nicht funktioniert. Das Ergebnis wird als Festlegung in der `implementation-doc.md` festgeschrieben; die Zuordnung je Posten in Schritt 3 benutzt dieselben Gruppen.
