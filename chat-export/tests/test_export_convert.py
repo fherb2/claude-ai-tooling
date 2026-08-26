@@ -870,7 +870,7 @@ plain = flat("repo", "/ziel")
 check("a run without side files announces none of them",
       not any(suffix in plain for suffix, _ in cec.FILE_KIND_WORDS), plain)
 check("conversation files and the protocol are always announced",
-      "JSON-Datei je Chat" in plain and "protokoll.json" in plain, plain)
+      "JSON-Datei je Chat" in plain and "protocol.json" in plain, plain)
 
 rich = flat("repo", "/ziel", "a" + cec.THINKING_SUFFIX,
             "a" + cec.CREATION_SUFFIX)
@@ -1557,9 +1557,9 @@ MAP_OUT_CMP = os.path.join(WORK, "via-map")
 run("list", "--map", MAP_FILE, "--out", MAP_OUT_CMP,
     "--now", "2026-08-19T20:00:00Z")
 
-with open(os.path.join(WEB_OUT, "protokoll.json"), encoding="utf-8") as handle:
+with open(os.path.join(WEB_OUT, "protocol.json"), encoding="utf-8") as handle:
     WEB_PROTO = json.load(handle)
-with open(os.path.join(MAP_OUT_CMP, "protokoll.json"), encoding="utf-8") as handle:
+with open(os.path.join(MAP_OUT_CMP, "protocol.json"), encoding="utf-8") as handle:
     MAP_PROTO = json.load(handle)
 
 check("list --web fills created_at from the web list",
@@ -1676,7 +1676,7 @@ EMPTY_RUN = run("list", "--web", EMPTY_BUNDLE, "--out", EMPTY_OUT,
                "--project", "Leertest")
 check("list writes a protocol for a project with zero chats instead of "
       "aborting", EMPTY_RUN.returncode == 0, EMPTY_RUN.stderr)
-with open(os.path.join(EMPTY_OUT, "protokoll.json"), encoding="utf-8") as handle:
+with open(os.path.join(EMPTY_OUT, "protocol.json"), encoding="utf-8") as handle:
     EMPTY_PROTO = json.load(handle)
 check("that protocol is well-formed, just empty",
       EMPTY_PROTO["project"] == "Leertest" and EMPTY_PROTO["chats"] == {})
@@ -1703,7 +1703,7 @@ BEHIND_RUN = run("convert", "--zip", ARCHIVE, "--out", BEHIND_DIR,
 
 def behind_entry():
     """The protocol entry after converting the outdated source."""
-    with open(os.path.join(BEHIND_DIR, "protokoll.json"),
+    with open(os.path.join(BEHIND_DIR, "protocol.json"),
               encoding="utf-8") as handle:
         return json.load(handle)["chats"]["lin-1"]
 
@@ -1732,7 +1732,7 @@ with open(SAME_LIST, "w", encoding="utf-8") as handle:
 run("list", "--map", SAME_LIST, "--out", SAME_DIR)
 SAME_RUN = run("convert", "--zip", ARCHIVE, "--out", SAME_DIR,
                "--now", "2026-05-02T00:00:00+00:00")
-with open(os.path.join(SAME_DIR, "protokoll.json"), encoding="utf-8") as handle:
+with open(os.path.join(SAME_DIR, "protocol.json"), encoding="utf-8") as handle:
     SAME_ENTRY = json.load(handle)["chats"]["lin-1"]
 check("the same instant written 'Z' and '+00:00' counts as up to date",
       SAME_ENTRY["status"] == "exported", SAME_ENTRY["status"])
@@ -1779,7 +1779,7 @@ run("convert", "--zip", LIFE_ZIP, "--out", LIFE_DIR,
 
 def life_entry(uuid):
     """The protocol entry for one of the two chats."""
-    with open(os.path.join(LIFE_DIR, "protokoll.json"),
+    with open(os.path.join(LIFE_DIR, "protocol.json"),
               encoding="utf-8") as handle:
         return json.load(handle)["chats"][uuid]
 
@@ -1827,7 +1827,7 @@ run("list", "--map", STAY_LIST, "--out", STAY_DIR)
 run("convert", "--zip", STAY_ZIP, "--out", STAY_DIR,
     "--now", "2026-05-02T00:00:00+00:00")
 run("list", "--map", STAY_LIST, "--out", STAY_DIR)
-with open(os.path.join(STAY_DIR, "protokoll.json"), encoding="utf-8") as handle:
+with open(os.path.join(STAY_DIR, "protocol.json"), encoding="utf-8") as handle:
     STAY_ENTRY = json.load(handle)["chats"]["shell-3"]
 check("an unchanged state leaves a deleted chat deleted",
       STAY_ENTRY["status"] == "deleted", STAY_ENTRY["status"])
