@@ -8,27 +8,6 @@ Eine `status.md` führt dieses Vorhaben nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
-## 11 Englisch prüfen: Dateinamen, Skripte, Skript-Dokumentation
-
-Das Repository liegt auf einer weltweit zugänglichen Plattform. Zu prüfen und gegebenenfalls zu korrigieren ist deshalb, ob **Dateinamen, Skripte und die Dokumentation von Skripten** durchgehend englisch sind. **Nicht** Gegenstand ist die deutsche Prosa: Die Arbeitssprache des Repositories bleibt Deutsch, und READMEs liegen ohnehin zweisprachig vor.
-
-Dieser Schritt reicht über `skills/` hinaus und betrifft alle Bausteine; einen repository-weiten Fahrplan gibt es nicht, deshalb steht er hier. Wächst er, bekommt er einen eigenen Ort.
-
-Zu durchsuchen sind drei Klassen:
-
-- **Dateinamen — erledigt (26. August 2026).** Umbenannt sind `implementation-doc.md` (dreimal, vorher `implementation_doku.md` bzw. `implementierungs_doku.md`), `chrome-access.de.md`, `syncthing-synology-setup-guide.md` sowie die Skill-Ordner `in-depth-online-literature-research` (vorher `tiefen-recherche`, Name vom Entwickler festgelegt) und `🚧_software-task-detection`; alle Verweise sind nachgezogen, die Projekt-CLAUDE.md über den Infra-Branch. Bewusst geblieben sind nach der Abgrenzung des Entwicklers — international sein muss, was für den Nutzer da ist, nicht die Projektverwaltung — die Entwicklungsdateien (`fahrplan.md`, `status.md`, `version2_fahrplan.md`, `noch-geplant.md`, `offener_fall_chatprotokolle.md`) und der temporäre 🚷-Ordner. Der Nachtrag in `noch-geplant.md` (sechs Altnamen-Verweise) ist nach dem Commit des Entwicklers erledigt (26. August 2026).
-- **Skripte:** Bezeichner, Kommentare, Docstrings und Hilfetexte englisch. Ausstehend ist der Sweep über `correct-zaaack-md-editor-mistakes` und `pack-source-to-txt`; chat-export und home-sharing sind belegt englisch. Entschieden am 26. August 2026: `protokoll.json` → `protocol.json` und `konfliktloesung.md` → `conflict-resolution.md` sind ausgeführt (Umbenennungsvermerke in Vorgabe 2.4 von chat-export bzw. Kapitel 3.4 der home-sharing-Doku; kein Lesepfad für alte Namen, Bestände und Installationen werden nachgezogen). Zwei bewusste Ausnahmen: Die Testdateien `test_wegegleichheit.py`/`wegegleichheit_referenz.py` bleiben — Tests sind Entwicklung, kein Nutzer kopiert sie. Und die Laufzeitmeldungen von home-sharing an den Nutzer bleiben deutsch (dessen Sprachfestlegung 2.5, mit Begründung dokumentiert); die Englisch-Regel gilt Bezeichnern, Kommentaren und Docstrings, nicht den an den Entwickler gerichteten Meldungen.
-- **Dokumentation von Skripten** — also das, was einen Skriptaufruf, seine Parameter und seine Ausgabe erklärt, unabhängig davon, in welcher Datei es steht.
-
-Vier Dinge machen daraus eine Prüfung mit Entscheidungen und keinen mechanischen Durchlauf:
-
-1. **Jede Umbenennung zieht Verweise nach sich.** Ein Dateiname steht in READMEs, in der Doku und in Skripten; nach jeder Umbenennung gehört ein Suchlauf über den alten Namen dazu, sonst bleiben tote Verweise stehen.
-2. **Bei Skill-Ordnern ist der Name die Schnittstelle.** Der Ordnername ist zugleich das Frontmatter-Feld `name` und damit der Slash-Aufruf; eine Umbenennung ändert den Aufruf für jede bereits installierte Kopie — das ist eine Änderung am Verhalten, nicht an einer Datei, und wird einzeln entschieden. (Für `tiefen-recherche` → `in-depth-online-literature-research` am 26. August 2026 entschieden und ausgeführt.)
-3. **`fahrplan.md` und `status.md` sind von außen vorgegeben** (Arbeitsanweisungen §2.3). Ihre Namen zu ändern hieße, die globale `CLAUDE.md` zu ändern — das entscheidet der Entwickler, nicht dieser Schritt.
-4. **Was in einer nicht-englischen Sprachfassung steht, bleibt dort.** Ein `.de.md` ist kein Verstoß, sondern die Kennzeichnung einer Sprachfassung.
-
-Ergebnis des Schrittes ist zuerst eine **Liste der Fundstellen mit Vorschlag**, nicht eine ausgeführte Umbenennung. Entschieden wird je Fund.
-
 ## 3 Anweisungs-Inventar zuordnen
 
 Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner, der nach Abschluss entfällt) werden einzeln zugeordnet. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `implementation-doc.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `implementation-doc.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
