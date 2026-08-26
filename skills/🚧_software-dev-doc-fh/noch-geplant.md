@@ -60,7 +60,7 @@ Daraus die Frage, die diese Recherche ausgelöst hat: Liegt es daran, dass die R
 
 ### 6 Anwendungen ohne Regelcharakter
 
-`home-.claude-sharing/fahrplan.md` trägt eine eigene Präambel mit lokalen Regeln (Dringlichkeitsreihenfolge statt Nummernreihenfolge, Abschnitt „Dauerhaft" für nie Erledigtes). `chat-export/fahrplan.md` führt den Fahrplan ausschließlich als Befundliste. `home-.claude-sharing/files/konfliktloesung.md` stellt ausdrücklich klar, dass die mitgeladene Projektmethodik samt Fahrplan **in der Konfliktsitzung nicht gilt**.
+`home-.claude-sharing/fahrplan.md` trägt eine eigene Präambel mit lokalen Regeln (Dringlichkeitsreihenfolge statt Nummernreihenfolge, Abschnitt „Dauerhaft" für nie Erledigtes). `chat-export/fahrplan.md` führt den Fahrplan ausschließlich als Befundliste. `home-.claude-sharing/files/conflict-resolution.md` stellt ausdrücklich klar, dass die mitgeladene Projektmethodik samt Fahrplan **in der Konfliktsitzung nicht gilt**.
 
 ### 7 Nebenbefund zum Trigger-Entwurf
 

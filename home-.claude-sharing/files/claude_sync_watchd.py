@@ -35,7 +35,7 @@ modify any file in the watched directory. It observes, reports and escalates.
 @Claude:
     This file is the daemon, not the conflict session. If you are reading it
     because a conflict session was started, the instructions you need are in
-    ``konfliktloesung.md`` -- that file, not this one, governs what you do.
+    ``conflict-resolution.md`` -- that file, not this one, governs what you do.
 
     If you are asked to change this script: the determinations it implements
     live in ``implementation-doc.md`` chapters 3.1 (behaviour), 3.2 (state
@@ -79,7 +79,7 @@ from typing import Any, Optional
 TOOL_DIR = Path.home() / ".claude-sync-watch"
 STATE_FILE = TOOL_DIR / "zustand.json"
 LOCK_FILE = TOOL_DIR / ".lauf.lock"
-INSTRUCTION_FILE = TOOL_DIR / "konfliktloesung.md"
+INSTRUCTION_FILE = TOOL_DIR / "conflict-resolution.md"
 TOOLS_DIR = TOOL_DIR / "tools"
 
 
@@ -89,7 +89,7 @@ def set_tool_dir(directory: Path) -> None:
     TOOL_DIR = directory
     STATE_FILE = TOOL_DIR / "zustand.json"
     LOCK_FILE = TOOL_DIR / ".lauf.lock"
-    INSTRUCTION_FILE = TOOL_DIR / "konfliktloesung.md"
+    INSTRUCTION_FILE = TOOL_DIR / "conflict-resolution.md"
     TOOLS_DIR = TOOL_DIR / "tools"
 
 DEFAULT_WATCH_DIR = Path.home() / ".claude"
@@ -1153,7 +1153,7 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
             "keine Konfliktsitzung starten. Bitte den Inhalt des "
             "files/-Ordner aus der Repo-Quelle von claude-sync-watch "
             "vollständig nach ~/.claude-sync-watch kopieren. Dort ist auch "
-            "das fehlende File 'konfliktloesung.md' enthalten.")
+            "das fehlende File 'conflict-resolution.md' enthalten.")
         return None
     # Argument order is load-bearing, not cosmetic: ``--add-dir`` is variadic
     # (``--add-dir <directories...>``), so it swallows every following argument
