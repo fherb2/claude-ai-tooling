@@ -1,3 +1,11 @@
+# GIT-LFS
+
+Allgemein sinnvoll ist ein Git-Abschnitt im Skill: EIne Session hatte mir nach der LFS-Installation mitgeteilt:
+
+"Andere Rechner: Dort muss git-lfs ebenfalls installiert sein (sudo apt install git-lfs), sonst siehst Du nach dem Pull nur kleine Pointer-Textdateien statt der Bilder. Ich habe LFS bewusst nur lokal im Repo aktiviert (Deine Regel: keine Änderungen außerhalb der Projektwurzel) — auf jedem weiteren Rechner einmalig git lfs install (global) oder git lfs install --local im Repo ausführen."
+
+Deshalb immer nach Session-Start, wenn das erste mal git in der Session benutzt wird: Prüfen, ob LFS im Projekt vorgesehen ist (.gitattributes vorhanden reicht?), dann prüfen, ob im Projekt installiert. Wenn nicht: Nutzer darauf hinweisen und ihm die Installation anbieten.
+
 # Noch geplant: Fahrplan, Planungsablage und die Dateien eines Entwicklungsvorhabens
 
 *Diese Datei ist Arbeitsmaterial zum Skill, nicht Teil von ihm. Die `SKILL.md` verweist nicht auf sie, sie wird also nie geladen (`implementation_doku.md` 1.2). Sie hält fest, was an diesem Skill noch zu tun ist, bevor er installiert werden kann.*
