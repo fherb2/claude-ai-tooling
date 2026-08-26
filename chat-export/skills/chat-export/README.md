@@ -135,9 +135,9 @@ Was leider nicht geht: Diese Chats in Claude Code fortzusetzen. Aber sag einfach
 
 Der Skill kann jederzeit nachlegen: neue Chats holen und weitergelaufene ersetzen. Damit das auch in einem halben Jahr noch funktioniert, gibt es vier Dinge, die du beim ersten Mal richtig machen solltest. Sie kosten nichts, und keines davon lässt sich nachträglich reparieren, ohne von Hand einzugreifen.
 
-**Ein Ordner je claude.ai-Projekt.** Wirf nicht die Chats mehrerer Projekte in denselben Ordner. Die `protokoll.json` dort führt den Stand für **ein** Projekt; ein zweites Projekt überschreibt dessen Anlegedatum, und danach reicht ein angeforderter Export nicht mehr weit genug zurück. Die Chats, die schon im Ordner liegen, bleiben vollständig — falsch wird nur die Rechnung, was noch fehlt. Und die kannst du dann nicht mehr benutzen.
+**Ein Ordner je claude.ai-Projekt.** Wirf nicht die Chats mehrerer Projekte in denselben Ordner. Die `protocol.json` dort führt den Stand für **ein** Projekt; ein zweites Projekt überschreibt dessen Anlegedatum, und danach reicht ein angeforderter Export nicht mehr weit genug zurück. Die Chats, die schon im Ordner liegen, bleiben vollständig — falsch wird nur die Rechnung, was noch fehlt. Und die kannst du dann nicht mehr benutzen.
 
-**Behalte den Ordner samt `protokoll.json`.** Das ist der Zustand, aus dem der Skill weiß, was er schon hat. Lädst du die Chats zusätzlich in das Projektwissen einer claude.ai-Instanz, ist das eine **Kopie** — nachgereicht wird immer aus dem lokalen Ordner. Löschst du ihn, fängt der Skill von vorn an und holt alles erneut.
+**Behalte den Ordner samt `protocol.json`.** Das ist der Zustand, aus dem der Skill weiß, was er schon hat. Lädst du die Chats zusätzlich in das Projektwissen einer claude.ai-Instanz, ist das eine **Kopie** — nachgereicht wird immer aus dem lokalen Ordner. Löschst du ihn, fängt der Skill von vorn an und holt alles erneut.
 
 **Leg das Archiv nicht unter `~/.claude/projects/` ab, wenn es dauerhaft halten soll.** Claude Code räumt dort nach einer Frist auf (Standard 30 Tage), und `claude project purge` nimmt den Ordner mit. Wenn du diesen Ort trotzdem willst — er ist sinnvoll für Chats, die nicht ins geteilte Repo dürfen —, dann setze vorher die Frist hoch.
 
@@ -197,7 +197,7 @@ Je Chat entsteht eine **Gesprächsdatei** mit den Redebeiträgen, benannt nach D
 
 Getrennt liegen sie, weil sie den Umfang sonst vervielfachen würden: Die Überlegungen allein sind fast so lang wie das Gespräch selbst. Wer einen Chat nachliest, will in aller Regel das Gespräch — die Zusatzdateien sind da, wenn man sie braucht, und stören nicht, wenn nicht.
 
-Dazu kommt eine `protokoll.json`. Sie merkt sich, welche Chats geholt wurden und auf welchem Stand sie waren. Nur deshalb kann ein späterer Lauf sagen, was neu ist und was gewachsen — ohne sie wäre jeder Import ein Neuanfang.
+Dazu kommt eine `protocol.json`. Sie merkt sich, welche Chats geholt wurden und auf welchem Stand sie waren. Nur deshalb kann ein späterer Lauf sagen, was neu ist und was gewachsen — ohne sie wäre jeder Import ein Neuanfang.
 
 Wird ein gewachsener Chat erneut geholt, **ersetzt** seine neue Fassung die alte vollständig; die alten Dateien werden vorher entfernt und dabei einzeln genannt. Stilles Löschen gäbe es hier nicht.
 
