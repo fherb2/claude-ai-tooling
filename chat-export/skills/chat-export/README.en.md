@@ -1,6 +1,6 @@
 # chat-export — Bring chats from claude.ai into your project
 
-*Last updated: 2026-08-22*
+*Last updated: 2026-08-26*
 
 **This skill fetches chats from your claude.ai projects and stores them as searchable JSON files in the project Claude Code is currently running in.** They are meant for finding earlier context again: what was once discussed in a chat is afterward findable in the project, instead of sitting only in the account.
 
@@ -136,9 +136,9 @@ What unfortunately doesn't work: continuing these chats in Claude Code. But just
 
 The skill can add to an archive at any time: fetch new chats and replace ones that have grown. For that to still work half a year from now, there are four things to get right the first time. None of them costs anything, and none can be repaired afterwards without editing by hand.
 
-**One folder per claude.ai project.** Do not put the chats of several projects into the same folder. The `protokoll.json` there tracks the state of **one** project; a second project overwrites its start date, and after that a requested export no longer reaches far enough back. The chats already in the folder stay complete — what goes wrong is only the calculation of what is still missing. And that calculation is then unusable.
+**One folder per claude.ai project.** Do not put the chats of several projects into the same folder. The `protocol.json` there tracks the state of **one** project; a second project overwrites its start date, and after that a requested export no longer reaches far enough back. The chats already in the folder stay complete — what goes wrong is only the calculation of what is still missing. And that calculation is then unusable.
 
-**Keep the folder, `protokoll.json` included.** That is the state the skill reads to know what it already has. If you additionally upload the chats into the project knowledge of a claude.ai instance, that is a **copy** — topping up always happens from the local folder. Delete it and the skill starts over and fetches everything again.
+**Keep the folder, `protocol.json` included.** That is the state the skill reads to know what it already has. If you additionally upload the chats into the project knowledge of a claude.ai instance, that is a **copy** — topping up always happens from the local folder. Delete it and the skill starts over and fetches everything again.
 
 **Do not put the archive under `~/.claude/projects/` if it is meant to last.** Claude Code cleans up there after a retention period (30 days by default), and `claude project purge` takes the folder with it. If you want that location anyway — it makes sense for chats that must not go into a shared repo — raise the retention period first.
 
@@ -198,7 +198,7 @@ Each chat produces a **conversation file** with the exchanged messages, named af
 
 They sit apart because otherwise they would multiply the volume: the reasoning alone is nearly as long as the conversation itself. Whoever reads a chat back generally wants the conversation — the extra files are there when you need them, and don't get in the way when you don't.
 
-On top of that comes a `protokoll.json`. It keeps track of which chats were fetched and what state they were in. Only because of that can a later run tell what's new and what has grown — without it, every import would be starting from scratch.
+On top of that comes a `protocol.json`. It keeps track of which chats were fetched and what state they were in. Only because of that can a later run tell what's new and what has grown — without it, every import would be starting from scratch.
 
 If a chat that has grown is fetched again, its new version **replaces** the old one completely; the old files are removed beforehand, and named individually as that happens. There is no silent deletion here.
 

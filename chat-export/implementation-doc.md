@@ -283,7 +283,7 @@ Der Grund für die Auslagerung ist stets dieselbe Rechnung: Denkschritte (9,2 Mi
 
 ## 2.4 Das Protokoll
 
-Eine `protokoll.json` je Quellprojekt, neben den Chatdateien. Sie wird mit der Chatliste angelegt — vor jedem Chattext — und ist ab da die Referenz; bei Widerspruch zwischen Protokoll und Verzeichnis gilt das Protokoll. Je Chat:
+Eine `protocol.json` je Quellprojekt, neben den Chatdateien. **Die Datei hieß bis zum 26. August 2026 `protokoll.json`** — umbenannt nach der Dateinamen-Regel (englische Namen, Fahrplanschritt 11 in `skills/`). Einen Lesepfad für den alten Namen gibt es bewusst nicht: Die Altbestände auf den Systemen des Entwicklers wurden im selben Zug mit umbenannt (Entscheidung des Entwicklers vom 26. August 2026); wer anderswo ein älteres Archiv vorfindet, benennt dessen `protokoll.json` von Hand um. Sie wird mit der Chatliste angelegt — vor jedem Chattext — und ist ab da die Referenz; bei Widerspruch zwischen Protokoll und Verzeichnis gilt das Protokoll. Je Chat:
 
 
 | Feld                   | Wozu                                                                                                                                                                                                                                                                                                                                  |
