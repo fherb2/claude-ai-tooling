@@ -11,7 +11,6 @@ Allgemeine Anweisungen zur Projektarbeit und zum Coding:
 
 Sprachen:
 - Chat in deutsch, wir duzen uns
-- Code in Englisch, inkl. Kommentaren
 
 Vorwissen: Dazu zählen Dateien im Projekt oder zum Chatanfang hochgeladene Dateien sowie die im Projekt befindlichen Chats. Bitte berücksichtige nie Chats, die außerhalb des Projekts geführt wurden. Auch dann nicht, wenn sie inhaltlich dazu passen könnten.
 
@@ -22,14 +21,11 @@ Artefakte allgemein:
 - Bevor Du ein Artefakt erzeugst, dann prüfe immer zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte inhaltlich:
-- Erzeuge nur Code, der bisher besprochen ist und wirklich notwendig ist. Nice-to-have-Funktionen oder auch Optimierungen bzgl. Softwarequalität können wir dann nachträglich noch zufügen. Aber Du kannst mir natürlich vorher Vorschläge machen, die ich dann vor der Codeerstellung gegebenenfalls doch mit "anwähle".
-- Erweitere nie den bereits realisierten Funktionsumfang im Code, wenn wir das nicht vorher einzeln festgelegt haben.
 - Kurze Codestücke kannst Du mir ohne Artefakt direkt im Chat präsentieren.
 
 Debugging, Testcode:
 - Es hat sich in Python bewährt, wenn Du mir kurze Debuggings zur Ursachensuche als Python-Aufruf-"Einzeiler" für die Kommandozeile präsentierst (python -c "..."). Ich gebe Dir dann das Ergebnis von der Kommandozeile in den Chat zurück.
 - Umfassenderes Debugging kann jedoch als Artefakt von Dir erstellt werden, dass ich dann z.B. mit Python in meinem Projekt ausführe.
-- Debugging-Code, den wir sozusagen als "Probe" einfügen und der nach der fehlerbeseitigung wieder heraus genommen wird oder wo noch nicht klar ist, ob der Code so als Lösung übernommen werden kann: 1) Bei Einzeilern bis Dreizeilern: Hinter jede Zeile '# DEBUG ' einfügen. Vorhandener Kommentar folgt dann danach und fängt nochmal mit einem # an. Mir dient ' # DEBUG ' als Token, um diese Zeilen später zu entfernen oder im Debugging schneller zu finden. 2) Ab 4 Zeilen Debug-Code oder wenn wir Zeilen durch Auskommentierung vorübergehend still legen, bekommen eine einleitende Zeile in der Form '# DEBUG ---------------' und nach den Änderungsstellen eine Zeile der Form '# DEBUG END ------------' . Diesa Abschnitte dürfen auch verschachtelt werden, wenn es sich bei der Fehlersuche so ergibt. Verschachtelung nicht extra einrücken. Die Einrückung dieser Zeilen orientiert sich an der Struktur des Python-Programms..
 - Solange wir keinen "experimentellen" Code schreiben und Funktionen implementiert haben, werde ich Dich anweisen einen Unit-Test für pytest dafür zu schreiben. Dazu folgende Punkte:
    * Unit-Test-Code soll einerseits in CI ausführbar sein, aber auch per Start von der Kommandozeile (z.B. beim Debugging). Für letzteres darf der Unit-Test-Code Diagnoseinformationen an die Kommandozeile senden. (Wenn die im CI auch gesendet werden, stört das nicht.)
    * Lege Funktionen im Code so an, dass sie leicht testbar sind:

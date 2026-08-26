@@ -6,8 +6,9 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil gedacht: Wird ein Eintrag erledigt oder verworfen, behalten die übrigen ihre Nummern (analog zur Fahrplan-Nummerierungsregel des Repos).
 
-## 1 Die Quelldateien
+**Erledigt und entfernt am 27. August 2026:** T2, T12, T13 (abgedeckt durch den Skill `common-code-generation`) und T16 (abgedeckt durch `temp-debug-code`, als Nachfolger mit geänderten Marken). Die zugehörigen Passagen sind auch aus den Quelldateien dieses Ordners entfernt — sie sind Arbeitsmittel und sollen nur noch tragen, was zu verwerten bleibt. Die Beschreibungen der ursprünglichen, vollständigen Fassungen in den Kapiteln 1 und 2 bleiben als historische Einordnung stehen.
 
+## 1 Die Quelldateien
 
 | Kürzel | Datei                                                                      | Inhaltlicher Zuschnitt                                                                                                                                                                                    |
 | ------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -35,11 +36,9 @@ Vier der sechs unterschiedlichen Texte (BIRD, CAM, SCH‑A, SCH‑B) tragen dens
 
 Legende: ✓ enthalten · (✓) in abgewandelter Form enthalten · ⊘ ausdrücklich ausgeklammert · – nicht enthalten. Die Varianten stehen in Kapitel 4 beim jeweiligen Eintrag.
 
-
 | Nr. | Thema                                    | ALLG | MOD  | BIRD | CAM  | SCH‑A | SCH‑B |
 | --- | ---------------------------------------- | ---- | ---- | ---- | ---- | ------ | ------ |
 | T1  | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
-| T2  | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
 | T3  | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
 | T4  | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
 | T5  | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
@@ -49,11 +48,8 @@ Legende: ✓ enthalten · (✓) in abgewandelter Form enthalten · ⊘ ausdrück
 | T9  | Artefakte nicht nachträglich ändern    | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
 | T10 | Vorher/Ersetzen-Schema                   | –   | (✓) | ✓   | –   | –     | (✓)   |
 | T11 | Teil-Artefakte ab ~2 A4-Seiten           | –   | –   | –   | ✓   | ⊘     | –     |
-| T12 | Nur besprochenen, notwendigen Code       | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T13 | Funktionsumfang nie ungefragt erweitern  | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T14 | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T15 | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T16 | DEBUG-Kennzeichnung von Probe-Code       | –   | –   | ✓   | –   | (✓)   | ✓     |
 | T17 | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T18 | Testfreundliche Funktionsanlage          | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T19 | debug-Parameter-Konvention               | –   | –   | ✓   | (✓) | ✓     | ✓     |
@@ -79,14 +75,6 @@ Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und ein
 **Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich. ALLG nur „Chat auf Deutsch“, ohne Duzen.
 
 **Einordnung:** **[abgedeckt]** für die Sprache (§1.1). Das Duzen ist nirgends im heutigen Regelwerk festgehalten — falls es weiterhin gelten soll, wäre es ein Ein-Satz-Zusatz für §1.1.
-
-#### T2 Code auf Englisch, einschließlich Kommentaren
-
-**Aussage:** Code in Englisch, inklusive Kommentaren.
-
-**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich („Code in Englisch, inkl. Kommentaren“). ALLG präziser: „Code-Identifier, Kommentare **und Docstrings** auf Englisch“ — die einzige Quelle, die Docstrings ausdrücklich nennt.
-
-**Einordnung:** **[abgedeckt]** durch den Skill `common-code-generation` („Alles, was im Quelltext steht — Bezeichner, Kommentare und Docstrings —, schreibst Du auf Englisch“), der zusätzlich das Vorschlagen von Benennungen regelt. Die ALLG-Präzisierung ist dort bereits übernommen.
 
 #### T3 Dokumentsprache Deutsch, projektabhängig änderbar
 
@@ -164,24 +152,6 @@ Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind säm
 
 **Einordnung:** **[claude.ai-Mechanik]**, schon innerhalb der Quellen selbst überholt. Für die Chronologie-Vermutung in Kapitel 2 ist dieser Eintrag das stärkste Indiz.
 
-### C Code-Inhalt
-
-#### T12 Nur besprochenen, wirklich notwendigen Code erzeugen
-
-**Aussage:** Nur Code erzeugen, der besprochen und notwendig ist; Nice-to-have-Funktionen und nicht abgesprochene Qualitäts-Optimierungen erst nachträglich; Vorschläge dafür sind erwünscht und werden vom Nutzer „angewählt“.
-
-**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B; BIRD/SCH‑B mit dem präzisierenden Einschub „die nicht explizit abgesprochen sind“.
-
-**Einordnung:** **[abgedeckt]** — nahezu wortgleich in den Skill `common-code-generation` übernommen (Abschnitt „Schreiben von Code allgemein“), dort ergänzt um „schlage solche Erweiterungen immer frühzeitig vor“.
-
-#### T13 Funktionsumfang nie ungefragt erweitern
-
-**Aussage:** Den bereits realisierten Funktionsumfang nie erweitern, wenn das nicht vorher einzeln festgelegt wurde.
-
-**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B; CAM ohne „bereits realisierten“.
-
-**Einordnung:** **[abgedeckt]** — wortgleich in `common-code-generation` enthalten.
-
 ### D Debugging und Tests
 
 #### T14 Kurze Ursachensuche als `python -c`-Einzeiler
@@ -199,14 +169,6 @@ Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind säm
 **Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich.
 
 **Einordnung:** **[claude.ai-Mechanik]** in der Form, Kern wie T14. In Claude Code übernimmt das Scratchpad bzw. das Repo diese Rolle.
-
-#### T16 Kennzeichnung von temporärem Probe-Code
-
-**Aussage:** Debug-Code, der als „Probe“ eingefügt und später wieder entfernt wird, sowie zum Testen stillgelegter Code werden markiert: bei 1–3 Zeilen `# DEBUG` hinter jeder Zeile (vorhandener Kommentar folgt danach mit neuem `#`); ab 4 Zeilen oder bei Auskommentierungen ein Block aus `# DEBUG ---------------` davor und `# DEBUG END ------------` danach; Blöcke dürfen sich verschachteln, werden aber nicht extra eingerückt — die Einrückung folgt der Programmstruktur.
-
-**Fundstellen:** BIRD und SCH‑B in der ausführlichsten Fassung (mit „hinter jede (!) Zeile“ und dem Hinweis, dass die Marke auch Folge-Chats das Wiederfinden erleichtert); SCH‑A in einer etwas knapperen Frühform. CAM hat noch keine Kennzeichnungsregel.
-
-**Einordnung:** **[abgedeckt]** durch den Skill `temp-debug-code` — aber als **Nachfolger mit bewusst geänderten Festlegungen**, nicht als Kopie. Die Abweichungen im Einzelnen, damit niemand die alten Marken für die gültigen hält: Markensyntax heute `# DEBUG #` (mit schließender Raute, sprachunabhängig suchbar); neue eigene Marke `# DEBUG: ORIGINAL #` für stillgelegten Originalcode (in den alten Fassungen nicht unterschieden); Blockmarken heute `# DEBUG: START ------------ #`/`# DEBUG: END ------------ #`; Blockgrenze heute **ab 5** Zeilen statt ab 4; dazu neu: verpflichtender grep-Selbsttest und Regeln für das Entfernen. Die alten Fassungen sind damit vollständig überholt; ihr Wert ist dokumentarisch.
 
 #### T17 Unit-Tests mit pytest: CI-fähig und von der Kommandozeile startbar
 
@@ -235,7 +197,7 @@ Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind säm
 
 Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (die spätere Form aktiviert den Testcode dann, die frühe nicht), und die frühe Fassung prüft eine lokale Variable, wo die spätere den kwargs-Eintrag prüft. Vor einer Übernahme ist genau eine Fassung festzulegen.
 
-**Einordnung:** **[nicht abgedeckt]** — Kandidat für den Test-Skill (T17/T18). Zu klären ist dabei auch das Verhältnis zu T16/`temp-debug-code`: T19 beschreibt **dauerhaft** im Code verbleibende Debug-Pfade, die der Skill `temp-debug-code` ausdrücklich von seinen Regeln ausnimmt — die beiden ergänzen sich, überschneiden sich also nicht.
+**Einordnung:** **[nicht abgedeckt]** — Kandidat für den Test-Skill (T17/T18). Zu klären ist dabei auch das Verhältnis zum Skill `temp-debug-code` (vormals T16): T19 beschreibt **dauerhaft** im Code verbleibende Debug-Pfade, die der Skill `temp-debug-code` ausdrücklich von seinen Regeln ausnimmt — die beiden ergänzen sich, überschneiden sich also nicht.
 
 ### E Projektgedächtnis über Chat-Grenzen
 
@@ -287,7 +249,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 **Fundstellen:** nur MOD.
 
-**Einordnung:** **[nicht abgedeckt]** — weder CLAUDE.md noch `common-code-generation` enthalten ein Generalisierbarkeits-Kriterium. Zu entscheiden: als allgemeine Design-Leitlinie in `common-code-generation` aufnehmen, oder bewusst projektspezifisch lassen (im Spannungsfeld zu T12/T13, die vor ungefragtem Mehrumfang schützen — Generalisierung ist genau die Art Erweiterung, die dort der Absprache bedarf).
+**Einordnung:** **[nicht abgedeckt]** — weder CLAUDE.md noch `common-code-generation` enthalten ein Generalisierbarkeits-Kriterium. Zu entscheiden: als allgemeine Design-Leitlinie in `common-code-generation` aufnehmen, oder bewusst projektspezifisch lassen (im Spannungsfeld zu den Regeln aus `common-code-generation` — vormals T12/T13 —, die vor ungefragtem Mehrumfang schützen; Generalisierung ist genau die Art Erweiterung, die dort der Absprache bedarf).
 
 #### T26 Alte Chats aufgreifen, Internet-Recherche erwünscht
 
@@ -313,14 +275,11 @@ T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedien
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
-
 | Einträge    | Heutiger Ort                  | Abweichung/Anmerkung                                                                                                                    |
 | ------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | T1           | §1.1                         | Duzen nirgends festgehalten.                                                                                                            |
-| T2, T12, T13 | Skill`common-code-generation` | vollständig übernommen und erweitert.                                                                                                 |
 | T3           | §1.1                         | —                                                                                                                                      |
 | T6, T7       | §1.3–§1.5                  | verschärft weitergeführt.                                                                                                             |
-| T16          | Skill`temp-debug-code`        | Nachfolger mit geänderten Marken (`# DEBUG #`, ORIGINAL-Marke, Blockgrenze 5 statt 4, Selbsttest) — alte Marken nicht mehr verwenden. |
 | T21          | §2.1, §1.9                  | —                                                                                                                                      |
 | T22          | §2.2                         | ALLG nennt zusätzlich Code-Style-Beispiele als Ausnahme; §2.2 nicht. Klären: bewusst entfallen oder verloren?                        |
 
@@ -328,7 +287,7 @@ T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedien
 
 - **Python-Test-Konventionen (T17, T18, T19):** der größte ungenutzte Block — pytest CI+CLI, testfreundliche Funktionsanlage, debug-Parameter. Kandidat für einen neuen Skill; bei T19 vorher genau eine der zwei unverträglichen Fassungen festlegen. Abgrenzung zu `temp-debug-code` ist sauber (dauerhafter vs. temporärer Debug-Code).
 - **Konzept-/Findungsphasen-Arbeitsmodus (T23, T24, T26-Kern):** Alternativen aktiv einbringen, erklären statt kodieren, fremde Lösungen recherchieren. Kandidat als Zusatz zu §2.1 oder als eigener Phasen-Baustein/Skill.
-- **Generalisierbarkeit (T25):** Design-Leitlinie; Zuordnung offen (in `common-code-generation` oder projektspezifisch belassen), Spannungsfeld zu T12/T13 beachten.
+- **Generalisierbarkeit (T25):** Design-Leitlinie; Zuordnung offen (in `common-code-generation` oder projektspezifisch belassen), Spannungsfeld zu dessen Regeln gegen ungefragten Mehrumfang (vormals T12/T13) beachten.
 - **Debugging-Methodik-Kern (T14/T15):** „kleinste reproduzierende Probe zuerst“ — kleiner möglicher Baustein, falls je ein Debugging-Methodik-Skill entsteht.
 - **Status-Protokoll-Detailregeln (T20):** Vergleichsmaterial für den Ausbau von `software-dev-doc-fh` (Referenzieren statt Ausschreiben, Missverständnisfestigkeit, API-Rümpfe als Schrittbeschreibung); der append-only-Mechanismus selbst ist durch Fahrplan/Status bewusst abgelöst.
 - **Kleinigkeiten:** Duzen (T1), ggf. Code-Style-Beispiel-Ausnahme (T22).
