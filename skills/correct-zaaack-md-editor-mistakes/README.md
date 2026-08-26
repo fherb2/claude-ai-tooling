@@ -1,6 +1,6 @@
 # correct-zaaack-md-editor-mistakes — beschädigten Leerraum in Markdown-Tabellen finden und beheben
 
-*Stand: 2026-08-25*
+*Stand: 2026-08-26*
 
 *[English version](README.en.md)*
 
@@ -179,6 +179,8 @@ Nebenbefund, der die Grenze der Freigabe bestätigt: In der wirksamen Fassung ko
 ## Stand und Offenes
 
 **Status.** Fertig und benutzbar. Werkzeuge geprüft, Skilltext und stiller Trigger ausformuliert, Frontmatter gesetzt, beide Sprachfassungen vorhanden.
+
+**Zweiteilung geprüft und verworfen** (25. August 2026). Die Teilung in dünne `SKILL.md` und nachgeladene Regeldatei (Vorgaben, Kapitel 5.2) scheitert hier an der dritten Bedingung: Ob ein Projekt betroffen ist, zeigt erst ein Lauf der Werkzeuge, und deren Beschreibung ist der Regelteil — die Klärung müsste ihn also ohnehin laden.
 
 **Offen:**
 
