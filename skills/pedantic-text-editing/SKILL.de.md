@@ -19,6 +19,6 @@ Für Texte, deren **Wortlaut selbst das Produkt ist** — Aufsätze, Anträge, V
 
 ## Gilt er, dann die Regeln laden
 
-**Lies `${CLAUDE_SKILL_DIR}/regeln.de.md` vollständig und arbeite ab dann danach.** Liegt dort keine Datei dieses Namens, sieh im Skill-Ordner nach, welche Regeldatei es gibt — beim Installieren kann umbenannt worden sein. Die Regeln stehen dort, nicht hier. Bevor Du sie gelesen hast, ändere an dem Text nichts — auch keine Kleinigkeit.
+**Lies `${CLAUDE_SKILL_DIR}/rules.de.md` vollständig und arbeite ab dann danach.** Liegt dort keine Datei dieses Namens, sieh im Skill-Ordner nach, welche Regeldatei es gibt — beim Installieren kann umbenannt worden sein. Die Regeln stehen dort, nicht hier. Bevor Du sie gelesen hast, ändere an dem Text nichts — auch keine Kleinigkeit.
 
 Diese Teilung ist Absicht und wird nicht zusammengelegt: Der Skill wird häufig geladen, ohne zur Anwendung zu kommen, und was er dann kostet, ist genau diese Seite. Der Regeltext bleibt in solchen Sitzungen draußen.
