@@ -9,7 +9,7 @@
 # this script itself sits in. That directory must be ~/.claude-sync-watch:
 # the unit file hardcodes %h/.claude-sync-watch, so any other location would
 # require editing it, and keeping the unit a static file is deliberate
-# (implementierungs_doku.md, 2.7 and 3.5).
+# (implementation-doc.md, 2.7 and 3.5).
 #
 # This script installs nothing behind your back. Where a package is missing it
 # says what breaks, offers to install it, and acts only on an explicit "yes"

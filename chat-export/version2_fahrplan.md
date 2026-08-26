@@ -2,7 +2,7 @@
 
 **Was diese Datei ist.** Der Umriss der nächsten Ausbaustufe: die Komplexe, ihre Ziele und was sie berühren. **Noch keine Schritte** — die entstehen, wenn wir mit einem Komplex anfangen, und werden dann hier ausdetailliert (Arbeitsanweisungen §2.6, Repo-`CLAUDE.md` „Wo ein Plan steht"). Schrittnummern gibt es deshalb noch keine; sie beginnen bei 1, sobald der erste Komplex aufgeschlagen wird.
 
-**Wo Version 1 steht.** Produktiv und unangetastet. Was sie leistet, sagt `implementation_doku.md`; was sie **nicht** leistet, deren Kapitel 1.8. Dieser Fahrplan setzt dort an und wiederholt es nicht.
+**Wo Version 1 steht.** Produktiv und unangetastet. Was sie leistet, sagt `implementation-doc.md`; was sie **nicht** leistet, deren Kapitel 1.8. Dieser Fahrplan setzt dort an und wiederholt es nicht.
 
 **Die Reihenfolge ist nicht frei.** Komplex A trägt Komplex B: Ohne den Projektbezug in der Chatdatei kann ein Claude-Code-Projekt nicht neben einem claude.ai-Projekt im selben Verzeichnis stehen.
 

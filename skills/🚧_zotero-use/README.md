@@ -34,7 +34,7 @@ Ein zotero.org-Konto ist **kostenlos**. Bezahlt wird nur Zoteros eigener Dateisp
 
 ## Geltungsbereich
 
-Dies ist das erste konkrete Beispiel für ein „Thema jenseits des Codens" im Sinne von `implementation_doku.md`, Kapitel 8.3 — reine Literatur-/Referenzverwaltung, kein Software-Kontext. Ein späterer Skill dazu muss entsprechend deklariert sein, nicht an einen Coding-Trigger gebunden.
+Dies ist das erste konkrete Beispiel für ein „Thema jenseits des Codens" im Sinne von `implementation-doc.md`, Kapitel 8.3 — reine Literatur-/Referenzverwaltung, kein Software-Kontext. Ein späterer Skill dazu muss entsprechend deklariert sein, nicht an einen Coding-Trigger gebunden.
 
 **Zur Verpackung:** Skills laufen inzwischen produktübergreifend — dieselbe `SKILL.md` in Claude Code, Claude Desktop und Claude Cowork (Stand August 2026, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein fertiger Skill hier müsste also nicht auf Claude Code beschränkt bleiben.
 

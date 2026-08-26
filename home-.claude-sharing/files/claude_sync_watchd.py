@@ -38,7 +38,7 @@ modify any file in the watched directory. It observes, reports and escalates.
     ``konfliktloesung.md`` -- that file, not this one, governs what you do.
 
     If you are asked to change this script: the determinations it implements
-    live in ``implementierungs_doku.md`` chapters 3.1 (behaviour), 3.2 (state
+    live in ``implementation-doc.md`` chapters 3.1 (behaviour), 3.2 (state
     file) and 3.3 (dialogs and terminal launch); the repo-wide rules are in
     chapter 2. Read the relevant chapter before editing, and propose a doc
     change together with any code change that alters behaviour.
@@ -227,7 +227,7 @@ def _require_linux(what: str) -> None:
     if _is_windows():
         raise NotImplementedError(
             f"{what} is not implemented for Windows yet "
-            "(implementierungs_doku.md, 3.7)."
+            "(implementation-doc.md, 3.7)."
         )
 
 
