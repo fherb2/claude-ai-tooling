@@ -1,6 +1,6 @@
 # pedantic-text-editing — Textbearbeitung mit Detailtreue
 
-*Stand: 2026-08-25*
+*Stand: 2026-08-26*
 
 *[English version](README.en.md)*
 
@@ -26,7 +26,7 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
    | Deutsch         | Englisch        |
    | --------------- | --------------- |
    | `SKILL.de.md`   | `SKILL.en.md`   |
-   | `regeln.de.md`  | `regeln.en.md`  |
+   | `rules.de.md`   | `rules.en.md`   |
    | `README.md`     | `README.en.md`  |
 
    **Verpflichtend ist daran allein, dass die gewählte SKILL-Fassung am Zielort `SKILL.md` heißt** — Claude Code erkennt keinen anderen Namen. Ob dafür umbenannt oder zusätzlich abgelegt wird, ist gleichgültig. Die Regeldatei behält ihren Namen: Die `SKILL.md` verweist auf sie, und dieser Verweis ist der einzige Weg, auf dem die Regeln überhaupt geladen werden. Wer sie umbenennt, zieht den Verweis mit.
