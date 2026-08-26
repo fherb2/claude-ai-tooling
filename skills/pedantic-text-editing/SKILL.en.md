@@ -19,6 +19,6 @@ For texts whose **wording is itself the product** — essays, applications, talk
 
 ## If it does apply, load the rules
 
-**Read `${CLAUDE_SKILL_DIR}/regeln.en.md` in full and work by it from then on.** If no file of that name is there, look in the skill folder for whichever rules file exists — it may have been renamed during installation. The rules are there, not here. Until you have read them, change nothing in the text — not even a trifle.
+**Read `${CLAUDE_SKILL_DIR}/rules.en.md` in full and work by it from then on.** If no file of that name is there, look in the skill folder for whichever rules file exists — it may have been renamed during installation. The rules are there, not here. Until you have read them, change nothing in the text — not even a trifle.
 
 This split is deliberate and does not get merged: the skill is loaded often without coming into play, and what it costs then is exactly this page. In such sessions the rules text stays out.

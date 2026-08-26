@@ -1,6 +1,6 @@
 # pedantic-text-editing — text editing with fidelity to detail
 
-*Last updated: 2026-08-25*
+*Last updated: 2026-08-26*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`.
 
@@ -24,7 +24,7 @@ To that end it separates three kinds of finding — rule violation, matter of fa
    | German         | English        |
    | -------------- | -------------- |
    | `SKILL.de.md`  | `SKILL.en.md`  |
-   | `regeln.de.md` | `regeln.en.md` |
+   | `rules.de.md`  | `rules.en.md`  |
    | `README.md`    | `README.en.md` |
 
    **Mandatory in this is only that the chosen SKILL version is called `SKILL.md` at the target location** — Claude Code recognizes no other name. Whether it is renamed for that or additionally placed makes no difference. The rules file keeps its name: the `SKILL.md` points to it, and that pointer is the only way the rules ever get loaded. Whoever renames it carries the pointer along.
