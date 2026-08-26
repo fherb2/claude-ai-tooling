@@ -1,6 +1,5 @@
 Sprachen:
 - Chat in deutsch, wir duzen uns
-- Code in Englisch, inkl. Kommentaren
 
 Artefakte allgemein:
 - Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
@@ -9,8 +8,6 @@ Artefakte allgemein:
 - Bevor Du ein Artefakt erzeugst, dann prüfe zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte:
-- Erzeuge nur Code, der bisher besprochen ist und wirklich notwendig ist. Nice-to-have-Funktionen oder auch Optimierungen bzgl. Softwarequalität können wir dann nachträglich noch zufügen. Aber Du kannst mir natürlich vorher Vorschläge machen, die ich dann vor der Codeerstellung gegebenenfalls doch mit "anwähle".
-- Erweitere nie den Funktionsumfang im Code, wenn wir das nicht vorher einzeln festgelegt haben.
 - Kurze Codestücke kannst Du mir ohne Artefakt direkt im Chat präsentieren.
 
 Debugging, Testcode:
