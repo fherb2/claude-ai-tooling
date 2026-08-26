@@ -73,6 +73,7 @@ git worktree add <worktree-dir>/<topic> <workbench>
 
 - After every completed work step a **checkpoint commit** in the own worktree, without asking. It covers the whole tree of the worktree — which contains only the session's own work.
 - No command that changes foreign worktrees, foreign branches or the main checkout.
+- **Command chains never rely on a lingering `cd`.** Every Git command addresses its target itself — `git -C <worktree>` for the workbench, `git -C <main-checkout>` for the squash. And no command runs with its working directory inside a worktree that is removed in the same go.
 - `push` of the workbench only after consent in the individual case.
 
 ### Changing central files (infra)
@@ -104,7 +105,7 @@ Fixed checklist, in this order:
 1. **Infra sync**: `git diff <infra> -- <infra-files>` must be empty; otherwise `restore` — which also ends every experiment.
 2. **Experiment search**: `grep -rn "INFRA-EXPERIMENT" <worktree>` must be empty.
 3. **Fetch the integration state**: `git fetch`; if the integration branch has moved on, merge it into the workbench and resolve conflicts here — not only at squash time.
-4. **Propose the squash merge**; the user determines the commit text. If the session sits isolated in the worktree, `ExitWorktree` first — otherwise the main checkout is blocked. Execution in the main checkout on the integration branch: `git merge --squash <workbench>`, then `git commit` **without `-a`** — committed is only what the squash put into the index, the user's unversioned hand work remains untouched. Show `git status` beforehand.
+4. **Propose the squash merge**; the user determines the commit text. If the session sits isolated in the worktree, `ExitWorktree` first — otherwise the main checkout is blocked. Execution in the main checkout on the integration branch, **explicitly addressed there** (`git -C <main-checkout>`), never via the working directory of a running chain — a `cd` from an earlier link lingers, and a squash inside the workbench's own worktree merges the branch into itself: "nothing to commit", the chain breaks mid-procedure (observed four times in one day, 26 August 2026). So: `git -C <main-checkout> merge --squash <workbench>`, then there `git commit` **without `-a`** — committed is only what the squash put into the index, the user's unversioned hand work remains untouched. Show `git status` beforehand.
 5. **Clean up** after consent: remove the worktree (`git worktree remove`), delete the workbench branch. For a follow-up task, derive freshly from the integration branch.
 
 ### Initial setup of the model
