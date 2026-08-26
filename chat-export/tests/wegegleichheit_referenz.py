@@ -7,7 +7,7 @@ would be the only yardstick of itself, and every format change would pass by
 definition. That is the whole reason this file exists.
 
 **It is not a route and never will be.** It descends from the abandoned read
-route (``implementation_doku.md`` 1.7), which fetched a chat page by page from
+route (``implementation-doc.md`` 1.7), which fetched a chat page by page from
 a tool the platform withdrew on 18 August 2026. What survived here is only
 what the comparison needs: parsing a handed-over page into turns, building the
 chat document, and keeping the protocol. The command line, the fetch loop and

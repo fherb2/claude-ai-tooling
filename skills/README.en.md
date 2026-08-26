@@ -1,6 +1,6 @@
 # Skills for Claude Code
 
-*Last updated: 2026-08-25*
+*Last updated: 2026-08-26*
 
 *[Deutsche Fassung](README.md)*
 
@@ -16,7 +16,7 @@ Reusable skills for Claude Code, together with the triggers that fire them. This
 | [`parallel-sessions/`](parallel-sessions/README.en.md)<br>✅☑ | **Several Claude sessions at the same time in the same repository, separated via Git worktrees** — one workbench in its own worktree per session, central files via an infra branch, completion by squash merge; without an agreed model, settling Git write authority remains as the fallback. |
 | [`pedantic-text-editing/`](pedantic-text-editing/README.en.md)<br>✅☑ | **Text editing with fidelity to detail** — every change presented individually for approval, not a character changed outside the approved spots, and afterwards the proof through the diff. For texts whose wording is itself the product; not for source code or documentation accompanying software. |
 | [`temp-debug-code/`](temp-debug-code/README.en.md)<br>✅☑ | **Unambiguous marking of code added or changed for an ongoing debugging session only** — not for debug code meant to stay in the source permanently.                                                                                               |
-| [`tiefen-recherche/`](tiefen-recherche/README.en.md)<br>✅☑ | **Thorough source and literature research that does not give up too early** — systematic variation of search terms, channels and search levels, mandatory verification of every search summary, and instead of "nothing found" a report on the search paths still open. |
+| [`in-depth-online-literature-research/`](in-depth-online-literature-research/README.en.md)<br>✅☑ | **Thorough source and literature research that does not give up too early** — systematic variation of search terms, channels and search levels, mandatory verification of every search summary, and instead of "nothing found" a report on the search paths still open. |
 
 (✅ German version finished and usable · ☑ English version finished and usable · 🚧 in progress · ⚠️ with reservations)
 
@@ -28,7 +28,7 @@ It introduces and implements a concept of "silent triggers" that allows even wea
 
 On top of that, some skills are **split in two**: the `SKILL.md` then only settles whether the skill is to be applied at all, and loads the actual rules from a second file in the same folder once that is agreed. A skill firing on a situation in which it often turns out not to be needed thus costs only its settling page instead of its whole text.
 
-The rules for this area, `skills/`, and the findings from the accompanying test series are in `implementation_doku.md`. This README describes only the result: what there is and how to use it. On top of that, every skill has a README file of its own carrying its particular notes and its current state of development.
+The rules for this area, `skills/`, and the findings from the accompanying test series are in `implementation-doc.md`. This README describes only the result: what there is and how to use it. On top of that, every skill has a README file of its own carrying its particular notes and its current state of development.
 
 ## 3 Obtaining and installing skills
 
@@ -40,7 +40,7 @@ The technique Anthropic provides fires a skill via its `description`: if it matc
 
 Skills that need such a trigger carry a `CLAUDE-snippet.md` in their folder for it. The snippet inside is to be added by hand to the `CLAUDE.md` of the same level.
 
-**Which languages a skill is available in differs from case to case.** Most of them exist here in German only; their files then carry no language marker and are copied unchanged. Only where there are several versions do `SKILL.md` and `CLAUDE-snippet.md` carry a language marker in front of the extension — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Exactly one language version is installed then, and the chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and nothing else. `README.md` is the exception: with several versions it carries **no** marker for the German version, only the English one is called `README.en.md` — GitHub and GitLab, when browsing a folder, automatically display only a file named exactly `README.md`; a language marker would prevent that (see `implementation_doku.md`, chapter 5.1, for details). Which language version to pick follows from the language used in the chat, whereby the English version should as such be compatible with every chat language.
+**Which languages a skill is available in differs from case to case.** Most of them exist here in German only; their files then carry no language marker and are copied unchanged. Only where there are several versions do `SKILL.md` and `CLAUDE-snippet.md` carry a language marker in front of the extension — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Exactly one language version is installed then, and the chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and nothing else. `README.md` is the exception: with several versions it carries **no** marker for the German version, only the English one is called `README.en.md` — GitHub and GitLab, when browsing a folder, automatically display only a file named exactly `README.md`; a language marker would prevent that (see `implementation-doc.md`, chapter 5.1, for details). Which language version to pick follows from the language used in the chat, whereby the English version should as such be compatible with every chat language.
 
 The folder name is the same in all versions and never carries a marker; the same holds for the skill name in the frontmatter and hence for the `/<skill-name>` invocation.
 
@@ -68,7 +68,7 @@ Three rules — two of them from measurements rather than taste, the third from 
 
 **The skill's `description` decides first.** It begins with the main use case and uses the words a user would say unprompted. Putting a classification in front of it ("Test skill…", "Internal version…") or using project-internal jargon that appears in no request can render the trigger ineffective — measured: the very same trigger text fired with a good description and did not with a weak one.
 
-**A trigger should be bound to an event or an action,** not merely to a property of the task. "Keep an eye on whether this task is complex" does not carry itself; "before you change a file for the first time, check …" or "if a file turns up that you have not touched, then …" fire reliably. The test series behind this are in `implementation_doku.md`, chapter 3.
+**A trigger should be bound to an event or an action,** not merely to a property of the task. "Keep an eye on whether this task is complex" does not carry itself; "before you change a file for the first time, check …" or "if a file turns up that you have not touched, then …" fire reliably. The test series behind this are in `implementation-doc.md`, chapter 3.
 
 **The `description` is written in the third person.** It describes the skill — "Translates documents …", "Use as soon as …" — and addresses nobody, neither Claude nor the user. This is not a matter of style: the description is injected into the system prompt, and a shifting point of view disturbs the selection among many skills there. Anthropic says so explicitly — *"Always write in third person […] inconsistent point-of-view can cause discovery problems"* ([Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 

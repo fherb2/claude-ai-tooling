@@ -1,6 +1,6 @@
 # chat-export — Chats aus claude.ai in dein Projekt holen
 
-*Stand: 2026-08-23*
+*Stand: 2026-08-26*
 
 **Dieser Skill holt Chats aus deinen claude.ai-Projekten und legt sie als durchsuchbare JSON-Dateien in dem Projekt ab, in dem Claude Code gerade läuft.** Gedacht sind sie zum Wiederfinden früheren Zusammenhangs: Was in einem Chat einmal besprochen wurde, steht danach im Projekt und ist auffindbar, statt nur im Konto zu liegen.
 
@@ -40,7 +40,7 @@ Punkt 1 und 3 entsprechen dabei der vollständigen Installation der Claude Chrom
 
 4. **Chrome läuft.** Ein Fenster genügt; claude.ai selbst muss nicht offen sein, der Skill legt sich seinen eigenen Tab an.
 5. **Claude Code läuft in dem Projekt, in das importiert werden soll.** Das Ziel ist immer das Projekt, in dem du gerade arbeitest — der Skill holt die Chats dorthin, wo die Sitzung steht. Du kannst auch die VSCode Claude Code Extension dazu verwenden.
-6. Du musst zuerst **die Bridge zwischen Claude Code und der Chrome Claude Extension herstellen**. Zu diesem Zweck musst du dich zuerst *in Chrome mit dem gleichen Konto anmelden wie in Claude Code*. Rufe dann in Chrome mal das Claude Chat Fenster der Claude Chrome Extension auf: Wenn es startet und nicht meldet, dass noch eine Anmeldung stattfinden muss, ist es ok. Wenn es auch erst eine Anmeldung benötigt, melde es an. Spätestens jetzt ist die Claude Chrome Extension wirklich mit dem Konto verbunden. Ausführlich protokollierte Fehlerbilder beim Herstellen dieser Bridge und was jeweils geholfen hat, stehen in [`chrome-zugriff.de.md`](../../chrome-zugriff.de.md).
+6. Du musst zuerst **die Bridge zwischen Claude Code und der Chrome Claude Extension herstellen**. Zu diesem Zweck musst du dich zuerst *in Chrome mit dem gleichen Konto anmelden wie in Claude Code*. Rufe dann in Chrome mal das Claude Chat Fenster der Claude Chrome Extension auf: Wenn es startet und nicht meldet, dass noch eine Anmeldung stattfinden muss, ist es ok. Wenn es auch erst eine Anmeldung benötigt, melde es an. Spätestens jetzt ist die Claude Chrome Extension wirklich mit dem Konto verbunden. Ausführlich protokollierte Fehlerbilder beim Herstellen dieser Bridge und was jeweils geholfen hat, stehen in [`chrome-access.de.md`](../../chrome-access.de.md).
 7. **Stelle jetzt aus Claude Code die Bridge her**, indem du am Prompt "@browser" übergibst. (Den meist angehängten Vorschlag kannst du abwenden, indem du hinter @browser noch ein Leerzeichen setzt.)
 8. **Frage abschließend Claude Code**, ob es einen Tab in Chrome öffnen kann. Erst wenn das funktioniert, steht die Bridge tatsächlich.
 9. Falls Du **aus einem anderen Claude-Account Chats importieren** möchtest, kannst du dich jetzt in einem neuen Tab in Chrome bei Claude.ai abmelden und mit dem anderen Konto anmelden. Ein E-Mail-Turn ist dabei wahrscheinlich fällig. Die Bridge bricht dabei nicht.

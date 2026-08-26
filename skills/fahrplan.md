@@ -16,14 +16,14 @@ Dieser Schritt reicht über `skills/` hinaus und betrifft alle Bausteine; einen 
 
 Zu durchsuchen sind drei Klassen:
 
-- **Dateinamen.** Auffällig sind unter anderem `implementation_doku.md`, `implementierungs_doku.md`, `version2_fahrplan.md`, `chrome-zugriff.de.md`, `offener_fall_chatprotokolle.md`, `konfliktloesung.md`, `Syncthing-Synology-Konfigurationsanleitung-allgemein.md`, `fahrplan.md`, `noch-geplant.md` sowie die Skill-Ordner `tiefen-recherche` und `🚧_softwareaufgabe-erkennen`.
-- **Skripte:** Bezeichner, Kommentare, Docstrings, Hilfetexte und Ausgaben an den Nutzer.
+- **Dateinamen — erledigt (26. August 2026).** Umbenannt sind `implementation-doc.md` (dreimal, vorher `implementation_doku.md` bzw. `implementierungs_doku.md`), `chrome-access.de.md`, `syncthing-synology-setup-guide.md` sowie die Skill-Ordner `in-depth-online-literature-research` (vorher `tiefen-recherche`, Name vom Entwickler festgelegt) und `🚧_software-task-detection`; alle Verweise sind nachgezogen, die Projekt-CLAUDE.md über den Infra-Branch. Bewusst geblieben sind nach der Abgrenzung des Entwicklers — international sein muss, was für den Nutzer da ist, nicht die Projektverwaltung — die Entwicklungsdateien (`fahrplan.md`, `status.md`, `version2_fahrplan.md`, `noch-geplant.md`, `offener_fall_chatprotokolle.md`) und der temporäre 🚷-Ordner. Ein Ein-Wort-Nachtrag steht aus: `noch-geplant.md` verweist noch auf den alten Doku-Namen, wird aber erst angefasst, wenn der Entwickler seine unkommittierten Zeilen dort committet hat.
+- **Skripte:** Bezeichner, Kommentare, Docstrings, Hilfetexte und Ausgaben an den Nutzer. Dazu drei aus der Dateinamen-Klasse hierher verschobene, weil code-gekoppelte Namen: `protokoll.json` (chat-export, Vorgabe 2.4 — echte Archive existieren, braucht eine Kompatibilitätsentscheidung), `konfliktloesung.md` (home-sharing, Produktdatei des laufenden Dienstes samt Unit und Installskripten) und die Testdateien `test_wegegleichheit.py`/`wegegleichheit_referenz.py`.
 - **Dokumentation von Skripten** — also das, was einen Skriptaufruf, seine Parameter und seine Ausgabe erklärt, unabhängig davon, in welcher Datei es steht.
 
 Vier Dinge machen daraus eine Prüfung mit Entscheidungen und keinen mechanischen Durchlauf:
 
 1. **Jede Umbenennung zieht Verweise nach sich.** Ein Dateiname steht in READMEs, in der Doku und in Skripten; nach jeder Umbenennung gehört ein Suchlauf über den alten Namen dazu, sonst bleiben tote Verweise stehen.
-2. **Bei Skill-Ordnern ist der Name die Schnittstelle.** Der Ordnername ist zugleich das Frontmatter-Feld `name` und damit der Slash-Aufruf. `tiefen-recherche` umzubenennen ändert `/tiefen-recherche` für jede bereits installierte Kopie — das ist eine Änderung am Verhalten, nicht an einer Datei, und muss einzeln entschieden werden.
+2. **Bei Skill-Ordnern ist der Name die Schnittstelle.** Der Ordnername ist zugleich das Frontmatter-Feld `name` und damit der Slash-Aufruf; eine Umbenennung ändert den Aufruf für jede bereits installierte Kopie — das ist eine Änderung am Verhalten, nicht an einer Datei, und wird einzeln entschieden. (Für `tiefen-recherche` → `in-depth-online-literature-research` am 26. August 2026 entschieden und ausgeführt.)
 3. **`fahrplan.md` und `status.md` sind von außen vorgegeben** (Arbeitsanweisungen §2.3). Ihre Namen zu ändern hieße, die globale `CLAUDE.md` zu ändern — das entscheidet der Entwickler, nicht dieser Schritt.
 4. **Was in einer nicht-englischen Sprachfassung steht, bleibt dort.** Ein `.de.md` ist kein Verstoß, sondern die Kennzeichnung einer Sprachfassung.
 
@@ -31,7 +31,7 @@ Ergebnis des Schrittes ist zuerst eine **Liste der Fundstellen mit Vorschlag**, 
 
 ## 3 Anweisungs-Inventar zuordnen
 
-Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner, der nach Abschluss entfällt) werden einzeln zugeordnet. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `implementation_doku.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `implementation_doku.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
+Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner, der nach Abschluss entfällt) werden einzeln zugeordnet. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `implementation-doc.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `implementation-doc.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
 
 Damit erledigt sich zugleich der übergreifend offene Punkt „Neuordnung der Arbeitsanweisungen zu Skill-Zuhausen“.
 
@@ -45,7 +45,7 @@ Klären, ob die vorhandenen Skills `konzept-segmentierung` und `konsistenzpruefu
 
 Bei dieser Gelegenheit fällt auch die Entscheidung über die Zweiteilung aus Schritt 2.
 
-## 6 `🚧_softwareaufgabe-erkennen`: über den Fortbestand entscheiden
+## 6 `🚧_software-task-detection`: über den Fortbestand entscheiden
 
 Entscheiden, ob daraus ein eigenständiger Skill wird, ob er die Vorstufe von `software-dev-doc-fh` ist — oder ob er sich mit `common-code-generation` erledigt hat, der inzwischen einen Teil davon trägt. Erst danach lohnt Arbeit am Inhalt. Fällt die Entscheidung für einen eigenen Skill: den Trigger nach Kapitel 2 der Vorgaben geankert neu formulieren, nicht als Hintergrund-Beobachtung.
 
@@ -62,7 +62,7 @@ Entscheiden, ob daraus ein eigenständiger Skill wird, ob er die Vorstufe von `s
 - Dabei klären, ob `zotero-cli-cc` Sammlungs-Management schon kann oder ob ein dünner Zusatz nötig ist.
 - Danach erst: Werkzeug-Entscheidung (`zotero-cli-cc` vs. `zotero-mcp` vs. Plugin-Variante `cookjohn/zotero-mcp`) und Verpackung als Skill.
 
-## 9 `tiefen-recherche`: zwei Erprobungen nachholen
+## 9 `in-depth-online-literature-research`: zwei Erprobungen nachholen
 
 Der Skill bleibt dabei **benutzbar** — beide Punkte betreffen die Absicherung, nicht die Funktion. Dass ein Skill irgendwann einen nicht absehbaren Fehler hervorruft, lässt sich ohnehin nicht ausschließen; das ist kein Grund, ihn als unfertig zu führen.
 

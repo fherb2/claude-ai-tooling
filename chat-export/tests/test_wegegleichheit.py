@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The converter must produce the documented file, measured against a second implementation.
 
-The promise of ``implementation_doku.md`` Vorgabe 2.5: the same chat ends up
+The promise of ``implementation-doc.md`` Vorgabe 2.5: the same chat ends up
 as the same document, whichever way it came in. Otherwise the content of the
 archive depends on the route, and "do I have this chat?" stops being a sharp
 question.

@@ -4,7 +4,7 @@
 Doku 2.9 binds it: this docstring is the whole operating manual, because
 Claude Code reads it and not necessarily the implementation doc, and
 ``tests/test_docstrings.py`` guards that.  Chapter 3.1
-of ``implementation_doku.md`` holds the determinations this implements, chapter
+of ``implementation-doc.md`` holds the determinations this implements, chapter
 2 the repo-wide ones; the numbers quoted below come from there.
 
     python3 chat_export_convert.py list    --map <dump> | --web <bundle> --out <dir> \

@@ -6,7 +6,7 @@
 
 # Stand: Noch in Überarbeitung. Nicht benutzen!
 
-Status: **Im Betrieb beim Entwickler, nicht zur Weitergabe freigegeben.** Der Abgleich läuft seit dem 11. August 2026 auf zwei Rechnern, der Wächter ist auf beiden als Dienst eingerichtet und hat echte Konflikte behandelt. Die Doku (`implementierungs_doku.md`) ist in sich geprüft und gegen den Code abgeglichen; die Befunde dieses Abgleichs werden gerade abgearbeitet (Anhang B der Doku). Der Warnhinweis oben bleibt stehen, solange das Werkzeug ausschließlich beim Entwickler im Quasi-Testbetrieb läuft — er entfällt erst, wenn es auch Kollegen benutzen dürfen. Offene Fragen (F3, F7, F11) stehen im Anhang der Doku.
+Status: **Im Betrieb beim Entwickler, nicht zur Weitergabe freigegeben.** Der Abgleich läuft seit dem 11. August 2026 auf zwei Rechnern, der Wächter ist auf beiden als Dienst eingerichtet und hat echte Konflikte behandelt. Die Doku (`implementation-doc.md`) ist in sich geprüft und gegen den Code abgeglichen; die Befunde dieses Abgleichs werden gerade abgearbeitet (Anhang B der Doku). Der Warnhinweis oben bleibt stehen, solange das Werkzeug ausschließlich beim Entwickler im Quasi-Testbetrieb läuft — er entfällt erst, wenn es auch Kollegen benutzen dürfen. Offene Fragen (F3, F7, F11) stehen im Anhang der Doku.
 
 ## Ziel
 
@@ -35,6 +35,6 @@ Der Dienst startet danach bei jeder Anmeldung an der grafischen Sitzung von selb
 
 ## Weiterführendes
 
-- `implementierungs_doku.md` — vollständiges Konzept (Zusammenhänge, Vorgaben, Einheiten) samt Fragenkatalog
+- `implementation-doc.md` — vollständiges Konzept (Zusammenhänge, Vorgaben, Einheiten) samt Fragenkatalog
 - `fahrplan.md` — nächste Schritte; `status.md` — was davon schon abgearbeitet ist
-- `Syncthing-Synology-Konfigurationsanleitung-allgemein.md` — Einrichtung des Vermittlungsknotens und der Clients
+- `syncthing-synology-setup-guide.md` — Einrichtung des Vermittlungsknotens und der Clients

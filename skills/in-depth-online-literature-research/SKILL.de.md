@@ -1,6 +1,6 @@
 ---
-name: tiefen-recherche
-description: Gründliche Quellen- und Literaturrecherche im Web, die nicht beim ersten Fehlschlag endet — wechselt systematisch Suchbegriffe, Kanäle und Ebenen (Register, Kataloge, Autorenverfolgung), prüft jede Suchzusammenfassung an der Primärquelle und meldet statt „nichts gefunden" die noch offenen Suchwege. Verwenden, sobald etwas recherchiert, belegt oder wiedergefunden werden soll — eine Literaturquelle, ein Fakt, ein Dokument — und die ersten Suchtreffer die Frage nicht beantworten, oder wenn der Nutzer /tiefen-recherche aufruft.
+name: in-depth-online-literature-research
+description: Gründliche Quellen- und Literaturrecherche im Web, die nicht beim ersten Fehlschlag endet — wechselt systematisch Suchbegriffe, Kanäle und Ebenen (Register, Kataloge, Autorenverfolgung), prüft jede Suchzusammenfassung an der Primärquelle und meldet statt „nichts gefunden" die noch offenen Suchwege. Verwenden, sobald etwas recherchiert, belegt oder wiedergefunden werden soll — eine Literaturquelle, ein Fakt, ein Dokument — und die ersten Suchtreffer die Frage nicht beantworten, oder wenn der Nutzer /in-depth-online-literature-research aufruft.
 license: CC0-1.0
 ---
 
