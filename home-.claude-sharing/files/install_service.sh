@@ -178,7 +178,7 @@ fi
 
 # --- 2. Own files ---------------------------------------------------------
 
-for file in claude_sync_watchd.py "$UNIT_NAME" konfliktloesung.md .stignore; do
+for file in claude_sync_watchd.py "$UNIT_NAME" conflict-resolution.md .stignore; do
     [ -f "$SCRIPT_DIR/$file" ] || fail \
         "Die Datei '$file' fehlt in $SCRIPT_DIR." \
 "Alle Dateien des Vorhabens müssen in diesem Ordner liegen. Bitte den

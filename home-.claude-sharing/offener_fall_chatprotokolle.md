@@ -164,7 +164,7 @@ Auch das verstößt nicht gegen die Vorgabe »keine selbsttätige Zusammenführu
 
 **6.4 Wo das hingehörte, wenn es beschlossen wird.**
 
-- Als Sonderregel in die Arbeitsanweisung der Konfliktsitzung (`konfliktloesung.md`, beschrieben im Kapitel **„Arbeitsanweisung für die Konfliktsitzung"**): Bei Konflikten unter `projects/` keine Fassung wählen, sondern die Vereinigung nach `uuid` vorschlagen, und vorher das Schließen des Chats auf allen Rechnern empfehlen.
+- Als Sonderregel in die Arbeitsanweisung der Konfliktsitzung (`conflict-resolution.md`, beschrieben im Kapitel **„Arbeitsanweisung für die Konfliktsitzung"**): Bei Konflikten unter `projects/` keine Fassung wählen, sondern die Vereinigung nach `uuid` vorschlagen, und vorher das Schließen des Chats auf allen Rechnern empfehlen.
 - Als Zusammenhang in das Kapitel **„Konflikte: Entstehung und Gestalt"**, weil dort die Warnung steht, die dieser Fall erklärt.
 - Als Befund in **„Belegführung und Testplan"** sowie bei **F3** und **F7** im Fragenkatalog.
 
@@ -206,7 +206,7 @@ Für den Fall, dass am entfernten Rechner eine Sitzung läuft und deshalb vor de
 
 ## 10 Was getan wurde und was nicht
 
-**Nicht getan, bewusst:** keine Änderung an der Implementierungsdoku, an `konfliktloesung.md` oder am Wächter. Der Doku-Review soll zuerst zu einem konsistenten Stand kommen; erst danach wird dieser Fall eingearbeitet.
+**Nicht getan, bewusst:** keine Änderung an der Implementierungsdoku, an `conflict-resolution.md` oder am Wächter. Der Doku-Review soll zuerst zu einem konsistenten Stand kommen; erst danach wird dieser Fall eingearbeitet.
 
 **Getan am 13. August:** Der vorliegende Konflikt wurde aufgelöst — nach Prüfung der Enthaltensein-Eigenschaft **nur die Kopie gelöscht**, das Original unangetastet (Abschnitt 4). Die Messungen waren rein lesend und ohne Gesprächsinhalte.
 
