@@ -168,18 +168,19 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 
 ### 5.2 Zweiteilung: dünne `SKILL.md`, nachgeladener Regelteil
 
-**Ein Skill, der nach dem Auslösen erst klärt, ob er überhaupt angewendet wird, trägt seine Regeln nicht in der `SKILL.md`.** Sie enthält dann nur dreierlei: den Geltungsbereich, die Klärung samt Absage, und die Anweisung, bei Zustimmung eine zweite Datei desselben Ordners zu lesen (`${CLAUDE_SKILL_DIR}/<datei>.md`). Alles Weitere steht in dieser zweiten Datei.
+**Ein Skill, der nach dem Auslösen erst klärt, ob er überhaupt angewendet wird, trägt seine Regeln nicht in der `SKILL.md`.** Sie enthält dann nur dreierlei: den Geltungsbereich, die Klärung samt Absage, und die Anweisung, bei Zustimmung eine zweite Datei desselben Ordners zu lesen (`${CLAUDE_SKILL_DIR}/<datei>.md`). Alles Weitere steht in dieser zweiten Datei. **Sie heißt einheitlich `rules.md`**, bei mehreren Sprachfassungen `rules.de.md`/`rules.en.md` nach 5.1 (Festlegung des Entwicklers vom 26. August 2026; Dateinamen sind englisch).
 
 Der Grund steckt im Ladeverhalten (1.2): Weitere Dateien im Skill-Ordner lädt Claude nur, wenn die `SKILL.md` ausdrücklich auf sie verweist — und was einmal geladen ist, bleibt für den Rest der Sitzung im Kontext. Ein Skill, der auf eine Lage auslöst, in der er oft doch nicht zum Zug kommt, schleppt seinen vollen Text sonst in jeder dieser Sitzungen mit, ohne je benutzt zu werden. Mit der Teilung kostet er dann nur die Klärungsseite.
 
 **Zwei Skills wären der falsche Weg** — sie müssten gemeinsam installiert werden, und 2.3 verbietet ohnehin, dass ein Skill auf einen anderen verweist. Die zweite Datei im selben Ordner löst beides.
 
-**Vorgeschlagen wird die Teilung, wenn beide Bedingungen zutreffen:**
+**Vorgeschlagen wird die Teilung, wenn alle drei Bedingungen zutreffen:**
 
 1. **Die Abwahl ist ein realistischer Ausgang** — der Skill löst auf eine Lage aus, die er nicht sicher trifft, und der Nutzer verneint die Anwendung erwartbar häufig.
 2. **Der Regelteil ist deutlich länger als die Klärung.**
+3. **Die Entscheidung ist ohne den Regelteil zu treffen.** Beleg ist `correct-zaaack-md-editor-mistakes` (geprüft am 25. August 2026): Er erfüllt die ersten beiden Bedingungen, aber ob ein Projekt betroffen ist, zeigt erst ein Lauf seiner Werkzeuge — und deren Beschreibung ist der Regelteil. Die Klärung müsste ihn also ohnehin laden, und die Teilung spart nichts.
 
-Trifft nur eines zu, bringt die Teilung nichts: Ein Skill, der immer gilt, sobald er auslöst, spart nichts, und ein kurzer Regelteil rechtfertigt den zusätzlichen Ladeschritt nicht. Entsteht ein neuer Skill oder wächst ein bestehender, wird diese Prüfung vorgenommen und die Teilung vorgeschlagen; entschieden wird sie vom Nutzer.
+Fehlt eine der Bedingungen, bringt die Teilung nichts: Ein Skill, der immer gilt, sobald er auslöst, spart nichts; ein kurzer Regelteil rechtfertigt den zusätzlichen Ladeschritt nicht; und wer den Regelteil schon zur Klärung braucht, lädt ihn ohnehin. Entsteht ein neuer Skill oder wächst ein bestehender, wird diese Prüfung vorgenommen und die Teilung vorgeschlagen; entschieden wird sie vom Nutzer.
 
 **In der `SKILL.md` bleibt außerdem der Satz, der die Teilung begründet.** Ohne ihn liest sich die dünne Datei wie ein unfertiger Skill und wird beim nächsten Aufräumen wieder zusammengelegt.
 
