@@ -1,6 +1,6 @@
 # Skills für Claude Code
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-27*
 
 *[English version](README.en.md)*
 
@@ -28,7 +28,7 @@ Eingeführt und umgesetzt wird dabei ein Konzept der **stillen Trigger**, das au
 
 Dazu kommt bei manchen Skills eine **Zweiteilung**: Die `SKILL.md` klärt dann zuerst nur, ob der Skill überhaupt zur Anwendung kommt, und lädt den eigentlichen Regelteil erst bei Zustimmung aus einer zweiten Datei desselben Ordners nach. Ein Skill, der auf eine Lage auslöst, in der er oft doch nicht gebraucht wird, kostet so nur seine Klärungsseite statt seines ganzen Textes.
 
-Vorgaben für diesen Bereich `skills/` und Erkenntnisse aus den zugehörigen Messreihen stehen in `implementation-doc.md`. Diese README beschreibt nur das Ergebnis: Was es gibt und wie man es benutzt. Jedes Skill hat dazu noch ein eigenes README-File mit speziellen Hinweisen und dem jeweiligen Entwicklungszustand des Skills.
+Vorgaben für diesen Bereich `skills/` und Erkenntnisse aus den zugehörigen Messreihen stehen in `skill-dev-doc.md`. Diese README beschreibt nur das Ergebnis: Was es gibt und wie man es benutzt. Jedes Skill hat dazu noch ein eigenes README-File mit speziellen Hinweisen und dem jeweiligen Entwicklungszustand des Skills.
 
 ## 3 Skills beschaffen und installieren
 
@@ -40,7 +40,7 @@ Die von Anthropic vorgesehene Technik löst einen Skill über seine `description
 
 Skills, die einen solchen Trigger brauchen, bringen dafür eine Datei `CLAUDE-snippet.md` in ihrem Ordner mit. Ihr Inhalt wird der `CLAUDE.md` derselben Ebene per Hand zugefügt.
 
-**In welchen Sprachen ein Skill vorliegt, ist von Fall zu Fall verschieden.** Die meisten gibt es hier nur auf Deutsch; ihre Dateien tragen dann kein Sprachkürzel und werden unverändert kopiert. Nur wo es mehrere Fassungen gibt, tragen `SKILL.md` und `CLAUDE-snippet.md` ein Sprachkürzel vor der Endung — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Installiert wird dann genau eine Sprachversion, und die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die `README.md` bildet die Ausnahme: Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel — GitHub und GitLab zeigen beim Browsen eines Ordners automatisch nur eine Datei namens exakt `README.md` an, ein Sprachkürzel würde das verhindern (Näheres in `implementation-doc.md`, Kapitel 5.1). Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Fassung an sich gegenüber allen Chat-Sprachen kompatibel sein sollte.
+**In welchen Sprachen ein Skill vorliegt, ist von Fall zu Fall verschieden.** Die meisten gibt es hier nur auf Deutsch; ihre Dateien tragen dann kein Sprachkürzel und werden unverändert kopiert. Nur wo es mehrere Fassungen gibt, tragen `SKILL.md` und `CLAUDE-snippet.md` ein Sprachkürzel vor der Endung — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Installiert wird dann genau eine Sprachversion, und die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die `README.md` bildet die Ausnahme: Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel — GitHub und GitLab zeigen beim Browsen eines Ordners automatisch nur eine Datei namens exakt `README.md` an, ein Sprachkürzel würde das verhindern (Näheres in `skill-dev-doc.md`, Kapitel 5.1). Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Fassung an sich gegenüber allen Chat-Sprachen kompatibel sein sollte.
 
 Der Ordnername ist in allen Fassungen derselbe und trägt nie ein Kürzel; dasselbe gilt für den Skill-Namen im Frontmatter und damit für den Aufruf `/<skill-name>`.
 
@@ -68,13 +68,13 @@ Drei Regeln — zwei davon aus Messungen und nicht aus Geschmack, die dritte aus
 
 **Die `description` des Skills entscheidet zuerst.** Sie beginnt mit dem Hauptanwendungsfall und benutzt die Wörter, die ein Nutzer von sich aus sagen würde. Wer dort eine Einordnung voranstellt („Testskill…“, „Interne Fassung…“) oder projektinterne Fachbegriffe verwendet, die in keiner Anfrage vorkommen, kann den Trigger unwirksam machen — gemessen: derselbe Trigger-Text feuerte mit guter Beschreibung, mit schwacher nicht.
 
-**Ein Trigger sollte an ein Ereignis oder eine Handlung gebunden sein,** nicht bloß an eine Eigenschaft der Aufgabe. „Behalte im Blick, ob diese Aufgabe komplex ist“ trägt sich nicht selbst; „bevor du zum ersten Mal eine Datei änderst, prüfe …“ oder „taucht eine Datei auf, die du nicht angefasst hast, dann …“ lösen zuverlässig aus. Die Messreihen dazu stehen in `implementation-doc.md`, Kapitel 3.
+**Ein Trigger sollte an ein Ereignis oder eine Handlung gebunden sein,** nicht bloß an eine Eigenschaft der Aufgabe. „Behalte im Blick, ob diese Aufgabe komplex ist“ trägt sich nicht selbst; „bevor du zum ersten Mal eine Datei änderst, prüfe …“ oder „taucht eine Datei auf, die du nicht angefasst hast, dann …“ lösen zuverlässig aus. Die Messreihen dazu stehen in `skill-dev-doc.md`, Kapitel 3.
 
 **Die `description` steht in der dritten Person.** Sie beschreibt den Skill — „Übersetzt Dokumente …“, „Verwenden, sobald …“ — und spricht niemanden an, weder Claude noch den Nutzer. Das ist keine Stilfrage: Die Beschreibung wird in den Systemprompt eingefügt, und ein wechselnder Blickwinkel stört dort die Auswahl unter vielen Skills. Anthropic sagt das ausdrücklich — *„Always write in third person […] inconsistent point-of-view can cause discovery problems“* ([Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)).
 
 ## 4 Offene Punkte des Vorhabens
 
-Die anstehenden Schritte samt ihrer Reihenfolge stehen im **[Fahrplan](fahrplan.md)**. Was an einem einzelnen Skill fertig ist — und was dort zwar geplant, aber noch nicht auf der Tagesordnung ist —, steht in dessen eigener `README.md` im Skill-Ordner.
+Die anstehenden Schritte samt ihrer Reihenfolge stehen im **[Fahrplan](../work-plan.md)**. Was an einem einzelnen Skill fertig ist — und was dort zwar geplant, aber noch nicht auf der Tagesordnung ist —, steht in dessen eigener `README.md` im Skill-Ordner.
 
 ## Lizenz
 
