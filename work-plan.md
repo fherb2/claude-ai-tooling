@@ -1,16 +1,18 @@
-# Fahrplan des Vorhabens `skills/`
+# Fahrplan des Repositories
 
 Die anstehenden Schritte in der Reihenfolge ihrer Bearbeitung. Erledigte Schritte fliegen raus; die Nummern der übrigen werden dabei **nicht** neu vergeben, neue Schritte zählen hoch.
 
-Was hier **nicht** steht: der Zustand eines Skills und alles, was zwar geplant, aber noch nicht auf der Tagesordnung ist. Beides trägt die `README.md` des jeweiligen Skills. Der Fahrplan gibt die Folgeschritte der Projektbearbeitung vor, keine Zukunftsvisionen.
+**Dieser Fahrplan gilt repository-weit.** Er lag bis zum 27. August 2026 in `skills/`, weil die Arbeit dort begann; seine Schritte betrafen aber längst alle Bereiche (zuletzt die Dateinamen-Prüfung und die Zielwelt-Sortierung). Vorhaben mit eigenem, abgegrenztem Entwicklungsstand führen daneben weiter ihren eigenen: `chat-export/work-plan-v2.md` und `home-.claude-sharing/work-plan.md`.
 
-Eine `status.md` führt dieses Vorhaben nicht.
+Was hier **nicht** steht: der Zustand eines Skills oder Bereichs und alles, was zwar geplant, aber noch nicht auf der Tagesordnung ist. Beides trägt die `README.md` des jeweiligen Skills bzw. Bereichs. Der Fahrplan gibt die Folgeschritte der Projektbearbeitung vor, keine Zukunftsvisionen.
+
+Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
 ## 3 Anweisungs-Inventar zuordnen
 
-Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner, der nach Abschluss entfällt) werden einzeln zugeordnet. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `implementation-doc.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `implementation-doc.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
+Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner, der nach Abschluss entfällt) werden einzeln zugeordnet. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `skill-dev-doc.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `skill-dev-doc.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
 
 Damit erledigt sich zugleich der übergreifend offene Punkt „Neuordnung der Arbeitsanweisungen zu Skill-Zuhausen“.
 
@@ -52,4 +54,4 @@ Der Skill bleibt dabei **benutzbar** — beide Punkte betreffen die Absicherung,
 
 ## 12 Bereiche und Skills nach Zielwelt sortieren
 
-Alle Bereiche und Skills des Repos werden in drei Gruppen sortiert (Festlegung des Entwicklers vom 27. August 2026): **web- und Claude-Code-fähig**, **nur Claude-Code-fähig** und **nur web-fähig** (claude.ai). Manche Skills wird es in beiden Zielwelten in abgewandelter Form geben, weil der Claude-Code-Wortlaut auf claude.ai so nicht funktioniert. Das Ergebnis wird als Festlegung in der `implementation-doc.md` festgeschrieben; die Zuordnung je Posten in Schritt 3 benutzt dieselben Gruppen.
+Alle Bereiche und Skills des Repos werden in drei Gruppen sortiert (Festlegung des Entwicklers vom 27. August 2026): **web- und Claude-Code-fähig**, **nur Claude-Code-fähig** und **nur web-fähig** (claude.ai). Manche Skills wird es in beiden Zielwelten in abgewandelter Form geben, weil der Claude-Code-Wortlaut auf claude.ai so nicht funktioniert. Das Ergebnis wird als Festlegung in der `skill-dev-doc.md` festgeschrieben; die Zuordnung je Posten in Schritt 3 benutzt dieselben Gruppen.

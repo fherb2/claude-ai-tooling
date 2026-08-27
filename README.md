@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-08-25*
+*Stand: 2026-08-27*
 
 *[English version](README.en.md)*
 
@@ -19,6 +19,8 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
 
 (✅ einsatzbereit · 🚧 in Arbeit · ⚠️ mit Vorbehalt · ☑ abh. vom Skill)
+
+Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[`skill-dev-doc.md`](skill-dev-doc.md)** trägt die Vorgaben und das Umgebungswissen für den Bau von Skills — gleich in welchem Ordner sie entstehen —, **[`work-plan.md`](work-plan.md)** die anstehenden Arbeitsschritte. Vorhaben mit eigenem Entwicklungsstand führen daneben ihre eigene Doku und ihren eigenen Arbeitsplan.
 
 ### **Anwendungshinweise** weiter unten in dieser README:
 

@@ -45,6 +45,6 @@ Der Skill wirkt auch in claude.ai und im Claude-Desktop: Dieselbe `SKILL.md` lä
 
 **Status:** Fertig und einsatzbereit. Die deutsche Fassung ist am 23. August 2026 entstanden und in zwei Inhaltstests erprobt worden — einem Auffinde-Härtefall (Fachartikel, den die allgemeine Suche nicht liefert) und einer offenen Sammelrecherche in fremdem Fachgebiet und fremder Sprache; beide bestanden, aus dem zweiten stammt der Selbsttest gegen nachlassende Kennzeichnungsdisziplin. Die englische Fassung ist am 24. August 2026 als Übersetzung der deutschen entstanden.
 
-**Offen:** Zwei Erprobungen stehen noch aus — die Nachmessung des Selbsttests und der claude.ai-Zweig der Ergebnisübergabe. Die Schritte dazu stehen im [Fahrplan](../fahrplan.md). Beide betreffen die Absicherung, nicht die Benutzbarkeit: Der Skill ist fertig und einsatzbereit.
+**Offen:** Zwei Erprobungen stehen noch aus — die Nachmessung des Selbsttests und der claude.ai-Zweig der Ergebnisübergabe. Die Schritte dazu stehen im [Fahrplan](../../work-plan.md). Beide betreffen die Absicherung, nicht die Benutzbarkeit: Der Skill ist fertig und einsatzbereit.
 
 **Bewusst offen gelassen:** Ob eine Quellenkarte geführt wird, wo sie im Projekt liegt und ob ein Projekt mehrere führt, entscheidet der Nutzer im Zielprojekt — der Skill schreibt weder Ablageort noch Zuschnitt vor. Eine Aufspaltung in mehrere Karten lohnt erst, wenn ein Projekt nachweislich zwei fachfremde Recherchestränge beherbergt.
