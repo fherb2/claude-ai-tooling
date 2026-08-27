@@ -55,3 +55,20 @@ Der Skill bleibt dabei **benutzbar** — beide Punkte betreffen die Absicherung,
 ## 12 Bereiche und Skills nach Zielwelt sortieren
 
 Alle Bereiche und Skills des Repos werden in drei Gruppen sortiert (Festlegung des Entwicklers vom 27. August 2026): **web- und Claude-Code-fähig**, **nur Claude-Code-fähig** und **nur web-fähig** (claude.ai). Manche Skills wird es in beiden Zielwelten in abgewandelter Form geben, weil der Claude-Code-Wortlaut auf claude.ai so nicht funktioniert. Das Ergebnis wird als Festlegung in der `skill-dev-doc.md` festgeschrieben; die Zuordnung je Posten in Schritt 3 benutzt dieselben Gruppen.
+
+## 13 `pedantic-text-editing`: die Ausführung einem Skript übergeben
+
+**Betriebsbefund des Entwicklers vom 27. August 2026:** Nach der Freigabe — oft „alle" — führt die Instanz jede einzelne Änderung als eigene Werkzeugoperation aus. Bei einer Runde mit bis zu 30 Stellen dauert das sehr lange, und der Aufwand wächst mit jeder Stelle, obwohl der Vorgang mechanisch ist: Alle Angaben liegen zum Zeitpunkt der Ausführung bereits vor — Vorher-Stück, Nachher-Stück, Zeilennummer, und zwar bezogen auf die **unveränderte** Ausgangsdatei.
+
+**Ansatz:** Ein Skript im Skill-Ordner führt die freigegebenen Ersetzungen in einem Lauf aus. Seine Datenquelle ist die Befunddatei, die ohnehin vor der Ausführung entsteht und committet wird (Abschnitt 8 und 11 der Regeln): Sie trägt je Fund die ID, die Zeilennummer, Vorher und Nachher in leerraumtreuen Codeblöcken sowie den Freigabestand in der Blocküberschrift.
+
+**Vor dem Bau zu klären:**
+
+- **Mehrere Funde in derselben Zeile** sind der Normalfall (im Beispiel des Entwicklers zweimal Zeile 17, zweimal Zeile 42). Das Skript muss sie nacheinander auf dieselbe Zeile anwenden und melden, wenn zwei Vorher-Stücke einander überlappen.
+- **Die Zeilennummer bezieht sich auf den Ausgangsstand.** Solange keine Ersetzung Zeilen hinzufügt oder entfernt, bleibt sie gültig; ob mehrzeilige Ersetzungen überhaupt zugelassen werden, ist zu entscheiden.
+- **Eindeutigkeit:** Innerhalb der genannten Zeile muss das Vorher-Stück genau einmal vorkommen. Trifft es mehrfach oder gar nicht, wird die Stelle nicht geraten, sondern gemeldet — dieselbe Regel wie heute in Abschnitt 10.
+- **Freigabestand:** Woher nimmt das Skript, welche IDs freigegeben sind? Entweder aus der Blocküberschrift der Befunddatei oder als Aufrufparameter; beides ist möglich, eines ist festzulegen.
+- **Die Gegenprobe bleibt Pflicht** (Abschnitt 11) und wird nicht durch das Skript ersetzt. Sie kann aber von ihm gestützt werden: Trefferzahl gegen freigegebene IDs, dazu weiterhin der Blick in `git diff`.
+- **Format-Empfindlichkeit:** Der Parser liest eine Markdown-Datei. Fasst ein Editor sie an, kann Leerraum verlorengehen — genau der Grund, aus dem die Befunddatei heute schon Blöcke statt Tabellenzeilen benutzt. Das Skript muss einen unlesbaren Block melden statt ihn zu überspringen.
+
+**Zusammenhang mit Schritt 12:** Dasselbe Skript ist der einzige bekannte Weg zu einer Web-Fassung, die ihr Detailtreue-Versprechen mechanisch hält — auf claude.ai läuft der Rückweg sonst durch die Inferenz und erzeugt eine Abschrift. Die Entscheidung über die Web-Fassung sollte deshalb nach diesem Schritt fallen, nicht davor.
