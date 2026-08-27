@@ -1,6 +1,6 @@
 # pedantic-text-editing — Textbearbeitung mit Detailtreue
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-27*
 
 *[English version](README.en.md)*
 
@@ -55,7 +55,11 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 ## Stand
 
-**Status: abgeschlossen.** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs; der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben. Die Erprobung im Betrieb ist abgeschlossen: Rundengröße, Teilung, Ausschnittlängen und die Form der Vorlage haben an einem echten Text getragen, und die Betriebsbefunde (Tabellenformat der Vorlage, Behandlung zurückgestellter inhaltlicher Funde, Aufräum-Erinnerung) sind in den Regeltext eingearbeitet (25. August 2026). Offene Punkte gibt es nicht.
+**Status: abgeschlossen.** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs; der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben. Die Erprobung im Betrieb ist abgeschlossen: Rundengröße, Teilung, Ausschnittlängen und die Form der Vorlage haben an einem echten Text getragen, und die Betriebsbefunde (Tabellenformat der Vorlage, Behandlung zurückgestellter inhaltlicher Funde, Aufräum-Erinnerung) sind in den Regeltext eingearbeitet (25. August 2026).
+
+**Offen:**
+
+- **Die Ausführung dauert zu lange.** Nach der Freigabe führt die Instanz jede Änderung einzeln aus; bei einer vollen Runde summiert sich das erheblich, obwohl alle Angaben mechanisch vorliegen. Ein Skript, das die freigegebenen Ersetzungen in einem Lauf ausführt, ist als Schritt 13 im [Fahrplan](../../work-plan.md) beschrieben — samt der Fragen, die vor dem Bau zu klären sind. Betriebsbefund vom 27. August 2026; die Funktion des Skills ist davon unberührt.
 
 **Bewusst offen gelassene Entscheidungen:**
 
