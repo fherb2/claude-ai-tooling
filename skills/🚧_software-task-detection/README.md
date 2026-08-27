@@ -10,4 +10,4 @@ Erkennen, dass die Anfrage des Nutzers auf eine zu schreibende oder zu ändernde
 
 **Teilweise überholt.** `common-code-generation` trägt inzwischen einen Teil dessen, was hier als Idee steht: Er wird ausgelöst, wenn Code entsteht, auch ohne dass die Anfrage von Code spricht.
 
-**Offen:** Ob aus der Idee überhaupt ein eigener Skill wird, ist nicht entschieden. Der Schritt dazu steht im [Fahrplan](../fahrplan.md).
+**Offen:** Ob aus der Idee überhaupt ein eigener Skill wird, ist nicht entschieden. Der Schritt dazu steht im [Fahrplan](../../work-plan.md).

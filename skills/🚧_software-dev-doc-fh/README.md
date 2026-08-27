@@ -43,6 +43,6 @@ Das Kürzel `-fh` ist Absicht: Das ist die Arbeitsweise eines bestimmten Entwick
 
 **Status:** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden. Die Erprobung am Zielort findet statt, wenn der Skill dort gebraucht wird.
 
-**Offen:** Ob die Werkzeug-Skills `konzept-segmentierung` und `konsistenzpruefung` in dieses Vorhaben gehören, ist nicht entschieden. Der Schritt dazu steht im [Fahrplan](../fahrplan.md).
+**Offen:** Ob die Werkzeug-Skills `konzept-segmentierung` und `konsistenzpruefung` in dieses Vorhaben gehören, ist nicht entschieden. Der Schritt dazu steht im [Fahrplan](../../work-plan.md).
 
 **Geplant, aber noch nicht auf der Tagesordnung.** Bei der nächsten Arbeit an diesem Skill ist mitzuentscheiden, ob er nach Kapitel 5.2 der Vorgaben zweigeteilt wird — dünne `SKILL.md` mit einer Klärung, ob der Standard hier überhaupt gilt, und ein nachgeladener Regelteil. Der Trigger ist eigenschaftsförmig („sobald eine Software-Änderung über eine lokal begrenzte Korrektur hinausgeht"), eine Abwahl also realistisch, und der Regelteil ist lang genug. Anders als bei anderen Kandidaten wäre hier aber kein Klärungsschritt umzubauen, sondern erst einer zu entwerfen — deshalb keine eigene Runde, sondern eine Entscheidung im Zuge der inhaltlichen Arbeit (Durchsicht vom 25. August 2026).

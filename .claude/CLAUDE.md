@@ -36,10 +36,21 @@ der Entwicklung entfällt (siehe unten).
 Was für den Nutzer da ist, trägt englische Dateinamen; die Arbeitssprache
 der Inhalte bleibt davon unberührt Deutsch. Ein Sprachkürzel wie `.de.md`
 kennzeichnet eine Sprachfassung und ist kein Verstoß. Ausgenommen sind
-Entwicklungs- und Verwaltungsdateien (`fahrplan.md`, `status.md`,
-`noch-geplant.md` u. Ä.) — international sein muss, was für den Nutzer da
-ist, nicht die Projektverwaltung (Festlegung des Entwicklers vom
-26. August 2026, Abschluss von Fahrplanschritt 11 in `skills/`).
+Entwicklungs- und Verwaltungsdateien (`status.md`, `noch-geplant.md`
+u. Ä.) — international sein muss, was für den Nutzer da ist, nicht die
+Projektverwaltung (Festlegung des Entwicklers vom 26. August 2026,
+Abschluss von Fahrplanschritt 11).
+
+**Eine Ausnahme von dieser Ausnahme, bewusst abweichend von
+Arbeitsanweisungen §2.3:** Der Fahrplan heißt in diesem Repository
+`work-plan.md`, nicht `fahrplan.md`. Grund ist der Ort — dies ist das
+einzige international gehostete Repository des Entwicklers, und der
+Fahrplan liegt hier in der Projektwurzel, also im ersten Blickfeld jedes
+Besuchers. Der Begriff „Fahrplan" bleibt in der deutschen Prosa
+unverändert; nur der Dateiname folgt der Sichtbarkeit (Festlegung des
+Entwicklers vom 27. August 2026). Betroffen sind alle drei: die
+repository-weite `work-plan.md` in der Wurzel,
+`home-.claude-sharing/work-plan.md` und `chat-export/work-plan-v2.md`.
 
 Zwei Präzisierungen: Bei Skill-Ordnern ist der Name die Schnittstelle —
 Ordnername, Frontmatter-Feld `name` und Slash-Aufruf sind dasselbe; eine
@@ -84,7 +95,7 @@ nichts für ein anderes ab. Welche Struktur eines hat, sagt seine eigene
 README; welche Regeln darin gelten, sein eigener Vorgabenteil (siehe nächster
 Abschnitt).
 
-## `fahrplan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich
+## `work-plan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich
 
 Diese drei Dateien tragen die Entwicklung eines Vorhabens. Sie sind
 **keine Pflichtausstattung** eines Ordners, und ihr Fehlen ist kein Mangel,
@@ -92,7 +103,7 @@ den man beheben müsste.
 
 - **Während der Entwicklung** gelten die Arbeitsanweisungen §2.3 und §2.6:
   Fahrplan und Status werden geführt, die Doku wächst mit dem Code.
-- **Ist ein Vorhaben fertig**, können `fahrplan.md` und `status.md`
+- **Ist ein Vorhaben fertig**, können `work-plan.md` und `status.md`
   **entfallen** — ohne offene Schritte wären sie leere Hüllen. Bevor sie
   gelöscht werden, wandert ihr dauerhaft geltender Teil in die Doku oder die
   README; was dort schon steht, entfällt ersatzlos.
@@ -118,7 +129,7 @@ vollständig — nicht nur die Sektion, die zur Aufgabe gehört.
 Der Grund steckt in der Natur dieser Vorgaben: Sie halten fest, was man der
 einzelnen Datei nicht ansieht. Dass etwa die `description` eines Skills
 gegen eine Vorgabe verstößt, erkennt man nicht beim Lesen der `SKILL.md`,
-sondern nur gegen `skills/implementation-doc.md`. Wer die Vorgaben nicht kennt,
+sondern nur gegen `skill-dev-doc.md`. Wer die Vorgaben nicht kennt,
 schreibt den Verstoß gutgläubig hin — und der nächste Review meldet ihn zu
 Recht.
 
@@ -263,7 +274,7 @@ gesagt, statt es liegenzulassen.
 Entsteht in `skills/` ein neuer Skill oder wächst ein bestehender, prüfe, ob
 sein Regelteil aus der `SKILL.md` heraus in eine nachgeladene Datei desselben
 Ordners gehört, und schlage die Teilung vor. Wann sie sich lohnt und wie sie
-gebaut wird, steht in `skills/implementation-doc.md`, Kapitel 5.2 — hier
+gebaut wird, steht in `skill-dev-doc.md`, Kapitel 5.2 — hier
 absichtlich kein zweites Mal.
 
 # Baustellenschilder in Ordnernamen

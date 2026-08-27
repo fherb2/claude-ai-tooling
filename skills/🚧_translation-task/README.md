@@ -36,6 +36,6 @@ Vor der Arbeit klärt er Zielsprache und Fachjargon-Grad und legt eine Arbeitspr
 
 **Status:** Anweisungen vollständig, Frontmatter gesetzt. Die Erprobung am Zielort findet statt, wenn der Skill dort gebraucht wird.
 
-**Offen:** Fünf Festlegungen stehen noch aus; sie sind in der `SKILL.md` unter „Noch nicht festgelegt" benannt. Der Schritt dazu steht im [Fahrplan](../fahrplan.md).
+**Offen:** Fünf Festlegungen stehen noch aus; sie sind in der `SKILL.md` unter „Noch nicht festgelegt" benannt. Der Schritt dazu steht im [Fahrplan](../../work-plan.md).
 
 **Bewusst offen gelassen:** Das Glossar wird nicht mitgeliefert. Es entsteht im Betrieb und ist projektabhängig; eine leere Vorlage würde nur suggerieren, es gäbe einen Startbestand.

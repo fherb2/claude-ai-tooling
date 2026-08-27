@@ -8,7 +8,7 @@ Deshalb immer nach Session-Start, wenn das erste mal git in der Session benutzt 
 
 # Noch geplant: Fahrplan, Planungsablage und die Dateien eines Entwicklungsvorhabens
 
-*Diese Datei ist Arbeitsmaterial zum Skill, nicht Teil von ihm. Die `SKILL.md` verweist nicht auf sie, sie wird also nie geladen (`implementation-doc.md` 1.2). Sie hält fest, was an diesem Skill noch zu tun ist, bevor er installiert werden kann.*
+*Diese Datei ist Arbeitsmaterial zum Skill, nicht Teil von ihm. Die `SKILL.md` verweist nicht auf sie, sie wird also nie geladen (`skill-dev-doc.md` 1.2). Sie hält fest, was an diesem Skill noch zu tun ist, bevor er installiert werden kann.*
 
 ## Anlass
 
@@ -33,7 +33,7 @@ Daraus die Frage, die diese Recherche ausgelöst hat: Liegt es daran, dass die R
 - **§2.6 „Fahrplan und Status"**: Fahrplan = „die nächsten Schritte in **aufgabenangemessener Detaillierung**", Erledigtes fliegt raus; Status = ausschließlich abgearbeitete Einträge, keine Entscheidungen.
 - **§1.9 „Kontext-Haushalt"**: „Wird der Kontext knapp, ist die nächste Handlung die **Detaillierung des Fahrplans** — vor jeder Komprimierung"; Fahrplan und Status sind „das Übergabemedium zwischen Maschinen und Sessions".
 - **§2.5 „Arbeitsschleife"**: „Die Tagesaufgabe kommt aus dem Fahrplan."
-- **§2.3 „Dokumentstruktur"**: `fahrplan.md` und `status.md` liegen neben den Segmentdateien, ohne numerisches Präfix.
+- **§2.3 „Dokumentstruktur"**: `work-plan.md` und `status.md` liegen neben den Segmentdateien, ohne numerisches Präfix.
 - **§2.1 „Phasen"**: Der Fahrplan entsteht erstmalig in Phase 3, der Segmentierung.
 - **§1.7 „Commits"**: „Der Commit-Body benennt den Fahrplanpunkt bzw. den Plan des Schritts."
 
@@ -41,7 +41,7 @@ Daraus die Frage, die diese Recherche ausgelöst hat: Liegt es daran, dass die R
 
 - **„Wo ein Plan steht"**: es gebe „genau zwei Orte, und **keine eigenen Plan-Dateien**" — Review-Befunde in den Doku-Anhang, **alles andere „im Fahrplan, im betreffenden Schritt ausdetailliert"**. Ausdrücklich mit §2.6 und §1.9 begründet: „das ist genau ein Plan." Dazu: höchstens ein unausgeführter Plan gleichzeitig, Zweck ist die Wiederaufnahme ohne Chatkenntnis, nach der Ausführung wird er ersetzt statt ergänzt.
 - **„Fahrplan-Nummerierung"**: Nummern werden beim Streichen erledigter Schritte nicht neu vergeben.
-- **„`fahrplan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich"**: keine Pflichtausstattung, dürfen nach Fertigstellung entfallen; wo es keinen Fahrplan gibt, trägt die README „den Plan des nächsten Schritts".
+- **„`work-plan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich"**: keine Pflichtausstattung, dürfen nach Fertigstellung entfallen; wo es keinen Fahrplan gibt, trägt die README „den Plan des nächsten Schritts".
 - **„Befundlisten abarbeiten"**: welche Befundlisten offen sind, sagt der Fahrplan des jeweiligen Vorhabens.
 
 ### 3 Die installierten Skills berühren den Fahrplan nur am Rand
@@ -56,11 +56,11 @@ Daraus die Frage, die diese Recherche ausgelöst hat: Liegt es daran, dass die R
 
 ### 5 Die eine Stelle, die den Fahrplan bewusst abwählt
 
-`skills/implementation-doc.md` begründet, warum das Vorhaben `skills/` keinen Fahrplan führt: Es entsteht kein zusammenhängender Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte; „ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen". An seine Stelle tritt nach 6.1 eine **„Offen"-Liste in der README des jeweiligen Skills** — „Diese Liste ersetzt den früheren Gesamt-Fahrplan" —, und dort steht dann auch der Plan des nächsten Schritts, höchstens einer, deutlich als unausgeführt gekennzeichnet. Das ist bereits heute ein vierter Ablageort für Planungen, der in keiner der drei anderen Quellen vorkommt.
+`skill-dev-doc.md` begründet, warum das Vorhaben `skills/` keinen Fahrplan führt: Es entsteht kein zusammenhängender Quellcode, sondern eine Sammlung einzeln nebeneinanderstehender Anweisungstexte; „ein gemeinsamer Fahrplan hätte deshalb nichts zu ordnen". An seine Stelle tritt nach 6.1 eine **„Offen"-Liste in der README des jeweiligen Skills** — „Diese Liste ersetzt den früheren Gesamt-Fahrplan" —, und dort steht dann auch der Plan des nächsten Schritts, höchstens einer, deutlich als unausgeführt gekennzeichnet. Das ist bereits heute ein vierter Ablageort für Planungen, der in keiner der drei anderen Quellen vorkommt.
 
 ### 6 Anwendungen ohne Regelcharakter
 
-`home-.claude-sharing/fahrplan.md` trägt eine eigene Präambel mit lokalen Regeln (Dringlichkeitsreihenfolge statt Nummernreihenfolge, Abschnitt „Dauerhaft" für nie Erledigtes). `chat-export/fahrplan.md` führt den Fahrplan ausschließlich als Befundliste. `home-.claude-sharing/files/conflict-resolution.md` stellt ausdrücklich klar, dass die mitgeladene Projektmethodik samt Fahrplan **in der Konfliktsitzung nicht gilt**.
+`home-.claude-sharing/work-plan.md` trägt eine eigene Präambel mit lokalen Regeln (Dringlichkeitsreihenfolge statt Nummernreihenfolge, Abschnitt „Dauerhaft" für nie Erledigtes). `chat-export/work-plan.md` führt den Fahrplan ausschließlich als Befundliste. `home-.claude-sharing/files/conflict-resolution.md` stellt ausdrücklich klar, dass die mitgeladene Projektmethodik samt Fahrplan **in der Konfliktsitzung nicht gilt**.
 
 ### 7 Nebenbefund zum Trigger-Entwurf
 
@@ -72,13 +72,13 @@ Daraus die Frage, die diese Recherche ausgelöst hat: Liegt es daran, dass die R
 
 **Das ist die erste und wichtigste Aufgabe, weil alle folgenden davon abhängen.** Solange dieselbe Festlegung an mehreren Orten steht, entstehen Doppelungen, die auseinanderdriften, und Kollisionen, bei denen niemand mehr sagen kann, welche Fassung gilt. Der Befund zeigt das an einem konkreten Fall: „Wo ein Plan steht" existiert in zwei gleichlautenden Fassungen, und eine Änderung an nur einer davon hätte den Widerspruch nicht behoben, sondern verdoppelt.
 
-Umzuziehen ist die Beschreibung **aller** Dateien, die ein Entwicklungsvorhaben begleiten — welche es gibt, was jede trägt, was ausdrücklich **nicht** hineingehört, und was mit ihr geschieht, wenn das Vorhaben fertig ist: die Implementierungsdoku mit ihrer Segmentstruktur, `fahrplan.md`, `status.md`, der Review-Anhang und die künftigen Planungsdateien (T2).
+Umzuziehen ist die Beschreibung **aller** Dateien, die ein Entwicklungsvorhaben begleiten — welche es gibt, was jede trägt, was ausdrücklich **nicht** hineingehört, und was mit ihr geschieht, wenn das Vorhaben fertig ist: die Implementierungsdoku mit ihrer Segmentstruktur, `work-plan.md`, `status.md`, der Review-Anhang und die künftigen Planungsdateien (T2).
 
 Quellen, aus denen der Inhalt herausgelöst wird, und was dort zurückbleibt:
 
 - **`~/.claude/CLAUDE.md` §2.1 bis §2.6** — der gesamte Abschnitt 2 ist der Sache nach dieser Skill. Zurück bleibt der stille Trigger nach `CLAUDE-snippet.md` und, soweit weiterhin gebraucht, die Abgrenzung aus der Präambel, wann Abschnitt 2 überhaupt gilt.
 - **`<projekt>/.claude/CLAUDE.md`** — „Wo ein Plan steht", „Fahrplan-Nummerierung" und der Abschnitt über die entwicklungszeitlichen Dateien. Zurück bleibt nur, was **repo-spezifisch** ist und nicht verallgemeinert werden kann.
-- **`skills/implementation-doc.md` 6.1** — die Abwahl des Fahrplans für das Vorhaben `skills/` bleibt dort, sie ist projektspezifisch. Der Skill sollte diesen Fall aber **kennen** und benennen: Ein Vorhaben ohne zusammenhängenden Quellcode darf die Dateistruktur ersetzen, und wo das geschieht, gehört die Abweichung in die Vorgaben des Vorhabens.
+- **`skill-dev-doc.md` 6.1** — die Abwahl des Fahrplans für das Vorhaben `skills/` bleibt dort, sie ist projektspezifisch. Der Skill sollte diesen Fall aber **kennen** und benennen: Ein Vorhaben ohne zusammenhängenden Quellcode darf die Dateistruktur ersetzen, und wo das geschieht, gehört die Abweichung in die Vorgaben des Vorhabens.
 - **`konzept-segmentierung` und `konsistenzpruefung`** — beide dürfen den Fahrplan weiter **benutzen**, aber nicht mehr **definieren**. Ihre Sätze sind daraufhin durchzusehen; wo sie eine Eigenschaft des Fahrplans behaupten, wird daraus ein Verweis.
 
 Nach dem Umzug gilt für jede Fundstelle die Probe: Sie nennt den Fahrplan, oder sie beschreibt ihn — beides zugleich darf keine mehr.
@@ -105,8 +105,8 @@ Vorschlag für den Umbau dieses Skills, in der Reihenfolge der Wirkung.
 
 **T2.7 Unberührt bleiben** die Nummernregel, „Erledigtes fliegt raus" und die Trennung von Status und Entscheidung. Sie waren nie das Problem.
 
-**T2.8 Ohne Installation wirkt nichts davon.** Der Skill muss an einen Ladeort kopiert und der stille Trigger aus `CLAUDE-snippet.md` in die `CLAUDE.md` des Zielorts übernommen werden, die Datei danach am Zielort gelöscht (`implementation-doc.md` 5). Erst dann ist die Frage überhaupt beantwortbar, ob er auslöst. Mit dem Umzug aus T1 wächst außerdem sein Gegenstand: Die `description` nennt heute „Fahrplan und Status" beiläufig am Ende — sie ist daraufhin durchzusehen, ob sie den erweiterten Inhalt noch trägt.
+**T2.8 Ohne Installation wirkt nichts davon.** Der Skill muss an einen Ladeort kopiert und der stille Trigger aus `CLAUDE-snippet.md` in die `CLAUDE.md` des Zielorts übernommen werden, die Datei danach am Zielort gelöscht (`skill-dev-doc.md` 5). Erst dann ist die Frage überhaupt beantwortbar, ob er auslöst. Mit dem Umzug aus T1 wächst außerdem sein Gegenstand: Die `description` nennt heute „Fahrplan und Status" beiläufig am Ende — sie ist daraufhin durchzusehen, ob sie den erweiterten Inhalt noch trägt.
 
 ### T3 — Diese Datei hat am Ende zu verschwinden
 
-`implementation-doc.md` 5 lässt Zusatzdateien nur zu, wenn die `SKILL.md` auf sie verweist, und 6.1 weist offene Punkte der `README.md` des Skills unter „Offen" zu. Diese Datei steht also neben der Vorgabe; sie ist Arbeitsmaterial für einen Umbau, der mehrere Dateien außerhalb dieses Ordners betrifft, und dafür in der README am falschen Platz. Ist der Umbau ausgeführt, wandert das Verbliebene unter „Offen" in die `README.md`, und diese Datei wird gelöscht.
+`skill-dev-doc.md` 5 lässt Zusatzdateien nur zu, wenn die `SKILL.md` auf sie verweist, und 6.1 weist offene Punkte der `README.md` des Skills unter „Offen" zu. Diese Datei steht also neben der Vorgabe; sie ist Arbeitsmaterial für einen Umbau, der mehrere Dateien außerhalb dieses Ordners betrifft, und dafür in der README am falschen Platz. Ist der Umbau ausgeführt, wandert das Verbliebene unter „Offen" in die `README.md`, und diese Datei wird gelöscht.
