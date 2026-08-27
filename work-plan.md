@@ -16,7 +16,7 @@ Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeit
 
 Damit erledigt sich zugleich der übergreifend offene Punkt „Neuordnung der Arbeitsanweisungen zu Skill-Zuhausen“.
 
-**Der Schritt ist größer als sein ursprünglicher Zuschnitt und wird bei Beginn untergliedert** (Festlegung des Entwicklers vom 27. August 2026). Dreierlei dazu: T2, T12, T13 und T16 sind erledigt und aus Inventar wie Quelldateien entfernt (abgedeckt durch `common-code-generation` bzw. `temp-debug-code`). Die durch die globale CLAUDE.md abgedeckten Posten (T1, T3, T6, T7, T21, T22) gelten ausdrücklich **nicht** als erledigt — die globale CLAUDE.md wird selbst noch zu dynamisch ladenden Skills durchgearbeitet, und diese Posten sind dafür Referenzmaterial. Und die Zielwelt-Sortierung (Schritt 12) wirkt herein: Je Posten ist auch zu bestimmen, in welche Zielwelt-Gruppe sein Zuhause gehört.
+**Der Schritt ist größer als sein ursprünglicher Zuschnitt und wird bei Beginn untergliedert** (Festlegung des Entwicklers vom 27. August 2026). Dreierlei dazu: T2, T12, T13 und T16 sind erledigt und aus Inventar wie Quelldateien entfernt (abgedeckt durch `common-code-generation` bzw. `temp-debug-code`). Die durch die globale CLAUDE.md abgedeckten Posten (T1, T3, T6, T7, T21, T22) gelten ausdrücklich **nicht** als erledigt — die globale CLAUDE.md wird selbst noch zu dynamisch ladenden Skills durchgearbeitet, und diese Posten sind dafür Referenzmaterial. Und die Zielwelt-Sortierung wirkt herein: Je Posten ist auch zu bestimmen, in welche Zielwelt-Gruppe sein Zuhause gehört — die Gruppen und das Zuordnungskriterium stehen in Kapitel 9 der `skill-dev-doc.md`.
 
 ## 4 `🚧_translation-task`: die fünf offenen Festlegungen
 
@@ -52,10 +52,6 @@ Der Skill bleibt dabei **benutzbar** — beide Punkte betreffen die Absicherung,
 - Die Wirksamkeit des Selbsttests nachmessen. Der passende Prüffall: eine Wiederholung der Sammelrecherche mit anschließendem Abgleich aller Links gegen die tatsächlich abgerufenen Seiten.
 - Den claude.ai-Zweig der Ergebnisübergabe (automatisches Artefakt) dort erproben.
 
-## 12 Bereiche und Skills nach Zielwelt sortieren
-
-Alle Bereiche und Skills des Repos werden in drei Gruppen sortiert (Festlegung des Entwicklers vom 27. August 2026): **web- und Claude-Code-fähig**, **nur Claude-Code-fähig** und **nur web-fähig** (claude.ai). Manche Skills wird es in beiden Zielwelten in abgewandelter Form geben, weil der Claude-Code-Wortlaut auf claude.ai so nicht funktioniert. Das Ergebnis wird als Festlegung in der `skill-dev-doc.md` festgeschrieben; die Zuordnung je Posten in Schritt 3 benutzt dieselben Gruppen.
-
 ## 13 `pedantic-text-editing`: die Ausführung einem Skript übergeben
 
 **Betriebsbefund des Entwicklers vom 27. August 2026:** Nach der Freigabe — oft „alle" — führt die Instanz jede einzelne Änderung als eigene Werkzeugoperation aus. Bei einer Runde mit bis zu 30 Stellen dauert das sehr lange, und der Aufwand wächst mit jeder Stelle, obwohl der Vorgang mechanisch ist: Alle Angaben liegen zum Zeitpunkt der Ausführung bereits vor — Vorher-Stück, Nachher-Stück, Zeilennummer, und zwar bezogen auf die **unveränderte** Ausgangsdatei.
@@ -71,4 +67,4 @@ Alle Bereiche und Skills des Repos werden in drei Gruppen sortiert (Festlegung d
 - **Die Gegenprobe bleibt Pflicht** (Abschnitt 11) und wird nicht durch das Skript ersetzt. Sie kann aber von ihm gestützt werden: Trefferzahl gegen freigegebene IDs, dazu weiterhin der Blick in `git diff`.
 - **Format-Empfindlichkeit:** Der Parser liest eine Markdown-Datei. Fasst ein Editor sie an, kann Leerraum verlorengehen — genau der Grund, aus dem die Befunddatei heute schon Blöcke statt Tabellenzeilen benutzt. Das Skript muss einen unlesbaren Block melden statt ihn zu überspringen.
 
-**Zusammenhang mit Schritt 12:** Dasselbe Skript ist der einzige bekannte Weg zu einer Web-Fassung, die ihr Detailtreue-Versprechen mechanisch hält — auf claude.ai läuft der Rückweg sonst durch die Inferenz und erzeugt eine Abschrift. Die Entscheidung über die Web-Fassung sollte deshalb nach diesem Schritt fallen, nicht davor.
+**Zusammenhang mit der Zielwelt-Festlegung:** Dasselbe Skript ist der einzige bekannte Weg zu einer Web-Fassung dieses Skills, die ihr Detailtreue-Versprechen mechanisch hält — auf claude.ai läuft der Rückweg sonst durch die Inferenz und erzeugt eine Abschrift (`skill-dev-doc.md` 1.4). Deshalb steht seine Web-Fassung in Kapitel 9.4 als „offen bis Schritt 13"; die Sortierung selbst ist davon unberührt und abgeschlossen.

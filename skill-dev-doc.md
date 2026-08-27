@@ -36,6 +36,28 @@ Wozu er da ist, erklärt die Gesamt-README. Für das Schreiben zählen zwei Ding
 
 **Ein Skill ohne stillen Trigger ist der Normalfall.** Gebraucht wird er nur, wenn die Auslösebedingung nicht aus der Nutzeranfrage selbst hervorgeht.
 
+### 1.4 Die zweite Zielwelt: claude.ai
+
+Was ein Skill dort kann und was nicht — erarbeitet am 27. August 2026, Beleglage je Aussage ausgewiesen. Die Vorgabe, die daraus folgt, steht in Kapitel 9.
+
+**Was sich unverändert überträgt:**
+
+- **Der stille Trigger.** claude.ai hat auf beiden Ebenen ein Feld für Anweisungen: eines global für das Konto — die Entsprechung zur `~/.claude/CLAUDE.md` — und eines je Projekt. Beide werden geschrieben wie eine `CLAUDE.md`, es geht nichts verloren. (Beobachtung des Entwicklers aus laufender Nutzung.)
+- **Die Zweiteilung** aus Kapitel 5.2. Custom Skills werden dort als **ZIP** hochgeladen (Settings → Features; Pro, Max, Team, Enterprise, Voraussetzung ist aktivierte Code-Ausführung), und das Nachladen weiterer Dateien ist ausdrücklich vorgesehen: *„If those instructions reference other files … Claude reads those files too"*, mit *„None until accessed"* als Token-Kosten (belegt, [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)). Unterschiedlich ist allein der **Pfad-Ausdruck**: `${CLAUDE_SKILL_DIR}` ersetzt nur Claude Code (belegt, [Skills](https://code.claude.com/docs/en/skills)); auf claude.ai bliebe er wörtlicher Text.
+- **Das Description-Budget** (8.1) gilt dort ebenso: Jeder installierte Skill kostet dauerhaft seine Beschreibung in der Listung, ob er auslöst oder nicht.
+
+**Wo die Grenze verläuft — und sie ist asymmetrisch:**
+
+- **Der Lesepfad ist mechanisch möglich.** *„Files in your projects are now accessible through Claude's computing environment while remaining in context"* (belegt, [Create and edit files](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude)) — ein Skript im Container kann Projektwissen-Dateien also lesen. Der Nachsatz ist die Einschränkung: Sie bleiben dabei im Kontext, der Container spart keinen Kontext.
+- **Der Rückweg läuft durch die Inferenz.** Ein Skript erzeugt **kein** Artefakt; seine Ausgabe geht in den Kontext, und erst die Instanz überträgt sie. Was so zurückkommt, ist eine **Abschrift, keine Ersetzung** — für jeden Skill entscheidend, der Detailtreue verspricht. (Beobachtung des Entwicklers.) Artefakte entstehen inzwischen selbst in der Ausführungsumgebung — *„Claude now uses the computing environment to create artifacts"* (belegt, ebd.) —, was daran nichts ändert: Geschrieben werden sie weiterhin von der Instanz.
+- **Kein Zugriff auf den Rechner des Nutzers.** Die Ausführungsumgebung ist eine VM bei Anthropic; kein Repo, kein Git, keine lokalen Dateien. Das ist das Kriterium, an dem sich die Gruppe eines Skills entscheidet (Kapitel 9).
+- **Grenzen nebenbei:** 30 MB je Datei für Up- und Download; das öffentliche Teilen von Konversationen mit File-Artefakten aus der Code-Ausführung ist für Free-, Pro- und Max-Konten deaktiviert (belegt, ebd.).
+
+**Zwei offene Prüffragen**, beide klein und beide erst beim ersten Web-Skill fällig:
+
+1. **Kommt eine reine Textdatei als Download heraus?** Dokumentiert sind `.xlsx`, `.pptx`, `.docx`, `.pdf`, PNG und Python-Skripte; bei diesen Formaten ist der Weg zwingend mechanisch, weil der Inhalt nicht durch eine Antwort laufen kann. Ob `.md`, `.tex` oder `.txt` ebenso ankommen, sagt die Doku nicht. Davon hängt ab, ob ein Skill auf claude.ai überhaupt eine mechanisch gesicherte Rückgabe haben kann.
+2. **Zieht ein hochgeladener Skill dort wirklich seine zweite Datei?** Das Nachladen ist belegt, aber von uns nicht beobachtet. Ein zweigeteilter Skill hochladen und nachsehen genügt.
+
 ---
 
 ## 2 Vorgaben für Trigger
@@ -190,6 +212,8 @@ Fehlt eine der Bedingungen, bringt die Teilung nichts: Ein Skill, der immer gilt
 
 Die zweite Datei folgt der Sprachregel aus 5.1 wie die `SKILL` selbst und wandert bei der Installation in der gewählten Sprache mit.
 
+**Die Teilung trägt in beiden Zielwelten.** Auf claude.ai ist das Nachladen gebündelter Dateien ausdrücklich vorgesehen; unterschiedlich ist allein der Pfad-Ausdruck im Ladebefehl (1.4). Wo die Fassungen einer Zielwelt weiter auseinandergehen, ist dieselbe Konstruktion zugleich der Ort dafür — eine Regeldatei je Zielwelt (9.2).
+
 Prüfbar: Auf jede `SKILL.md`, die beide Bedingungen erfüllt und trotzdem ihren ganzen Regeltext trägt, lässt sich zeigen — das ist der Verstoß. Ebenso auf jede Zusatzdatei, auf die keine `SKILL.md` verweist: Sie wird nie geladen.
 
 ---
@@ -289,3 +313,56 @@ Festlegung, vom Entwickler am 22. August 2026 bestätigt. Sie ist der Maßstab, 
 Festlegung, vom Entwickler am 22. August 2026 vorgegeben. Claude wird weit über das Coden hinaus eingesetzt; dass die bisher gesammelten Anweisungen fast nur vom Coden handeln, ist Zufall ihrer Herkunft, keine Aussage über die Nutzung. Daraus folgt für jede Anweisung und jeden Skill: Eine Regel, die nur fürs Coden gilt, muss ausdrücklich so deklariert sein — in der `description`, im Trigger und im Skill-Körper —, damit sie eine Claude-Instanz in anderen Arbeitsformen nicht bindet. Eine Dokumentation beschreibt nicht zwingend eine Software, ein Plan ist nicht zwingend ein Softwareentwicklungsplan.
 
 Prüffrage bei jeder Zuordnung eines Anweisungs-Postens: Gilt er nur beim Coden, in allen Arbeitsformen oder in einer anderen, benennbaren Arbeitsform? Die Antwort ist Teil der Zuordnung und wird mit festgehalten.
+
+---
+
+## 9 Zielwelten
+
+Jeder Skill gehört in genau eine von drei Gruppen. Was die Zielwelten technisch können, steht in 1.4; hier steht, was daraus für den Bau folgt. Festlegung des Entwicklers vom 27./28. August 2026.
+
+### 9.1 Die drei Gruppen
+
+- **web + code** — der Skill ist in beiden Zielwelten sinnvoll. Wie weit die Fassungen auseinandergehen, entscheidet 9.2.
+- **nur code** — der Skill braucht, was es auf claude.ai nicht gibt: Zugriff auf die Dateien des Nutzers, Git, den lokalen Rechner.
+- **nur web** — der Skill regelt etwas, das es nur dort gibt (Artefakt-Mechanik, Projektwissen-Uploads).
+
+**Das Zuordnungskriterium ist der Datenweg, nicht das Thema.** Ein Skill, der nur Verhalten regelt, überträgt sich; sobald er Daten anfasst, entscheidet die Frage, ob sie ihn erreichen und ob sein Ergebnis zurückkommt (1.4). Reine Verhaltensregeln sind deshalb fast immer web+code, und der teuerste Fall ist ein Skill, dessen Ergebnis mechanisch zurückgeschrieben werden muss.
+
+### 9.2 Wie tief die Fassungen auseinandergehen — vier Bauformen
+
+Zwei getrennte Skills sind nie der Weg (2.3). Gestaffelt nach dem, was sich tatsächlich unterscheidet:
+
+| Unterschied | Bauform |
+| --- | --- |
+| ein Wort — etwa der Ablageort einer Anweisung | **Ein Skilltext**, der beide Orte nennt |
+| ein Absatz — ein Prüfschritt hat in einer Welt kein Werkzeug | **Ein Skilltext** mit kurzem Verzweigungsabsatz |
+| ein ganzer Mechanismus | **Eigene Regeldatei je Zielwelt**; beim Installieren wird die passende mitgenommen, wie heute schon die Sprachfassung |
+| die Zielwelt kann die Sache nicht | **keine Fassung** — begründet in der README des Skills festhalten |
+
+Die dritte Zeile kostet nichts Zusätzliches: Die Zweiteilung aus 5.2 trägt die Zielwelt genauso wie die Sprache. Nur der Ladebefehl im Gate nennt dann einen anderen Pfad-Ausdruck (1.4).
+
+### 9.3 Aufnahmekriterium: Nutzen gegen Dauerkosten
+
+**Ein Skill wird für eine Zielwelt nur gebaut, wenn sein Nutzen dort die Dauerkosten seiner Description trägt.** Die Description steht bei jedem installierten Skill dauerhaft in der Listung, ob er auslöst oder nicht (8.1) — und das ist die einzige Kostenstelle, die keine Zweiteilung wegnimmt.
+
+Der teuerste Fall ist deshalb nicht der große Skill, sondern der **selten gebrauchte mit breitem Trigger**: Er lädt oft und nützt selten. Bei ihm ist die Frage nicht, wie man ihn billiger macht, sondern ob er in dieser Welt überhaupt installiert gehört.
+
+**Technische Zuordnung und Nutzungsentscheidung sind zweierlei.** Die Gruppe sagt, was möglich ist; ob eine mögliche Fassung auch entsteht, entscheidet der Entwickler je Skill — und erst dann, wenn er sie braucht. Eine offene Nutzungsentscheidung ist kein Mangel und wird als solche vermerkt.
+
+### 9.4 Zuordnung der vorhandenen Skills
+
+Stand 28. August 2026. „Web-Fassung" nennt die Nutzungsentscheidung, nicht die technische Möglichkeit.
+
+| Skill | Gruppe | Web-Fassung | Grund |
+| --- | --- | --- | --- |
+| `common-code-generation` | web + code | ja | Reine Verhaltensregeln, fasst keine Dateien an. Ein Wort ändert sich: der Ablageort der Plan-Regel |
+| `in-depth-online-literature-research` | web + code | ja | Websuche gibt es beidseitig; die Quellenkarte kann Claude dort nicht schreiben, nur vorschlagen |
+| `temp-debug-code` | web + code | offen | Marken gelten unverändert; der `grep`-Selbsttest braucht eine Fassung ohne Shell. Ob auf claude.ai überhaupt debuggt wird, entscheidet der Entwickler |
+| `pedantic-text-editing` | web + code | offen bis Schritt 13 | Der Kern trägt, aber der Rückweg wäre eine Abschrift (1.4). Eine mechanisch gesicherte Fassung hängt am Ersetzungsskript und an Prüffrage 1 aus 1.4 |
+| `correct-zaaack-md-editor-mistakes` | nur code | — | Die Werkzeuge liefen im Container, aber die Markdown-Dateien des Nutzers kommen nicht hinein und die Korrektur nicht zurück |
+| `parallel-sessions` | nur code | — | Git-Worktrees haben auf claude.ai keinen Gegenstand |
+| `chat-export` | nur code | — | Braucht Browser-Anbindung und ein Skript auf dem Rechner des Nutzers |
+
+`🚧_web-code-artefacts` ist der bisher einzige Kandidat für **nur web**; seine Zuordnung fällt mit seiner Ausarbeitung. Die Skills, die nur unter `~/.claude/skills/` liegen (`konzept-segmentierung`, `konsistenzpruefung`), sind hier nicht bewertet — sie sind nicht im Repo.
+
+Prüfbar: Auf jeden Skill ohne Gruppenangabe in dieser Tabelle lässt sich zeigen — das ist die Lücke. Und auf jede Web-Fassung, die gebaut wurde, ohne dass 9.3 dafür beantwortet ist.
