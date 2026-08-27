@@ -1,6 +1,6 @@
 # pedantic-text-editing — text editing with fidelity to detail
 
-*Last updated: 2026-08-26*
+*Last updated: 2026-08-27*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`.
 
@@ -53,7 +53,11 @@ To that end it separates three kinds of finding — rule violation, matter of fa
 
 ## State
 
-**Status: complete.** Both language versions of `SKILL` and rules file are finished, as are both READMEs; the rules text has been talked through with the developer and approved. Trying it out in practice is concluded: round size, splitting, excerpt lengths and the form of presentation held up on a real text, and the operational findings (table format of the review list, handling of deferred substantive findings, cleanup reminder) have been worked into the rules text (25 August 2026). There are no open points.
+**Status: complete.** Both language versions of `SKILL` and rules file are finished, as are both READMEs; the rules text has been talked through with the developer and approved. Trying it out in practice is concluded: round size, splitting, excerpt lengths and the form of presentation held up on a real text, and the operational findings (table format of the review list, handling of deferred substantive findings, cleanup reminder) have been worked into the rules text (25 August 2026).
+
+**Open:**
+
+- **Carrying out the changes takes too long.** After approval the instance applies every change one at a time; over a full round that adds up considerably, although every detail is mechanically available. A script that performs the approved replacements in a single run is described as step 13 in the [work plan](../../work-plan.md) (in German), together with the questions to settle before building it. Operational finding of 27 August 2026; the skill's function is unaffected.
 
 **Deliberately left open:**
 
