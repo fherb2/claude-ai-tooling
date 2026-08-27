@@ -34,12 +34,12 @@ Ein zotero.org-Konto ist **kostenlos**. Bezahlt wird nur Zoteros eigener Dateisp
 
 ## Geltungsbereich
 
-Dies ist das erste konkrete Beispiel für ein „Thema jenseits des Codens" im Sinne von `implementation-doc.md`, Kapitel 8.3 — reine Literatur-/Referenzverwaltung, kein Software-Kontext. Ein späterer Skill dazu muss entsprechend deklariert sein, nicht an einen Coding-Trigger gebunden.
+Dies ist das erste konkrete Beispiel für ein „Thema jenseits des Codens" im Sinne von `skill-dev-doc.md`, Kapitel 8.3 — reine Literatur-/Referenzverwaltung, kein Software-Kontext. Ein späterer Skill dazu muss entsprechend deklariert sein, nicht an einen Coding-Trigger gebunden.
 
 **Zur Verpackung:** Skills laufen inzwischen produktübergreifend — dieselbe `SKILL.md` in Claude Code, Claude Desktop und Claude Cowork (Stand August 2026, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein fertiger Skill hier müsste also nicht auf Claude Code beschränkt bleiben.
 
 ## Offen
 
-Probelauf, Klärung des Sammlungs-Managements und die anschließende Werkzeug-Entscheidung stehen als Schritte im [Fahrplan](../fahrplan.md). Nicht auf der Tagesordnung, aber festgehalten:
+Probelauf, Klärung des Sammlungs-Managements und die anschließende Werkzeug-Entscheidung stehen als Schritte im [Fahrplan](../../work-plan.md). Nicht auf der Tagesordnung, aber festgehalten:
 
 - Frühere Nebenidee, noch unentschieden: Markdown-Chat-Zusammenfassungen als Zotero-Quelle ablegen, um sie später wiederzufinden. Zotero indiziert `.md`-Anhänge derzeit **nicht** (dokumentierter Fehler, [Zotero-Forum](https://forums.zotero.org/discussion/94637/indexing-of-markdown-plain-text-attachments-with-md-extension)) — Workaround: dieselbe Datei als `.txt` anhängen. Eine „Weiterchatten"-Funktion kennt Zotero nicht; das bliebe reine Konvention (Notiz-/Extra-Feld mit Rückverweis).

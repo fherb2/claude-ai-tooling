@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-08-25*
+*Last updated: 2026-08-27*
 
 *[Deutsche Fassung](README.md)*
 
@@ -19,6 +19,8 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.en.md)<br>✅ | **Ready-made blocks of text for instruction files**: paragraphs to be copied out one by one, for the `CLAUDE.md` of a local installation and for the places where claude.ai takes instructions. |
 
 (✅ ready to use · 🚧 in progress · ⚠️ with reservations · ☑ depends on the skill)
+
+Two files in the project root accompany the development of every building block: **[`skill-dev-doc.md`](skill-dev-doc.md)** carries the guidelines and the environment knowledge for building skills — no matter which folder they grow in — and **[`work-plan.md`](work-plan.md)** the upcoming work steps (both in German). Projects with a development state of their own keep their own documentation and work plan alongside.
 
 ### **Usage notes** further down in this README:
 

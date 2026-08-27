@@ -38,7 +38,7 @@ Lässt sich eine geplante Änderung ohne Kontrollfluss nicht beschreiben, ist de
 ## Dokumentstruktur
 
 - **Ordner:** `running_implementation_doc/` — der Name ist pro Projekt anpassbar.
-- **Dateien:** je eine für Segment 1 und 2, dann eine je Hauptkapitel von Segment 3; dazu `fahrplan.md` und `status.md`. Die Dokumentdateien tragen numerische Präfixe in Leseordnung (`1_zusammenhaenge.md`, `2_vorgaben.md`, `3_1_orchestrator.md`, `3_2_pipeline.md`, …), Fahrplan und Status nicht.
+- **Dateien:** je eine für Segment 1 und 2, dann eine je Hauptkapitel von Segment 3; dazu `work-plan.md` und `status.md`. Die Dokumentdateien tragen numerische Präfixe in Leseordnung (`1_zusammenhaenge.md`, `2_vorgaben.md`, `3_1_orchestrator.md`, `3_2_pipeline.md`, …), Fahrplan und Status nicht.
 - **Überschriften:** Die Segmente sind Überschriften erster Ordnung, nummeriert 1 bis 3. Die Überschrift „3 …" steht nur in der ersten Kapiteldatei von Segment 3; jede weitere beginnt direkt mit ihrer Kapitelüberschrift zweiter Ordnung. So ergibt das Verketten aller Dokumentdateien in Dateireihenfolge ein gültiges Gesamtdokument.
 
 Ob ein Segment auf eine Datei oder mehrere verteilt wird, entscheidet das Projekt. Verlangt ist nur, dass die Verkettung in Dateireihenfolge lesbar bleibt.
