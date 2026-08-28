@@ -8,6 +8,8 @@ Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil gedacht: Wird ein 
 
 **Erledigt und entfernt am 27. August 2026:** T2, T12, T13 (abgedeckt durch den Skill `common-code-generation`) und T16 (abgedeckt durch `temp-debug-code`, als Nachfolger mit geänderten Marken). Die zugehörigen Passagen sind auch aus den Quelldateien dieses Ordners entfernt — sie sind Arbeitsmittel und sollen nur noch tragen, was zu verwerten bleibt. Die Beschreibungen der ursprünglichen, vollständigen Fassungen in den Kapiteln 1 und 2 bleiben als historische Einordnung stehen.
 
+**Erledigt und entfernt am 28. August 2026:** T8, T9, T10, T11 — verarbeitet im Skill `skills/🚧_web-code-editing/`, geprüft gegen den Frontend-Stand vom August 2026 statt übernommen (T11 war schon in den Quellen überholt und ist ersatzlos entfallen; T9 ist dort zeitlos neu begründet). Die zugehörigen Passagen sind aus den Quelldateien entfernt — **außer in MOD**: Dessen Verallgemeinerung von T8–T10 auf Dokument-Artefakte ist nicht verarbeitet und bleibt als mögliches eigenes Material stehen.
+
 ## 1 Die Quelldateien
 
 | Kürzel | Datei                                                                      | Inhaltlicher Zuschnitt                                                                                                                                                                                    |
@@ -44,10 +46,6 @@ Legende: ✓ enthalten · (✓) in abgewandelter Form enthalten · ⊘ ausdrück
 | T5  | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
 | T6  | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     |
 | T7  | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
-| T8  | Wann Artefakt, wann Chat                 | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
-| T9  | Artefakte nicht nachträglich ändern    | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
-| T10 | Vorher/Ersetzen-Schema                   | –   | (✓) | ✓   | –   | –     | (✓)   |
-| T11 | Teil-Artefakte ab ~2 A4-Seiten           | –   | –   | –   | ✓   | ⊘     | –     |
 | T14 | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T15 | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T17 | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     |
@@ -102,7 +100,7 @@ Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und ein
 
 ### B Artefakt-Arbeitsweise (claude.ai-Web-Frontend)
 
-Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind sämtlich Reaktionen auf zwei Eigenheiten des Web-Frontends: Artefakt-Änderungen konnten das Artefakt zerstören, und der Nutzer übernahm den Inhalt per Hand in seinen Code. Für eine künftige claude.ai-Nutzung existiert dafür bereits das Vorhaben `skills/🚧_web-code-editing/` (in Arbeit) — die Einträge hier sind dessen Rohmaterial.
+Von den Einträgen T6–T11 dieser Gruppe sind T8–T11 am 28. August 2026 im Skill `skills/🚧_web-code-editing/` verarbeitet und hier entfernt (siehe Erledigt-Notiz oben). T6 und T7 stehen mit doppelter Rolle: Im Web-Skill sind sie als „Bevor Du schreibst" verarbeitet; als Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md (§1.3–1.5) bleiben sie hier.
 
 #### T6 Ankündigen und Freigabe vor jedem Artefakt
 
@@ -119,38 +117,6 @@ Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind säm
 **Fundstellen:** MOD, BIRD, SCH‑A, SCH‑B in der ausführlichen Form („…lasse alle Fragen geklärt sein, bevor Du tatsächlich anfängst“); CAM in einer knapperen Frühform.
 
 **Einordnung:** **[abgedeckt]** sinngemäß durch §1.3/§1.5 — der Plan-Zustimmungs-Zyklus erzwingt die Klärung vor der Ausführung.
-
-#### T8 Wann Artefakt, wann Chat
-
-**Aussage (erweiterte Fassung):** Artefakte nur für neuen Code oder Code, der Altes in sehr großen Stücken vollständig ersetzt; ganze Dateien immer als Artefakt; ganze Funktionen/Klassen dürfen als Artefakt; alles andere als Änderungsanweisung im Chat (T10).
-
-**Fundstellen:** BIRD, SCH‑B mit den vollen Kriterien; MOD dieselben Kriterien, verallgemeinert auf „Code/Dokumenteninhalte“; CAM und SCH‑A nur die Kurzregel „kurze Codestücke direkt im Chat, ohne Artefakt“.
-
-**Einordnung:** **[claude.ai-Mechanik]** — in Claude Code entscheidet niemand mehr zwischen Artefakt und Chat, geschrieben wird direkt in Dateien. Rohmaterial für `web-code-editing`.
-
-#### T9 Artefakte nach Erstellung nicht mehr ändern
-
-**Aussage:** Einmal erstellte Artefakte normalerweise nicht mehr ändern (Grund: Web-Frontend-Fehler zerstören Artefakte; der Inhalt ist ohnehin schon auf den Rechner kopiert). Änderungen stattdessen als Einfüge-/Ersetzungsanweisung mitteilen — missverständnisfrei lokalisiert, mit exakter Einrückung.
-
-**Fundstellen:** alle außer ALLG. Varianten: CAM ohne die Ausnahme „es sei denn, ich bitte Dich darum“; BIRD/SCH‑B/MOD mit dieser Ausnahme und den Präzisierungen zu Einfügeort und Einrückung; SCH‑A zusätzlich mit einer Änderungs-Ausnahme für kurze, übersichtliche Snippets **unter 30 Zeilen** und der Regel, Positionen inhaltlich (z. B. Funktionsname) statt per Zeilennummer zu beschreiben.
-
-**Einordnung:** **[claude.ai-Mechanik]**. Die SCH‑A-Ausklammerung von T11 zeigt zudem, dass diese Regeln als Reaktion auf konkrete Frontend-Zustände entstanden und mit dem Frontend altern — ein Argument, sie bei einer Neuauflage für claude.ai gegen den heutigen Stand des Frontends zu prüfen, statt sie zu übernehmen.
-
-#### T10 Vorher/Ersetzen-Schema für Änderungen im Chat
-
-**Aussage:** Änderungen im Chat folgen einem festen Schema: ein „Vorher“-Block mit den zu ändernden Zeilen exakt so, wie sie die Editor-Suche findet, dann ein „Ersetzen-mit“-Block mit dem neuen Inhalt; originale Einrückung zwingend; **niemals Zeilennummern** zur Ortsangabe.
-
-**Fundstellen:** BIRD (Grundform); SCH‑B ergänzt: „Vorher“/„Nachher“ **vor** den Block schreiben, nicht hinein; MOD wie SCH‑B, verallgemeinert auf Dokumenteninhalte. CAM und SCH‑A haben das Schema nicht (SCH‑A stattdessen die inhaltliche Positionsbeschreibung, siehe T9).
-
-**Einordnung:** **[claude.ai-Mechanik]** — das Schema ist der Sache nach ein von Hand ausgeführtes Suchen-und-Ersetzen und entspricht exakt dem, was in Claude Code das Edit-Werkzeug maschinell tut (alter String → neuer String, keine Zeilennummern). Als Erkenntnis bleibt: Das Prinzip „Ortsangabe über Inhalt, nie über Zeilennummern“ hat sich unabhängig vom Werkzeug bewährt. Rohmaterial für `web-code-editing`.
-
-#### T11 Teil-Artefakte bei Überlänge
-
-**Aussage:** Artefakte, die länger als etwa zwei kleingedruckte A4-Seiten würden, in mehreren Teil-Artefakten liefern (Grund: Unterbrechung durch „Fortsetzen“, Zerstörungsgefahr beim Weiterschreiben).
-
-**Fundstellen:** CAM aktiv. SCH‑A: ausdrücklich **ausgeklammert** mit Begründung „Es scheinen inzwischen auch längere Artefakte zu funktionieren“, Wortlaut in Klammern konserviert. BIRD, SCH‑B, MOD: nicht mehr enthalten.
-
-**Einordnung:** **[claude.ai-Mechanik]**, schon innerhalb der Quellen selbst überholt. Für die Chronologie-Vermutung in Kapitel 2 ist dieser Eintrag das stärkste Indiz.
 
 ### D Debugging und Tests
 
@@ -211,7 +177,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 #### T21 Konzept-Artefakte
 
-**Aussage:** Beim Erarbeiten eines Konzepts (Code-Strukturen, APIs) entsteht spätestens am Ende der Konzipierung ein Konzept-Artefakt (Markdown). Der Auftrag kommt vom Nutzer, Claude darf es aber vorschlagen. Nicht zu früh anlegen (wegen des Artefakt-Änderungsproblems T9); in der erweiterten Fassung zusätzlich: rechtzeitig **vor** Erreichen des Chatlängen-Limits sichern, mit Reserve von einigen Chat-Blöcken für die Besprechung des Konzepts.
+**Aussage:** Beim Erarbeiten eines Konzepts (Code-Strukturen, APIs) entsteht spätestens am Ende der Konzipierung ein Konzept-Artefakt (Markdown). Der Auftrag kommt vom Nutzer, Claude darf es aber vorschlagen. Nicht zu früh anlegen (wegen des Artefakt-Änderungsproblems, vormals T9 — im Skill `web-code-editing` zeitlos neu gefasst); in der erweiterten Fassung zusätzlich: rechtzeitig **vor** Erreichen des Chatlängen-Limits sichern, mit Reserve von einigen Chat-Blöcken für die Besprechung des Konzepts.
 
 **Fundstellen:** CAM und SCH‑A in der Basisfassung; BIRD und SCH‑B erweitert („in der Regel“, „Vielleicht habe ich es nur vergessen“, Chatlängen-Vorsorge).
 
@@ -271,7 +237,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedient werden soll, sind diese Einträge das Rohmaterial für `skills/🚧_web-code-editing/` — dabei T11/SCH‑A als Warnung mitnehmen: Diese Regeln altern mit dem Web-Frontend und sind vor einer Neuauflage gegen dessen aktuellen Stand zu prüfen.
+T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/🚧_web-code-editing/` verarbeitet und entfernt. **T4 und T5 gehen einen eigenen Weg** (Entscheidung des Entwicklers vom 28. August 2026): Sie sind keine Artefakt-Mechanik, sondern eine Projektanweisung für claude.ai (Vorwissen-Abgrenzung) — sie gehören, falls weiter gewollt, in das dortige Anweisungsfeld, und vorher ist ihre Aktualität zu prüfen: Ob die Chat-Suche heute noch projektübergreifend arbeitet, ist offen.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
