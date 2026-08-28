@@ -1,6 +1,6 @@
 # pedantic-text-editing — text editing with fidelity to detail
 
-*Last updated: 2026-08-27*
+*Last updated: 2026-08-28*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`.
 
@@ -27,7 +27,9 @@ To that end it separates three kinds of finding — rule violation, matter of fa
    | `rules.de.md`  | `rules.en.md`  |
    | `README.md`    | `README.en.md` |
 
-   **Mandatory in this is only that the chosen SKILL version is called `SKILL.md` at the target location** — Claude Code recognizes no other name. Whether it is renamed for that or additionally placed makes no difference. The rules file keeps its name: the `SKILL.md` points to it, and that pointer is the only way the rules ever get loaded. Whoever renames it carries the pointer along.
+   Plus **`apply_findings.py`** — the script is language-independent and belongs to both versions. Without it Claude would have to carry out every approved change one at a time, which makes a full round take very long.
+
+   **Mandatory in this is only that the chosen SKILL version is called `SKILL.md` at the target location** — Claude Code recognizes no other name. Whether it is renamed for that or additionally placed makes no difference. Rules file and script keep their names: the `SKILL.md` points to the rules, those point to the script, and these pointers are the only way either gets loaded at all. Whoever renames carries the pointers along.
 
 ## Details
 
@@ -45,6 +47,10 @@ To that end it separates three kinds of finding — rule violation, matter of fa
 
 **Head and log are not decoration.** The head states what was **not** examined. That later answers the question why a place did not catch anyone's eye back then — without it, that cannot be reconstructed.
 
+**The script `apply_findings.py` carries out the round, and it never guesses.** It reads the findings file — which is written and committed before any change anyway — and receives from Claude the list of approved IDs together with the text fragments that stood in the chat. The two are held against each other: a slipped selection shows up there instead of passing as a plausible-looking wrong change. The search uses the full before-fragment, the replacement only the part that actually changes — otherwise two findings sharing a context word would wrongly count as a conflict. If a place cannot be located unambiguously, the script writes **nothing at all**, not even the undisputed places: a half-changed file would be the worst outcome, because from then on the line numbers in the findings file describe a state that no longer exists.
+
+**Measured against real rounds** (28 August 2026): four completed rounds from a running text project, 90 approved changes, replayed against their respective starting states — in all four cases the result was **byte-identical** with what had previously been made by hand. Three of the four rounds contained a pair of findings sharing a word; that is where the first version of the conflict check failed, and it is the origin of the split between search fragment and change core.
+
 **The file holds blocks, not table rows.** The text fragments must be exact to the character, and some editors realign Markdown table rows on saving and eat whitespace doing it. In the chat the presentation is tabular, because that is easier to survey — and there a finding gets as many table rows as it needs, the follow-up rows leave ID and line number empty, and the label (`Bef`, `Aft`, `Rsn`) sits in a narrow column of its own so that the text beside it starts at the same place throughout. A `<br>` inside the cell would be the obvious way but is not rendered everywhere: in the Claude Code frontend it shows up as visible text (observed 25 August 2026, on the skill's first use).
 
 **Displayed and stored excerpt are two things.** The displayed one follows the decision: the user must be able to find the spot and rule on it without gathering the context themselves. The stored one follows uniqueness within the file, because it is the template for an exact replacement. The two may differ in length; whoever collapses them gets either unclear proposals or replacements that slip.
@@ -53,11 +59,7 @@ To that end it separates three kinds of finding — rule violation, matter of fa
 
 ## State
 
-**Status: complete.** Both language versions of `SKILL` and rules file are finished, as are both READMEs; the rules text has been talked through with the developer and approved. Trying it out in practice is concluded: round size, splitting, excerpt lengths and the form of presentation held up on a real text, and the operational findings (table format of the review list, handling of deferred substantive findings, cleanup reminder) have been worked into the rules text (25 August 2026).
-
-**Open:**
-
-- **Carrying out the changes takes too long.** After approval the instance applies every change one at a time; over a full round that adds up considerably, although every detail is mechanically available. A script that performs the approved replacements in a single run is described as step 13 in the [work plan](../../work-plan.md) (in German), together with the questions to settle before building it. Operational finding of 27 August 2026; the skill's function is unaffected.
+**Status: complete.** Both language versions of `SKILL` and rules file are finished, as are both READMEs; the rules text has been talked through with the developer and approved. Trying it out in practice is concluded: round size, splitting, excerpt lengths and the form of presentation held up on a real text, and the operational findings (table format of the review list, handling of deferred substantive findings, cleanup reminder) have been worked into the rules text (25 August 2026). Since 28 August 2026 the script `apply_findings.py` carries out the changes, cross-checked against four real rounds (see “Details”). There are no open points.
 
 **Deliberately left open:**
 
