@@ -1,6 +1,6 @@
 # Skills für Claude Code
 
-*Stand: 2026-08-27*
+*Stand: 2026-08-28*
 
 *[English version](README.en.md)*
 

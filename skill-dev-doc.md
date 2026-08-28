@@ -49,14 +49,16 @@ Was ein Skill dort kann und was nicht — erarbeitet am 27. August 2026, Belegla
 **Wo die Grenze verläuft — und sie ist asymmetrisch:**
 
 - **Der Lesepfad ist mechanisch möglich.** *„Files in your projects are now accessible through Claude's computing environment while remaining in context"* (belegt, [Create and edit files](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude)) — ein Skript im Container kann Projektwissen-Dateien also lesen. Der Nachsatz ist die Einschränkung: Sie bleiben dabei im Kontext, der Container spart keinen Kontext.
-- **Der Rückweg läuft durch die Inferenz.** Ein Skript erzeugt **kein** Artefakt; seine Ausgabe geht in den Kontext, und erst die Instanz überträgt sie. Was so zurückkommt, ist eine **Abschrift, keine Ersetzung** — für jeden Skill entscheidend, der Detailtreue verspricht. (Beobachtung des Entwicklers.) Artefakte entstehen inzwischen selbst in der Ausführungsumgebung — *„Claude now uses the computing environment to create artifacts"* (belegt, ebd.) —, was daran nichts ändert: Geschrieben werden sie weiterhin von der Instanz.
+- **Der Rückweg ist zweigeteilt.** Ein **Artefakt** schreibt die Instanz — sein Inhalt läuft durch die Inferenz und ist eine Abschrift, keine Ersetzung; daran ändert auch nichts, dass Artefakte inzwischen in der Ausführungsumgebung entstehen (*„Claude now uses the computing environment to create artifacts"*, belegt, ebd.). Ein **Download** dagegen kann mechanisch entstehen: Datei im Container per Ersetzung ändern, nach `/mnt/user-data/outputs` legen, als Download anbieten — der Inhalt läuft nicht durch die Antwort. Kompletter Roundtrip beobachtet am 28. August 2026 (siehe unten).
+- **Der Lesepfad ist im RAG-Fall bestätigt und präzisiert:** Die Projektwissen-Dateien liegen unter **`/mnt/project/`** als echte Dateien gemountet — auch bei einer Wissensbasis weit über dem Kontextfenster. Beobachtet am 28. August 2026 an einem realen Projekt (gepackte Codebasis mit 39.898 Zeilen): eine 753-Zeilen-Quelldatei anhand ihrer `#!PKSRC:`-Token exakt extrahiert, eine Zeile eingefügt, per `diff` nachgewiesen (`1a2`, Rest bitidentisch), als Download bereitgestellt und als Artefakt angezeigt. **Wichtig: Die Selbstauskunft der Instanz verneinte diesen Zugriff zunächst überzeugt** — erst der konkrete Skript-Vorschlag brachte die Korrektur. Ein Skill, der diesen Weg braucht, muss ihn ausdrücklich anweisen (`ls /mnt/project/`), sonst scheitert er an der falschen Selbstauskunft. Die Pfade sind Beobachtung, keine Zusage.
 - **Kein Zugriff auf den Rechner des Nutzers.** Die Ausführungsumgebung ist eine VM bei Anthropic; kein Repo, kein Git, keine lokalen Dateien. Das ist das Kriterium, an dem sich die Gruppe eines Skills entscheidet (Kapitel 9).
 - **Grenzen nebenbei:** 30 MB je Datei für Up- und Download; das öffentliche Teilen von Konversationen mit File-Artefakten aus der Code-Ausführung ist für Free-, Pro- und Max-Konten deaktiviert (belegt, ebd.).
 
-**Zwei offene Prüffragen**, beide klein und beide erst beim ersten Web-Skill fällig:
+**Eine offene Prüffrage**, fällig beim ersten hochgeladenen Skill:
 
-1. **Kommt eine reine Textdatei als Download heraus?** Dokumentiert sind `.xlsx`, `.pptx`, `.docx`, `.pdf`, PNG und Python-Skripte; bei diesen Formaten ist der Weg zwingend mechanisch, weil der Inhalt nicht durch eine Antwort laufen kann. Ob `.md`, `.tex` oder `.txt` ebenso ankommen, sagt die Doku nicht. Davon hängt ab, ob ein Skill auf claude.ai überhaupt eine mechanisch gesicherte Rückgabe haben kann.
-2. **Zieht ein hochgeladener Skill dort wirklich seine zweite Datei?** Das Nachladen ist belegt, aber von uns nicht beobachtet. Ein zweigeteilter Skill hochladen und nachsehen genügt.
+1. **Zieht ein hochgeladener Skill dort wirklich seine zweite Datei?** Das Nachladen ist belegt, aber von uns nicht beobachtet. Ein zweigeteilter Skill hochladen und nachsehen genügt.
+
+*(Beantwortet am 28. August 2026: Ob eine reine Textdatei als Download herauskommt — ja; eine geänderte `.py` kam im Roundtrip-Test als Download an, siehe oben.)*
 
 ---
 
@@ -358,11 +360,11 @@ Stand 28. August 2026. „Web-Fassung" nennt die Nutzungsentscheidung, nicht die
 | `common-code-generation` | web + code | ja | Reine Verhaltensregeln, fasst keine Dateien an. Ein Wort ändert sich: der Ablageort der Plan-Regel |
 | `in-depth-online-literature-research` | web + code | ja | Websuche gibt es beidseitig; die Quellenkarte kann Claude dort nicht schreiben, nur vorschlagen |
 | `temp-debug-code` | web + code | offen | Marken gelten unverändert; der `grep`-Selbsttest braucht eine Fassung ohne Shell. Ob auf claude.ai überhaupt debuggt wird, entscheidet der Entwickler |
-| `pedantic-text-editing` | web + code | offen bis Schritt 13 | Der Kern trägt, aber der Rückweg wäre eine Abschrift (1.4). Eine mechanisch gesicherte Fassung hängt am Ersetzungsskript und an Prüffrage 1 aus 1.4 |
+| `pedantic-text-editing` | web + code | offen, aber machbar | Ersetzungsskript existiert (`apply_findings.py`), der mechanische Rückweg über `/mnt/user-data/outputs` ist beobachtet (1.4) — eine Web-Fassung könnte das Detailtreue-Versprechen halten. Ob sie gebaut wird, entscheidet der Entwickler |
 | `correct-zaaack-md-editor-mistakes` | nur code | — | Die Werkzeuge liefen im Container, aber die Markdown-Dateien des Nutzers kommen nicht hinein und die Korrektur nicht zurück |
 | `parallel-sessions` | nur code | — | Git-Worktrees haben auf claude.ai keinen Gegenstand |
 | `chat-export` | nur code | — | Braucht Browser-Anbindung und ein Skript auf dem Rechner des Nutzers |
 
-`🚧_web-code-editing` ist der bisher einzige Kandidat für **nur web**; seine Zuordnung fällt mit seiner Ausarbeitung. Die Skills, die nur unter `~/.claude/skills/` liegen (`konzept-segmentierung`, `konsistenzpruefung`), sind hier nicht bewertet — sie sind nicht im Repo.
+`🚧_web-code-editing` ist zugeordnet: **nur web** — er regelt Quellen und Rückgabewege des Web-Frontends; in Claude Code schreibt das Edit-Werkzeug direkt in die Dateien (ausgearbeitet am 28. August 2026, Erprobung als hochgeladener Skill offen). Die Skills, die nur unter `~/.claude/skills/` liegen (`konzept-segmentierung`, `konsistenzpruefung`), sind hier nicht bewertet — sie sind nicht im Repo.
 
 Prüfbar: Auf jeden Skill ohne Gruppenangabe in dieser Tabelle lässt sich zeigen — das ist die Lücke. Und auf jede Web-Fassung, die gebaut wurde, ohne dass 9.3 dafür beantwortet ist.
