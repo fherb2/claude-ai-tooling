@@ -102,7 +102,7 @@ Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und ein
 
 ### B Artefakt-Arbeitsweise (claude.ai-Web-Frontend)
 
-Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind sämtlich Reaktionen auf zwei Eigenheiten des Web-Frontends: Artefakt-Änderungen konnten das Artefakt zerstören, und der Nutzer übernahm den Inhalt per Hand in seinen Code. Für eine künftige claude.ai-Nutzung existiert dafür bereits das Vorhaben `skills/🚧_web-code-artefacts/` (in Arbeit) — die Einträge hier sind dessen Rohmaterial.
+Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind sämtlich Reaktionen auf zwei Eigenheiten des Web-Frontends: Artefakt-Änderungen konnten das Artefakt zerstören, und der Nutzer übernahm den Inhalt per Hand in seinen Code. Für eine künftige claude.ai-Nutzung existiert dafür bereits das Vorhaben `skills/🚧_web-code-editing/` (in Arbeit) — die Einträge hier sind dessen Rohmaterial.
 
 #### T6 Ankündigen und Freigabe vor jedem Artefakt
 
@@ -126,7 +126,7 @@ Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind säm
 
 **Fundstellen:** BIRD, SCH‑B mit den vollen Kriterien; MOD dieselben Kriterien, verallgemeinert auf „Code/Dokumenteninhalte“; CAM und SCH‑A nur die Kurzregel „kurze Codestücke direkt im Chat, ohne Artefakt“.
 
-**Einordnung:** **[claude.ai-Mechanik]** — in Claude Code entscheidet niemand mehr zwischen Artefakt und Chat, geschrieben wird direkt in Dateien. Rohmaterial für `web-code-artefacts`.
+**Einordnung:** **[claude.ai-Mechanik]** — in Claude Code entscheidet niemand mehr zwischen Artefakt und Chat, geschrieben wird direkt in Dateien. Rohmaterial für `web-code-editing`.
 
 #### T9 Artefakte nach Erstellung nicht mehr ändern
 
@@ -142,7 +142,7 @@ Die Einträge T6–T11 regeln den Umgang mit claude.ai-Artefakten. Sie sind säm
 
 **Fundstellen:** BIRD (Grundform); SCH‑B ergänzt: „Vorher“/„Nachher“ **vor** den Block schreiben, nicht hinein; MOD wie SCH‑B, verallgemeinert auf Dokumenteninhalte. CAM und SCH‑A haben das Schema nicht (SCH‑A stattdessen die inhaltliche Positionsbeschreibung, siehe T9).
 
-**Einordnung:** **[claude.ai-Mechanik]** — das Schema ist der Sache nach ein von Hand ausgeführtes Suchen-und-Ersetzen und entspricht exakt dem, was in Claude Code das Edit-Werkzeug maschinell tut (alter String → neuer String, keine Zeilennummern). Als Erkenntnis bleibt: Das Prinzip „Ortsangabe über Inhalt, nie über Zeilennummern“ hat sich unabhängig vom Werkzeug bewährt. Rohmaterial für `web-code-artefacts`.
+**Einordnung:** **[claude.ai-Mechanik]** — das Schema ist der Sache nach ein von Hand ausgeführtes Suchen-und-Ersetzen und entspricht exakt dem, was in Claude Code das Edit-Werkzeug maschinell tut (alter String → neuer String, keine Zeilennummern). Als Erkenntnis bleibt: Das Prinzip „Ortsangabe über Inhalt, nie über Zeilennummern“ hat sich unabhängig vom Werkzeug bewährt. Rohmaterial für `web-code-editing`.
 
 #### T11 Teil-Artefakte bei Überlänge
 
@@ -271,7 +271,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedient werden soll, sind diese Einträge das Rohmaterial für `skills/🚧_web-code-artefacts/` — dabei T11/SCH‑A als Warnung mitnehmen: Diese Regeln altern mit dem Web-Frontend und sind vor einer Neuauflage gegen dessen aktuellen Stand zu prüfen.
+T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedient werden soll, sind diese Einträge das Rohmaterial für `skills/🚧_web-code-editing/` — dabei T11/SCH‑A als Warnung mitnehmen: Diese Regeln altern mit dem Web-Frontend und sind vor einer Neuauflage gegen dessen aktuellen Stand zu prüfen.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
@@ -295,6 +295,6 @@ T4, T5, T8, T9, T10, T11, T14 (Form), T15 (Form). Sofern claude.ai weiter bedien
 ### 5.4 Offene Fragen an den Entwickler
 
 1. Stimmt die in Kapitel 2 vermutete Reihenfolge der Fassungen (CAM → SCH‑A → BIRD → SCH‑B; MOD als Ableger)? Sie beruht allein auf Textbefunden.
-2. Soll claude.ai weiterhin als Arbeitsumgebung bedient werden? Davon hängt ab, ob die Einträge aus 5.1 in `web-code-artefacts` einfließen oder nur dokumentarisch bleiben.
+2. Soll claude.ai weiterhin als Arbeitsumgebung bedient werden? Davon hängt ab, ob die Einträge aus 5.1 in `web-code-editing` einfließen oder nur dokumentarisch bleiben.
 3. T22: Sind Code-Style-Beispiele in Konzept-/Implementierungsdokumenten weiterhin erlaubte Ausnahme?
 4. T19: Welche der beiden debug-Parameter-Fassungen gilt, falls der Test-Skill entsteht?
