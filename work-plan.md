@@ -32,7 +32,7 @@ Bei dieser Gelegenheit fällt auch die Entscheidung über die Zweiteilung aus Sc
 
 Entscheiden, ob daraus ein eigenständiger Skill wird, ob er die Vorstufe von `software-dev-doc-fh` ist — oder ob er sich mit `common-code-generation` erledigt hat, der inzwischen einen Teil davon trägt. Erst danach lohnt Arbeit am Inhalt. Fällt die Entscheidung für einen eigenen Skill: den Trigger nach Kapitel 2 der Vorgaben geankert neu formulieren, nicht als Hintergrund-Beobachtung.
 
-## 7 `🚧_web-code-artefacts`: aus der Rohfassung einen Skill machen
+## 7 `🚧_web-code-editing`: aus der Rohfassung einen Skill machen
 
 - Frontmatter anlegen (`name`, `description`, `license`); die `description` nach Kapitel 2 der Vorgaben formulieren — dritte Person, Hauptanwendungsfall vorn.
 - Den Text in Abschnitte gliedern und vom Ich-Ton der Vorlage („ich entscheide“, „sage mir also“) auf die Anrede an Claude umstellen.
