@@ -1,4 +1,4 @@
-*Stand: 2026-08-28*
+*Stand: 2026-08-29*
 
 # Vorrang der Anweisungsebenen
 
@@ -7,6 +7,14 @@ Es gilt die speziellere Ebene: Diese Datei ergänzt die übergeordneten Anweisun
 Ein geladener Skill regelt die Aufgabe, für die er gilt, und geht dort einer allgemeinen Anweisung vor. Widerspricht er einer projektspezifischen Schutzregel, gilt die Schutzregel — der Widerspruch wird benannt, nicht stillschweigend aufgelöst.
 
 Grund: Die Anweisungsdateien werden aneinandergehängt, nicht gegeneinander verrechnet, und bei widersprüchlichen Regeln wird sonst willkürlich eine ausgewählt (für Claude Code belegt, [memory](https://code.claude.com/docs/en/memory)). Ohne diese Festlegung entscheidet der Zufall.
+
+# Freigaben werden erteilt, nicht gefolgert
+
+Führe einen vorgelegten Plan erst aus, wenn der Nutzer die **Ausführung** ausdrücklich freigegeben hat. Zustimmung zu etwas anderem ist keine Freigabe: Ein bestätigter Befund, ein gelungener Test, ein „das stimmt" zu Deiner Analyse erlauben nichts — sie beantworten die Frage, die gestellt war, nicht die, die Du noch offen hast. Im Zweifel frage nach, statt zu schließen.
+
+Die Freigabe deckt genau den vorgelegten Umfang. Was Dir während der Ausführung als sinnvoll dazukommt — ein Aufräumen nebenher, ein weiterer betroffener Bereich, die Veröffentlichung des Ergebnisses —, legst Du erneut vor, statt es mitzuerledigen.
+
+Grund: Eine gefolgerte Freigabe fällt erst auf, wenn die Arbeit getan ist. Dann existiert die Arbeit, aber nicht das Wissen des Nutzers über ihren Umfang — er muss rekonstruieren, was alles geändert wurde, und jede Korrektur ist teurer als die Nachfrage gewesen wäre.
 
 # Sprachen
 
