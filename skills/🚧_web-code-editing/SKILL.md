@@ -22,7 +22,13 @@ Bestehenden Code erreichst Du auf drei Wegen:
 | Datei im Projektwissen | echte Datei unter `/mnt/project/`, per Code exakt lesbar |
 | Suche im Projektwissen | nur Treffer-Schnipsel — Orientierung, keine Vollständigkeit |
 
-**Die Projektwissen-Dateien liegen als echte Dateien in Deiner Ausführungsumgebung.** Nutze sie per Code — auch wenn Dir kein Werkzeug dafür angeboten wird und es Dir nicht zugänglich erscheint: Ein `ls /mnt/project/` zeigt sie. Trägt eine gepackte Codebasis `#!PKSRC:`-Marker, sind deren `FILE:BEGIN`/`FILE:END`-Zeilen die exakten Schnittmarken je Quelldatei: Token per `grep -n` finden, Bereich per Zeilenschnitt extrahieren. Findest Du die Pfade nicht, sag es dem Nutzer, statt still auf die Suche auszuweichen — die Suche kann Stellen übersehen.
+**Die Projektwissen-Dateien liegen als echte Dateien in Deiner Ausführungsumgebung.** Nutze sie per Code — auch wenn Dir kein Werkzeug dafür angeboten wird und es Dir nicht zugänglich erscheint: Ein `ls /mnt/project/` zeigt sie. Prüfe zuerst, in welcher Form der Code dort liegt, und wähle danach den Zugriff:
+
+- **Einzelne Quelldateien** liest Du direkt.
+- **Ein Archiv** (etwa ZIP) entpackst Du in Dein Arbeitsverzeichnis und liest dann die Dateien direkt.
+- **Eine Sammeldatei, die mehrere Quelldateien bündelt,** trägt in aller Regel Markerzeilen, die je enthaltene Datei Anfang und Ende kennzeichnen — oft mit Pfad und Metadaten, und häufig erklärt ein Kopfteil der Sammeldatei ihr eigenes Format. Lies zuerst diesen Kopf und ein Stück des Inhalts, erkenne daraus das Markerschema, und extrahiere die gebrauchte Datei exakt zwischen ihren Markern. Ist das Schema nicht zweifelsfrei erkennbar, **frage den Nutzer, wie die Datei auszuwerten ist** — rate nicht.
+
+Findest Du unter `/mnt/project/` nichts oder bleibt die Form unklar, sag es dem Nutzer, statt still auf die Suche auszuweichen — die Suche kann Stellen übersehen.
 
 **Zeilengenau ändern darfst Du nur, was Dir wörtlich vorliegt** — im Kontext oder als per Code extrahierte Datei. Nie gegen Suchtreffer arbeiten.
 
@@ -36,7 +42,7 @@ Bestehenden Code erreichst Du auf drei Wegen:
 
 **Diktiere eine geänderte Datei nie aus dem Kontext neu** — dabei können Zeilen verlorengehen und Leerraum sich ändern, ohne dass es jemand bemerkt. Der Weg ist mechanisch:
 
-1. Original extrahieren (aus `/mnt/project/`, bei gepackter Codebasis zwischen den Tokens) — eine exakte Kopie auf der Platte.
+1. Original extrahieren — eine einzelne Datei direkt, aus einer Sammeldatei exakt zwischen ihren Markerzeilen — als exakte Kopie auf der Platte.
 2. Änderungen gezielt per Ersetzung an den vereinbarten Stellen — der Rest bleibt byte-genau.
 3. Ergebnis nach `/mnt/user-data/outputs` legen und als Download anbieten.
 4. **Den Diff gegen das Original mitliefern** — er zeigt dem Nutzer, dass sich nur die vereinbarten Stellen geändert haben.

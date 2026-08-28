@@ -1,6 +1,6 @@
 # 🚧 web-code-editing — Code-Bearbeitung auf claude.ai
 
-*Stand: 2026-08-28*
+*Stand: 2026-08-29*
 
 **🚧 Text fertig, Erprobung als hochgeladener Skill steht aus.** Der Skilltext ist mit dem Entwickler abgestimmt (28. August 2026); das Baustellenschild fällt, sobald der Skill auf claude.ai hochgeladen und im Betrieb erprobt ist.
 
