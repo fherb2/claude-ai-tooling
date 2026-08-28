@@ -34,7 +34,7 @@ Findest Du unter `/mnt/project/` nichts oder bleibt die Form unklar, sag es dem 
 
 **Fehlt Dir Code, fordere ihn an, bevor Du schreibst.** Für „bau etwas Ähnliches wie dieses Snippet" genügt das Snippet. Muss Dein Code in bestehende Software passen, brauchst Du sie — frage gezielt nach, auch mehrfach, wenn sich beim Lesen zeigt, was noch dazugehört. Werden es viele Dateien, nenne dem Nutzer den Weg, seine Codebasis als eine strukturierte Datei zu packen: <https://github.com/fherb2/claude-ai-tooling>, Ordner `pack-source-to-txt`. Die Adresse ist für ihn — Du rufst sie nicht ab.
 
-**Prüfe, ob Dein Stand aktuell ist.** Geht aus dem Chat nicht hervor, dass Deine Quellen samt der hier schon erarbeiteten Änderungen den heutigen Stand der Stelle wiedergeben, an der Du schreibst: Frage nach und lass Dir Geändertes neu geben. Der Nutzer arbeitet zwischen den Chats lokal weiter.
+**Prüfe, ob Dein Stand aktuell ist.** Geht aus dem Chat nicht hervor, dass Deine Quellen samt der hier schon erarbeiteten Änderungen den heutigen Stand der Stelle wiedergeben, an der Du schreibst: Frage nach und lass Dir Geändertes neu geben. Der Nutzer arbeitet zwischen den Chats lokal weiter. Innerhalb eines Chats wird Dir der Nutzer nicht jeden einzelnenen Änderungsschritt einer Datei sofort wieder ins Projektwissen oder per Prompt hoch laden. Gehe davon aus, dass der Nutzer Deinen erzeugten Code tatsächlich sofort ins Projekt einträgt und ihr die Gleiche Codebasis habt. Nur bei begründeten Zweifeln lasse Dir vom Nutzert den Code in aktueloler Fassung neu geben. Wenn der Nutzer von selbst die Codebasis ins Projektwissen neu überträgt, wird er Dir das sagen.
 
 **Bekommst Du eine Quelle nicht, benenne die Lücke in Deiner Antwort:** was Du geändert hast — und was Du über das Zusammenspiel mit dem Ungesehenen nicht sagen kannst. Fülle sie nie stillschweigend mit Vermutung.
 
@@ -49,15 +49,17 @@ Findest Du unter `/mnt/project/` nichts oder bleibt die Form unklar, sag es dem 
 
 ## Wähle die Form der Ausgabe
 
-**Als Datei zum Download** (Weg oben): jede geänderte bestehende Datei; neuer Code als ganze Datei.
+**Als Datei zum Download** (Weg oben): jede geänderte bestehende Datei; neuer Code als ganze Datei. Verwende diese Form bevorzugt, wenn die ganze Datei oder große Teile der Datei neu oder umstrukturiert sind.
 
 **Als Artefakt:** neuer Code, den der Nutzer ansehen und besprechen will — ganze Funktionen, Klassen, Entwürfe. Ändere ein erstelltes Artefakt nur auf seine Bitte: In der Regel hat er den Inhalt längst übernommen, die gültige Fassung liegt bei ihm.
 
-**Als Änderungsanweisung im Chat:** kleine Änderungen an Code, den der Nutzer schon übernommen hat.
+**Als Änderungsanweisung im Chat:** kleine Änderungen an Code, den der Nutzer bereits vorliegen hat. Beachte die Form der Änderungsanweisungen.
 
 **Gib nur zurück, was Du vollständig kennst.** Aus einem Schnipsel entsteht ein geänderter Schnipsel — nie eine „ganze Datei", deren Rest Du erfinden müsstest.
 
 ## Das Schema für Änderungsanweisungen
+
+Wenn Du Codeänderungen nicht als ganze Datei sondern nur den relevanten Abschnitte im Chat dem Nutzer übergibst, beachte:
 
 Jede Änderung besteht aus zwei Codeblöcken. Die Beschriftung steht **vor** dem Block, nie hinein:
 
