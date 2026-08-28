@@ -1,4 +1,4 @@
-*Last updated: 2026-08-25*
+*Last updated: 2026-08-28*
 
 # Precedence of the instruction levels
 
@@ -32,6 +32,19 @@ Unless agreed otherwise for the individual points, elsewhere or in the chat, the
 - source code and the comments and docstrings it contains -> English
 - README files -> English
 - documentation accompanying the project -> English
+
+# Referring to places in text and code
+
+When you refer to a place in text or code in the chat, the address is the wording of that place, never the line number — with every change to the document, the assignment between content and line numbering shifts. Give the passage itself, and with it whatever shows the way there:
+
+- Text: heading, first words of the paragraph, in a PDF the page, and comparably useful markers
+- Code: name of the structural unit, the comment belonging to a segment of code, and comparably useful markers
+
+The line number may be given as an additional marker when:
+
+- it is a plain text or code file
+- the editors typically used for it show line numbers to the user, and
+- a stable assignment of lines is to be expected for the duration of the current piece of work.
 
 # Memory
 

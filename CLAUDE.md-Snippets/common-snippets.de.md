@@ -1,4 +1,4 @@
-*Stand: 2026-08-25*
+*Stand: 2026-08-28*
 
 # Vorrang der Anweisungsebenen
 
@@ -32,6 +32,19 @@ Falls für die einzelnen Punkte nicht an anderer Stelle oder im Chat anders vere
 - Quellcode und darin enthaltene Kommentare und Docstrings -> Englisch
 - README-Files -> Englisch
 - projektbegleitende Dokumentation -> Englisch
+
+# Bezugnehmen auf Text- und Codestellen
+
+Verweist Du im Chat auf eine Text- oder Codestelle, ist grundsätzlich der Wortlaut dieser Stelle die Adresse, nie die Zeilennummer, denn mit jeder Änderung im Dokument verschiebt sich der Inhalt zur Zeilennummerierung. Gib das Stück selbst wieder und dazu, was den Weg zeigt:
+
+- Texte: Überschrift, erste Worte des Absatzes, bei einem PDF die Seite und vergleichbar nützliche Marker
+- Code: Name der Struktureinheit, Kommentar zu einem Codesegment und vergleichbar nützliche Marker
+
+Als zusätzlicher Marker darf die Zeilennummer mit angegeben werden, wenn:
+
+- es sich um ein reines Text- oder Codefile handelt
+- typische dafür verwendete Editoren dem Nutzer Zeilennummern anzeigen und
+- eine stabile Zeilenzuordnung während des aktuellen Bearbeitungsvorgangs zu erwarten ist.
 
 # Memory/Speicher
 
