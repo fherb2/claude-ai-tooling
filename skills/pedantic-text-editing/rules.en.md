@@ -113,7 +113,7 @@ After:
 Reason: word doubled.
 ```
 
-- **The before-fragment is verbatim and unique within the file.** If it is not, extend it until it is.
+- **The before-fragment is verbatim and unique within its line.** If it is not, extend it until it is. Line number and wording together address the place; uniqueness across the whole file is not required and would force needlessly long excerpts for common turns of phrase.
 - The file holds the **approved** state, including the rejected entries with their decision.
 - **It is not deleted by itself.** It may go once its durable parts stand in the decisions file (section 9). If the user orders it deleted, check that first and enter what is missing, rather than deleting and losing it. The impulse to clean up comes from the user — the files lie visibly next to the text. (A reminder by the skill stood here at first, did not fire in practice and would have been due in every round from the second on; removed on 25 August 2026.)
 
@@ -140,9 +140,33 @@ Three rules carry the procedure:
 
 ## 10 Carrying it out
 
-- Only the approved places are changed, each as an exact replacement of the before-fragment by the after-fragment. If the before-fragment is not found verbatim, change nothing and report it.
-- **Prose is written with the file tools, never through a script using a heredoc, `sed` or `awk`.** Quotation marks and dashes in the text end the script's strings early, and the run breaks off in the middle of the file.
+**The replacements are carried out by the script `apply_findings.py`, not by you one at a time.** It sits in this skill's folder. By hand, a round of 30 places takes very long, although the operation is mechanical: before-fragment, after-fragment and line number have long been written down in the findings file.
+
+Three steps:
+
+1. **Write the approval list as JSON** — one object per approved finding with `id`, `line`, `before`, `after`, exactly as you presented them in the chat. Put it in a working directory **outside** the project; it is a throwaway file and belongs in no commit. **Write it with the file tool, never through a heredoc** — quotation marks and dashes in prose end the string early there.
+
+2. **Call the script:**
+
+   ```bash
+   python3 "${CLAUDE_SKILL_DIR}/apply_findings.py" \
+       --findings <findings file> --text <text file> --approved <approval file>
+   ```
+
+   With `--check` it locates every place and writes nothing — useful when you want to see beforehand what would happen.
+
+3. **Read the output.** `applied` names the IDs carried out, `problems` those refused, `written` says whether the file was touched.
+
+**The script never guesses.** If it cannot locate a place unambiguously, it writes **nothing at all** — not even the undisputed places. That is deliberate: a half-changed file would be the worst outcome, because from then on the line numbers in the findings file describe a state that no longer exists. Report the problem, settle it with the user, and let the script run again; a second run on the unchanged file is harmless.
+
+What the messages mean: `ambiguous-in-line` — the before-fragment stands more than once in its line and must be lengthened. `not-found` — it is not in the text, the file has changed since the findings were taken. `overlap` — two approved findings change the same characters. `line-mismatch`, `before-mismatch`, `after-mismatch` — your approval list and the findings file contradict each other, which points to a slipped selection. `unreadable-block` — a block of the findings file is damaged.
+
+Two rules still hold, script or no script:
+
+- **Prose is written with the file tools, never through a script using a heredoc, `sed` or `awk`.** That covers the approval list as much as any other file you write yourself.
 - No formatter, no linter, no tool that re-wraps or normalizes the file in passing.
+
+**Without a findings file** — when the text only exists in the chat (section 14) — the script drops out and the older form applies: every approved place as an exact replacement of the before-fragment by the after-fragment; if the before-fragment is not found verbatim, change nothing and report it.
 
 ## 11 The record and the counter-check
 
@@ -153,7 +177,7 @@ Two commits per round, in this order, each with the affected paths only (`git ad
 
 The markers make the rounds findable via `git log --grep`; the rest of the commit message follows the project's conventions. From the pair both things follow: the findings sit in the first commit, and the difference between the two is exactly what was carried out.
 
-**The counter-check before the second commit is mandatory.** Look at `git diff -- <text file>` and hold the changed places against the approved IDs. If the count does not match, or if the diff shows something belonging to no approved ID: commit nothing, take the surplus change back, report it to the user. This is the only point at which an unnoticed change shows up at all — it is never skipped, not even for a single correction.
+**The counter-check before the second commit is mandatory** — including when the script from section 10 has run. Its `applied` list is a support, not a substitute: a tool confirming its own work is no control. Look at `git diff -- <text file>` and hold the changed places against the approved IDs. If the count does not match, or if the diff shows something belonging to no approved ID: commit nothing, take the surplus change back, report it to the user. This is the only point at which an unnoticed change shows up at all — it is never skipped, not even for a single correction.
 
 **Without version control:** make a copy of the text file in a working directory outside the project before the round and run the counter-check with `diff` against that copy. The record is then missing, the counter-check is not.
 

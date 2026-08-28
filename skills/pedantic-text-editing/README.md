@@ -1,6 +1,6 @@
 # pedantic-text-editing — Textbearbeitung mit Detailtreue
 
-*Stand: 2026-08-27*
+*Stand: 2026-08-28*
 
 *[English version](README.en.md)*
 
@@ -29,7 +29,9 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
    | `rules.de.md`   | `rules.en.md`   |
    | `README.md`     | `README.en.md`  |
 
-   **Verpflichtend ist daran allein, dass die gewählte SKILL-Fassung am Zielort `SKILL.md` heißt** — Claude Code erkennt keinen anderen Namen. Ob dafür umbenannt oder zusätzlich abgelegt wird, ist gleichgültig. Die Regeldatei behält ihren Namen: Die `SKILL.md` verweist auf sie, und dieser Verweis ist der einzige Weg, auf dem die Regeln überhaupt geladen werden. Wer sie umbenennt, zieht den Verweis mit.
+   Dazu **`apply_findings.py`** — das Skript ist sprachunabhängig und gehört in beide Fassungen. Ohne es müsste Claude jede freigegebene Änderung einzeln ausführen, was eine volle Runde sehr lange dauern lässt.
+
+   **Verpflichtend ist daran allein, dass die gewählte SKILL-Fassung am Zielort `SKILL.md` heißt** — Claude Code erkennt keinen anderen Namen. Ob dafür umbenannt oder zusätzlich abgelegt wird, ist gleichgültig. Regeldatei und Skript behalten ihre Namen: Die `SKILL.md` verweist auf die Regeln, diese auf das Skript, und diese Verweise sind der einzige Weg, auf dem beides überhaupt geladen wird. Wer umbenennt, zieht die Verweise mit.
 
 ## Details
 
@@ -47,6 +49,10 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 **Kopf und Protokoll sind kein Beiwerk.** Im Kopf steht, was **nicht** untersucht wurde. Das beantwortet später die Frage, warum eine Stelle damals nicht auffiel — ohne ihn ist das nicht mehr zu rekonstruieren.
 
+**Das Skript `apply_findings.py` führt die Runde aus, und es rät nie.** Es liest die Befunddatei — die ohnehin vor jeder Änderung entsteht und committet wird — und bekommt von Claude die Liste der freigegebenen IDs samt der Textstücke, die im Chat standen. Beides wird gegeneinander gehalten: Eine verrutschte Auswahl fällt dabei auf, statt als plausibel aussehende Falschänderung durchzugehen. Gesucht wird mit dem vollen Vorher-Stück, ersetzt nur im tatsächlich geänderten Kern — sonst gälten zwei Funde, die sich ein Kontextwort teilen, fälschlich als Konflikt. Findet sich eine Stelle nicht eindeutig, schreibt das Skript **gar nichts**, auch nicht die unstrittigen Stellen: Eine halb geänderte Datei wäre der schlechteste Ausgang, weil die Zeilennummern der Befunddatei danach einen Stand beschreiben, den es nicht mehr gibt.
+
+**Gemessen an echten Runden** (28. August 2026): vier abgeschlossene Runden aus einem laufenden Textprojekt, 90 freigegebene Änderungen, gegen den jeweiligen Ausgangsstand nachgespielt — das Ergebnis war in allen vier Fällen **byte-identisch** mit dem, was zuvor von Hand entstanden war. Drei der vier Runden enthielten dabei ein Paar von Funden, die sich ein Wort teilen; daran ist die erste Fassung der Konfliktprüfung gescheitert, und daher stammt die Trennung zwischen Suchstück und Änderungskern.
+
 **In der Datei stehen Blöcke, keine Tabellenzeilen.** Die Textstücke müssen zeichengenau sein, und manche Editoren richten Markdown-Tabellenzeilen beim Speichern neu aus und fressen dabei Leerraum. Im Chat wird tabellarisch vorgelegt, weil sich das leichter überblicken lässt — dort bekommt ein Fund so viele Tabellenzeilen, wie er braucht, die Folgezeilen lassen ID und Zeilennummer leer, und die Beschriftung (`Vorh`, `Nach`, `Begr`) steht in einer eigenen schmalen Spalte, damit der Text darunter überall an derselben Stelle beginnt. Ein `<br>` in der Zelle wäre der naheliegende Weg, wird aber nicht überall umgesetzt: Im Frontend von Claude Code erscheint es als sichtbarer Text (beobachtet am 25. August 2026, beim ersten Einsatz des Skills).
 
 **Angezeigter und gespeicherter Ausschnitt sind zwei Dinge.** Der angezeigte richtet sich nach der Entscheidung: Der Nutzer muss die Stelle finden und über sie befinden können, ohne den Kontext selbst zusammenzusuchen. Der gespeicherte richtet sich nach der Eindeutigkeit in der Datei, denn er ist die Vorlage für eine exakte Ersetzung. Beide dürfen sich in der Länge unterscheiden; wer das zusammenzieht, bekommt entweder unklare Vorlagen oder verrutschende Ersetzungen.
@@ -55,11 +61,7 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 ## Stand
 
-**Status: abgeschlossen.** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs; der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben. Die Erprobung im Betrieb ist abgeschlossen: Rundengröße, Teilung, Ausschnittlängen und die Form der Vorlage haben an einem echten Text getragen, und die Betriebsbefunde (Tabellenformat der Vorlage, Behandlung zurückgestellter inhaltlicher Funde, Aufräum-Erinnerung) sind in den Regeltext eingearbeitet (25. August 2026).
-
-**Offen:**
-
-- **Die Ausführung dauert zu lange.** Nach der Freigabe führt die Instanz jede Änderung einzeln aus; bei einer vollen Runde summiert sich das erheblich, obwohl alle Angaben mechanisch vorliegen. Ein Skript, das die freigegebenen Ersetzungen in einem Lauf ausführt, ist als Schritt 13 im [Fahrplan](../../work-plan.md) beschrieben — samt der Fragen, die vor dem Bau zu klären sind. Betriebsbefund vom 27. August 2026; die Funktion des Skills ist davon unberührt.
+**Status: abgeschlossen.** Beide Sprachfassungen von `SKILL` und Regeldatei sind fertig, ebenso beide READMEs; der Regeltext ist mit dem Entwickler durchgesprochen und freigegeben. Die Erprobung im Betrieb ist abgeschlossen: Rundengröße, Teilung, Ausschnittlängen und die Form der Vorlage haben an einem echten Text getragen, und die Betriebsbefunde (Tabellenformat der Vorlage, Behandlung zurückgestellter inhaltlicher Funde, Aufräum-Erinnerung) sind in den Regeltext eingearbeitet (25. August 2026). Die Ausführung übernimmt seit dem 28. August 2026 das Skript `apply_findings.py`, an vier echten Runden gegengeprüft (siehe „Details“). Offene Punkte gibt es nicht.
 
 **Bewusst offen gelassene Entscheidungen:**
 
