@@ -8,7 +8,7 @@ Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil gedacht: Wird ein 
 
 **Erledigt und entfernt am 27. August 2026:** T2, T12, T13 (abgedeckt durch den Skill `common-code-generation`) und T16 (abgedeckt durch `temp-debug-code`, als Nachfolger mit geänderten Marken). Die zugehörigen Passagen sind auch aus den Quelldateien dieses Ordners entfernt — sie sind Arbeitsmittel und sollen nur noch tragen, was zu verwerten bleibt. Die Beschreibungen der ursprünglichen, vollständigen Fassungen in den Kapiteln 1 und 2 bleiben als historische Einordnung stehen.
 
-**Erledigt und entfernt am 28. August 2026:** T8, T9, T10, T11 — verarbeitet im Skill `skills/🚧_web-code-editing/`, geprüft gegen den Frontend-Stand vom August 2026 statt übernommen (T11 war schon in den Quellen überholt und ist ersatzlos entfallen; T9 ist dort zeitlos neu begründet). Die zugehörigen Passagen sind aus den Quelldateien entfernt — **außer in MOD**: Dessen Verallgemeinerung von T8–T10 auf Dokument-Artefakte ist nicht verarbeitet und bleibt als mögliches eigenes Material stehen.
+**Erledigt und entfernt am 28. August 2026:** T8, T9, T10, T11 — verarbeitet im Skill `skills/web-code-editing/`, geprüft gegen den Frontend-Stand vom August 2026 statt übernommen (T11 war schon in den Quellen überholt und ist ersatzlos entfallen; T9 ist dort zeitlos neu begründet). Die zugehörigen Passagen sind aus den Quelldateien entfernt — **außer in MOD**: Dessen Verallgemeinerung von T8–T10 auf Dokument-Artefakte ist nicht verarbeitet und bleibt als mögliches eigenes Material stehen.
 
 ## 1 Die Quelldateien
 
@@ -100,7 +100,7 @@ Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und ein
 
 ### B Artefakt-Arbeitsweise (claude.ai-Web-Frontend)
 
-Von den Einträgen T6–T11 dieser Gruppe sind T8–T11 am 28. August 2026 im Skill `skills/🚧_web-code-editing/` verarbeitet und hier entfernt (siehe Erledigt-Notiz oben). T6 und T7 stehen mit doppelter Rolle: Im Web-Skill sind sie als „Bevor Du schreibst" verarbeitet; als Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md (§1.3–1.5) bleiben sie hier.
+Von den Einträgen T6–T11 dieser Gruppe sind T8–T11 am 28. August 2026 im Skill `skills/web-code-editing/` verarbeitet und hier entfernt (siehe Erledigt-Notiz oben). T6 und T7 stehen mit doppelter Rolle: Im Web-Skill sind sie als „Bevor Du schreibst" verarbeitet; als Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md (§1.3–1.5) bleiben sie hier.
 
 #### T6 Ankündigen und Freigabe vor jedem Artefakt
 
@@ -237,7 +237,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/🚧_web-code-editing/` verarbeitet und entfernt. **T4 und T5 gehen einen eigenen Weg** (Entscheidung des Entwicklers vom 28. August 2026): Sie sind keine Artefakt-Mechanik, sondern eine Projektanweisung für claude.ai (Vorwissen-Abgrenzung) — sie gehören, falls weiter gewollt, in das dortige Anweisungsfeld, und vorher ist ihre Aktualität zu prüfen: Ob die Chat-Suche heute noch projektübergreifend arbeitet, ist offen.
+T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und entfernt. **T4 und T5 gehen einen eigenen Weg** (Entscheidung des Entwicklers vom 28. August 2026): Sie sind keine Artefakt-Mechanik, sondern eine Projektanweisung für claude.ai (Vorwissen-Abgrenzung) — sie gehören, falls weiter gewollt, in das dortige Anweisungsfeld, und vorher ist ihre Aktualität zu prüfen: Ob die Chat-Suche heute noch projektübergreifend arbeitet, ist offen.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 

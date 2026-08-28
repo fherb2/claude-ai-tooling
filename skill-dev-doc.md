@@ -365,6 +365,6 @@ Stand 28. August 2026. „Web-Fassung" nennt die Nutzungsentscheidung, nicht die
 | `parallel-sessions` | nur code | — | Git-Worktrees haben auf claude.ai keinen Gegenstand |
 | `chat-export` | nur code | — | Braucht Browser-Anbindung und ein Skript auf dem Rechner des Nutzers |
 
-`🚧_web-code-editing` ist zugeordnet: **nur web** — er regelt Quellen und Rückgabewege des Web-Frontends; in Claude Code schreibt das Edit-Werkzeug direkt in die Dateien (ausgearbeitet am 28. August 2026, Erprobung als hochgeladener Skill offen). Die Skills, die nur unter `~/.claude/skills/` liegen (`konzept-segmentierung`, `konsistenzpruefung`), sind hier nicht bewertet — sie sind nicht im Repo.
+`web-code-editing` ist zugeordnet: **nur web** — er regelt Quellen und Rückgabewege des Web-Frontends; in Claude Code schreibt das Edit-Werkzeug direkt in die Dateien (fertiggestellt in beiden Sprachfassungen am 29. August 2026, Erprobung als hochgeladener Skill offen). Die Skills, die nur unter `~/.claude/skills/` liegen (`konzept-segmentierung`, `konsistenzpruefung`), sind hier nicht bewertet — sie sind nicht im Repo.
 
 Prüfbar: Auf jeden Skill ohne Gruppenangabe in dieser Tabelle lässt sich zeigen — das ist die Lücke. Und auf jede Web-Fassung, die gebaut wurde, ohne dass 9.3 dafür beantwortet ist.
