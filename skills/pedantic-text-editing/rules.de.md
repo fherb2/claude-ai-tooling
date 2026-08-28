@@ -113,7 +113,7 @@ Nachher:
 Begründung: Konjunktion und Artikel verwechselt.
 ```
 
-- **Das Vorher-Stück ist wörtlich und in der Datei eindeutig.** Ist es das nicht, verlängere es, bis es eindeutig ist.
+- **Das Vorher-Stück ist wörtlich und in seiner Zeile eindeutig.** Ist es das nicht, verlängere es, bis es das ist. Zeilennummer und Wortlaut zusammen adressieren die Stelle; datei-weite Eindeutigkeit ist nicht verlangt und zwänge bei häufigen Wendungen zu unnötig langen Ausschnitten.
 - Die Datei hält den **freigegebenen** Stand, einschließlich der abgelehnten Einträge mit ihrer Entscheidung.
 - **Gelöscht wird sie nicht von selbst.** Sie darf weg, sobald ihre dauerhaften Anteile in der Entscheidungsdatei stehen (Abschnitt 9). Weist der Nutzer das Löschen an, prüfe das vorher nach und trage Fehlendes nach, statt zu löschen und es zu verlieren. Der Anstoß zum Aufräumen kommt vom Nutzer — die Dateien liegen sichtbar neben dem Text. (Eine Erinnerung durch den Skill stand hier zunächst, feuerte im Betrieb nicht und wäre ab der zweiten Runde in jeder Runde fällig gewesen; entfernt am 25. August 2026.)
 
@@ -140,9 +140,33 @@ Drei Regeln, die das Verfahren tragen:
 
 ## 10 Ausführen
 
-- Geändert werden ausschließlich die freigegebenen Stellen, jede als exakte Ersetzung des Vorher-Stücks durch das Nachher-Stück. Findet sich das Vorher-Stück nicht wörtlich, ändere nichts und melde es.
-- **Deutsche Prosa wird mit den Datei-Werkzeugen geschrieben, nie über ein Skript mit Heredoc, `sed` oder `awk`.** Anführungszeichen und Gedankenstriche im Text beenden dort die Zeichenketten vorzeitig, und der Lauf bricht mitten in der Datei ab.
+**Die Ersetzungen führt das Skript `apply_findings.py` aus, nicht Du von Hand.** Es liegt im Ordner dieses Skills. Von Hand dauert eine Runde mit 30 Stellen sehr lange, obwohl der Vorgang mechanisch ist: Vorher-Stück, Nachher-Stück und Zeilennummer stehen längst in der Befunddatei.
+
+Drei Schritte:
+
+1. **Die Freigabeliste als JSON schreiben** — je freigegebener Fund ein Objekt mit `id`, `line`, `before`, `after`, genau so, wie Du sie im Chat vorgelegt hast. Lege sie in einem Arbeitsverzeichnis **außerhalb** des Projekts ab; sie ist eine Wegwerfdatei und gehört in keinen Commit. **Schreibe sie mit dem Datei-Werkzeug, nie über ein Heredoc** — Anführungszeichen und Gedankenstriche im deutschen Text beenden dort die Zeichenkette vorzeitig.
+
+2. **Das Skript aufrufen:**
+
+   ```bash
+   python3 "${CLAUDE_SKILL_DIR}/apply_findings.py" \
+       --findings <befunddatei> --text <textdatei> --approved <freigabedatei>
+   ```
+
+   Mit `--check` sucht es alle Stellen und schreibt nichts — nützlich, wenn Du vor dem Schreiben sehen willst, was passieren wird.
+
+3. **Die Ausgabe lesen.** `applied` nennt die ausgeführten IDs, `problems` die verweigerten, `written` sagt, ob die Datei angefasst wurde.
+
+**Das Skript rät nie.** Findet es eine Stelle nicht eindeutig, schreibt es **gar nichts** — auch nicht die unstrittigen Stellen. Das ist Absicht: Eine halb geänderte Datei wäre der schlechteste Ausgang, weil die Zeilennummern der Befunddatei danach einen Stand beschreiben, den es nicht mehr gibt. Melde das Problem, kläre es mit dem Nutzer und lass das Skript erneut laufen; ein zweiter Lauf auf der unveränderten Datei ist gefahrlos.
+
+Was die Meldungen bedeuten: `ambiguous-in-line` — das Vorher-Stück steht mehrfach in seiner Zeile, es muss länger werden. `not-found` — es steht nicht im Text, die Datei hat sich seit der Befundaufnahme geändert. `overlap` — zwei freigegebene Funde ändern dieselben Zeichen. `line-mismatch`, `before-mismatch`, `after-mismatch` — Deine Freigabeliste und die Befunddatei widersprechen sich, was auf eine verrutschte Auswahl deutet. `unreadable-block` — ein Block der Befunddatei ist beschädigt.
+
+Zwei Regeln gelten weiter, auch mit Skript:
+
+- **Deutsche Prosa wird mit den Datei-Werkzeugen geschrieben, nie über ein Skript mit Heredoc, `sed` oder `awk`.** Das betrifft die Freigabeliste ebenso wie jede andere Datei, die Du selbst schreibst.
 - Kein Formatierer, kein Linter, kein Werkzeug, das die Datei nebenbei umbricht oder normalisiert.
+
+**Ohne Befunddatei** — wenn der Text nur im Chat steht (Abschnitt 14) — entfällt das Skript, und es gilt die alte Form: jede freigegebene Stelle als exakte Ersetzung des Vorher-Stücks durch das Nachher-Stück; findet sich das Vorher-Stück nicht wörtlich, ändere nichts und melde es.
 
 ## 11 Der Nachweis und die Gegenprobe
 
@@ -153,7 +177,7 @@ Je Runde zwei Commits, in dieser Reihenfolge, jeweils nur mit den betroffenen Pf
 
 Die Marken machen die Runden über `git log --grep` auffindbar; die übrige Form der Commit-Nachricht richtet sich nach den Gepflogenheiten des Projekts. Aus dem Paar ergibt sich beides: Die Befunde stehen im ersten Commit, und die Differenz zwischen beiden ist genau das, was ausgeführt wurde.
 
-**Die Gegenprobe vor dem zweiten Commit ist Pflicht.** Sieh Dir `git diff -- <textdatei>` an und halte die geänderten Stellen gegen die freigegebenen IDs. Stimmt die Zahl nicht, oder steht im Diff etwas, das zu keiner freigegebenen ID gehört: nichts committen, die überzählige Änderung zurücknehmen, dem Nutzer melden. Dies ist die einzige Stelle, an der eine unbemerkte Änderung überhaupt auffällt — sie entfällt nie, auch nicht bei einer einzigen Korrektur.
+**Die Gegenprobe vor dem zweiten Commit ist Pflicht** — auch dann, wenn das Skript nach Abschnitt 10 gelaufen ist. Seine `applied`-Liste ist eine Stütze, kein Ersatz: Ein Werkzeug, das seine eigene Arbeit bestätigt, ist keine Kontrolle. Sieh Dir `git diff -- <textdatei>` an und halte die geänderten Stellen gegen die freigegebenen IDs. Stimmt die Zahl nicht, oder steht im Diff etwas, das zu keiner freigegebenen ID gehört: nichts committen, die überzählige Änderung zurücknehmen, dem Nutzer melden. Dies ist die einzige Stelle, an der eine unbemerkte Änderung überhaupt auffällt — sie entfällt nie, auch nicht bei einer einzigen Korrektur.
 
 **Ohne Versionierung:** Lege vor der Runde eine Kopie der Textdatei in einem Arbeitsverzeichnis außerhalb des Projekts an und führe die Gegenprobe mit `diff` gegen diese Kopie. Der Nachweis fehlt dann, die Gegenprobe nicht.
 
