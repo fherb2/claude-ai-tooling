@@ -1,6 +1,6 @@
 # Skills for Claude Code
 
-*Last updated: 2026-08-28*
+*Last updated: 2026-08-29*
 
 *[Deutsche Fassung](README.md)*
 
@@ -17,6 +17,7 @@ Reusable skills for Claude Code, together with the triggers that fire them. This
 | [`pedantic-text-editing/`](pedantic-text-editing/README.en.md)<br>✅☑ | **Text editing with fidelity to detail** — every change presented individually for approval, not a character changed outside the approved spots, and afterwards the proof through the diff. For texts whose wording is itself the product; not for source code or documentation accompanying software. |
 | [`temp-debug-code/`](temp-debug-code/README.en.md)<br>✅☑ | **Unambiguous marking of code added or changed for an ongoing debugging session only** — not for debug code meant to stay in the source permanently.                                                                                               |
 | [`in-depth-online-literature-research/`](in-depth-online-literature-research/README.en.md)<br>✅☑ | **Thorough source and literature research that does not give up too early** — systematic variation of search terms, channels and search levels, mandatory verification of every search summary, and instead of "nothing found" a report on the search paths still open. |
+| [`web-code-editing/`](web-code-editing/README.en.md)<br>✅☑ | **Editing code on claude.ai**: secure the sources completely (project knowledge sits as files under `/mnt/project/`), return changed files mechanically as downloads instead of re-dictating them, small changes as a before/replace scheme in the chat. For claude.ai only.                                                        |
 
 (✅ German version finished and usable · ☑ English version finished and usable · 🚧 in progress · ⚠️ with reservations)
 
