@@ -1,4 +1,4 @@
-*Last updated: 2026-08-28*
+*Last updated: 2026-08-29*
 
 # Precedence of the instruction levels
 
@@ -7,6 +7,14 @@ The more specific level holds: this file supplements the instruction files above
 A loaded skill governs the task it applies to and takes precedence there over a general instruction. Where it contradicts a project-specific protective rule, the protective rule holds — and the contradiction is named, not resolved silently.
 
 Reason: instruction files are concatenated, not weighed against each other, and where rules contradict each other one of them is otherwise picked arbitrarily (documented for Claude Code, [memory](https://code.claude.com/docs/en/memory)). Without this ruling, chance decides.
+
+# Approval is given, not inferred
+
+Only carry out a plan you have presented once the user has expressly approved **carrying it out**. Agreement with something else is not approval: a confirmed finding, a successful test, a "that's right" to your analysis permit nothing — they answer the question that was asked, not the one you still have open. When in doubt, ask instead of inferring.
+
+The approval covers exactly the scope presented. Whatever comes to seem sensible during execution — a cleanup on the side, another affected area, publishing the result — you present anew instead of doing it along the way.
+
+Reason: an inferred approval only comes to light once the work is done. The work then exists, but the user's knowledge of its scope does not — they are left reconstructing what was changed, and every correction costs more than the question would have.
 
 # Languages
 
