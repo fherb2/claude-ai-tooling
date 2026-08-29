@@ -6,7 +6,7 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behält seine Nummer für immer, auch wenn er erledigt ist und nach Kapitel 6 wandert (analog zur Fahrplan-Nummerierungsregel des Repos). Jede Nummer kommt genau einmal vor — in Kapitel 4 oder in Kapitel 6.
 
-**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T2, T8, T9, T10, T11, T12, T13 und T16.
+**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T8, T9, T10, T11, T12, T13 und T16.
 
 ## 1 Die Quelldateien
 
@@ -43,7 +43,7 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 
 | Nr. |  | Thema                                    | ALLG | MOD  | BIRD | CAM  | SCH‑A | SCH‑B |
 | --- | --- | ---------------------------------------- | ---- | ---- | ---- | ---- | ------ | ------ |
-| T1  |  | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
+| T1  | ✅ | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
 | T2  | ✅ | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
 | T3  |  | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
 | T4  |  | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
@@ -78,14 +78,6 @@ Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien u
 Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und eine Einordnung gegenüber dem heutigen Regelwerk (globale `~/.claude/CLAUDE.md`, hier „§…“, und die Skills dieses Repos). Die Einordnung trägt eine von vier Kategorien: **[claude.ai-Mechanik]** — an das Web-Frontend gebunden, in Claude Code gegenstandslos; **[abgedeckt]** — inhaltlich im heutigen Regelwerk enthalten; **[teilweise abgedeckt]**; **[nicht abgedeckt]** — Kandidat für eine Neuzusammenstellung.
 
 ### A Sprache und Kontextquellen
-
-#### T1 Chat auf Deutsch, Duzen
-
-**Aussage:** Chat auf Deutsch; „wir duzen uns“.
-
-**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich. ALLG nur „Chat auf Deutsch“, ohne Duzen.
-
-**Einordnung:** **[abgedeckt]** für die Sprache (§1.1). Das Duzen ist nirgends im heutigen Regelwerk festgehalten — falls es weiterhin gelten soll, wäre es ein Ein-Satz-Zusatz für §1.1.
 
 #### T3 Dokumentsprache Deutsch, projektabhängig änderbar
 
@@ -256,7 +248,6 @@ T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind 
 
 | Einträge    | Heutiger Ort                  | Abweichung/Anmerkung                                                                                                                    |
 | ------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| T1           | §1.1                         | Duzen nirgends festgehalten.                                                                                                            |
 | T3           | §1.1                         | —                                                                                                                                      |
 | T6, T7       | §1.3–§1.5                  | verschärft weitergeführt.                                                                                                             |
 | T21          | §2.1, §1.9                  | —                                                                                                                                      |
@@ -282,11 +273,21 @@ Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb
 
 ## 6 Erledigte Einträge
 
-Hier stehen die Einträge, aus denen bereits ein Skill entstanden ist. Sie sind damit abgearbeitet, aber nicht wertlos: Sie belegen, woher eine Regel kommt und was bei ihrer Übernahme bewusst geändert wurde. Wer wissen will, warum ein Skill von seiner Vorlage abweicht, findet die Antwort hier — und der nächste Durchgang muss nicht neu herleiten, was schon entschieden ist.
+Hier stehen die abgearbeiteten Einträge — die meisten, weil aus ihnen ein Skill entstanden ist; einzelne auch, weil entschieden wurde, dass sie in keinen gehören, oder weil sie sich erledigt hatten. Was das im Einzelfall war, sagt die erste Zeile des Eintrags. Sie sind damit vom Tisch, aber nicht wertlos: Sie belegen, woher eine Regel kommt und was bei ihrer Übernahme bewusst geändert wurde. Wer wissen will, warum ein Skill von seiner Vorlage abweicht, findet die Antwort hier — und der nächste Durchgang muss nicht neu herleiten, was schon entschieden ist.
 
 Die Einträge waren am 27. und 28. August 2026 samt ihren Passagen in den Quelldateien gelöscht worden. Der Entwickler hat das am 29. August 2026 als Fehleinschätzung verworfen — was das Inventar angeht, endgültig: **Die Einträge bleiben hier stehen.** Erledigtes wird verschoben statt entfernt. Der Wortlaut unten ist der ursprüngliche; angepasst wurden allein die Ordnerbezeichnungen, damit der Verweis auf den heutigen Skill trägt.
 
 Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt worden, diesmal nach einem anderen Verfahren: Jeder Posten wurde einzeln vorgelegt und Stelle für Stelle gegen den übernehmenden Skill gehalten, der Skill wurde dabei mehrfach verbessert, und gelöscht wurde erst nach ausdrücklicher Freigabe des Entwicklers. Was daran anders ist als am 27./28. August, ist nicht das Ergebnis, sondern der Weg dorthin — und dass das Belegmaterial jetzt gesichert ist: Die unveränderten Quelldateien liegen im Unterordner `original/`.
+
+#### T1 Chat auf Deutsch, Duzen
+
+**Entschieden:** Kein Skill-Zuhause, 29. August 2026 · Gruppe A (Sprache und Kontextquellen). Ob geduzt und in welcher Sprache geschrieben wird, entscheidet jeder Nutzer für sich. Das gehört in seine eigene `CLAUDE.md` beziehungsweise in das Anweisungsfeld auf claude.ai — nicht in einen Skill, der weitergegeben wird.
+
+**Aussage:** Chat auf Deutsch; „wir duzen uns“.
+
+**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich. ALLG nur „Chat auf Deutsch“, ohne Duzen.
+
+**Einordnung:** **[abgedeckt]** für die Sprache (§1.1). Das Duzen ist nirgends im heutigen Regelwerk festgehalten — falls es weiterhin gelten soll, wäre es ein Ein-Satz-Zusatz für §1.1.
 
 #### T2 Code auf Englisch, einschließlich Kommentaren
 
