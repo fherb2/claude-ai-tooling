@@ -10,7 +10,7 @@
 
 ## Installation
 
-Custom skills reach claude.ai as a ZIP via Settings → Features (Pro/Max/Team/Enterprise, code execution enabled). **One** language version is chosen — `SKILL.de.md` or `SKILL.en.md` — and it must be called `SKILL.md` inside the ZIP; the other version stays out. The skill is a single file, no further files belong to it.
+Custom skills reach claude.ai as a ZIP via the skill settings (Pro/Max/Team/Enterprise, code execution enabled). One language version is chosen — `SKILL.de.md` or `SKILL.en.md` — and it goes into the ZIP renamed to `SKILL.md`. The ZIP is named `web-code-editing.zip`: claude.ai adopts the ZIP file name as the skill name. No further files belong to it; the READMEs are not needed inside the ZIP.
 
 ## Details
 
