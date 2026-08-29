@@ -4,8 +4,6 @@ Allgemeine Anweisungen zur Projektarbeit und zum Coding:
 
 Sprachen:
 
-[T5]Vorwissen: Dazu zählen Dateien im Projekt oder zum Chatanfang hochgeladene Dateien sowie die im Projekt befindlichen Chats. Bitte berücksichtige nie Chats, die außerhalb des Projekts geführt wurden. Auch dann nicht, wenn sie inhaltlich dazu passen könnten.
-
 Artefakte allgemein:
 - [T6]Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
 - [T7]Bevor Du ein Artefakt erzeugst oder eine Code-Änderung, dann prüfe immer zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an zu schreiben, sondern Frage mich und lasse alle Fragen geklärt sein, bevor Du tatsächlich anfängst..
