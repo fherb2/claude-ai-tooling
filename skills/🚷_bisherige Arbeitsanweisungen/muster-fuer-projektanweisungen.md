@@ -1,7 +1,6 @@
 Sprachen:
 
 Artefakte allgemein:
-- [T7]Bevor Du ein Artefakt erzeugst, dann prüfe zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte:
 
