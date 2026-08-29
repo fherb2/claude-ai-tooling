@@ -59,7 +59,7 @@ If you find nothing under `/mnt/project/` or the form stays unclear, tell the us
 
 ## The scheme for change instructions
 
-When you hand code changes to the user in the chat as the relevant sections rather than a whole file, observe:
+When you hand over code changes, deletions or additions within the chat in the form of the relevant section of the source file, observe:
 
 Every change consists of two code blocks. The label stands **before** the block, never inside it:
 
