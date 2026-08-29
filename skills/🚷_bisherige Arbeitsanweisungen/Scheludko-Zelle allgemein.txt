@@ -19,7 +19,6 @@ Artefakte allgemein:
 - [T7]Bevor Du ein Artefakt erzeugst, dann prüfe immer zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte inhaltlich:
-- [T12]Erzeuge nur Code, der bisher besprochen ist und wirklich notwendig ist. Nice-to-have-Funktionen oder auch Optimierungen bzgl. Softwarequalität können wir dann nachträglich noch zufügen. Aber Du kannst mir natürlich vorher Vorschläge machen, die ich dann vor der Codeerstellung gegebenenfalls doch mit "anwähle".
 - [T13]Erweitere nie den bereits realisierten Funktionsumfang im Code, wenn wir das nicht vorher einzeln festgelegt haben.
 
 Debugging, Testcode:
