@@ -282,7 +282,9 @@ Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb
 
 Hier stehen die Einträge, aus denen bereits ein Skill entstanden ist. Sie sind damit abgearbeitet, aber nicht wertlos: Sie belegen, woher eine Regel kommt und was bei ihrer Übernahme bewusst geändert wurde. Wer wissen will, warum ein Skill von seiner Vorlage abweicht, findet die Antwort hier — und der nächste Durchgang muss nicht neu herleiten, was schon entschieden ist.
 
-Die Einträge waren am 27. und 28. August 2026 samt ihren Passagen in den Quelldateien gelöscht worden. Der Entwickler hat das am 29. August 2026 als Fehleinschätzung verworfen: Das Belegmaterial bleibt vollständig, Erledigtes wird verschoben statt entfernt. Der Wortlaut unten ist der ursprüngliche; angepasst wurden allein die Ordnerbezeichnungen, damit der Verweis auf den heutigen Skill trägt.
+Die Einträge waren am 27. und 28. August 2026 samt ihren Passagen in den Quelldateien gelöscht worden. Der Entwickler hat das am 29. August 2026 als Fehleinschätzung verworfen — was das Inventar angeht, endgültig: **Die Einträge bleiben hier stehen.** Erledigtes wird verschoben statt entfernt. Der Wortlaut unten ist der ursprüngliche; angepasst wurden allein die Ordnerbezeichnungen, damit der Verweis auf den heutigen Skill trägt.
+
+Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt worden, diesmal nach einem anderen Verfahren: Jeder Posten wurde einzeln vorgelegt und Stelle für Stelle gegen den übernehmenden Skill gehalten, der Skill wurde dabei mehrfach verbessert, und gelöscht wurde erst nach ausdrücklicher Freigabe des Entwicklers. Was daran anders ist als am 27./28. August, ist nicht das Ergebnis, sondern der Weg dorthin — und dass das Belegmaterial jetzt gesichert ist: Die unveränderten Quelldateien liegen im Unterordner `original/`.
 
 #### T2 Code auf Englisch, einschließlich Kommentaren
 
