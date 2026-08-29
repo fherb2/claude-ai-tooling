@@ -59,7 +59,7 @@ Findest Du unter `/mnt/project/` nichts oder bleibt die Form unklar, sag es dem 
 
 ## Das Schema für Änderungsanweisungen
 
-Wenn Du Codeänderungen nicht als ganze Datei, sondern nur die relevanten Abschnitte im Chat dem Nutzer übergibst, beachte:
+Wenn Du Codeänderungen, -streichungen oder -zufügungen innerhalb des Chats in Form des relevanten Abschnittes des Quellfiles übergibst, beachte:
 
 Jede Änderung besteht aus zwei Codeblöcken. Die Beschriftung steht **vor** dem Block, nie hinein:
 

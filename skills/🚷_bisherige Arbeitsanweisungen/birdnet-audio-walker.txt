@@ -11,7 +11,6 @@ Sprachen:
 
 Artefakte allgemein:
 - [T6]Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
-- [T10]Benutze für bei Code-Änderungen und -Hinzufügungen, die Du im Chat ausführst, ein einheitliches Schema aus einen "Vorher"-Codeblock und einen nachfolgenden "Ersetzen-mit-Codeblock". Im ersten Codeblock zeigst Du die zu ändernden Zeilen vor der Änderung, wie ich sie mit der Suchen-Funktion des Editors finden kann. Im nachfolgenden Codeblock ist dann der Code enthalten, den ich an die Stelle der Zeilen aus dem ersten Codeblock exakt dahin setzen soll. Beachte unbedingt die originalen Einrückungen. Verwende zur Beschreibung der Änderungs-/Einfügestelle niemals Zeilennummern. Nur den Code so, wie ich ihn für den ersten Codeblock beschrieben habe.
 - [T7]Bevor Du ein Artefakt erzeugst oder eine Code-Änderung, dann prüfe immer zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an zu schreiben, sondern Frage mich und lasse alle Fragen geklärt sein, bevor Du tatsächlich anfängst..
 
 Code-Artefakte/-Änderungen/-Erstellungen inhaltlich:
