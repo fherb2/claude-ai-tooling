@@ -6,7 +6,7 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behält seine Nummer für immer, auch wenn er erledigt ist und nach Kapitel 6 wandert (analog zur Fahrplan-Nummerierungsregel des Repos). Jede Nummer kommt genau einmal vor — in Kapitel 4 oder in Kapitel 6.
 
-**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T8, T9, T10, T11, T12, T13 und T16.
+**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T8, T9, T10, T11, T12, T13 und T16.
 
 ## 1 Die Quelldateien
 
@@ -45,8 +45,8 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | --- | --- | ---------------------------------------- | ---- | ---- | ---- | ---- | ------ | ------ |
 | T1  | ✅ | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
 | T2  | ✅ | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
-| T3  |  | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
-| T4  |  | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
+| T3  | ✅ | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
+| T4  | ✅ | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
 | T5  |  | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
 | T6  |  | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     |
 | T7  |  | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
@@ -78,22 +78,6 @@ Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien u
 Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und eine Einordnung gegenüber dem heutigen Regelwerk (globale `~/.claude/CLAUDE.md`, hier „§…“, und die Skills dieses Repos). Die Einordnung trägt eine von vier Kategorien: **[claude.ai-Mechanik]** — an das Web-Frontend gebunden, in Claude Code gegenstandslos; **[abgedeckt]** — inhaltlich im heutigen Regelwerk enthalten; **[teilweise abgedeckt]**; **[nicht abgedeckt]** — Kandidat für eine Neuzusammenstellung.
 
 ### A Sprache und Kontextquellen
-
-#### T3 Dokumentsprache Deutsch, projektabhängig änderbar
-
-**Aussage:** Dokumente auf Deutsch, sofern nicht anders gefordert; die Sprache von Konzept-/Implementationsdokumenten wird projektabhängig festgelegt, und bei bestehenden Dokumenten erkennt Claude sie selbst.
-
-**Fundstellen:** nur ALLG.
-
-**Einordnung:** **[abgedeckt]** durch §1.1 („Dokumentation: Deutsch, wenn … nicht anders festgelegt“). Der Zusatz „bei bestehendem Dokument Sprache selbst erkennen“ steht dort nicht wörtlich, ist aber gelebte Praxis; kaum regelungsbedürftig.
-
-#### T4 Chat-Suche nur innerhalb des Projekts
-
-**Aussage:** Die Chats-durchsuchen-Funktion soll nur Chats innerhalb des claude.ai-Projekts berücksichtigen, nie Chats anderer Projekte oder außerhalb von Projekten.
-
-**Fundstellen:** BIRD, SCH‑A, SCH‑B wortgleich, jeweils als vorangestellter Einzelpunkt.
-
-**Einordnung:** **[claude.ai-Mechanik]**. In Claude Code ist der Projektkontext strukturell das Repository; für historische Chats gelten §1.11/§1.12 und das Vorhaben `chat-export/`. Der dahinterstehende Grundsatz — nur den Kontext des Projekts als Vorwissen zulassen — ist damit strukturell erfüllt. Bleibt claude.ai im Einsatz, gehört der Punkt in die dortige Projektanweisung.
 
 #### T5 Definition des Vorwissens
 
@@ -242,13 +226,12 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 und T5 gehen einen eigenen Weg** (Entscheidung des Entwicklers vom 28. August 2026): Sie sind keine Artefakt-Mechanik, sondern eine Projektanweisung für claude.ai (Vorwissen-Abgrenzung) — sie gehören, falls weiter gewollt, in das dortige Anweisungsfeld, und vorher ist ihre Aktualität zu prüfen: Ob die Chat-Suche heute noch projektübergreifend arbeitet, ist offen.
+T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 ist am 29. August 2026 geschlossen** (Entscheidung des Entwicklers): Die damals offene Prüffrage, ob die Chat-Suche projektübergreifend arbeitet, ist beantwortet — auf claude.ai durchsucht sie ohnehin nur die Chats des eigenen Projekts. Der Punkt braucht also kein Zuhause; sein Eintrag steht in Kapitel 6. **T5 bleibt offen:** Er ist keine Artefakt-Mechanik, sondern eine Projektanweisung für claude.ai (Vorwissen-Abgrenzung) und gehört, falls weiter gewollt, in das dortige Anweisungsfeld.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
 | Einträge    | Heutiger Ort                  | Abweichung/Anmerkung                                                                                                                    |
 | ------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| T3           | §1.1                         | —                                                                                                                                      |
 | T6, T7       | §1.3–§1.5                  | verschärft weitergeführt.                                                                                                             |
 | T21          | §2.1, §1.9                  | —                                                                                                                                      |
 | T22          | §2.2                         | ALLG nennt zusätzlich Code-Style-Beispiele als Ausnahme; §2.2 nicht. Klären: bewusst entfallen oder verloren?                        |
@@ -298,6 +281,26 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 **Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich („Code in Englisch, inkl. Kommentaren“). ALLG präziser: „Code-Identifier, Kommentare **und Docstrings** auf Englisch“ — die einzige Quelle, die Docstrings ausdrücklich nennt.
 
 **Einordnung:** **[abgedeckt]** durch den Skill `common-code-generation` („Alles, was im Quelltext steht — Bezeichner, Kommentare und Docstrings —, schreibst Du auf Englisch“), der zusätzlich das Vorschlagen von Benennungen regelt. Die ALLG-Präzisierung ist dort bereits übernommen.
+
+#### T3 Dokumentsprache Deutsch, projektabhängig änderbar
+
+**Entschieden:** Kein Skill-Zuhause, 29. August 2026 · Gruppe A (Sprache und Kontextquellen). Die Dokumentsprache hängt am Nutzer und am einzelnen Projekt; sie festzulegen ist Sache der jeweiligen `CLAUDE.md` beziehungsweise des Projekts selbst, nicht die eines Skills.
+
+**Aussage:** Dokumente auf Deutsch, sofern nicht anders gefordert; die Sprache von Konzept-/Implementationsdokumenten wird projektabhängig festgelegt, und bei bestehenden Dokumenten erkennt Claude sie selbst.
+
+**Fundstellen:** nur ALLG.
+
+**Einordnung:** **[abgedeckt]** durch §1.1 („Dokumentation: Deutsch, wenn … nicht anders festgelegt“). Der Zusatz „bei bestehendem Dokument Sprache selbst erkennen“ steht dort nicht wörtlich, ist aber gelebte Praxis; kaum regelungsbedürftig.
+
+#### T4 Chat-Suche nur innerhalb des Projekts
+
+**Entschieden:** Kein Zuhause nötig, 29. August 2026 · Gruppe A (Sprache und Kontextquellen). Der Punkt ist von Haus aus erfüllt: Auf claude.ai durchsucht die Chat-Suche ohnehin nur die Chats des eigenen Projekts. Damit beantwortet sich zugleich die Prüffrage, die in 5.1 offenstand.
+
+**Aussage:** Die Chats-durchsuchen-Funktion soll nur Chats innerhalb des claude.ai-Projekts berücksichtigen, nie Chats anderer Projekte oder außerhalb von Projekten.
+
+**Fundstellen:** BIRD, SCH‑A, SCH‑B wortgleich, jeweils als vorangestellter Einzelpunkt.
+
+**Einordnung:** **[claude.ai-Mechanik]**. In Claude Code ist der Projektkontext strukturell das Repository; für historische Chats gelten §1.11/§1.12 und das Vorhaben `chat-export/`. Der dahinterstehende Grundsatz — nur den Kontext des Projekts als Vorwissen zulassen — ist damit strukturell erfüllt. Bleibt claude.ai im Einsatz, gehört der Punkt in die dortige Projektanweisung.
 
 #### T8 Wann Artefakt, wann Chat
 
