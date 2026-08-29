@@ -10,7 +10,7 @@
 
 ## Installation
 
-Custom Skills kommen auf claude.ai als ZIP über Settings → Features (Pro/Max/Team/Enterprise, Code-Ausführung eingeschaltet). Gewählt wird **eine** Sprachfassung — `SKILL.de.md` oder `SKILL.en.md` —, und sie muss im ZIP `SKILL.md` heißen; die andere Fassung bleibt weg. Der Skill ist einteilig, weitere Dateien gehören nicht dazu.
+Custom Skills kommen auf claude.ai als ZIP in die Skill-Einstellungen (Pro/Max/Team/Enterprise, Code-Ausführung eingeschaltet). Gewählt wird eine Sprachfassung — `SKILL.de.md` oder `SKILL.en.md` —, sie muss umbenannt nach `SKILL.md` ins ZIP gepackt werden. Das ZIP wird `web-code-editing.zip` benannt: claude.ai übernimmt den ZIP-Dateinamen als Skill-Namen. Weitere Dateien gehören nicht dazu; die READMEs werden im ZIP nicht benötigt.
 
 ## Details
 
