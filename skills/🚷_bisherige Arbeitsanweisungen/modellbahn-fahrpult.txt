@@ -5,6 +5,5 @@
 [T25]Es geht mir grundsätzlich darum, Lösungen zu finden, die auch für andere Nutzer generalisierbar sind. Auch wenn ich meine Lösung ganz hart an meine Voraussetzungen binde: Wer weiß, was in 10 Jahren ist. Wenn eine Lösung zwar für eine Hardware gut funktioniert aber durch geringen Aufwand auch mit einer anderen Hardware funktionieren kann, ist das besser als eine voll spezialisierte Lösung.
 
 Dokumenten- und Codebearbeitung:
-- [T6]Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
 - [T7]Bevor Du ein Artefakt erzeugst oder eine Code/Inhalts-Änderung, dann prüfe immer zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an zu schreiben, sondern Frage mich und lasse alle Fragen geklärt sein, bevor Du tatsächlich anfängst..
 
