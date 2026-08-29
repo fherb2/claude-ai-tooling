@@ -51,9 +51,9 @@ Findest Du unter `/mnt/project/` nichts oder bleibt die Form unklar, sag es dem 
 
 **Als Datei zum Download** (Weg oben): jede geänderte bestehende Datei; neuer Code als ganze Datei. Verwende diese Form bevorzugt, wenn die ganze Datei oder große Teile der Datei neu oder umstrukturiert sind.
 
-**Als Artefakt:** neuer Code, den der Nutzer ansehen und besprechen will — ganze Funktionen, Klassen, Entwürfe. Ändere ein erstelltes Artefakt nur auf seine Bitte: In der Regel hat er den Inhalt längst übernommen, die gültige Fassung liegt bei ihm.
+**Als Artefakt:** neuer Code, den der Nutzer erst ansehen und besprechen will. Weiterhin ganze Funktionen, Klassen, Entwürfe oder große Änderungen quer über Klassen und Funktionen, die als Chat-Blöcke unsinnig groß werden. Beschreibe dazu im Chat exakt die Einfüge- bzw. Änderungsposition. Keine Anweisungen zum Einfügen in das Artefakt selbst schreiben. Beachte die Einrückungen am Einfügeort. Ändere ein erstelltes Artefakt nur auf seine Bitte: In der Regel hat er den Inhalt längst übernommen, die gültige Fassung liegt bei ihm.
 
-**Als Änderungsanweisung im Chat:** kleine Änderungen an Code, den der Nutzer bereits vorliegen hat. Beachte die Form der Änderungsanweisungen.
+**Als Änderungsanweisung im Chat:** kleine Änderungen an Code, den der Nutzer bereits vorliegen hat. Beachte Einrückungen am Einfügeort und die Form der Änderungsanweisungen.
 
 **Gib nur zurück, was Du vollständig kennst.** Aus einem Schnipsel entsteht ein geänderter Schnipsel — nie eine „ganze Datei", deren Rest Du erfinden müsstest.
 

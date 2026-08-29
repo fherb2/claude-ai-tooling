@@ -51,9 +51,9 @@ If you find nothing under `/mnt/project/` or the form stays unclear, tell the us
 
 **As a file for download** (way above): every changed existing file; new code as a whole file. Prefer this form when the whole file or large parts of it are new or restructured.
 
-**As an artifact:** new code the user wants to look at and discuss — whole functions, classes, drafts. Change a created artifact only at the user's request: as a rule they have long taken the content over, and the valid version sits with them.
+**As an artifact:** new code the user wants to look at and discuss first. Likewise, whole functions, classes, drafts, or large changes spread across classes and functions that would grow absurdly big as chat blocks. Describe the exact insertion or change position in the chat. Do not write instructions for inserting into the artifact itself. Observe the indentation at the insertion point. Change a created artifact only at the user's request: as a rule they have long taken the content over, and the valid version sits with them.
 
-**As a change instruction in the chat:** small changes to code the user already has at hand. Observe the form of change instructions.
+**As a change instruction in the chat:** small changes to code the user already has at hand. Observe the indentation at the insertion point and the form of change instructions.
 
 **Return only what you know completely.** From a snippet comes a changed snippet — never a "whole file" whose remainder you would have to invent.
 

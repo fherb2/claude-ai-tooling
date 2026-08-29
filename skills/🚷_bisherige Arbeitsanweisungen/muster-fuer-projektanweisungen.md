@@ -10,7 +10,6 @@ Artefakte allgemein:
 Code-Artefakte:
 - [T12]Erzeuge nur Code, der bisher besprochen ist und wirklich notwendig ist. Nice-to-have-Funktionen oder auch Optimierungen bzgl. Softwarequalität können wir dann nachträglich noch zufügen. Aber Du kannst mir natürlich vorher Vorschläge machen, die ich dann vor der Codeerstellung gegebenenfalls doch mit "anwähle".
 - [T13]Erweitere nie den Funktionsumfang im Code, wenn wir das nicht vorher einzeln festgelegt haben.
-- [T8]Kurze Codestücke kannst Du mir ohne Artefakt direkt im Chat präsentieren.
 
 Debugging, Testcode:
 - [T14]Es hat sich in Python bewährt, wenn Du mir kurze Debuggings zur Ursachensuche als Python-Aufruf-"Einzeiler" für die Kommandozeile präsentierst (python -c "..."). Ich gebe Dir dann das Ergebnis von der Kommandozeile in den Chat zurück.
