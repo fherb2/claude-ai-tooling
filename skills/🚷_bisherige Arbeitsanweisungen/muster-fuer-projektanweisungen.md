@@ -6,7 +6,6 @@ Artefakte allgemein:
 - [T7]Bevor Du ein Artefakt erzeugst, dann prüfe zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte:
-- [T13]Erweitere nie den Funktionsumfang im Code, wenn wir das nicht vorher einzeln festgelegt haben.
 
 Debugging, Testcode:
 - [T14]Es hat sich in Python bewährt, wenn Du mir kurze Debuggings zur Ursachensuche als Python-Aufruf-"Einzeiler" für die Kommandozeile präsentierst (python -c "..."). Ich gebe Dir dann das Ergebnis von der Kommandozeile in den Chat zurück.
