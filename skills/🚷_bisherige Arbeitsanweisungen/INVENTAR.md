@@ -6,7 +6,7 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behält seine Nummer für immer, auch wenn er erledigt ist und nach Kapitel 6 wandert (analog zur Fahrplan-Nummerierungsregel des Repos). Jede Nummer kommt genau einmal vor — in Kapitel 4 oder in Kapitel 6.
 
-**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T8, T9, T10, T11, T12, T13 und T16.
+**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T8, T9, T10, T11, T12, T13 und T16.
 
 ## 1 Die Quelldateien
 
@@ -47,7 +47,7 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T2  | ✅ | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
 | T3  | ✅ | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
 | T4  | ✅ | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
-| T5  |  | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
+| T5  | ✅ | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
 | T6  |  | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     |
 | T7  |  | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
 | T8  | ✅ | Wann Artefakt, wann Chat                 | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
@@ -77,19 +77,9 @@ Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien u
 
 Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und eine Einordnung gegenüber dem heutigen Regelwerk (globale `~/.claude/CLAUDE.md`, hier „§…“, und die Skills dieses Repos). Die Einordnung trägt eine von vier Kategorien: **[claude.ai-Mechanik]** — an das Web-Frontend gebunden, in Claude Code gegenstandslos; **[abgedeckt]** — inhaltlich im heutigen Regelwerk enthalten; **[teilweise abgedeckt]**; **[nicht abgedeckt]** — Kandidat für eine Neuzusammenstellung.
 
-### A Sprache und Kontextquellen
-
-#### T5 Definition des Vorwissens
-
-**Aussage:** Vorwissen sind Projektdateien, zum Chatanfang hochgeladene Dateien und die Chats im Projekt; Chats außerhalb des Projekts zählen nie dazu, auch wenn sie inhaltlich passen.
-
-**Fundstellen:** BIRD, SCH‑A, SCH‑B wortgleich.
-
-**Einordnung:** **[claude.ai-Mechanik]**, Begründung wie T4. Bemerkenswert als Konzept: Die explizite Vorwissen-Definition wird in T20 (Status Protokoll) wiederverwendet („referenziere das Vorwissen, statt es auszuschreiben“) — dieses Prinzip lebt heute in §2.6 (Fahrplan/Status als Übergabemedium) weiter.
-
 ### B Artefakt-Arbeitsweise (claude.ai-Web-Frontend)
 
-Von den Einträgen T6–T11 dieser Gruppe sind T8–T11 am 28. August 2026 im Skill `skills/web-code-editing/` verarbeitet; sie stehen deshalb in Kapitel 6. T6 und T7 stehen mit doppelter Rolle: Im Web-Skill sind sie als „Bevor Du schreibst" verarbeitet; als Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md (§1.3–1.5) bleiben sie hier.
+Von den Einträgen T6–T11 dieser Gruppe sind T8–T11 am 28. August 2026 im Skill `skills/web-code-editing/` verarbeitet; sie stehen deshalb in Kapitel 6. T6 und T7 stehen mit doppelter Rolle: Im Web-Skill sind sie als „Bevor Du schreibst“ verarbeitet; als Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md (§1.3–1.5) bleiben sie hier.
 
 #### T6 Ankündigen und Freigabe vor jedem Artefakt
 
@@ -226,7 +216,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 ist am 29. August 2026 geschlossen** (Entscheidung des Entwicklers): Die damals offene Prüffrage, ob die Chat-Suche projektübergreifend arbeitet, ist beantwortet — auf claude.ai durchsucht sie ohnehin nur die Chats des eigenen Projekts. Der Punkt braucht also kein Zuhause; sein Eintrag steht in Kapitel 6. **T5 bleibt offen:** Er ist keine Artefakt-Mechanik, sondern eine Projektanweisung für claude.ai (Vorwissen-Abgrenzung) und gehört, falls weiter gewollt, in das dortige Anweisungsfeld.
+T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 ist am 29. August 2026 geschlossen** (Entscheidung des Entwicklers): Die damals offene Prüffrage, ob die Chat-Suche projektübergreifend arbeitet, ist beantwortet — auf claude.ai durchsucht sie ohnehin nur die Chats des eigenen Projekts. Der Punkt braucht also kein Zuhause; sein Eintrag steht in Kapitel 6. **T5 ist am selben Tag geschlossen:** Die Vorwissen-Definition wird für die Arbeit mit Claude nicht mehr gebraucht; auch sein Eintrag steht in Kapitel 6. Damit ist diese Gruppe bis auf T14 und T15 abgearbeitet.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
@@ -301,6 +291,16 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 **Fundstellen:** BIRD, SCH‑A, SCH‑B wortgleich, jeweils als vorangestellter Einzelpunkt.
 
 **Einordnung:** **[claude.ai-Mechanik]**. In Claude Code ist der Projektkontext strukturell das Repository; für historische Chats gelten §1.11/§1.12 und das Vorhaben `chat-export/`. Der dahinterstehende Grundsatz — nur den Kontext des Projekts als Vorwissen zulassen — ist damit strukturell erfüllt. Bleibt claude.ai im Einsatz, gehört der Punkt in die dortige Projektanweisung.
+
+#### T5 Definition des Vorwissens
+
+**Entschieden:** Entfällt, 29. August 2026 · Gruppe A (Sprache und Kontextquellen). Die Vorwissen-Definition wird für die Arbeit mit Claude nicht mehr gebraucht. Der Eintrag bleibt hier stehen, weil T20 auf ihn Bezug nimmt („referenziere das Vorwissen, statt es auszuschreiben“) — der Faden ist also nicht durchtrennt.
+
+**Aussage:** Vorwissen sind Projektdateien, zum Chatanfang hochgeladene Dateien und die Chats im Projekt; Chats außerhalb des Projekts zählen nie dazu, auch wenn sie inhaltlich passen.
+
+**Fundstellen:** BIRD, SCH‑A, SCH‑B wortgleich.
+
+**Einordnung:** **[claude.ai-Mechanik]**, Begründung wie T4. Bemerkenswert als Konzept: Die explizite Vorwissen-Definition wird in T20 (Status Protokoll) wiederverwendet („referenziere das Vorwissen, statt es auszuschreiben“) — dieses Prinzip lebt heute in §2.6 (Fahrplan/Status als Übergabemedium) weiter.
 
 #### T8 Wann Artefakt, wann Chat
 
