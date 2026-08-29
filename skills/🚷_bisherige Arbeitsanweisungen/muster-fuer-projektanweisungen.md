@@ -1,6 +1,5 @@
 Sprachen:
 - [T1]Chat in deutsch, wir duzen uns
-- [T2]Code in Englisch, inkl. Kommentaren
 
 Artefakte allgemein:
 - [T6]Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
