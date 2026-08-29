@@ -37,39 +37,41 @@ MUSTER zählt nicht als siebter Text, sondern erklärt die Verwandtschaft: Es is
 
 ## 3 Themenmatrix
 
-Legende: ✓ enthalten · (✓) in abgewandelter Form enthalten · ⊘ ausdrücklich ausgeklammert · – nicht enthalten. Die Varianten stehen beim jeweiligen Eintrag — in Kapitel 4, für die verarbeiteten Themen in Kapitel 6.
+Legende der Quellenspalten: ✓ enthalten · (✓) in abgewandelter Form enthalten · ⊘ ausdrücklich ausgeklammert · – nicht enthalten. Die Varianten stehen beim jeweiligen Eintrag — in Kapitel 4, für die verarbeiteten Themen in Kapitel 6.
 
-| Nr. | Thema                                    | ALLG | MOD  | BIRD | CAM  | SCH‑A | SCH‑B |
-| --- | ---------------------------------------- | ---- | ---- | ---- | ---- | ------ | ------ |
-| T1  | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
-| T2  | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
-| T3  | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
-| T4  | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
-| T5  | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
-| T6  | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     |
-| T7  | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
-| T8  | Wann Artefakt, wann Chat                 | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
-| T9  | Artefakte nicht nachträglich ändern    | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
-| T10 | Vorher/Ersetzen-Schema                   | –   | (✓) | ✓   | –   | –     | (✓)   |
-| T11 | Teil-Artefakte ab ~2 A4-Seiten           | –   | –   | –   | ✓   | ⊘     | –     |
-| T12 | Nur besprochenen, notwendigen Code       | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T13 | Funktionsumfang nie ungefragt erweitern  | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T14 | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T15 | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T16 | DEBUG-Kennzeichnung von Probe-Code       | –   | –   | ✓   | –   | (✓)   | ✓     |
-| T17 | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T18 | Testfreundliche Funktionsanlage          | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T19 | debug-Parameter-Konvention               | –   | –   | ✓   | (✓) | ✓     | ✓     |
-| T20 | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     |
-| T21 | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     |
-| T22 | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
-| T23 | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
-| T24 | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
-| T25 | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
-| T26 | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     |
-| T27 | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     |
+Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk: **✅ heißt abgearbeitet** — der Posten ist in einen Skill überführt (oder bewusst verworfen), und seine Passagen sind aus den Quelldateien entfernt. Ohne Vermerk steht er noch offen.
 
-Die Matrix ist vollständig und bleibt es: Sie bildet ab, was in den Quelldateien steht, unabhängig davon, ob ein Thema schon verarbeitet ist. Erledigt sind T2, T8, T9, T10, T11, T12, T13 und T16 — ihre Einträge stehen in Kapitel 6.
+| Nr. |  | Thema                                    | ALLG | MOD  | BIRD | CAM  | SCH‑A | SCH‑B |
+| --- | --- | ---------------------------------------- | ---- | ---- | ---- | ---- | ------ | ------ |
+| T1  |  | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
+| T2  | ✅ | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
+| T3  |  | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
+| T4  |  | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
+| T5  |  | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
+| T6  |  | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     |
+| T7  |  | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
+| T8  | ✅ | Wann Artefakt, wann Chat                 | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
+| T9  | ✅ | Artefakte nicht nachträglich ändern    | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
+| T10 | ✅ | Vorher/Ersetzen-Schema                   | –   | (✓) | ✓   | –   | –     | (✓)   |
+| T11 | ✅ | Teil-Artefakte ab ~2 A4-Seiten           | –   | –   | –   | ✓   | ⊘     | –     |
+| T12 | ✅ | Nur besprochenen, notwendigen Code       | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T13 | ✅ | Funktionsumfang nie ungefragt erweitern  | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T14 |  | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T15 |  | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T16 | ✅ | DEBUG-Kennzeichnung von Probe-Code       | –   | –   | ✓   | –   | (✓)   | ✓     |
+| T17 |  | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T18 |  | Testfreundliche Funktionsanlage          | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T19 |  | debug-Parameter-Konvention               | –   | –   | ✓   | (✓) | ✓     | ✓     |
+| T20 |  | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     |
+| T21 |  | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     |
+| T22 |  | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
+| T23 |  | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
+| T24 |  | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
+| T25 |  | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
+| T26 |  | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     |
+| T27 |  | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     |
+
+Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien ursprünglich enthielten, unabhängig davon, ob ein Thema inzwischen verarbeitet und aus ihnen entfernt ist. Wer den ursprünglichen Wortlaut braucht, findet ihn im Unterordner `original/`. Die Einträge der abgehakten Posten stehen in Kapitel 6.
 
 ## 4 Die Anweisungen im Einzelnen
 
