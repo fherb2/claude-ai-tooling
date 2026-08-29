@@ -137,7 +137,7 @@ Original code that has to give way for the search is **only commented out — ne
 ## What else you watch out for when changing
 
 - At decision points — branches, case distinctions — and inside loops the marks matter especially, so that the original state stays restorable with minimal effort and in a way the user can follow.
-- Take over the indentation you find, or that of the programming language in use, unchanged.
+- Take over the indentation you find, or that of the programming language in use, unchanged. Block marks and separator lines follow it too — **not** the nesting depth of the debugging efforts, and not the order in which you inserted them.
 
 ## Removing debug code again
 

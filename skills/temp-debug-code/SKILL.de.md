@@ -137,7 +137,7 @@ Originalcode, der für die Fehlersuche weichen muss, wird **ausschließlich ausk
 ## Worauf Du beim Ändern außerdem achtest
 
 - An Entscheidungsstellen — Verzweigungen, Case-Aufteilungen — und in Schleifen kommt es besonders auf die richtige Anwendung der Marken an, damit der Originalzustand mit minimalem Aufwand und für den Nutzer nachvollziehbar wiederherstellbar bleibt.
-- Übernimm die vorgefundene Einrückung beziehungsweise die der verwendeten Programmiersprache unverändert.
+- Übernimm die vorgefundene Einrückung beziehungsweise die der verwendeten Programmiersprache unverändert. Auch Blockmarken und Trennzeilen folgen ihr — **nicht** der Schachtelungstiefe der Debug-Vorhaben und nicht der Reihenfolge, in der Du sie eingefügt hast.
 
 ## Debug-Code wieder entfernen
 
