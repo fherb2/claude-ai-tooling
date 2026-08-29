@@ -6,7 +6,7 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behält seine Nummer für immer, auch wenn er erledigt ist und nach Kapitel 6 wandert (analog zur Fahrplan-Nummerierungsregel des Repos). Jede Nummer kommt genau einmal vor — in Kapitel 4 oder in Kapitel 6.
 
-**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T8, T9, T10, T11, T12, T13 und T16.
+**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13 und T16.
 
 ## 1 Die Quelldateien
 
@@ -49,7 +49,7 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T4  | ✅ | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
 | T5  | ✅ | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
 | T6  | ✅ | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     |
-| T7  |  | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
+| T7  | ✅ | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
 | T8  | ✅ | Wann Artefakt, wann Chat                 | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
 | T9  | ✅ | Artefakte nicht nachträglich ändern    | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
 | T10 | ✅ | Vorher/Ersetzen-Schema                   | –   | (✓) | ✓   | –   | –     | (✓)   |
@@ -76,18 +76,6 @@ Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien u
 ## 4 Die Anweisungen im Einzelnen
 
 Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und eine Einordnung gegenüber dem heutigen Regelwerk (globale `~/.claude/CLAUDE.md`, hier „§…“, und die Skills dieses Repos). Die Einordnung trägt eine von vier Kategorien: **[claude.ai-Mechanik]** — an das Web-Frontend gebunden, in Claude Code gegenstandslos; **[abgedeckt]** — inhaltlich im heutigen Regelwerk enthalten; **[teilweise abgedeckt]**; **[nicht abgedeckt]** — Kandidat für eine Neuzusammenstellung.
-
-### B Artefakt-Arbeitsweise (claude.ai-Web-Frontend)
-
-Von den Einträgen T6–T11 dieser Gruppe stehen T6 und T8–T11 in Kapitel 6. **T7 steht mit doppelter Rolle:** Im Skill `skills/web-code-editing/` ist er als „Bevor Du schreibst“ verarbeitet; als Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md (§1.3–1.5) bleibt er hier.
-
-#### T7 Offene Fragen vor Artefaktbeginn klären
-
-**Aussage:** Vor dem Schreiben eines Artefakts oder einer Code-Änderung prüfen, ob noch Fragen offen sind; erst schreiben, wenn alle geklärt sind.
-
-**Fundstellen:** MOD, BIRD, SCH‑A, SCH‑B in der ausführlichen Form („…lasse alle Fragen geklärt sein, bevor Du tatsächlich anfängst“); CAM in einer knapperen Frühform.
-
-**Einordnung:** **[abgedeckt]** sinngemäß durch §1.3/§1.5 — der Plan-Zustimmungs-Zyklus erzwingt die Klärung vor der Ausführung.
 
 ### D Debugging und Tests
 
@@ -214,7 +202,6 @@ T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind 
 
 | Einträge    | Heutiger Ort                  | Abweichung/Anmerkung                                                                                                                    |
 | ------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| T7           | §1.3–§1.5                  | verschärft weitergeführt.                                                                                                             |
 | T21          | §2.1, §1.9                  | —                                                                                                                                      |
 | T22          | §2.2                         | ALLG nennt zusätzlich Code-Style-Beispiele als Ausnahme; §2.2 nicht. Klären: bewusst entfallen oder verloren?                        |
 
@@ -303,6 +290,16 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 **Fundstellen:** MOD, BIRD, CAM, SCH‑A, SCH‑B — im Kern wortgleich; MOD verallgemeinert auf Dokument-Artefakte.
 
 **Einordnung:** **[abgedeckt]** und deutlich verschärft durch §1.3 (vollständiger, erklärender Plan je Datei und Stelle statt bloßer Ankündigung) und §1.4 (Abweichung heißt anhalten). Historisch interessant: Dies ist der direkte Vorläufer der heutigen Plan-vor-Ausführung-Regel.
+
+#### T7 Offene Fragen vor Artefaktbeginn klären
+
+**Verarbeitet:** Skill `skills/web-code-editing/` („Bevor Du schreibst“), 28. August 2026 · Gruppe B (Artefakt-Arbeitsweise); abgehakt am 29. August 2026. Zugleich in §1.3 und §1.5 abgedeckt, und dort über den Posten hinausgehend: §1.5 sagt auch, **wann nicht zu fragen ist** — wenn die Projektdokumentation die Frage bereits beantwortet.
+
+**Aussage:** Vor dem Schreiben eines Artefakts oder einer Code-Änderung prüfen, ob noch Fragen offen sind; erst schreiben, wenn alle geklärt sind.
+
+**Fundstellen:** MOD, BIRD, SCH‑A, SCH‑B in der ausführlichen Form („…lasse alle Fragen geklärt sein, bevor Du tatsächlich anfängst“); CAM in einer knapperen Frühform.
+
+**Einordnung:** **[abgedeckt]** sinngemäß durch §1.3/§1.5 — der Plan-Zustimmungs-Zyklus erzwingt die Klärung vor der Ausführung.
 
 #### T8 Wann Artefakt, wann Chat
 
