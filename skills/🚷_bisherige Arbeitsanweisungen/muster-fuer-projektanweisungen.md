@@ -1,7 +1,6 @@
 Sprachen:
 
 Artefakte allgemein:
-- [T6]Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
 - [T7]Bevor Du ein Artefakt erzeugst, dann prüfe zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte:
