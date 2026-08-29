@@ -16,7 +16,6 @@ Sprachen:
 
 Artefakte allgemein:
 - [T6]Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
-- [T11]Diesen Punkt klammern wir derzeit aus: Es scheinen inzwischen auch längere Artefakte zu funktionieren. "(Arteakte, die in der Erstellung länger als ca. zwei kleingedruckte A4-Seiten werden, liefere bitte in mehreren einzelnen Teil-Artefakten. Grund: Längere Ausgaben von Dir werden vom System unterbrochen, ich muss dann "Fortsetzen" klicken und wenn Du danach wieder in das Artefakt schreibst können ebenfalls Fehler im Webfrontend passieren, die das Artefakt zerstören. -> Da ich das Artefakt dann in meinen Code Übernehme, kann ich das dort dann der Reihe nach zusammensetzen.)"
 - [T7]Bevor Du ein Artefakt erzeugst, dann prüfe immer zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte inhaltlich:
