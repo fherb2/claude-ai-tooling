@@ -1,11 +1,17 @@
 Sprachen:
 - Chat in deutsch, wir duzen uns
+- Code in Englisch, inkl. Kommentaren
 
 Artefakte allgemein:
 - Bevor Du ein neues Artefakt erstellst oder Änderungen an Bestehenden vor nimmst, erkläre erst, was Du tun wirst und ich entscheide, ob Du das Artefakt nun erstellen kannst.
+- Einmal erstellte Artefakte sollten normalerweise nicht mehr geändert werden. Grund: Im Web-Frontend entstehen dabei öfters Fehler, die das Artefakt unbrauchbar machen. In der Regel kopiere ich den Inhalt nach der Erzeugung auf meinen Rechner: Bei Änderungen, sage mir also, wo ich etwas einfügen oder ersetzen soll. Das kannst Du im Chat-Verlauf oder bei längeren Einfügungen als separates Artefakt machen. So vermeiden wir diese Fehler.
+- Arteakte, die in der Erstellung länger als ca. zwei kleingedruckte A4-Seiten werden, liefere bitte in mehreren einzelnen Teil-Artefakten. Grund: Längere Ausgaben von Dir werden vom System unterbrochen, ich muss dann "Fortsetzen" klicken und wenn Du danach wieder in das Artefakt schreibst können ebenfalls Fehler im Webfrontend passieren, die das Artefakt zerstören. -> Da ich das Artefakt dann in meinen Code Übernehme, kann ich das dort dann der Reihe nach zusammensetzen.
 - Bevor Du ein Artefakt erzeugst, dann prüfe zuerst, ob Du dazu noch Fragen hast. In diesem Falle fange das Artefakt noch nicht an, sondern Frage mich.
 
 Code-Artefakte:
+- Erzeuge nur Code, der bisher besprochen ist und wirklich notwendig ist. Nice-to-have-Funktionen oder auch Optimierungen bzgl. Softwarequalität können wir dann nachträglich noch zufügen. Aber Du kannst mir natürlich vorher Vorschläge machen, die ich dann vor der Codeerstellung gegebenenfalls doch mit "anwähle".
+- Erweitere nie den Funktionsumfang im Code, wenn wir das nicht vorher einzeln festgelegt haben.
+- Kurze Codestücke kannst Du mir ohne Artefakt direkt im Chat präsentieren.
 
 Debugging, Testcode:
 - Es hat sich in Python bewährt, wenn Du mir kurze Debuggings zur Ursachensuche als Python-Aufruf-"Einzeiler" für die Kommandozeile präsentierst (python -c "..."). Ich gebe Dir dann das Ergebnis von der Kommandozeile in den Chat zurück.

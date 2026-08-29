@@ -8,7 +8,29 @@ Was hier **nicht** steht: der Zustand eines Skills oder Bereichs und alles, was 
 
 Eine `status.md` führt das Vorhaben `skills/` nicht.
 
-Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
+Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Schritt 14 steht bewusst vorn — Schritt 3 arbeitet mit dem Inventar, das dort erst wiederhergestellt wird. Ab Schritt 3 ist die Folge dann nicht mehr festgelegt; diese Schritte hängen nicht voneinander ab.
+
+## 14 Die Beschneidung des Anweisungs-Inventars zurücknehmen
+
+**Dies ist der ausgearbeitete Plan des nächsten Schritts; er ist noch nicht ausgeführt.**
+
+Am 27. und 28. August 2026 wurden erledigte Inventarposten aus der `INVENTAR.md` **und** aus den Quelldateien gelöscht. Der Entwickler hat dieses Vorgehen am 29. August 2026 als Fehleinschätzung verworfen: Das Belegmaterial bleibt vollständig, und Erledigtes wird nicht entfernt, sondern in ein eigenes Kapitel verschoben. Betroffen sind acht Posten — T2, T8, T9, T10, T11, T12, T13 und T16 — sowie die Passagen der Quelldateien, auf die ihre Fundstellenangaben zeigen. Die Nummern bleiben dabei bei ihren ursprünglichen Inhalten; neu vergeben wird nichts.
+
+Quelle der Rücknahme ist der Commit `23f868f` vom 26. August 2026, der letzte Stand vor der ersten Löschung. Für die sechs beschnittenen Quelldateien ist er zugleich der Importzustand: An ihnen wurde zwischen Anlage und Beschneidung nichts geändert, ein `git restore` führt sie deshalb ohne Verlust auf das Original zurück. Für die `INVENTAR.md` gilt das **nicht** — sie hat seither acht Verbesserungen erfahren, die erhalten bleiben müssen; dort wird selektiv zurückgetragen statt restauriert.
+
+**A — Quelldateien.** `git restore --source=23f868f --` auf `claude.ai-pro-allgemein.txt`, `birdnet-audio-walker.txt`, `GigE-CameraStreamingServer.txt`, `RTCP Camera Streamer and Player.txt`, `Scheludko-Zelle allgemein.txt` und `Scheludko-Zelle Bildverarbeitung.txt`. Die `modellbahn-fahrpult.txt` bleibt unberührt — sie wurde nie beschnitten. Gegenprobe danach: Die beiden CAM-Zwillinge müssen wieder byte-identisch sein, und der Diff zwischen BIRD und SCH‑B muss wieder genau den einen Unterschiedssatz zeigen (Beschriftung vor den Block statt hinein), statt wie heute leer auszufallen.
+
+**B — Die Musterdatei aufnehmen.** `muster-fuer-projektanweisungen.md` wird mitcommittet und im Inventar erschlossen: Kürzel **MUSTER**, eine Zeile in der Quellentabelle von Kapitel 1, dort außerdem „sieben Textdateien" auf acht; in Kapitel 2 ein Absatz zu ihrer Stellung — sie ist die gepflegte Vorlage, aus der die CAM-Fassung hervorging (identische Tippfehler, identische T19-Frühform), und damit ein Indiz zur offenen Frage 5.4-1 nach der Chronologie; in der Themenmatrix von Kapitel 3 eine weitere Spalte.
+
+**C — Das neue Kapitel 6.** Hinter Kapitel 5 entsteht „6 Erledigte Einträge" mit einem Kopfabsatz, der Anlass und Datum der Rücknahme nennt. Darin die acht Einträge in Nummernfolge, im Wortlaut aus `23f868f`. Jeder bekommt eine Zeile, die seinen heutigen Verbleib benennt: welcher Skill-Ordner ihn verarbeitet hat und wann. Die Ordnernamen im übernommenen Wortlaut werden auf die heutigen umgestellt — `web-code-artefacts` beziehungsweise `skills/🚧_web-code-artefacts/` heißt heute `skills/web-code-editing/` und ist fertig, nicht mehr „in Arbeit". Die Gruppenzugehörigkeit (A bis F) wird je Eintrag vermerkt, weil die Gruppenüberschriften in Kapitel 4 bleiben, wo sie sind; die dort entstandene Lücke bei Gruppe C bleibt bestehen, ihre beiden Einträge stehen künftig in Kapitel 6.
+
+**D — Anpassungen im bestehenden Text.** Der Dateikopf verliert seine zwei Erledigt-Notizen und bekommt stattdessen einen Satz, der auf Kapitel 6 zeigt. In Kapitel 3 kehren die acht Matrixzeilen zurück, darunter eine Zeile, die sagt, welche Nummern erledigt sind und wo sie stehen. Der Vorspann zu Gruppe B in Kapitel 4 meldet T8–T11 künftig als nach Kapitel 6 verschoben statt als entfernt; in Kapitel 5.1 wird derselbe Verweis nachgezogen. In 5.2 kehren die zwei gelöschten Tabellenzeilen **nicht** zurück, stattdessen ein Verweis auf Kapitel 6 — so bleibt die Unterscheidung gewahrt: „abgedeckt" heißt, das heutige Regelwerk enthält die Anweisung bereits, „erledigt" heißt, aus ihr wurde ein Skill. Und die drei Verweise, die beim Löschen zu „vormals T9", „vormals T16" und „vormals T12/T13" umformuliert wurden (in T19, T21 und T25), zeigen wieder auf die Nummern, ergänzt um die Kapitelangabe; ihre inhaltliche Präzisierung — welcher Skill die Regel heute trägt — bleibt erhalten.
+
+**E — Was außerhalb des Ordners nachzuziehen ist.** Eine einzige Stelle: In Schritt 3 dieses Fahrplans wird der Satz falsch, T2, T12, T13 und T16 seien „aus Inventar wie Quelldateien entfernt"; er wird auf den neuen Stand gebracht. Die übrigen T-Verweise im Repo bleiben richtig — die beiden READMEs von `web-code-editing` nennen T8–T11 als verarbeitete Herkunft, was zutrifft, und die T-Nummern in `software-dev-doc-fh` und `home-.claude-sharing` gehören zu eigenen, unabhängigen Nummernkreisen.
+
+**Prüfungen zum Abschluss.** Tabellen-Scan über die geänderten Markdown-Dateien; die Gegenprobe der Quelldateien aus Teil A; und die Kontrolle, dass jede der 27 Nummern genau einmal als Eintrag vorkommt — in Kapitel 4 oder in Kapitel 6, nie in beiden.
+
+Der Ordner trägt das 🚷-Schild und liegt deshalb nicht auf master; ein Release entfällt, die Arbeit endet auf dev.
 
 ## 3 Anweisungs-Inventar zuordnen
 
@@ -16,7 +38,7 @@ Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeit
 
 Damit erledigt sich zugleich der übergreifend offene Punkt „Neuordnung der Arbeitsanweisungen zu Skill-Zuhausen“.
 
-**Der Schritt ist größer als sein ursprünglicher Zuschnitt und wird bei Beginn untergliedert** (Festlegung des Entwicklers vom 27. August 2026). Dreierlei dazu: T2, T12, T13 und T16 sind erledigt und aus Inventar wie Quelldateien entfernt (abgedeckt durch `common-code-generation` bzw. `temp-debug-code`). Die durch die globale CLAUDE.md abgedeckten Posten (T1, T3, T6, T7, T21, T22) gelten ausdrücklich **nicht** als erledigt — die globale CLAUDE.md wird selbst noch zu dynamisch ladenden Skills durchgearbeitet, und diese Posten sind dafür Referenzmaterial. Und die Zielwelt-Sortierung wirkt herein: Je Posten ist auch zu bestimmen, in welche Zielwelt-Gruppe sein Zuhause gehört — die Gruppen und das Zuordnungskriterium stehen in Kapitel 9 der `skill-dev-doc.md`.
+**Der Schritt ist größer als sein ursprünglicher Zuschnitt und wird bei Beginn untergliedert** (Festlegung des Entwicklers vom 27. August 2026). Dreierlei dazu: T2, T8 bis T13 und T16 sind erledigt und stehen in Kapitel 6 des Inventars (verarbeitet in `common-code-generation`, `temp-debug-code` und `web-code-editing`); die Quelldateien tragen ihre Passagen weiterhin vollständig. Die durch die globale CLAUDE.md abgedeckten Posten (T1, T3, T6, T7, T21, T22) gelten ausdrücklich **nicht** als erledigt — die globale CLAUDE.md wird selbst noch zu dynamisch ladenden Skills durchgearbeitet, und diese Posten sind dafür Referenzmaterial. Und die Zielwelt-Sortierung wirkt herein: Je Posten ist auch zu bestimmen, in welche Zielwelt-Gruppe sein Zuhause gehört — die Gruppen und das Zuordnungskriterium stehen in Kapitel 9 der `skill-dev-doc.md`.
 
 ## 4 `🚧_translation-task`: die fünf offenen Festlegungen
 
