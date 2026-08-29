@@ -6,7 +6,6 @@ Allgemeine Anweisungen zur Projektarbeit und zum Coding:
 
 Sprachen:
 - [T1]Chat in deutsch, wir duzen uns
-- [T2]Code in Englisch, inkl. Kommentaren
 
 [T5]Vorwissen: Dazu zählen Dateien im Projekt oder zum Chatanfang hochgeladene Dateien sowie die im Projekt befindlichen Chats. Bitte berücksichtige nie Chats, die außerhalb des Projekts geführt wurden. Auch dann nicht, wenn sie inhaltlich dazu passen könnten.
 
