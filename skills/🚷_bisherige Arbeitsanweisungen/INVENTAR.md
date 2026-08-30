@@ -64,7 +64,7 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T19 |  | debug-Parameter-Konvention               | –   | –   | ✓   | (✓) | ✓     | ✓     |
 | T20 |  | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     |
 | T21 |  | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     |
-| T22 |  | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
+| T22 | ✅ | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
 | T23 | ✅ | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
 | T24 | ✅ | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
 | T25 | ✅ | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
@@ -126,14 +126,6 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 **Einordnung:** **[abgedeckt]** der Sache nach: Das Phasenmodell §2.1 (Findung → Fixierung → Segmentierung) ist der ausgebaute Nachfolger des Konzept-Artefakts, und die Chatlängen-Vorsorge entspricht exakt §1.9 (vor jeder Komprimierung den Fahrplan detaillieren). Der Timing-Gedanke „nicht zu früh festschreiben“ lebt in §2.1 als Findungsphase weiter.
 
-#### T22 Prosa-Code-Grenze in Konzept- und Implementationsdokumenten
-
-**Aussage:** Konzept- und Implementationsdokumente (auch Fahrplan-/Statusdokumente) enthalten keinen Implementierungscode. Genau zwei Ausnahmen: final beschlossene API-Signaturen sowie Nutzungs- **und Code-Style-Beispiele**.
-
-**Fundstellen:** nur ALLG.
-
-**Einordnung:** **[abgedeckt]** durch §2.2 — mit **einer inhaltlichen Abweichung**: §2.2 nennt als Ausnahmen API-Signaturen und Nutzungsbeispiele; die Code-Style-Beispiele aus ALLG kommen dort nicht vor. Zu entscheiden: Ist das ein bewusster Wegfall oder beim Übertragen verloren gegangen? (`common-code-generation` erwähnt Code-Styling-Vorgaben als primär geltend, regelt aber nicht deren Dokumentation per Beispiel.)
-
 ### F Projektphase und Arbeitsmodus
 
 #### T27 Projektspezifische Hintergrunddateien als Kontext
@@ -155,7 +147,6 @@ T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und s
 | Einträge    | Heutiger Ort                  | Abweichung/Anmerkung                                                                                                                    |
 | ------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | T21          | §2.1, §1.9                  | —                                                                                                                                      |
-| T22          | §2.2                         | ALLG nennt zusätzlich Code-Style-Beispiele als Ausnahme; §2.2 nicht. Klären: bewusst entfallen oder verloren?                        |
 
 Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb offen bleiben — sie sind Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md. Wovon bereits ein **Skill** gebaut wurde, gilt als erledigt und steht mit seiner Zuordnung in Kapitel 6.
 
@@ -163,12 +154,11 @@ Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb
 
 - **Python-Test-Konventionen (T17, T18, T19):** der größte ungenutzte Block — pytest CI+CLI, testfreundliche Funktionsanlage, debug-Parameter. Kandidat für einen neuen Skill; bei T19 vorher genau eine der zwei unverträglichen Fassungen festlegen. Abgrenzung zu `temp-debug-code` ist sauber (dauerhafter vs. temporärer Debug-Code).
 - **Status-Protokoll-Detailregeln (T20):** Vergleichsmaterial für den Ausbau von `software-dev-doc-fh` (Referenzieren statt Ausschreiben, Missverständnisfestigkeit, API-Rümpfe als Schrittbeschreibung); der append-only-Mechanismus selbst ist durch Fahrplan/Status bewusst abgelöst.
-- **Kleinigkeiten:** ggf. Code-Style-Beispiel-Ausnahme (T22).
 
 ### 5.4 Offene Fragen an den Entwickler
 
 1. Stimmt die in Kapitel 2 vermutete Reihenfolge der Fassungen (CAM → SCH‑A → BIRD → SCH‑B; MOD als Ableger)? Antwort: Diese Reihenfolge spielt keine entscheidende Rolle.
-2. T22: Sind Code-Style-Beispiele in Konzept-/Implementierungsdokumenten weiterhin erlaubte Ausnahme? Antwort: Wird geklärt, wenn der entsprechende Punkt in ein Skill überführt wird.
+2. T22: Sind Code-Style-Beispiele in Konzept-/Implementierungsdokumenten weiterhin erlaubte Ausnahme? Antwort: Erledigt am 30. August 2026 mit dem Abhaken von T22 — es entsteht kein Skill, damit gilt §2.2 unverändert und die Ausnahmeliste bleibt zweigliedrig. Näheres im Eintrag zu T22 in Kapitel 6.
 3. T19: Welche der beiden debug-Parameter-Fassungen gilt, falls der Test-Skill entsteht? Antwort: Wird geklärt, wenn der entsprechende Punkt in ein Skill überführt wird.
 
 ## 6 Erledigte Einträge
@@ -384,3 +374,15 @@ Was bleibt, ist Arbeitsmodus eines einzelnen Projekts in einer bestimmten Lage �
 **Fundstellen:** nur MOD, ein Absatz.
 
 **Einordnung:** **[teilweise abgedeckt]** — siehe oben.
+
+#### T22 Prosa-Code-Grenze in Konzept- und Implementationsdokumenten
+
+**Entschieden:** Kein Skill-Zuhause, 30. August 2026 · Gruppe E (Projektgedächtnis über Chat-Grenzen). Die Regel gilt bereits über §2.2 und bleibt dort; ein Skill entsteht daraus nicht.
+
+**Aussage:** Konzept- und Implementationsdokumente (auch Fahrplan-/Statusdokumente) enthalten keinen Implementierungscode. Genau zwei Ausnahmen: final beschlossene API-Signaturen sowie Nutzungs- **und Code-Style-Beispiele**.
+
+**Fundstellen:** nur ALLG, ein Absatz — der letzte, den diese Quelldatei noch enthielt.
+
+**Einordnung:** **[abgedeckt]** durch §2.2. Mit dem Abhaken ist auch die vermerkte Abweichung erledigt, und zwar ohne eigene Entscheidung: Da nichts übernommen wird, gilt §2.2 unverändert weiter. Zwei Punkte sind damit stillschweigend zugunsten von §2.2 entschieden. Erstens die Code-Style-Beispiele: ALLG zählt drei Ausnahmen auf, kündigt aber selbst „genau zwei“ an — die Quelle widerspricht sich, §2.2 mit zwei Ausnahmen ist die widerspruchsfreie Fassung. Zweitens die Reichweite: ALLG bezieht Fahrplan- und Statusdokumente ausdrücklich ein, §2.2 nennt nur Konzept- und Implementierungsdokumente. Wer eine der beiden Fragen später doch anders beantworten will, ändert §2.2, nicht dieses Inventar.
+
+Verwandt: Am selben Tag wurde in `skill-dev-doc.md` Anhang A festgehalten, dass §2.2 dort nicht greift — die Datei ist die laufende Anweisung des Vorhabens selbst und kein Konzeptdokument eines Produkts. Das ist dieselbe Reichweitenfrage aus der anderen Richtung.
