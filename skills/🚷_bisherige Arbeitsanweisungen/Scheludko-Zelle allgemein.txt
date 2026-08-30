@@ -1,5 +1,3 @@
-* [T24]Während der Planungsphase der Algorithmik nur in Ausnahmefällen mit sehr kurzen Codesnippets arbeiten.
-* [T24]Statt dessen mehr erklären, strukturieren, Literaturquellen finden und wo notwendig schematisch mittels Markdown und Schriftzeichen darstellen/zeichnen.
 * [T27]"Grob-Analyse v1.md" und "closedLoop7_1_hifiberry.py" in den Projektdaten dienen als Hintergrundinformation über das Ziel, dass in diesem Projekt bearbeitet werden soll. Insbesondere "Grob-Analyse v1.md" sollte als grundlegender Kontext im Auge behalten werden. "closedLoop7_1_hifiberry.py" wird eher benötigt, um Details der bisherigen Methoden herauszufinden. Beide Dokumente beschreiben jedoch nicht die Details des Projektzieles, wie wir sie uns in diesem Projekt erarbeiten. Sie beschreiben den Zweck des Systems und die alte Herangehensweise. Neue Erkenntnisse und Methoden können die einzelnen dort beschriebenen Verarbeitungsschritte ergänzen oder komplett ersetzen.
 * [T27]Weitere Files in den Projektdaten enstehen während unserer Chats uns sind Teil des neuen Entwicklungsziels.
 
