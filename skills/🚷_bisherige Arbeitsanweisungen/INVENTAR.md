@@ -67,7 +67,7 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T22 |  | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
 | T23 |  | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
 | T24 |  | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
-| T25 |  | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
+| T25 | ✅ | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
 | T26 |  | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     |
 | T27 |  | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     |
 
@@ -152,14 +152,6 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 **Einordnung:** **[nicht abgedeckt]** als Verhaltensregel — §2.2 regelt zwar, dass kein Code in die **Dokumente** gehört, aber nicht, dass in frühen Phasen der **Chat** prosalastig bleiben soll (Erklären, Literatur, Schemata). Kandidat für einen Konzeptphasen-Baustein; verwandt mit T23.
 
-#### T25 Generalisierbarkeit von Lösungen
-
-**Aussage:** Lösungen bevorzugen, die auch für andere Nutzer und Hardware generalisierbar sind: Funktioniert eine Lösung mit geringem Mehraufwand auch auf anderer Hardware, ist sie einer voll spezialisierten vorzuziehen — „Wer weiß, was in 10 Jahren ist.“
-
-**Fundstellen:** nur MOD.
-
-**Einordnung:** **[nicht abgedeckt]** — weder CLAUDE.md noch `common-code-generation` enthalten ein Generalisierbarkeits-Kriterium. Zu entscheiden: als allgemeine Design-Leitlinie in `common-code-generation` aufnehmen, oder bewusst projektspezifisch lassen (im Spannungsfeld zu T12/T13, Kapitel 6, heute in `common-code-generation`: Sie schützen vor ungefragtem Mehrumfang, und Generalisierung ist genau die Art Erweiterung, die dort der Absprache bedarf).
-
 #### T26 Alte Chats aufgreifen, Internet-Recherche erwünscht
 
 **Aussage:** Claude darf in bisherige Chats sehen und Inhalte wieder aufgreifen und darf im Internet nach Lösungsvorschlägen anderer Bastler suchen.
@@ -195,7 +187,6 @@ Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb
 
 - **Python-Test-Konventionen (T17, T18, T19):** der größte ungenutzte Block — pytest CI+CLI, testfreundliche Funktionsanlage, debug-Parameter. Kandidat für einen neuen Skill; bei T19 vorher genau eine der zwei unverträglichen Fassungen festlegen. Abgrenzung zu `temp-debug-code` ist sauber (dauerhafter vs. temporärer Debug-Code).
 - **Konzept-/Findungsphasen-Arbeitsmodus (T23, T24, T26-Kern):** Alternativen aktiv einbringen, erklären statt kodieren, fremde Lösungen recherchieren. Kandidat als Zusatz zu §2.1 oder als eigener Phasen-Baustein/Skill.
-- **Generalisierbarkeit (T25):** Design-Leitlinie; Zuordnung offen (in `common-code-generation` oder projektspezifisch belassen), Spannungsfeld zu dessen Regeln gegen ungefragten Mehrumfang (vormals T12/T13) beachten.
 - **Status-Protokoll-Detailregeln (T20):** Vergleichsmaterial für den Ausbau von `software-dev-doc-fh` (Referenzieren statt Ausschreiben, Missverständnisfestigkeit, API-Rümpfe als Schrittbeschreibung); der append-only-Mechanismus selbst ist durch Fahrplan/Status bewusst abgelöst.
 - **Kleinigkeiten:** ggf. Code-Style-Beispiel-Ausnahme (T22).
 
@@ -372,3 +363,13 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 **Fundstellen:** BIRD und SCH‑B in der ausführlichsten Fassung (mit „hinter jede (!) Zeile“ und dem Hinweis, dass die Marke auch Folge-Chats das Wiederfinden erleichtert); SCH‑A in einer etwas knapperen Frühform. CAM hat noch keine Kennzeichnungsregel.
 
 **Einordnung:** **[abgedeckt]** durch den Skill `temp-debug-code` — aber als **Nachfolger mit bewusst geänderten Festlegungen**, nicht als Kopie. Die Abweichungen im Einzelnen, damit niemand die alten Marken für die gültigen hält: Markensyntax heute `# DEBUG #` (mit schließender Raute, sprachunabhängig suchbar); neue eigene Marke `# DEBUG: ORIGINAL #` für stillgelegten Originalcode (in den alten Fassungen nicht unterschieden); Blockmarken heute `# DEBUG: START ------------ #`/`# DEBUG: END ------------ #`; Blockgrenze heute **ab 5** Zeilen statt ab 4; dazu neu: verpflichtender grep-Selbsttest und Regeln für das Entfernen. Die alten Fassungen sind damit vollständig überholt; ihr Wert ist dokumentarisch.
+
+#### T25 Generalisierbarkeit von Lösungen
+
+**Entschieden:** Kein Skill-Zuhause, 30. August 2026 · Gruppe F (Projektphase und Arbeitsmodus). Generalisierbarkeit bleibt bei den Skills unberücksichtigt — sie ist Sache des einzelnen Projekts und gehört in dessen `CLAUDE.md`, nicht in eine allgemeine Regel.
+
+**Aussage:** Lösungen bevorzugen, die auch für andere Nutzer und Hardware generalisierbar sind: Funktioniert eine Lösung mit geringem Mehraufwand auch auf anderer Hardware, ist sie einer voll spezialisierten vorzuziehen — „Wer weiß, was in 10 Jahren ist.“
+
+**Fundstellen:** nur MOD, ein Absatz.
+
+**Einordnung:** **[nicht abgedeckt]** — weder die CLAUDE.md noch `common-code-generation` enthalten ein Generalisierbarkeits-Kriterium. Zur Wahl standen: als allgemeine Design-Leitlinie in `common-code-generation` aufnehmen oder bewusst projektspezifisch lassen. Geprüft wurde dabei auch das im Inventar vermutete Spannungsfeld zu T12/T13 — es besteht so nicht: Jene Posten schützen vor ungefragtem **Funktionsumfang**, T25 betrifft die **Bauform bei gleichem Umfang**, und für Vorschläge dieser Art hat `common-code-generation` bereits ein Verfahren. Den Ausschlag gab deshalb nicht ein Widerspruch, sondern die Herkunft: Die Aussage stammt aus einem einzelnen Hobbyprojekt und ist dort eine Vorliebe des Entwicklers, keine allgemeine Regel. Als solche formuliert, hätte sie zu Vorratsabstraktion eingeladen.

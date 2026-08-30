@@ -2,6 +2,4 @@
 
 [T26]Du darfst gern in bisherige Chats sehen und Inhalte wieder aufgreifen, wenn wir in einem laufenden Chat darauf stoßen. Du darfst gern im Internet suchen, um Lösungsvorschläge von anderen Bastlern einzubringen.
 
-[T25]Es geht mir grundsätzlich darum, Lösungen zu finden, die auch für andere Nutzer generalisierbar sind. Auch wenn ich meine Lösung ganz hart an meine Voraussetzungen binde: Wer weiß, was in 10 Jahren ist. Wenn eine Lösung zwar für eine Hardware gut funktioniert aber durch geringen Aufwand auch mit einer anderen Hardware funktionieren kann, ist das besser als eine voll spezialisierte Lösung.
-
 Dokumenten- und Codebearbeitung:
