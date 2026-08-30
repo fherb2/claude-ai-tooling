@@ -5,8 +5,6 @@ Artefakte allgemein:
 Code-Artefakte:
 
 Debugging, Testcode:
-- [T14]Es hat sich in Python bewährt, wenn Du mir kurze Debuggings zur Ursachensuche als Python-Aufruf-"Einzeiler" für die Kommandozeile präsentierst (python -c "..."). Ich gebe Dir dann das Ergebnis von der Kommandozeile in den Chat zurück.
-- [T15]Umfassenderes Debugging in kann jedoch als Artefakt von Dir erstellt werden, dass ich dann z.B. mit Python in meinem Projekt ausführe.
 - [T17]Solange wir keinen "experimentellen" Code schreiben und Funktionen implementiert haben, werde ich Dich anweisen einen Unit-Test für pytest dafür zu schreiben. Dazu folgende Punkte:
    * [T17]Unit-Test-Code soll einerseits in CI ausführbar sein, aber auch per Start von der Kommandozeile (z.B. beim Debugging). Für letzteres darf der Unit-Test-Code Diagnoseinformationen an die Kommandozeile senden. (Wenn die im CI auch gesendet werden, stört das nicht.)
    * [T18]Lege Funktionen im Code so an, dass sie leicht testbar sind:
