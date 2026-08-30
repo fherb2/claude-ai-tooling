@@ -1,10 +1,10 @@
 # parallel-sessions — mehrere Claude-Sitzungen gleichzeitig im selben Repository, sauber getrennt über Git-Worktrees
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
-**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden; deutsche und englische Fassung.
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden; deutsche und englische Fassung. — Benutzbar mit Claude Code.
 
 **Gibt jeder gleichzeitig arbeitenden Claude-Sitzung ihren eigenen Git-Worktree mit eigener Werkbank und macht damit die Frage überflüssig, welche Sitzung committen darf.** Zwei Sitzungen im selben Arbeitsbaum überschreiben einander lautlos — das Tückische ist nicht der Konflikt, den Git melden würde, sondern das unbemerkte Mitwandern fremder Zwischenstände. Der Skill trennt die Sitzungen physisch: je Sitzung ein Worktree, darin eine kurzlebige Werkbank vom Integrationsbranch, Abschluss per Squash-Merge. Zentrale Dateien, die überall aktuell sein müssen (Projekt-CLAUDE.md, Editor-Konfiguration, `.gitignore`), liegen auf einem eigenen orphanen **Infra-Branch** und werden nicht gemergt, sondern von jeder Sitzung per `git restore --source` in den eigenen Worktree geholt. Für Projekte ohne dieses Modell enthält der Skill als Rückfallweg die alte Sofortregel: erst die Git-Schreibhoheit klären, dann arbeiten.
 
@@ -12,20 +12,17 @@
 
 ## Installation
 
-1. **Zielort wählen.** Der Skill gilt entweder für alle Projekte des Nutzers oder nur für eines:
+1. **Paket herunterladen.** `downloads/parallel-sessions_de_local.zip`
 
-   | Ort        | Pfad                                  | Gilt für                  |
-   | ---------- | ------------------------------------- | ------------------------- |
-   | Persönlich | `~/.claude/skills/parallel-sessions/` | alle Projekte des Nutzers |
-   | Projekt    | `.claude/skills/parallel-sessions/`   | nur dieses Projekt        |
+2. **Entpacken.** Das Archiv enthält einen Ordner `parallel-sessions/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-2. **Eine Sprachversion des Ordners `parallel-sessions/` kopieren.** Er enthält `SKILL.de.md`/`SKILL.en.md`, `rules.de.md`/`rules.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`, diese `README.md` und `README.en.md`; mit gehören alle Dateien der gewählten Sprache. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Regeldatei behält ihren Namen: Die `SKILL.md` verweist auf sie, und dieser Verweis ist der einzige Weg, auf dem die Regeln geladen werden; wer sie umbenennt, zieht den Verweis mit. Die Datumszeilen von README und Snippet zeigen am Zielort, von welchem Stand die Installation ist.
+3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` kommt **alles unterhalb der Trennlinie** in die `CLAUDE.md` des gewählten Orts. Der kursive Text darüber bleibt zurück; die Datei selbst bleibt im Skill-Ordner liegen und zeigt an ihrer Datumszeile, von welchem Stand der übernommene Trigger ist.
 
-3. **Stillen Trigger übernehmen.** Der Inhalt der zur gewählten Sprache passenden `CLAUDE-snippet`-Datei **unterhalb der Trennlinie** kommt in die `CLAUDE.md` des Zielorts; die Snippet-Dateien bleiben am Zielort liegen, wirksam ist allein die `CLAUDE.md`. Ohne diesen Schritt bemerkt der Skill die Situation nicht: Niemand sagt von sich aus „hier arbeitet gerade eine zweite Instanz".
+   Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/parallel-sessions` — die Lage bemerkt er dann nicht von selbst, denn niemand sagt von sich aus „hier arbeitet gerade eine zweite Instanz“.
 
-4. **Je Projekt einrichten.** Das Worktree-Modell wird nicht durch die Installation wirksam, sondern durch die Ersteinrichtung im Projekt (Branches, Infra-Dateiliste, die Datei `.claude/git-worktree-model.json`). Sie geschieht im Chat, auf Wunsch des Nutzers; der Skill führt durch die Schritte. Ohne sie wirkt nur der Rückfallweg.
+4. **Je Projekt einrichten.** Das Worktree-Modell wird nicht durch die Installation wirksam, sondern durch die Ersteinrichtung im Projekt: Branches, Infra-Dateiliste, die Datei `.claude/git-worktree-model.json`. Sie geschieht im Chat, auf Wunsch des Nutzers; der Skill führt durch die Schritte. Ohne sie wirkt nur der Rückfallweg.
 
-Die `README.md` gehört mit an den Zielort: Die `SKILL.md` verweist für alle Begründungen auf sie, und Claude zieht sie bei Nachfragen des Nutzers heran. Fehlt sie dort, funktioniert der Skill trotzdem — Antworten auf Warum-Fragen fallen dann nur dünner aus. Geprüft wird ihr Vorhandensein nicht.
+Die `README.md` bringt das Paket mit, und das aus gutem Grund: Die `SKILL.md` verweist für alle Begründungen auf sie, und Claude zieht sie bei Nachfragen heran. Fehlt sie, funktioniert der Skill trotzdem — Antworten auf Warum-Fragen fallen dann nur dünner aus.
 
 ## Details
 

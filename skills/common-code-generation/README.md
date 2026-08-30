@@ -1,8 +1,8 @@
 # common-code-generation — Allgemeine Regeln für das Erzeugen und Ändern von Code
 
-*Stand: 2026-08-25*
+*Stand: 2026-08-30*
 
-**✅ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung vorhanden.
+**✅ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung vorhanden. — Keine inhaltlichen Unterschiede zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 
 **Sammelt die allgemeinen Regeln der Zusammenarbeit beim Erzeugen und Ändern von Code** — die Art Festlegungen, die sonst in jeder `CLAUDE.md` wiederholt stehen müsste: englische Benennungen im Quelltext, kein ungefragt erweiterter Funktionsumfang, sparsamer Umgang mit Rechenzeit und Speicher. Benennungen und Optimierungen werden dabei **vorgeschlagen, nicht entschieden**; die Entscheidung bleibt beim Nutzer.
 
@@ -12,16 +12,27 @@ Die Regeln gelten, sobald in einer Sitzung Code entsteht oder geändert wird —
 
 ## Installation
 
-1. **Zielort wählen.** Der Skill gilt entweder für alle Projekte des Nutzers oder nur für eines:
+### Claude Code
 
-   | Ort         | Pfad                                          | Gilt für                  |
-   | ----------- | --------------------------------------------- | ------------------------- |
-   | Persönlich  | `~/.claude/skills/common-code-generation/`     | alle Projekte des Nutzers |
-   | Projekt     | `.claude/skills/common-code-generation/`       | nur dieses Projekt        |
+1. **Paket herunterladen.** `downloads/common-code-generation_de_local.zip`
 
-2. **Eine Sprachversion des Ordners `common-code-generation/` kopieren.** `SKILL` und `CLAUDE-snippet` liegen je zweimal vor (`.de`/`.en`); mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeilen zeigen später, von welchem Stand die Installation ist.
+2. **Entpacken.** Das Archiv enthält einen Ordner `common-code-generation/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` — passend zur gewählten Sprachfassung — kommt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts. Die Snippet-Dateien bleiben am Zielort liegen; wirksam ist allein die `CLAUDE.md`.
+3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` kommt **alles unterhalb der Trennlinie** in die `CLAUDE.md` des gewählten Orts. Der kursive Text darüber bleibt zurück; die Datei selbst bleibt im Skill-Ordner liegen und zeigt an ihrer Datumszeile, von welchem Stand der übernommene Trigger ist.
+
+   Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/common-code-generation`.
+
+### claude.ai und Claude Desktop (Chat + Cowork)
+
+1. **Paket herunterladen.** `downloads/common-code-generation_de_web.zip`
+
+2. **Hochladen.** Im dafür vorgesehenen Verwaltungsfeld für Skills der Anwendung das Archiv hochladen. Der Skill gilt danach für Dein Konto — nicht für Deine Organisation, und nicht gleichzeitig in Claude Code.
+
+3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` im Archiv kommt **alles unterhalb der Trennlinie** in das Anweisungsfeld — global für das Konto oder für das einzelne Projekt.
+
+   Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/common-code-generation`.
+
+Beide Pakete tragen denselben Inhalt — der Skill unterscheidet sich zwischen den Zielwelten nicht. Getrennt sind sie allein, damit der Name sagt, wohin das Archiv gehört.
 
 ## Details
 

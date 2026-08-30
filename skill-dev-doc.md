@@ -40,16 +40,20 @@ Wozu er da ist, erklärt die Gesamt-README. Für das Schreiben zählen zwei Ding
 
 Was ein Skill dort kann und was nicht — erarbeitet am 27. August 2026, Beleglage je Aussage ausgewiesen. Die Vorgabe, die daraus folgt, steht in Kapitel 9.
 
+**Claude Desktop ist zwei Umgebungen in einem Programm** (Beobachtung des Entwicklers am laufenden System, 30. August 2026). Der Reiter *Chat + Cowork* verhält sich wie claude.ai: Er sieht die Skills, die im claude.ai-Konto hochgeladen sind, und die Arbeit läuft vollständig bei Anthropic. Der Reiter *Code* ist dagegen Claude Code mit einem anderen Frontend — er liest die Skills aus `~/.claude`, kann Ordner anbinden und arbeitet unmittelbar auf dem Rechner. Eine Desktop-Installation bringt Claude Code also mit; wer es im Terminal nutzen will, installiert es trotzdem ein zweites Mal.
+
+**Daraus folgt die Schreibweise dieser Doku:** „Claude Desktop (Chat + Cowork)“ zählt zu claude.ai, „Claude Desktop (Code-Reiter)“ zu Claude Code. Steht irgendwo nur „Claude Desktop“, ist die Anwendung als Ganzes gemeint — etwa ihr lokaler Zustand unter `~/.claude`, den beide Reiter teilen.
+
 **Was sich unverändert überträgt:**
 
 - **Der stille Trigger.** claude.ai hat auf beiden Ebenen ein Feld für Anweisungen: eines global für das Konto — die Entsprechung zur `~/.claude/CLAUDE.md` — und eines je Projekt. Beide werden geschrieben wie eine `CLAUDE.md`, es geht nichts verloren. (Beobachtung des Entwicklers aus laufender Nutzung.)
-- **Die Zweiteilung** aus Kapitel 5.2. Custom Skills werden dort als **ZIP** hochgeladen (Settings → Features; Pro, Max, Team, Enterprise, Voraussetzung ist aktivierte Code-Ausführung), und das Nachladen weiterer Dateien ist ausdrücklich vorgesehen: *„If those instructions reference other files … Claude reads those files too"*, mit *„None until accessed"* als Token-Kosten (belegt, [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)). Unterschiedlich ist allein der **Pfad-Ausdruck**: `${CLAUDE_SKILL_DIR}` ersetzt nur Claude Code (belegt, [Skills](https://code.claude.com/docs/en/skills)); auf claude.ai bliebe er wörtlicher Text.
+- **Die Zweiteilung** aus Kapitel 5.2. Custom Skills werden dort als **ZIP** hochgeladen (Settings → Features; Pro, Max, Team, Enterprise, Voraussetzung ist aktivierte Code-Ausführung), und das Nachladen weiterer Dateien ist ausdrücklich vorgesehen: *„If those instructions reference other files … Claude reads those files too“*, mit *„None until accessed“* als Token-Kosten (belegt, [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)). Unterschiedlich ist allein der **Pfad-Ausdruck**: `${CLAUDE_SKILL_DIR}` ersetzt nur Claude Code (belegt, [Skills](https://code.claude.com/docs/en/skills)); auf claude.ai bliebe er wörtlicher Text.
 - **Das Description-Budget** (8.1) gilt dort ebenso: Jeder installierte Skill kostet dauerhaft seine Beschreibung in der Listung, ob er auslöst oder nicht.
 
 **Wo die Grenze verläuft — und sie ist asymmetrisch:**
 
-- **Der Lesepfad ist mechanisch möglich.** *„Files in your projects are now accessible through Claude's computing environment while remaining in context"* (belegt, [Create and edit files](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude)) — ein Skript im Container kann Projektwissen-Dateien also lesen. Der Nachsatz ist die Einschränkung: Sie bleiben dabei im Kontext, der Container spart keinen Kontext.
-- **Der Rückweg ist zweigeteilt.** Ein **Artefakt** schreibt die Instanz — sein Inhalt läuft durch die Inferenz und ist eine Abschrift, keine Ersetzung; daran ändert auch nichts, dass Artefakte inzwischen in der Ausführungsumgebung entstehen (*„Claude now uses the computing environment to create artifacts"*, belegt, ebd.). Ein **Download** dagegen kann mechanisch entstehen: Datei im Container per Ersetzung ändern, nach `/mnt/user-data/outputs` legen, als Download anbieten — der Inhalt läuft nicht durch die Antwort. Kompletter Roundtrip beobachtet am 28. August 2026 (siehe unten).
+- **Der Lesepfad ist mechanisch möglich.** *„Files in your projects are now accessible through Claude's computing environment while remaining in context“* (belegt, [Create and edit files](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude)) — ein Skript im Container kann Projektwissen-Dateien also lesen. Der Nachsatz ist die Einschränkung: Sie bleiben dabei im Kontext, der Container spart keinen Kontext.
+- **Der Rückweg ist zweigeteilt.** Ein **Artefakt** schreibt die Instanz — sein Inhalt läuft durch die Inferenz und ist eine Abschrift, keine Ersetzung; daran ändert auch nichts, dass Artefakte inzwischen in der Ausführungsumgebung entstehen (*„Claude now uses the computing environment to create artifacts“*, belegt, ebd.). Ein **Download** dagegen kann mechanisch entstehen: Datei im Container per Ersetzung ändern, nach `/mnt/user-data/outputs` legen, als Download anbieten — der Inhalt läuft nicht durch die Antwort. Kompletter Roundtrip beobachtet am 28. August 2026 (siehe unten).
 - **Der Lesepfad ist im RAG-Fall bestätigt und präzisiert:** Die Projektwissen-Dateien liegen unter **`/mnt/project/`** als echte Dateien gemountet — auch bei einer Wissensbasis weit über dem Kontextfenster. Beobachtet am 28. August 2026 an einem realen Projekt (gepackte Codebasis mit 39.898 Zeilen): eine 753-Zeilen-Quelldatei anhand ihrer `#!PKSRC:`-Token exakt extrahiert, eine Zeile eingefügt, per `diff` nachgewiesen (`1a2`, Rest bitidentisch), als Download bereitgestellt und als Artefakt angezeigt. **Wichtig: Die Selbstauskunft der Instanz verneinte diesen Zugriff zunächst überzeugt** — erst der konkrete Skript-Vorschlag brachte die Korrektur. Ein Skill, der diesen Weg braucht, muss ihn ausdrücklich anweisen (`ls /mnt/project/`), sonst scheitert er an der falschen Selbstauskunft. Die Pfade sind Beobachtung, keine Zusage.
 - **Kein Zugriff auf den Rechner des Nutzers.** Die Ausführungsumgebung ist eine VM bei Anthropic; kein Repo, kein Git, keine lokalen Dateien. Das ist das Kriterium, an dem sich die Gruppe eines Skills entscheidet (Kapitel 9).
 - **Grenzen nebenbei:** 30 MB je Datei für Up- und Download; das öffentliche Teilen von Konversationen mit File-Artefakten aus der Code-Ausführung ist für Free-, Pro- und Max-Konten deaktiviert (belegt, ebd.).
@@ -154,6 +158,7 @@ Jeder Skill liegt unter `skills/<skill-name>/`. Der Ordnername trägt **kein** S
 - **`README.md`** — verpflichtend. Die gesamte Dokumentation dieses Skills: was er leistet, wie er installiert wird, seine Feinheiten, sein Arbeitsstand und seine offenen Punkte. Aufbau nach 6.1; unter der Überschrift die Datumszeile (Projekt-CLAUDE.md, „Datumszeilen“).
 - **`CLAUDE-snippet.md`** — nur bei Skills mit stillem Trigger. Aufbau: ganz oben die Datumszeile (Projekt-CLAUDE.md, „Datumszeilen“), darunter eine kursive Kopfnotiz, die erklärt, was mit der Datei zu geschehen hat, darunter eine Trennlinie, darunter der zu übernehmende Absatz im Wortlaut. Die Trennlinie ist die maßgebliche Grenze: Was darunter steht, wird in die `CLAUDE.md` des Zielorts übernommen, was darüber steht — Datumszeile eingeschlossen — nicht.
 - **Weitere Dateien** — nur, wenn die `SKILL.md` ausdrücklich auf sie verweist; sonst werden sie nie geladen (1.2).
+- **`downloads/`** — die fertig geschnürten Installationspakete (5.3). Der einzige Ordner, der **nicht** an den Zielort gehört; beim Packen bleibt er außen vor.
 
 **Ein Ordner darf vorübergehend nur die `README.md` enthalten.** Das ist der Zustand einer festgehaltenen Idee: Sie hat einen Namen, einen Platz und eine Stelle, an der ihr Stand nachlesbar ist, aber noch keine Anweisungen. Erst wenn entschieden ist, dass daraus ein Skill wird, kommt die `SKILL.md` dazu.
 
@@ -198,6 +203,14 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 
 **Ein Skill, der nach dem Auslösen erst klärt, ob er überhaupt angewendet wird, trägt seine Regeln nicht in der `SKILL.md`.** Sie enthält dann nur dreierlei: den Geltungsbereich, die Klärung samt Absage, und die Anweisung, bei Zustimmung eine zweite Datei desselben Ordners zu lesen (`${CLAUDE_SKILL_DIR}/<datei>.md`). Alles Weitere steht in dieser zweiten Datei. **Sie heißt einheitlich `rules.md`**, bei mehreren Sprachfassungen `rules.de.md`/`rules.en.md` nach 5.1 (Festlegung des Entwicklers vom 26. August 2026; Dateinamen sind englisch).
 
+**Braucht ein Skill mehr als eine nachgeladene Datei**, tragen sie sprechende Namen statt Nummern — englisch, kleingeschrieben, mit Bindestrichen, dazu das Sprachkürzel nach 5.1 (Festlegung des Entwicklers vom 30. August 2026). Drei Rollen sind dabei zu unterscheiden:
+
+- **Ein Regelzweig** heißt `rules-<zweig>.md`. Trennt der Zweig zwei Zielwelten, benennt er nicht das Produkt, sondern die Fähigkeit, an der die Regeln hängen — `rules-local` gegen `rules-handover` statt `rules-code` gegen `rules-web`. Ein Produktname altert mit jedem neuen Produkt, eine Fähigkeit nicht.
+- **Was mehrere Zweige gemeinsam brauchen**, bekommt eine eigene Datei, die die Zweige ihrerseits nachladen. Sonst steht derselbe Inhalt mehrfach da und driftet auseinander — die Kette `SKILL.md` → Regelzweig → gemeinsame Datei ist ausdrücklich zulässig; das Verbot in 2.3 betrifft nur Verweise auf **andere Skills**.
+- **Ein Klärungsschritt vor dem Regelteil** — etwa eine Entscheidung, die der Nutzer treffen muss — steht in einer eigenen Datei und lädt danach den Regelzweig. So kostet ein Nein nur die Klärungsseite.
+
+Beleg für die Bauform ist `temp-debug-code` (30. August 2026): `SKILL.md` → `rules-local` beziehungsweise `user-choice` → `rules-handover`, beide Zweige laden bei Bedarf `marks`.
+
 Der Grund steckt im Ladeverhalten (1.2): Weitere Dateien im Skill-Ordner lädt Claude nur, wenn die `SKILL.md` ausdrücklich auf sie verweist — und was einmal geladen ist, bleibt für den Rest der Sitzung im Kontext. Ein Skill, der auf eine Lage auslöst, in der er oft doch nicht zum Zug kommt, schleppt seinen vollen Text sonst in jeder dieser Sitzungen mit, ohne je benutzt zu werden. Mit der Teilung kostet er dann nur die Klärungsseite.
 
 **Zwei Skills wären der falsche Weg** — sie müssten gemeinsam installiert werden, und 2.3 verbietet ohnehin, dass ein Skill auf einen anderen verweist. Die zweite Datei im selben Ordner löst beides.
@@ -218,6 +231,32 @@ Die zweite Datei folgt der Sprachregel aus 5.1 wie die `SKILL` selbst und wander
 
 Prüfbar: Auf jede `SKILL.md`, die beide Bedingungen erfüllt und trotzdem ihren ganzen Regeltext trägt, lässt sich zeigen — das ist der Verstoß. Ebenso auf jede Zusatzdatei, auf die keine `SKILL.md` verweist: Sie wird nie geladen.
 
+### 5.3 Download-Pakete
+
+**Ein Skill wird als fertiges Archiv zum Herunterladen angeboten, nicht als Ordner zum Zusammenkopieren** (Festlegung des Entwicklers vom 30. August 2026). Sobald ein Skill mehr als zwei Dateien hat, ist das Zusammenstellen von Hand fehleranfällig, und beim Aktualisieren merkt niemand, wenn eine Datei fehlt.
+
+**Wo sie liegen.** In `downloads/` im Ordner des Skills. Dieser Ordner ist nicht Teil des Skills und wird nie mitgepackt.
+
+**Welche es gibt.** Sprache mal Zielwelt — das ergibt zwei oder vier. Maßgeblich ist allein der Vermerk hinter dem Statushinweis in der README des Skills (6.1): Er nennt, für welche Varianten der Skill benutzbar ist. Kombinationen, die es dort nicht gibt, werden auch nicht angelegt.
+
+**Wie sie heißen.** `<skill>_<language>_local.zip` beziehungsweise `<skill>_<language>_web.zip` — dreiteilig auch dann, wenn es nur eine Zielwelt gibt, damit sie im Namen steht. `local` meint Claude Code, `web` meint claude.ai und Claude Desktop (Chat + Cowork).
+
+**Was darin liegt.** Ein einziger Ordner mit dem Namen des Skills, darin die Dateien — so verlangt es die Doku für den Upload auf claude.ai (belegt, [How to create custom Skills](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)), und beim lokalen Entpacken nach `~/.claude/skills/` entsteht damit genau der richtige Ordner. Der Test zeigt, dass der Upload auch andere Formen annimmt; maßgeblich ist trotzdem die dokumentierte, weil nur sie zugesagt ist.
+
+**Was hineingehört:** die `SKILL`-Fassung der Sprache, die README derselben Sprache, alle nachgeladenen Dateien (5.2) sowie das Snippet der passenden Zielwelt. Die README wandert immer mit — sie ist die Anwenderdokumentation und beim Nutzer besser aufgehoben als im Repo.
+
+**Umbenannt werden genau drei Dateien:** die gewählte `SKILL`-Fassung zu `SKILL.md`, die README der Sprache zu `README.md` und das Snippet der Zielwelt zu `CLAUDE-snippet.md`. Sprache und Zielwelt stehen ja schon im Namen des Archivs.
+
+**Alle übrigen Dateien behalten ihren Namen** — und das ist kein Schönheitsfehler, sondern der Grund, warum das Packen einfach bleibt: Die `SKILL.md` nennt die nachgeladenen Dateien beim Namen. Hieße `rules-local.de.md` im Paket plötzlich `rules-local.md`, müsste jeder Verweis im Text mitgezogen werden, und genau das geht still schief. Die drei umbenannten Dateien sind davon nicht betroffen: Auf die `SKILL.md` verweist niemand, und README und Snippet werden nur von der Installationsanleitung genannt, die den neuen Namen ohnehin verwendet.
+
+**Daraus folgt für jeden Verweis auf eine nachgeladene Datei: mit Sprachkürzel.** Die README nennt sie `rules-local.de.md`, die englische Fassung `rules-local.en.md` — nicht `rules-local.md`. Der kürzere Name stimmt nirgends: weder im Repo noch im Paket. Aufgefallen ist das erst bei der Prüfung des ersten gepackten Skills, dessen Aufbau-Tabelle alle vier nachgeladenen Dateien ohne Kürzel führte (30. August 2026).
+
+**Und die Kopfnotiz eines Snippets nennt die andere Zielwelt-Fassung nicht beim Namen.** Sie liegt im Paket nicht daneben, sondern in einem anderen Archiv; ein Dateiname an dieser Stelle zeigt beim Nutzer ins Leere. Der Verweis geht deshalb auf das andere **Paket**, nicht auf die andere Datei.
+
+**Wie gepackt wird.** `zip -9 -o -X`, die Einträge in sortierter Reihenfolge übergeben (`find … | LC_ALL=C sort | zip … -@`). Der Reihe nach: `-9` kostet bei diesen Dateigrößen nichts und spart beim Herunterladen; `-o` setzt das Datum des Archivs auf das der jüngsten enthaltenen Datei, womit man dem Paket ansieht, von welchem Stand es ist; `-X` lässt uid, gid und Zeitzonen-Extras weg, die sonst von Rechner zu Rechner verschieden ausfallen. Die Dateien selbst behalten ihre eigene mtime (`cp -p` beim Zusammenstellen). Zusammen mit der sortierten Reihenfolge ergibt gleicher Inhalt damit gleiche Bytes — ein Neubau ohne Änderung erzeugt keinen neuen Blob in git.
+
+**Geprüft wird von Hand, nicht von einem Skript.** Nach dem Packen wird der Inhalt jedes Archivs aufgelistet und angesehen: ob die Dateiliste stimmt und ob jede Datei, auf die aus dem Paket heraus verwiesen wird, auch darin liegt. Ein Bauskript gibt es bewusst nicht — ein Skill wird ein- bis dreimal in seinem Leben gepackt, ein Skript müsste bei jeder Strukturänderung nachgezogen werden und kostet mehr, als es spart.
+
 ---
 
 ## 6 READMEs und Fahrplan
@@ -231,7 +270,7 @@ Sie ist die vollständige Dokumentation dieses einen Skills und liest sich von �
 1. **Überschrift** — Skillname und in einem Halbsatz, wozu er da ist.
 2. **Statushinweis**, unmittelbar unter der Datumszeile und **ohne eigene Zwischenüberschrift**: ob der Skill benutzbar ist, mit demselben Symbol, das seine Zeile in der Übersichtstabelle der Gesamt-README trägt (6.2). Ist er es nicht uneingeschränkt, steht in einem Satz dabei, was fehlt, mit Verweis auf den Schlussabschnitt.
 3. **Überblick** — was der Skill leistet, in Prosa. Die Kernaussage steht **fett** im ersten Satz. Umfassend genug, dass der Nutzer den Skill danach einschätzen kann, aber ohne Detailflut; dazu die **Abgrenzung**, wo sie nicht selbstverständlich ist: wofür der Skill ausdrücklich **nicht** gilt.
-4. **Kapitel „Installation“** — die vollständige Anleitung, **konkretisiert auf diesen Skill**: echte Pfade statt Platzhalter, die tatsächlich vorhandenen Dateien statt des allgemeinen Falls. Nicht ein Verweis auf das Installationskapitel der Gesamt-README, sondern die Schritte selbst. Braucht der Skill **keinen** stillen Trigger, wird dieser Schritt ersatzlos weggelassen — er wird nicht als „entfällt hier“ aufgeführt. Ein Schritt, am Zielort etwas zu löschen, kommt nicht vor (siehe Kapitel 5).
+4. **Kapitel „Installation“** — wörtlich die Vorlage weiter unten, mit dem Namen des Skills statt `<skill>` und dem Sprachkürzel der jeweiligen README statt `<language>`. Gilt der Skill für beide Zielwelten, stehen beide Vorlagen als Unterabschnitte untereinander; gilt er nur für eine, steht nur diese. Braucht der Skill **keinen** stillen Trigger, entfällt dessen Schritt ersatzlos — er wird nicht als „entfällt hier“ aufgeführt. Ein Schritt, am Zielort etwas zu löschen, kommt nicht vor (siehe Kapitel 5).
 5. **Kapitel „Details“** — alles Weitere: Anwenderhinweise, Feinheiten des Verhaltens und die Hinweise, die dem weiteren Ausbau dienen, insbesondere die Regeln, deren Vereinfachung die Funktion zerstören würde.
 6. **Kapitel „Stand und Offenes“** — zum Schluss und in dieser Folge:
    - **Status** — was fertig ist, in einem Satz.
@@ -239,6 +278,36 @@ Sie ist die vollständige Dokumentation dieses einen Skills und liest sich von �
    - **Bewusst offen gelassene Entscheidungen**, sofern es welche gibt — Festlegungen, die der Skill absichtlich nicht trifft, weil sie ins Zielprojekt gehören. Das ist Vorwissen für die Weiterentwicklung, kein Versäumnis, und muss als solches erkennbar sein.
 
 Der ausdetaillierte Plan eines anstehenden Schrittes steht im Fahrplan (6.3), nicht hier. Einzige Ausnahme ist ein Plan, der den Inhalt des Skills selbst betrifft und mit ihm zusammen übernommen wird: Der steht unter „Offen“, höchstens einer gleichzeitig, deutlich als noch nicht ausgeführt gekennzeichnet, und wird nach der Ausführung ersetzt, nicht ergänzt.
+
+#### Die beiden Vorlagen für das Installationskapitel
+
+Wörtlich zu übernehmen, mit dem Namen des Skills statt `<skill>` und dem Kürzel der jeweiligen README statt `<language>`. Bei zwei Zielwelten stehen beide untereinander, jede unter ihrer eigenen Zwischenüberschrift.
+
+**Vorlage A — Claude Code:**
+
+> ##### Claude Code
+>
+> 1. **Paket herunterladen.** `downloads/<skill>_<language>_local.zip`
+>
+> 2. **Entpacken.** Das Archiv enthält einen Ordner `<skill>/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
+>
+> 3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` kommt **alles unterhalb der Trennlinie** in die `CLAUDE.md` des gewählten Orts. Der kursive Text darüber bleibt zurück; die Datei selbst bleibt im Skill-Ordner liegen und zeigt an ihrer Datumszeile, von welchem Stand der übernommene Trigger ist.
+>
+>    Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/<skill>`.
+
+**Vorlage B — claude.ai und Claude Desktop (Chat + Cowork):**
+
+> ##### claude.ai und Claude Desktop (Chat + Cowork)
+>
+> 1. **Paket herunterladen.** `downloads/<skill>_<language>_web.zip`
+>
+> 2. **Hochladen.** Im dafür vorgesehenen Verwaltungsfeld für Skills der Anwendung das Archiv hochladen. Der Skill gilt danach für Dein Konto — nicht für Deine Organisation, und nicht gleichzeitig in Claude Code.
+>
+> 3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` im Archiv kommt **alles unterhalb der Trennlinie** in das Anweisungsfeld — global für das Konto oder für das einzelne Projekt.
+>
+>    Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/<skill>`.
+
+Der dritte Schritt entfällt bei Skills ohne stillen Trigger ersatzlos. Das Verwaltungsfeld ist bewusst nicht mit seinem heutigen Namen genannt: Der Weg dorthin ändert sich, die Sache nicht.
 
 ### 6.2 Gesamt-README
 
@@ -353,14 +422,14 @@ Der teuerste Fall ist deshalb nicht der große Skill, sondern der **selten gebra
 
 ### 9.4 Zuordnung der vorhandenen Skills
 
-Stand 28. August 2026. „Web-Fassung" nennt die Nutzungsentscheidung, nicht die technische Möglichkeit.
+Stand 30. August 2026. „Web-Fassung“ nennt die Nutzungsentscheidung, nicht die technische Möglichkeit.
 
 | Skill | Gruppe | Web-Fassung | Grund |
 | --- | --- | --- | --- |
 | `common-code-generation` | web + code | ja | Reine Verhaltensregeln, fasst keine Dateien an. Ein Wort ändert sich: der Ablageort der Plan-Regel |
 | `in-depth-online-literature-research` | web + code | ja | Websuche gibt es beidseitig; die Quellenkarte kann Claude dort nicht schreiben, nur vorschlagen |
-| `temp-debug-code` | web + code | offen | Marken gelten unverändert; der `grep`-Selbsttest braucht eine Fassung ohne Shell. Ob auf claude.ai überhaupt debuggt wird, entscheidet der Entwickler |
-| `pedantic-text-editing` | web + code | offen, aber machbar | Ersetzungsskript existiert (`apply_findings.py`), der mechanische Rückweg über `/mnt/user-data/outputs` ist beobachtet (1.4) — eine Web-Fassung könnte das Detailtreue-Versprechen halten. Ob sie gebaut wird, entscheidet der Entwickler |
+| `temp-debug-code` | web + code | ja, gebaut | Seit dem 30. August 2026 in ein Tor und zwei Regelzweige geteilt (5.2): Mit Dateizugriff handelt Claude selbst, sonst entscheidet der Nutzer über die Kennzeichnung, und die Methodenleiter kommt hinzu. Die Suchläufe führt dort er aus, nicht Claude. Ob der Skill auf claude.ai installiert wird, bleibt Nutzungsentscheidung nach 9.3 |
+| `pedantic-text-editing` | web + code | nein, vorerst | Technisch machbar: Das Ersetzungsskript existiert (`apply_findings.py`), der mechanische Rückweg über `/mnt/user-data/outputs` ist beobachtet (1.4). Der Entwickler hat den Skill am 30. August 2026 dennoch auf Claude Code beschränkt — das Skript müsste für die Web-Welt erst überarbeitet werden. Eine Web-Fassung kommt später |
 | `correct-zaaack-md-editor-mistakes` | nur code | — | Die Werkzeuge liefen im Container, aber die Markdown-Dateien des Nutzers kommen nicht hinein und die Korrektur nicht zurück |
 | `parallel-sessions` | nur code | — | Git-Worktrees haben auf claude.ai keinen Gegenstand |
 | `chat-export` | nur code | — | Braucht Browser-Anbindung und ein Skript auf dem Rechner des Nutzers |

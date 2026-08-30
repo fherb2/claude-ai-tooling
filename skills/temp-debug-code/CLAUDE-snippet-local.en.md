@@ -1,12 +1,13 @@
-*Last updated: 2026-08-29*
+*Last updated: 2026-08-30*
 
 *This file is not part of the skill. It carries the silent trigger for
 environments with direct access to the file tree — Claude Code. For
-claude.ai and Claude Desktop, `CLAUDE-snippet-handover.en.md` applies
-instead; only ever one of the two is adopted. When installing: copy
-everything below the separator line into the `CLAUDE.md` of the target
-location; this file stays there, only the `CLAUDE.md` takes effect. Without
-the trigger the skill runs only on an explicit `/temp-debug-code` call.*
+claude.ai and Claude Desktop (Chat + Cowork) a different trigger applies; it
+sits in the package for those environments. Only ever one is adopted. When
+installing: copy everything below the separator line into the `CLAUDE.md` of
+the target location; this file stays there, only the `CLAUDE.md` takes
+effect. Without the trigger the skill runs only on an explicit
+`/temp-debug-code` call.*
 
 *This trigger depends on a cause the user never says out loud: they ask "why
 does this come out as 3?", and the decision to add a `print` line is

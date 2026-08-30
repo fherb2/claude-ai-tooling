@@ -1,10 +1,10 @@
 # parallel-sessions — several Claude sessions at the same time in the same repository, cleanly separated via Git worktrees
 
-*Last updated: 2026-08-26*
+*Last updated: 2026-08-30*
 
 *[Deutsche Fassung](README.md)*
 
-**✅☑ Finished and usable.** Instructions complete, frontmatter set, silent trigger present; German and English versions available.
+**✅☑ Finished and usable.** Instructions complete, frontmatter set, silent trigger present; German and English versions available. — Usable with Claude Code.
 
 **Gives every simultaneously working Claude session its own Git worktree with its own workbench, and thereby makes the question of which session may commit obsolete.** Two sessions in the same working tree overwrite each other silently — the treacherous part is not the conflict, which Git would report, but the unnoticed riding-along of foreign intermediate states. The skill separates the sessions physically: one worktree per session, inside it a short-lived workbench derived from the integration branch, completion by squash merge. Central files that must be current everywhere (the project CLAUDE.md, editor configuration, `.gitignore`) live on a dedicated orphan **infra branch** and are not merged but fetched by every session into its own worktree via `git restore --source`. For projects without this model the skill contains the old immediate rule as a fallback: first settle Git write authority, then work.
 
@@ -12,20 +12,17 @@
 
 ## Installation
 
-1. **Choose the target location.** The skill applies either to all of the user's projects or to a single one:
+1. **Download the package.** `downloads/parallel-sessions_en_local.zip`
 
-   | Location | Path                                  | Applies to                 |
-   | -------- | -------------------------------------- | -------------------------- |
-   | Personal | `~/.claude/skills/parallel-sessions/` | all of the user's projects |
-   | Project  | `.claude/skills/parallel-sessions/`   | this project only          |
+2. **Unpack it.** The archive contains a folder `parallel-sessions/` with all the files. Unpack it into `~/.claude/skills/` — then the skill applies to all projects — or into `.claude/skills/` in the project, then only there. An existing folder of the same name is replaced; nothing old is left behind.
 
-2. **Copy one language version of the folder `parallel-sessions/`.** It holds `SKILL.de.md`/`SKILL.en.md`, `rules.de.md`/`rules.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`, this `README.en.md` and the German `README.md`; all files of the chosen language come along. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other. The rules file keeps its name: the `SKILL.md` points to it, and that pointer is the only way the rules ever get loaded; whoever renames it carries the pointer along. The date lines of README and snippet show at the target location which state the installation is from.
+3. **Adopt the silent trigger.** You have to do this by hand. Claude then recognizes more easily from the context whether the skill should be loaded. To do it: from `CLAUDE-snippet.md`, **everything below the separator line** goes into the `CLAUDE.md` of the chosen location. The italic text above it stays behind; the file itself stays in the skill folder and shows by its date line which state the adopted trigger is from.
 
-3. **Adopt the silent trigger.** The content of the `CLAUDE-snippet` file matching the chosen language, **below the separator line**, goes into the `CLAUDE.md` of the target location; the snippet files stay at the target location, only the `CLAUDE.md` is effective. Without this step the skill does not notice the situation: nobody says of their own accord "a second instance is working here right now".
+   Without this step the skill only takes effect when called explicitly with `/parallel-sessions` — it will then not notice the situation by itself, because nobody says of their own accord "there is a second instance working here right now".
 
-4. **Set up per project.** The worktree model does not take effect through the installation but through the initial setup in the project (branches, infra file list, the file `.claude/git-worktree-model.json`). It happens in the chat, at the user's request; the skill leads through the steps. Without it only the fallback applies.
+4. **Set it up per project.** The worktree model does not take effect through the installation but through the initial setup in the project: branches, the infra file list, the file `.claude/git-worktree-model.json`. That happens in the chat, at the user's request; the skill walks through the steps. Without it, only the fallback path takes effect.
 
-The `README.md` belongs at the target location too: the `SKILL.md` points to it for all reasoning, and Claude consults it when the user asks follow-up questions. If it is missing there, the skill still works — answers to why-questions just come out thinner. Its presence is not checked.
+The package brings the `README.md` along, and for good reason: the `SKILL.md` points to it for all the reasoning, and Claude draws on it when questions come up. Without it the skill still works — answers to why-questions just come out thinner.
 
 ## Details
 
