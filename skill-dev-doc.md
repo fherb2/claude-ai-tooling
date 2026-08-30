@@ -20,7 +20,7 @@ Belegte Aussagen tragen ihre Quelle. **Beobachtung am laufenden System** und **M
 
 Der Ordner `skills/` in diesem Repository wird von Claude Code nicht erkannt. Ein Skill wirkt erst, wenn er an einem der vorgesehenen Ladeorte liegt — persönlich unter `~/.claude/skills/<skill-name>/` oder projektlokal unter `.claude/skills/<skill-name>/` (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills); die Zielorte samt Installationsablauf stehen in der Gesamt-README).
 
-Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5). Installiert wird dann eine vollständige Sprachversion des Ordners; der einzige zwingende Handgriff ist der Name der `SKILL.md` (5.1).
+Daraus folgt die Grundregel für den Aufbau: Ein Skill-Ordner hier trägt **genau die Struktur, die er am Zielort haben wird** (Kapitel 5) — mit dem einen Unterschied, dass hier alle Sprachfassungen nebeneinanderliegen. Welche davon an den Zielort gelangt und welche Dateien dabei umbenannt werden, entscheidet das Installationspaket; das Verfahren steht einheitlich in 5.3, die Schritte für den Nutzer als Vorlage in 6.1.
 
 ### 1.2 Ladeverhalten
 
@@ -398,6 +398,8 @@ Jeder Skill gehört in genau eine von drei Gruppen. Was die Zielwelten technisch
 - **nur web** — der Skill regelt etwas, das es nur dort gibt (Artefakt-Mechanik, Projektwissen-Uploads).
 
 **Das Zuordnungskriterium ist der Datenweg, nicht das Thema.** Ein Skill, der nur Verhalten regelt, überträgt sich; sobald er Daten anfasst, entscheidet die Frage, ob sie ihn erreichen und ob sein Ergebnis zurückkommt (1.4). Reine Verhaltensregeln sind deshalb fast immer web+code, und der teuerste Fall ist ein Skill, dessen Ergebnis mechanisch zurückgeschrieben werden muss.
+
+**Es gibt keine vierte Gruppe für Claude Cowork, und das ist eine Entscheidung, kein Versehen** (Festlegung des Entwicklers vom 30. August 2026). Cowork arbeitet über angebundene Ordner unmittelbar auf dem Rechner des Nutzers und fiele damit nach dem Datenweg-Kriterium nicht zu „nur web“ — es wäre eine eigene Lage. Bewertet wird sie hier vorerst nicht; die Begründung steht in der zentralen `README.md` des Repositories. Was in diesem Kapitel „web“ heißt, meint deshalb claude.ai-Chat und den Reiter *Chat + Cowork* von Claude Desktop, nicht die Cowork-Arbeitsweise mit angebundenen Ordnern. Wer diese Ausklammerung aufhebt, fängt hier an.
 
 ### 9.2 Wie tief die Fassungen auseinandergehen — vier Bauformen
 
