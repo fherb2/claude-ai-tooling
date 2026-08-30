@@ -180,7 +180,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 ist am 29. August 2026 geschlossen** (Entscheidung des Entwicklers): Die damals offene Prüffrage, ob die Chat-Suche projektübergreifend arbeitet, ist beantwortet — auf claude.ai durchsucht sie ohnehin nur die Chats des eigenen Projekts. Der Punkt braucht also kein Zuhause; sein Eintrag steht in Kapitel 6. **T5 ist am selben Tag geschlossen:** Die Vorwissen-Definition wird für die Arbeit mit Claude nicht mehr gebraucht; auch sein Eintrag steht in Kapitel 6. **T14 und T15 sind ebenfalls am 29. August 2026 geschlossen:** Ihre Form war claude.ai-Mechanik, ihr methodischer Kern ist in die Regeldatei `rules-handover` des Skills `temp-debug-code` eingegangen. Damit ist diese Gruppe vollständig abgearbeitet.
+T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 ist am 29. August 2026 geschlossen** (Entscheidung des Entwicklers): Die damals offene Prüffrage, ob die Chat-Suche projektübergreifend arbeitet, ist beantwortet — auf claude.ai durchsucht sie ohnehin nur die Chats des eigenen Projekts. Der Punkt braucht also kein Zuhause; sein Eintrag steht in Kapitel 6. **T5 ist am selben Tag geschlossen:** Die Vorwissen-Definition wird für die Arbeit mit Claude nicht mehr gebraucht; auch sein Eintrag steht in Kapitel 6. **T14 und T15 sind am 30. August 2026 geschlossen:** Ihre Form war claude.ai-Mechanik, ihr methodischer Kern ist in die Regeldatei `rules-handover` des Skills `temp-debug-code` eingegangen. Damit ist diese Gruppe vollständig abgearbeitet.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
@@ -345,7 +345,7 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 
 #### T14 Kurze Ursachensuche als `python -c`-Einzeiler
 
-**Verarbeitet:** Skill `temp-debug-code`, Regeldatei `rules-handover`, 29. August 2026 · Gruppe D (Debugging und Tests). Die claude.ai-Mechanik ist dort nicht übernommen, sondern ersetzt: Nicht mehr „gib dem Nutzer einen Einzeiler“, sondern erst die Frage, **wo der Fehler lebt** — reicht die Logik, führt Claude die Probe selbst aus; hängt sie an der Umgebung des Nutzers, gehört sie auf seinen Rechner. Die Form des Einzeilers ist dabei eine von drei sprachabhängigen Ausprägungen geworden.
+**Verarbeitet:** Skill `temp-debug-code`, Regeldatei `rules-handover`, 30. August 2026 · Gruppe D (Debugging und Tests). Die claude.ai-Mechanik ist dort nicht übernommen, sondern ersetzt: Nicht mehr „gib dem Nutzer einen Einzeiler“, sondern erst die Frage, **wo der Fehler lebt** — reicht die Logik, führt Claude die Probe selbst aus; hängt sie an der Umgebung des Nutzers, gehört sie auf seinen Rechner. Die Form des Einzeilers ist dabei eine von drei sprachabhängigen Ausprägungen geworden.
 
 **Aussage:** Kurze Debuggings zur Ursachensuche als Kommandozeilen-Einzeiler (`python -c "..."`) formulieren; der Nutzer führt sie aus und gibt das Ergebnis in den Chat zurück.
 
@@ -355,7 +355,7 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 
 #### T15 Umfassenderes Debugging als eigenes Skript
 
-**Verarbeitet:** Skill `temp-debug-code`, Regeldatei `rules-handover`, 29. August 2026 · Gruppe D (Debugging und Tests). Das eigene Skript ist dort Stufe 3 der Eskalationsleiter — es kommt, wenn ein einzelner Aufruf nicht mehr trägt. Neu gegenüber der Quelle ist die Stufe darüber: Erst wenn auch ein Skript von außen nicht herankommt, wird in den Quelltext eingegriffen, und ab dort greift die Kennzeichnung.
+**Verarbeitet:** Skill `temp-debug-code`, Regeldatei `rules-handover`, 30. August 2026 · Gruppe D (Debugging und Tests). Das eigene Skript ist dort Stufe 3 der Eskalationsleiter — es kommt, wenn ein einzelner Aufruf nicht mehr trägt. Neu gegenüber der Quelle ist die Stufe darüber: Erst wenn auch ein Skript von außen nicht herankommt, wird in den Quelltext eingegriffen, und ab dort greift die Kennzeichnung.
 
 **Aussage:** Größere Debugging-Aufbauten als eigenes Skript/Artefakt liefern, das im Projekt ausgeführt wird.
 

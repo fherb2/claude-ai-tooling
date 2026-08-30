@@ -1,6 +1,6 @@
 # temp-debug-code — Marking of temporary debug code
 
-*Last updated: 2026-08-29*
+*Last updated: 2026-08-30*
 
 *[Deutsche Fassung](README.md)*
 
@@ -10,7 +10,7 @@
 
 The second part of the skill is the cleaning up: before a cause found is reported or the actual correction written, Claude checks whether debug code is still standing in the source — including code from an earlier task — and either removes it or puts it to the user.
 
-**Where Claude does not reach the files itself** — on claude.ai and in Claude Desktop — a second subject comes in: which probe runs where, and how it is handed to the user. There it is also **their** decision whether anything is marked at all, because they enter the lines and take them out again.
+**Where Claude does not reach the files itself** — on claude.ai and in Claude Desktop (Chat + Cowork) — a second subject comes in: which probe runs where, and how it is handed to the user. There it is also **their** decision whether anything is marked at all, because they enter the lines and take them out again.
 
 **Not** meant is debug code intended to stay in the source permanently: output behind a debug flag, behind a log level or behind a configuration variable. That is regular program code, is not marked, and follows the usual rules of the project.
 
@@ -39,7 +39,7 @@ The marks stand **once per language**. They are character-identical in both envi
    | Personal | `~/.claude/skills/temp-debug-code/`  | all of the user's projects |
    | Project  | `.claude/skills/temp-debug-code/`    | this project only          |
 
-   On claude.ai and in Claude Desktop the folder is uploaded as a ZIP through *Customize → Skills* instead.
+   On claude.ai and in Claude Desktop (Chat + Cowork) the folder is uploaded as a ZIP through *Customize → Skills* instead.
 
 2. **Copy one language version of the folder `temp-debug-code/`.** Every file exists twice, distinguished by `.de.` and `.en.`. All files of the chosen language come along, README included. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; that name and no other is recognized. The other files keep their names, because the `SKILL.md` refers to them. The date lines later show which state the installation is from.
 
@@ -48,7 +48,7 @@ The marks stand **once per language**. They are character-identical in both envi
    | Environment | File | Target |
    | --- | --- | --- |
    | Claude Code | `CLAUDE-snippet-local.md` | `~/.claude/CLAUDE.md` or the project's `CLAUDE.md` |
-   | claude.ai, Claude Desktop | `CLAUDE-snippet-handover.md` | the instruction field — globally or per project |
+   | claude.ai, Claude Desktop (Chat + Cowork) | `CLAUDE-snippet-handover.md` | the instruction field — globally or per project |
 
    What is adopted is **everything below the separator line**; the italic text above it stays behind. The snippet files stay at the target location; only the instruction file takes effect, and their date lines show the state of the adopted trigger.
 
@@ -80,7 +80,7 @@ The marks stand **once per language**. They are character-identical in both envi
 
 ## Status and open points
 
-**Status:** instructions complete, frontmatter set, two silent triggers, description in the third person. On 29 August 2026 the marks were recast completely — the frame `@@~` instead of the old double hash, a label per debugging effort, nesting, separator lines — and the skill was at the same time split into a common part and two environment branches. Both language versions came into being together.
+**Status:** instructions complete, frontmatter set, two silent triggers, description in the third person. On 29 August 2026 the marks were recast completely — the frame `@@~` instead of the old double hash, a label per debugging effort, nesting, separator lines — and on 30 August the skill was split into a common part and two environment branches. Both language versions came into being together.
 
 **Open:** the new form of the marks and the split have never been in use. That does not make the skill unusable — its first use is at the same time its trial. Untested in particular is whether an uploaded skill on claude.ai actually pulls the files it refers to.
 

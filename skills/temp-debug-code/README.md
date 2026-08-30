@@ -1,6 +1,6 @@
 # temp-debug-code — Kennzeichnung von temporärem Debug-Code
 
-*Stand: 2026-08-29*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
@@ -10,7 +10,7 @@
 
 Der zweite Teil des Skills ist das Aufräumen: Bevor eine gefundene Ursache gemeldet oder die eigentliche Korrektur geschrieben wird, prüft Claude, ob noch Debug-Code im Quelltext steht — auch solcher aus einem früheren Auftrag —, und entfernt ihn beziehungsweise legt ihn dem Nutzer vor.
 
-**Wo Claude die Dateien nicht selbst erreicht** — auf claude.ai und in Claude Desktop —, kommt ein zweiter Gegenstand hinzu: welche Probe wo ausgeführt wird und wie sie dem Nutzer übergeben wird. Dort entscheidet außerdem **er**, ob überhaupt markiert wird, denn er trägt die Zeilen ein und baut sie wieder aus.
+**Wo Claude die Dateien nicht selbst erreicht** — auf claude.ai und in Claude Desktop (Chat + Cowork) —, kommt ein zweiter Gegenstand hinzu: welche Probe wo ausgeführt wird und wie sie dem Nutzer übergeben wird. Dort entscheidet außerdem **er**, ob überhaupt markiert wird, denn er trägt die Zeilen ein und baut sie wieder aus.
 
 **Nicht** gemeint ist Debug-Code, der dauerhaft im Quelltext bleiben soll: Ausgaben hinter einem Debug-Flag, hinter einer Log-Stufe oder hinter einer Konfigurationsvariablen. Das ist regulärer Programmcode, wird nicht markiert und folgt den üblichen Regeln des Projekts.
 
@@ -39,7 +39,7 @@ Die Marken stehen **einmal je Sprache**. Sie sind in beiden Umgebungen zeichengl
    | Persönlich  | `~/.claude/skills/temp-debug-code/`   | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/temp-debug-code/`     | nur dieses Projekt        |
 
-   Auf claude.ai und in Claude Desktop wird der Ordner stattdessen als ZIP über *Customize → Skills* hochgeladen.
+   Auf claude.ai und in Claude Desktop (Chat + Cowork) wird der Ordner stattdessen als ZIP über *Customize → Skills* hochgeladen.
 
 2. **Eine Sprachversion des Ordners `temp-debug-code/` kopieren.** Jede Datei liegt zweimal vor, unterschieden durch `.de.` und `.en.`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; erkannt wird ausschließlich dieser Name. Die übrigen Dateien behalten ihre Namen, denn die `SKILL.md` verweist auf sie. Die Datumszeilen zeigen später, von welchem Stand die Installation ist.
 
@@ -48,7 +48,7 @@ Die Marken stehen **einmal je Sprache**. Sie sind in beiden Umgebungen zeichengl
    | Umgebung | Datei | Ziel |
    | --- | --- | --- |
    | Claude Code | `CLAUDE-snippet-local.md` | `~/.claude/CLAUDE.md` oder die `CLAUDE.md` des Projekts |
-   | claude.ai, Claude Desktop | `CLAUDE-snippet-handover.md` | das Anweisungsfeld — global oder je Projekt |
+   | claude.ai, Claude Desktop (Chat + Cowork) | `CLAUDE-snippet-handover.md` | das Anweisungsfeld — global oder je Projekt |
 
    Übernommen wird **alles unterhalb der Trennlinie**; der kursive Text darüber bleibt zurück. Die Snippet-Dateien bleiben am Zielort liegen; wirksam ist allein die Anweisungsdatei, ihre Datumszeilen zeigen den Stand des übernommenen Triggers.
 
@@ -80,7 +80,7 @@ Die Marken stehen **einmal je Sprache**. Sie sind in beiden Umgebungen zeichengl
 
 ## Stand und Offenes
 
-**Status:** Anweisungen vollständig, Frontmatter gesetzt, zwei stille Trigger, Description in der dritten Person. Am 29. August 2026 sind die Marken vollständig neu gefasst worden — Rahmen `@@~` statt der alten Doppelraute, Kennung je Debug-Vorhaben, Verschachtelung, Trennzeilen — und der Skill ist zugleich in einen gemeinsamen Teil und zwei Umgebungszweige geteilt worden. Beide Sprachfassungen sind dabei gemeinsam entstanden.
+**Status:** Anweisungen vollständig, Frontmatter gesetzt, zwei stille Trigger, Description in der dritten Person. Am 29. August 2026 sind die Marken vollständig neu gefasst worden — Rahmen `@@~` statt der alten Doppelraute, Kennung je Debug-Vorhaben, Verschachtelung, Trennzeilen —, und am 30. August ist der Skill in einen gemeinsamen Teil und zwei Umgebungszweige geteilt worden. Beide Sprachfassungen sind dabei gemeinsam entstanden.
 
 **Offen:** Die neue Markenform und die Teilung waren noch nie im Einsatz. Das macht den Skill nicht unbenutzbar — sein erster Einsatz ist zugleich ihre Erprobung. Ungeprüft ist insbesondere, ob ein hochgeladener Skill auf claude.ai die nachgeladenen Dateien tatsächlich zieht.
 

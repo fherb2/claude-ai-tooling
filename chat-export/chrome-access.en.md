@@ -125,7 +125,7 @@ Checked at the user's request: the left sidebar of the claude.ai interface, with
 - **Web tile ("Start Claude Code Web"):** leads to an onboarding page (`/code/onboarding`) with a repository picker and an input field, but with the notice: *"Claude Code on the web requires GitHub access. Please contact an organization owner."* Locked for this account, then; not submitted.
 - **IDE extension:** not checked further (an install link into an IDE, no browser access to be expected).
 
-**Result: no locally created Claude Code projects from Claude Desktop can be reached via the Chrome tab.** The "Code" view in claude.ai is built for *starting* new sessions (terminal install, web with GitHub connection, IDE extension), not for *listing* existing local projects. For the web route, that means: **the only part of the Chrome tab that is usefully applicable is the "Home" area** — chats and projects in the ordinary claude.ai sense. Whether that changes in the future (e.g. a later list of connected local projects) is speculation and is not claimed here.
+**Result: no locally created Claude Code projects from Claude Desktop (Code tab) can be reached via the Chrome tab.** The "Code" view in claude.ai is built for *starting* new sessions (terminal install, web with GitHub connection, IDE extension), not for *listing* existing local projects. For the web route, that means: **the only part of the Chrome tab that is usefully applicable is the "Home" area** — chats and projects in the ordinary claude.ai sense. Whether that changes in the future (e.g. a later list of connected local projects) is speculation and is not claimed here.
 
 ## Stage 7: first real test run of the skill flow — Team account with no self-serve export, aborted on a code gap
 

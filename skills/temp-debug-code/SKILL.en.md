@@ -28,7 +28,7 @@ If you find such a rule only later, it holds **from then on** and overrides what
 
 Everything that follows hangs on a single distinction:
 
-**Do you reach the project's file tree directly — with tools that read and write its files?** In Claude Code you do. On claude.ai and in Claude Desktop you do not: there you work through the user, and their hand is the one on the source.
+**Do you reach the project's file tree directly — with tools that read and write its files?** In Claude Code you do. On claude.ai and in Claude Desktop (Chat + Cowork) you do not: there you work through the user, and their hand is the one on the source.
 
 > **Project knowledge is not the file tree.** If you find files under `/mnt/project/` or at a comparable place, those are **copies**. Changing something there changes nothing in the user's project. Finding something there proves no direct access.
 
