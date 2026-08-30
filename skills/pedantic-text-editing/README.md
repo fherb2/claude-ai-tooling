@@ -14,24 +14,13 @@ Dafür trennt er drei Arten von Fund — Regelverstoß, Sachfrage, Geschmack —
 
 ## Installation
 
-1. **Zielort wählen.** Der Skill gilt entweder für alle Projekte des Nutzers oder nur für eines:
+1. **Paket herunterladen.** `downloads/pedantic-text-editing_de_local.zip`
 
-   | Ort         | Pfad                                        | Gilt für                  |
-   | ----------- | ------------------------------------------- | ------------------------- |
-   | Persönlich  | `~/.claude/skills/pedantic-text-editing/`   | alle Projekte des Nutzers |
-   | Projekt     | `.claude/skills/pedantic-text-editing/`     | nur dieses Projekt        |
+2. **Entpacken.** Das Archiv enthält einen Ordner `pedantic-text-editing/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-2. **Eine Sprachfassung kopieren.** Der Ordnername bleibt unverändert. Kopiert wird eine vollständige Sprachfassung:
+Ein stiller Trigger entfällt hier: Der Skill löst zuverlässig über seine `description` aus oder wird mit `/pedantic-text-editing` aufgerufen.
 
-   | Deutsch         | Englisch        |
-   | --------------- | --------------- |
-   | `SKILL.de.md`   | `SKILL.en.md`   |
-   | `rules.de.md`   | `rules.en.md`   |
-   | `README.md`     | `README.en.md`  |
-
-   Dazu **`apply_findings.py`** — das Skript ist sprachunabhängig und gehört in beide Fassungen. Ohne es müsste Claude jede freigegebene Änderung einzeln ausführen, was eine volle Runde sehr lange dauern lässt.
-
-   **Verpflichtend ist daran allein, dass die gewählte SKILL-Fassung am Zielort `SKILL.md` heißt** — Claude Code erkennt keinen anderen Namen. Ob dafür umbenannt oder zusätzlich abgelegt wird, ist gleichgültig. Regeldatei und Skript behalten ihre Namen: Die `SKILL.md` verweist auf die Regeln, diese auf das Skript, und diese Verweise sind der einzige Weg, auf dem beides überhaupt geladen wird. Wer umbenennt, zieht die Verweise mit.
+Neben Skilltext und Regeln liegt im Paket auch **`apply_findings.py`**. Das Skript ist sprachunabhängig und in beiden Sprachfassungen dasselbe. Ohne es müsste Claude jede freigegebene Änderung einzeln ausführen, was eine volle Runde sehr lange dauern lässt.
 
 ## Details
 

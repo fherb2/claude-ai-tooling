@@ -16,35 +16,19 @@ Drei Dinge leistet der Skill. Er lässt Claude die Artefakte erkennen, sobald si
 
 ## Installation
 
-**1. Zielort wählen.**
+1. **Paket herunterladen.** `downloads/correct-zaaack-md-editor-mistakes_de_local.zip`
 
-| Ort         | Pfad                                                        | Gilt für                  |
-| ----------- | ----------------------------------------------------------- | ------------------------- |
-| Persönlich  | `~/.claude/skills/correct-zaaack-md-editor-mistakes/`       | alle Projekte des Nutzers |
-| Projekt     | `.claude/skills/correct-zaaack-md-editor-mistakes/`         | nur dieses Projekt        |
+2. **Entpacken.** Das Archiv enthält einen Ordner `correct-zaaack-md-editor-mistakes/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-Wer den Editor überhaupt benutzt, benutzt ihn in aller Regel überall — der persönliche Ort ist deshalb der naheliegende. Dagegen spricht einzig `SKIP` (siehe „Der Geltungsbereich"): Die Ausnahmeliste ist projektbezogen, und eine persönliche Installation trägt für alle Projekte dieselbe.
+   Der persönliche Ort ist hier der naheliegende: Wer den Editor überhaupt benutzt, benutzt ihn in aller Regel überall. Dagegen spricht einzig `SKIP` (siehe „Der Geltungsbereich“) — die Ausnahmeliste ist projektbezogen, und eine persönliche Installation trägt für alle Projekte dieselbe.
 
-**2. Eine Sprachversion des Ordners kopieren.** Der Ordnername bleibt unverändert. `SKILL` und `CLAUDE-snippet` liegen hier zweisprachig; mit gehören alle Dateien der gewählten Sprache, README und Werkzeuge eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen, eine `SKILL.de.md` allein ist kein Skill. Die Datumszeilen zeigen den Stand der Installation.
+3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` kommt **alles unterhalb der Trennlinie** in die `CLAUDE.md` des gewählten Orts. Der kursive Text darüber bleibt zurück; die Datei selbst bleibt im Skill-Ordner liegen und zeigt an ihrer Datumszeile, von welchem Stand der übernommene Trigger ist.
 
-```text
-SKILL.de.md  oder  SKILL.en.md          ->  zusätzlich als SKILL.md ablegen
-README.md, README.en.md                 ->  unverändert mit
-CLAUDE-snippet.de.md, CLAUDE-snippet.en.md  ->  unverändert mit
-md_table_artifacts.py, scan_md_tables.py, fix_md_tables.py
-```
+   Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/correct-zaaack-md-editor-mistakes`. Das ist hier der Regelfall des Versagens: Niemand bittet von sich aus darum, Tabellen auf Leerzeichen zu prüfen.
 
-Welche Sprache, richtet sich nach der, in der üblicherweise gearbeitet wird: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext und prägt die Sprache, in der Claude anschließend antwortet.
+4. **Optional den Hook einrichten** — siehe „Verlässlichkeit: der Hook“.
 
-Ein `__pycache__/` entsteht, sobald die Werkzeuge einmal gelaufen sind. Es gehört nicht mit an den Zielort und wird auch nicht mitversioniert.
-
-**Die `README.md` ist bei diesem Skill keine Beigabe, sondern Pflicht.** Bei anderen Skills kostet ihr Fehlen am Zielort nur Begründungstiefe bei Nachfragen; hier verweist die `SKILL.md` für die Hook-Einrichtung ausdrücklich auf sie, statt die Beschreibung dauerhaft im Kontext mitzuschleppen. Fehlt sie, zeigt der Verweis ins Leere.
-
-**3. Stillen Trigger übernehmen.** Der Inhalt **unterhalb der Trennlinie** in `CLAUDE-snippet.de.md` bzw. `CLAUDE-snippet.en.md` wird in die `CLAUDE.md` des Zielorts übernommen — bei persönlicher Installation in `~/.claude/CLAUDE.md`, bei projektbezogener in die des Projekts. Die kursiven Absätze oberhalb der Trennlinie sind die Anleitung dazu und werden nicht mitkopiert; sie nennen auch, was beim Anpassen des Wortlauts nicht wegfallen darf. Die Snippet-Dateien wandern mit an den Zielort und bleiben dort liegen: Wirksam ist allein die `CLAUDE.md`; ihre Datumszeilen zeigen, von welchem Stand der übernommene Trigger ist.
-
-Ohne diesen Schritt funktioniert der Skill weiter, wird aber nur geladen, wenn er ausdrücklich mit `/correct-zaaack-md-editor-mistakes` aufgerufen wird oder eine Anfrage seiner Beschreibung nahe genug kommt. Das ist bei diesem Skill der Regelfall des Versagens: Niemand bittet von sich aus darum, Tabellen auf Leerzeichen zu prüfen.
-
-**4. Optional den Hook einrichten** — siehe „Verlässlichkeit: der Hook".
+**Die `README.md` ist bei diesem Skill keine Beigabe, sondern Pflicht.** Bei anderen Skills kostet ihr Fehlen am Zielort nur Begründungstiefe bei Nachfragen; hier verweist die `SKILL.md` für die Hook-Einrichtung ausdrücklich auf sie, statt die Beschreibung dauerhaft im Kontext mitzuschleppen. Das Paket bringt sie deshalb mit — entferne sie nicht.
 
 ## Details
 
