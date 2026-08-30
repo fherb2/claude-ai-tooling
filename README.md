@@ -60,7 +60,7 @@ Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche 
 
 **Zweck: Anweisungen aus CLAUDE.md raus und Aufgabenbeschreibungen wiederverwendbar machen.** Skills starten auch ohne ein passendes „Trigger-Wort“.
 
-Wiederverwendbare Skills für Claude Code: Anweisungen, die nicht dauerhaft in `CLAUDE.md`-Dateien Kontext kosten, sondern erst geladen werden, wenn sie gebraucht werden.
+Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + Cowork): Anweisungen, die nicht dauerhaft in `CLAUDE.md`-Dateien Kontext kosten, sondern erst geladen werden, wenn sie gebraucht werden. Jeder fertige Skill liegt als Installationspaket bereit — ein Archiv je Sprache und Zielwelt, im Unterordner `downloads/` des Skills.
 
 Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Situationen, die niemand ausspricht. Der Anthropic-Standard, einen Skill aktiv vom Nutzer zu starten oder im Skill über `description:` per Trigger-Wörter im Chat automatisch zu starten, erweitert das Konzept der stillen Trigger auch ein Start aus dem Kontext des Chats heraus. Das ist keine Claude-Code-Erweiterung, sondern wird über besondere Formulierungsregeln in CLAUDE.md erreicht. Details zur Nachnutzung in diesem Baustein.
 
