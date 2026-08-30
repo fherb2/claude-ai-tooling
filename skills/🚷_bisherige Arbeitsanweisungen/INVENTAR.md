@@ -65,10 +65,10 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T20 |  | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     |
 | T21 |  | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     |
 | T22 |  | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
-| T23 |  | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
-| T24 |  | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
+| T23 | ✅ | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
+| T24 | ✅ | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
 | T25 | ✅ | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
-| T26 |  | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     |
+| T26 | ✅ | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     |
 | T27 |  | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     |
 
 Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien ursprünglich enthielten, unabhängig davon, ob ein Thema inzwischen verarbeitet und aus ihnen entfernt ist. Wer den ursprünglichen Wortlaut braucht, findet ihn im Unterordner `original/`. Die Einträge der abgehakten Posten stehen in Kapitel 6.
@@ -136,30 +136,6 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### F Projektphase und Arbeitsmodus
 
-#### T23 Findungsphase: Alternativen und eigene Ideen ausdrücklich erwünscht
-
-**Aussage:** Kurz nach der Findungsphase werden weiter Ideen gesammelt, abgewogen und verglichen; Claude soll immer auch Alternativen und eigene Ideen einbringen, „um … Lösungen nicht zu früh in feste Bahnen zu manövrieren“.
-
-**Fundstellen:** nur MOD.
-
-**Einordnung:** **[teilweise abgedeckt]** — §2.1 definiert die Findungsphase (sammeln, verwerfen, nichts ist Festlegung), verlangt das aktive Einbringen von Alternativen aber nicht ausdrücklich. Der Satz wäre ein guter Ein-Zeilen-Zusatz zur Findungsphasen-Definition oder Baustein eines Phasen-Skills.
-
-#### T24 Planungsphase der Algorithmik: erklären statt kodieren
-
-**Aussage:** Während der Planungsphase nur ausnahmsweise mit sehr kurzen Codesnippets arbeiten; stattdessen mehr erklären, strukturieren, Literaturquellen finden und wo nötig schematisch mit Markdown und Schriftzeichen zeichnen.
-
-**Fundstellen:** nur SCH‑A.
-
-**Einordnung:** **[nicht abgedeckt]** als Verhaltensregel — §2.2 regelt zwar, dass kein Code in die **Dokumente** gehört, aber nicht, dass in frühen Phasen der **Chat** prosalastig bleiben soll (Erklären, Literatur, Schemata). Kandidat für einen Konzeptphasen-Baustein; verwandt mit T23.
-
-#### T26 Alte Chats aufgreifen, Internet-Recherche erwünscht
-
-**Aussage:** Claude darf in bisherige Chats sehen und Inhalte wieder aufgreifen und darf im Internet nach Lösungsvorschlägen anderer Bastler suchen.
-
-**Fundstellen:** nur MOD.
-
-**Einordnung:** **[teilweise abgedeckt]** — der Umgang mit alten Chats ist über §1.11 geregelt (dort restriktiver: historische Information, Kollisionsprüfung nur auf Anfrage); Internet-Recherche ist in Claude Code eine Werkzeug-/Berechtigungsfrage und keine Anweisung. Der eigentliche Gehalt — in der Findungsphase fremde Lösungen **aktiv** einbeziehen — gehört als Erwünschtheit zum selben Phasen-Baustein wie T23.
-
 #### T27 Projektspezifische Hintergrunddateien als Kontext
 
 **Aussage:** Bestimmte Projektdateien („Grob-Analyse v1.md“ als grundlegender Kontext, „closedLoop7_1_hifiberry.py“ für Details der bisherigen Methoden) beschreiben Zweck und alte Herangehensweise, **nicht** das neue Entwicklungsziel — neue Erkenntnisse dürfen die dort beschriebenen Schritte ersetzen; die während der Chats entstehenden Dateien sind Teil des neuen Ziels.
@@ -186,7 +162,6 @@ Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb
 ### 5.3 Nicht oder nur teilweise abgedeckt — Kandidaten
 
 - **Python-Test-Konventionen (T17, T18, T19):** der größte ungenutzte Block — pytest CI+CLI, testfreundliche Funktionsanlage, debug-Parameter. Kandidat für einen neuen Skill; bei T19 vorher genau eine der zwei unverträglichen Fassungen festlegen. Abgrenzung zu `temp-debug-code` ist sauber (dauerhafter vs. temporärer Debug-Code).
-- **Konzept-/Findungsphasen-Arbeitsmodus (T23, T24, T26-Kern):** Alternativen aktiv einbringen, erklären statt kodieren, fremde Lösungen recherchieren. Kandidat als Zusatz zu §2.1 oder als eigener Phasen-Baustein/Skill.
 - **Status-Protokoll-Detailregeln (T20):** Vergleichsmaterial für den Ausbau von `software-dev-doc-fh` (Referenzieren statt Ausschreiben, Missverständnisfestigkeit, API-Rümpfe als Schrittbeschreibung); der append-only-Mechanismus selbst ist durch Fahrplan/Status bewusst abgelöst.
 - **Kleinigkeiten:** ggf. Code-Style-Beispiel-Ausnahme (T22).
 
@@ -373,3 +348,39 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 **Fundstellen:** nur MOD, ein Absatz.
 
 **Einordnung:** **[nicht abgedeckt]** — weder die CLAUDE.md noch `common-code-generation` enthalten ein Generalisierbarkeits-Kriterium. Zur Wahl standen: als allgemeine Design-Leitlinie in `common-code-generation` aufnehmen oder bewusst projektspezifisch lassen. Geprüft wurde dabei auch das im Inventar vermutete Spannungsfeld zu T12/T13 — es besteht so nicht: Jene Posten schützen vor ungefragtem **Funktionsumfang**, T25 betrifft die **Bauform bei gleichem Umfang**, und für Vorschläge dieser Art hat `common-code-generation` bereits ein Verfahren. Den Ausschlag gab deshalb nicht ein Widerspruch, sondern die Herkunft: Die Aussage stammt aus einem einzelnen Hobbyprojekt und ist dort eine Vorliebe des Entwicklers, keine allgemeine Regel. Als solche formuliert, hätte sie zu Vorratsabstraktion eingeladen.
+
+#### T23 Findungsphase: Alternativen und eigene Ideen ausdrücklich erwünscht
+
+**Entschieden:** Kein Skill-Zuhause, 30. August 2026 · Gruppe F (Projektphase und Arbeitsmodus). Zusammen mit T24 und T26 als Kandidat für einen Phasen-Skill geprüft und verworfen — siehe die gemeinsame Begründung bei T26.
+
+**Aussage:** Kurz nach der Findungsphase werden weiter Ideen gesammelt, abgewogen und verglichen; Claude soll immer auch Alternativen und eigene Ideen einbringen, „um … Lösungen nicht zu früh in feste Bahnen zu manövrieren“.
+
+**Fundstellen:** nur MOD, ein Absatz.
+
+**Einordnung:** **[teilweise abgedeckt]** — §2.1 definiert die Findungsphase (sammeln, verwerfen, nichts ist Festlegung), verlangt das aktive Einbringen von Alternativen aber nicht ausdrücklich.
+
+#### T24 Planungsphase der Algorithmik: erklären statt kodieren
+
+**Entschieden:** Kein Skill-Zuhause, 30. August 2026 · Gruppe F (Projektphase und Arbeitsmodus). Siehe die gemeinsame Begründung bei T26.
+
+**Aussage:** Während der Planungsphase nur ausnahmsweise mit sehr kurzen Codesnippets arbeiten; stattdessen mehr erklären, strukturieren, Literaturquellen finden und wo nötig schematisch mit Markdown und Schriftzeichen zeichnen.
+
+**Fundstellen:** nur SCH‑A, zwei Aufzählungspunkte.
+
+**Einordnung:** **[nicht abgedeckt]** als Verhaltensregel — §2.2 regelt zwar, dass kein Code in die **Dokumente** gehört, aber nicht, dass in frühen Phasen der **Chat** prosalastig bleiben soll. Anders als T23 und T26 spricht dieser Posten vom **Planungs**-Zeitpunkt, nicht von der Findungsphase; die beiden sind in §2.1 verschiedene Phasen. Auch das gemeinsame Zuhause wäre also erst zu bestimmen gewesen.
+
+#### T26 Alte Chats aufgreifen, Internet-Recherche erwünscht
+
+**Entschieden:** Kein Skill-Zuhause, 30. August 2026 · Gruppe F (Projektphase und Arbeitsmodus). **Hier steht die gemeinsame Begründung für T23, T24 und T26.**
+
+Die drei wurden zusammen als Kandidat für einen Phasen-Skill geprüft — so führt sie auch 5.3 — und zusammen verworfen. Der Grund ist zuerst der Umfang: Vier Absätze aus zwei Quellen, keine zehn Zeilen, sind zu wenig für einen eigenen Skill, und einen Skill um seiner selbst willen aufzufüllen hieße, Regeln zu erfinden, die niemand aufgestellt hat.
+
+Dazu kommt, dass wenig Eigenes übrig bleibt. Von T26 ist der Umgang mit alten Chats bereits in §1.11 geregelt, und zwar strenger als hier (historische Information, Kollisionsprüfung nur auf Anfrage); die Internet-Recherche ist in Claude Code eine Werkzeug- und Berechtigungsfrage, und für die gründliche Form gibt es `in-depth-online-literature-research`. T23 ergänzt §2.1 um einen Halbsatz. Und T24 betrifft eine andere Phase als die beiden anderen.
+
+Was bleibt, ist Arbeitsmodus eines einzelnen Projekts in einer bestimmten Lage — richtig aufgehoben in der `CLAUDE.md` des jeweiligen Projekts, nicht in einer allgemeinen Regel.
+
+**Aussage:** Claude darf in bisherige Chats sehen und Inhalte wieder aufgreifen und darf im Internet nach Lösungsvorschlägen anderer Bastler suchen.
+
+**Fundstellen:** nur MOD, ein Absatz.
+
+**Einordnung:** **[teilweise abgedeckt]** — siehe oben.

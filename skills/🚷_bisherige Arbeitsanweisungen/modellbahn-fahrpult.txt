@@ -1,5 +1,1 @@
-[T23]Aktuell befindet sich das Projekt kurz nach der "Findungsphase": Erste Entscheidungen werden getroffen. Weiterhin werden aber auch Ideen noch gesammelt, abgewogen, Lösungsmöglichkeiten verglichen, Features erdacht und auf Umsetzung geprüft. Es sind in den Chats deshalb von Dir immer auch Alternativen und eigene Ideen gefragt, um die Diskussionen möglichst produktiv werden zu lassen und Lösungen nicht zu früh in feste Bahnen zu manövrieren.
-
-[T26]Du darfst gern in bisherige Chats sehen und Inhalte wieder aufgreifen, wenn wir in einem laufenden Chat darauf stoßen. Du darfst gern im Internet suchen, um Lösungsvorschläge von anderen Bastlern einzubringen.
-
 Dokumenten- und Codebearbeitung:
