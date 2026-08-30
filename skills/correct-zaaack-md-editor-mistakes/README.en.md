@@ -1,10 +1,10 @@
 # correct-zaaack-md-editor-mistakes — find and repair damaged whitespace in Markdown tables
 
-*Last updated: 2026-08-26*
+*Last updated: 2026-08-30*
 
 *[Deutsche Fassung](README.md)*
 
-✅☑ **Finished and usable, in both language versions.** Tools, skill text and silent trigger are in place, the frontmatter is set. What is still open is stated in the closing section — none of it stands in the way of use.
+✅☑ **Finished and usable, in both language versions.** Tools, skill text and silent trigger are in place, the frontmatter is set. What is still open is stated in the closing section — none of it stands in the way of use. — Usable with Claude Code.
 
 ## Overview
 

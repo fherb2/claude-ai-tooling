@@ -2,7 +2,7 @@
 
 *Last updated: 2026-08-30*
 
-**✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version available. No silent trigger needed (reasons under "Details").
+**✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version available. No silent trigger needed (reasons under "Details"). — No difference in content between the version for claude.ai / Claude Desktop (Chat + Cowork) and Claude Code.
 
 **Turns a web search into a procedure: Claude systematically varies search terms, channels and search levels, checks every claim against the primary source, and reports the search paths still open instead of "nothing found".** The occasion for it is a recurring experience: the general web search reliably finds mass-content sites, but specialist articles, association publications and regional sources in particular disappear behind whatever is linked most often — and the summaries the search engines supply along the way invent details that appear on none of the linked pages.
 

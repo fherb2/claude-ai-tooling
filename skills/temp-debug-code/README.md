@@ -4,7 +4,7 @@
 
 *[English version](README.en.md)*
 
-**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stille Trigger für beide Umgebungen vorhanden, deutsche und englische Fassung vorhanden.
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stille Trigger für beide Umgebungen vorhanden, deutsche und englische Fassung vorhanden. — Mit inhaltlichen Unterschieden zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 
 **Versieht jede Zeile, die nur zur Fehlersuche entsteht, mit einer festen, suchbaren Marke** — eingefügte Debug- und `print`-Ausgaben ebenso wie Originalcode, der für die Dauer der Fehlersuche stillgelegt wird. Alle Marken beginnen mit derselben Zeichenfolge, deshalb findet ein einziger Suchlauf restlos jede Änderung, die zum Debuggen entstanden ist. Darauf beruht der ganze Zweck: Der Originalzustand bleibt vollständig wiederherstellbar — ohne Erinnerung und auch von jemandem, der nicht dabei war.
 

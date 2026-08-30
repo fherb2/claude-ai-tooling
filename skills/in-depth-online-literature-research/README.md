@@ -2,7 +2,7 @@
 
 *Stand: 2026-08-30*
 
-**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Kein stiller Trigger nötig (Begründung unter „Details").
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Kein stiller Trigger nötig (Begründung unter „Details"). — Keine inhaltlichen Unterschiede zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 
 **Macht aus einer Websuche ein Verfahren: Claude wechselt systematisch Suchbegriffe, Kanäle und Suchebenen, prüft jede Behauptung an der Primärquelle und meldet statt „nichts gefunden" die noch offenen Suchwege.** Der Anlass ist eine wiederkehrende Erfahrung: Die allgemeine Websuche findet Massenseiten zuverlässig, aber gerade Fachartikel, Vereinsschriften und regionale Quellen verschwinden hinter dem, was oft verlinkt ist — und die von Suchmaschinen mitgelieferten Zusammenfassungen erfinden dabei Details, die auf keiner der verlinkten Seiten stehen.
 
