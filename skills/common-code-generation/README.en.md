@@ -12,16 +12,27 @@ The rules apply as soon as code comes into being or is changed in a session — 
 
 ## Installation
 
-1. **Choose the target location.** The skill applies either to all of the user's projects or to a single one:
+### Claude Code
 
-   | Location | Path                                       | Applies to                 |
-   | -------- | ------------------------------------------ | -------------------------- |
-   | Personal | `~/.claude/skills/common-code-generation/`  | all of the user's projects |
-   | Project  | `.claude/skills/common-code-generation/`    | this project only          |
+1. **Download the package.** `downloads/common-code-generation_en_local.zip`
 
-2. **Copy one language version of the folder `common-code-generation/`.** `SKILL` and `CLAUDE-snippet` each exist twice (`.de`/`.en`); all files of the chosen language come along, README included. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other. The date lines later show which state the installation is from.
+2. **Unpack it.** The archive contains a folder `common-code-generation/` with all the files. Unpack it into `~/.claude/skills/` — then the skill applies to all projects — or into `.claude/skills/` in the project, then only there. An existing folder of the same name is replaced; nothing old is left behind.
 
-3. **Adopt the silent trigger.** The content of the `CLAUDE-snippet.md` — the one matching the chosen language version — goes **below the separator line** into the `CLAUDE.md` of the target location. The snippet files stay at the target location; only the `CLAUDE.md` is effective.
+3. **Adopt the silent trigger.** You have to do this by hand. Claude then recognizes more easily from the context whether the skill should be loaded. To do it: from `CLAUDE-snippet.md`, **everything below the separator line** goes into the `CLAUDE.md` of the chosen location. The italic text above it stays behind; the file itself stays in the skill folder and shows by its date line which state the adopted trigger is from.
+
+   Without this step the skill only takes effect when called explicitly with `/common-code-generation`.
+
+### claude.ai and Claude Desktop (Chat + Cowork)
+
+1. **Download the package.** `downloads/common-code-generation_en_web.zip`
+
+2. **Upload it.** Upload the archive in the application's management area for skills. The skill then applies to your account — not to your organization, and not at the same time in Claude Code.
+
+3. **Adopt the silent trigger.** You have to do this by hand. Claude then recognizes more easily from the context whether the skill should be loaded. To do it: from `CLAUDE-snippet.md` in the archive, **everything below the separator line** goes into the instruction field — globally for the account or for the single project.
+
+   Without this step the skill only takes effect when called explicitly with `/common-code-generation`.
+
+Both packages carry the same content — the skill does not differ between the target worlds. They are separate only so that the name says where the archive belongs.
 
 ## Details
 

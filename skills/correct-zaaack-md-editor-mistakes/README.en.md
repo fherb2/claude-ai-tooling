@@ -16,35 +16,19 @@ The skill does three things. It lets Claude recognize the artifacts as soon as t
 
 ## Installation
 
-**1. Choose the target location.**
+1. **Download the package.** `downloads/correct-zaaack-md-editor-mistakes_en_local.zip`
 
-| Location | Path | Applies to |
-| --- | --- | --- |
-| Personal | `~/.claude/skills/correct-zaaack-md-editor-mistakes/` | all of the user's projects |
-| Project | `.claude/skills/correct-zaaack-md-editor-mistakes/` | this project only |
+2. **Unpack it.** The archive contains a folder `correct-zaaack-md-editor-mistakes/` with all the files. Unpack it into `~/.claude/skills/` — then the skill applies to all projects — or into `.claude/skills/` in the project, then only there. An existing folder of the same name is replaced; nothing old is left behind.
 
-Whoever uses that editor at all uses it just about everywhere — the personal location is therefore the obvious one. The single argument against it is `SKIP` (see "The scope"): the exception list is project-related, and a personal installation carries the same one for all projects.
+   The personal location is the obvious one here: whoever uses the editor at all usually uses it everywhere. The one argument against it is `SKIP` (see "The scope") — the exception list is project-bound, and a personal installation carries the same one for all projects.
 
-**2. Copy one language version of the folder.** The folder name stays as it is. `SKILL` and `CLAUDE-snippet` are kept here in two languages; all files of the chosen language come along, README and tools included. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other, so a `SKILL.de.md` on its own is not a skill. The date lines show the state of the installation.
+3. **Adopt the silent trigger.** You have to do this by hand. Claude then recognizes more easily from the context whether the skill should be loaded. To do it: from `CLAUDE-snippet.md`, **everything below the separator line** goes into the `CLAUDE.md` of the chosen location. The italic text above it stays behind; the file itself stays in the skill folder and shows by its date line which state the adopted trigger is from.
 
-```text
-SKILL.de.md  or  SKILL.en.md            ->  additionally place as SKILL.md
-README.md, README.en.md                 ->  copied unchanged
-CLAUDE-snippet.de.md, CLAUDE-snippet.en.md  ->  copied unchanged
-md_table_artifacts.py, scan_md_tables.py, fix_md_tables.py
-```
+   Without this step the skill only takes effect when called explicitly with `/correct-zaaack-md-editor-mistakes`. That is the standard way it fails here: nobody asks of their own accord to have tables checked for spaces.
 
-Which language follows the one usually worked in: once loaded, the body of the `SKILL.md` stays in the context for the rest of the session and shapes the language Claude answers in afterwards.
+4. **Optionally set up the hook** — see "Reliability: the hook".
 
-A `__pycache__/` appears as soon as the tools have run once. It does not belong at the target location and is not put under version control either.
-
-**The `README.md` is not an extra with this skill but a requirement.** With other skills its absence at the target location only costs depth of reasoning on follow-up questions; here the `SKILL.md` explicitly points to it for the hook setup, instead of dragging that description along in the context permanently. If it is missing, the pointer leads nowhere.
-
-**3. Take over the silent trigger.** The content **below the separator line** in `CLAUDE-snippet.de.md` resp. `CLAUDE-snippet.en.md` goes into the `CLAUDE.md` of the target location — for a personal installation into `~/.claude/CLAUDE.md`, for a project one into the project's. The italic paragraphs above the separator are the instructions for that and are not copied along; they also state what must not be dropped when the wording is adapted. The snippet files travel along to the target location and stay there: only the `CLAUDE.md` is effective; their date lines show which state the adopted trigger is from.
-
-Without this step the skill still works, but is only loaded when it is called explicitly with `/correct-zaaack-md-editor-mistakes` or when a request comes close enough to its description. With this skill that is the standard case of failure: nobody asks of their own accord to have tables checked for spaces.
-
-**4. Optionally set up the hook** — see "Reliability: the hook".
+**The `README.md` is not an extra for this skill but a requirement.** With other skills its absence at the target location only costs depth of reasoning when questions come up; here the `SKILL.md` explicitly points to it for setting up the hook, instead of dragging the description along in the context permanently. That is why the package brings it — do not remove it.
 
 ## Details
 
