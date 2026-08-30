@@ -29,7 +29,7 @@ When you name parts of the code yourself, then:
 
 ## Writing code in general
 
-Produce only the code that is strictly necessary for the task at hand, and no extensions or improvements you thought up yourself. Nice-to-have features, and improvements to software quality that have not been explicitly agreed, can still be added afterwards. Always propose such extensions and improvements early.
+Produce only the code that is strictly necessary for the task at hand, and no extensions or improvements you thought up yourself. Nice-to-have features, and improvements to software quality that have not been explicitly agreed, can still be added afterwards. Propose such extensions and improvements early, during planning, to the developer. What of them is taken over, and in what form, is their decision.
 
 Never extend the functional scope already realized in the code unless this has been settled with the user in detail beforehand.
 

@@ -1,12 +1,12 @@
-*Last updated: 2026-08-29*
+*Last updated: 2026-08-30*
 
 *This file is not part of the skill. It carries the silent trigger for
 environments without direct access to the file tree — claude.ai and Claude
-Desktop. For Claude Code, `CLAUDE-snippet-local.en.md` applies instead; only
-ever one of the two is adopted. When installing: copy everything below the
-separator line into the instruction field of the target location — globally
-for the account or per project. Without the trigger the skill runs only on
-an explicit `/temp-debug-code` call.*
+Desktop (Chat + Cowork). For Claude Code a different trigger applies; it
+sits in the Claude Code package. Only ever one is adopted. When installing:
+copy everything below the separator line into the instruction field of the
+target location — globally for the account or per project. Without the
+trigger the skill runs only on an explicit `/temp-debug-code` call.*
 
 *The cause here is a different one than in Claude Code: Claude inserts
 nothing itself but proposes it to the user. The wording therefore binds to

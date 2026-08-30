@@ -1,10 +1,12 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-08-27*
+*Last updated: 2026-08-30*
 
 *[Deutsche Fassung](README.md)*
 
-Tools / components for the daily work with Claude — claude.ai, Claude Desktop and Claude Code. Self-contained components, each with its own documentation in its folder. This page is the overview only. Use the linked READMEs inside the components.
+Tools / components for the daily work with Claude — claude.ai, Claude Desktop (Chat + Cowork) and Claude Code. Self-contained components, each with its own documentation in its folder. This page is the overview only. Use the linked READMEs inside the components.
+
+**Claude Cowork in detail is not covered here yet.** The variant available since summer 2026 differs from the three named above in one decisive respect: through connected folders it works directly on the user's machine. What this repository says — target worlds, skills, workflows — therefore refers, strictly speaking, to claude.ai Chat, Claude Desktop Chat and Claude Code.
 
 ## What there is
 
@@ -58,7 +60,7 @@ An always-on NAS node acts as the intermediary. The actual core is dealing with 
 
 **Purpose: get instructions out of CLAUDE.md and make task descriptions reusable.** Skills also start without a matching "trigger word".
 
-Reusable skills for Claude Code: instructions that do not permanently cost context in `CLAUDE.md` files but are loaded only once they are needed.
+Reusable skills for Claude Code, claude.ai and Claude Desktop (Chat + Cowork): instructions that do not permanently cost context in `CLAUDE.md` files but are loaded only once they are needed. Every finished skill comes as an installation package — one archive per language and target world, in the skill's `downloads/` subfolder.
 
 Along with that, the concept of **silent triggers** developed here — triggers for situations nobody puts into words. The Anthropic standard has a skill either started by the user or fired automatically on trigger words given in the skill's `description:`; silent triggers extend that by a start out of the context of the chat. This is not an extension of Claude Code, but is achieved through particular rules of wording in CLAUDE.md. Details on reuse in this component.
 

@@ -1,8 +1,8 @@
 # in-depth-online-literature-research — Recherche, die nicht zu früh aufgibt
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-30*
 
-**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Kein stiller Trigger nötig (Begründung unter „Details").
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Kein stiller Trigger nötig (Begründung unter „Details"). — Keine inhaltlichen Unterschiede zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 
 **Macht aus einer Websuche ein Verfahren: Claude wechselt systematisch Suchbegriffe, Kanäle und Suchebenen, prüft jede Behauptung an der Primärquelle und meldet statt „nichts gefunden" die noch offenen Suchwege.** Der Anlass ist eine wiederkehrende Erfahrung: Die allgemeine Websuche findet Massenseiten zuverlässig, aber gerade Fachartikel, Vereinsschriften und regionale Quellen verschwinden hinter dem, was oft verlinkt ist — und die von Suchmaschinen mitgelieferten Zusammenfassungen erfinden dabei Details, die auf keiner der verlinkten Seiten stehen.
 
@@ -14,16 +14,19 @@ Der Skill gilt für **jede Art von Recherche** — Literatur, Fakten, Dokumente,
 
 ## Installation
 
-1. **Zielort wählen.** Der Skill gilt entweder für alle Projekte des Nutzers oder nur für eines:
+### Claude Code
 
-   | Ort         | Pfad                                   | Gilt für                  |
-   | ----------- | -------------------------------------- | ------------------------- |
-   | Persönlich  | `~/.claude/skills/in-depth-online-literature-research/`   | alle Projekte des Nutzers |
-   | Projekt     | `.claude/skills/in-depth-online-literature-research/`     | nur dieses Projekt        |
+1. **Paket herunterladen.** `downloads/in-depth-online-literature-research_de_local.zip`
 
-2. **Eine Sprachversion des Ordners `in-depth-online-literature-research/` kopieren.** Die `SKILL` liegt zweimal vor — `SKILL.de.md` und `SKILL.en.md`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeile zeigt später, von welchem Stand die Installation ist.
+2. **Entpacken.** Das Archiv enthält einen Ordner `in-depth-online-literature-research/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-Der Skill wirkt auch in claude.ai und im Claude-Desktop: Dieselbe `SKILL.md` läuft in jedem Claude-Produkt, in das sie eingebunden wird. Die Quellenkarte entfällt dort, wo kein Dateizugriff besteht.
+### claude.ai und Claude Desktop (Chat + Cowork)
+
+1. **Paket herunterladen.** `downloads/in-depth-online-literature-research_de_web.zip`
+
+2. **Hochladen.** Im dafür vorgesehenen Verwaltungsfeld für Skills der Anwendung das Archiv hochladen. Der Skill gilt danach für Dein Konto — nicht für Deine Organisation, und nicht gleichzeitig in Claude Code.
+
+Ein stiller Trigger entfällt hier: Der Skill löst über seine `description` aus oder wird mit `/in-depth-online-literature-research` aufgerufen; die Begründung steht unter „Details“. Beide Pakete tragen denselben Inhalt — getrennt sind sie allein, damit der Name sagt, wohin das Archiv gehört. Die Quellenkarte entfällt dort, wo kein Dateizugriff besteht.
 
 ## Details
 

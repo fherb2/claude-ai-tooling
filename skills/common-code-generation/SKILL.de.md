@@ -29,7 +29,7 @@ Wenn Du Codebestandteile selbst benennst, dann:
 
 ## Schreiben von Code allgemein
 
-Erzeuge nur Code, der für die jeweilige Aufgabe zwingend notwendig ist und keine selbst erdachten Erweiterungen oder Verbesserungen. Nice-to-have-Funktionen oder auch Optimierungen bzgl. Softwarequalität, die nicht explizit abgesprochen sind, können dann nachträglich noch hinzugefügt werden. Schlage solche Erweiterungen und Verbesserungen immer frühzeitig vor.
+Erzeuge nur Code, der für die jeweilige Aufgabe zwingend notwendig ist und keine selbst erdachten Erweiterungen oder Verbesserungen. Nice-to-have-Funktionen oder auch Optimierungen bzgl. Softwarequalität, die nicht explizit abgesprochen sind, können dann nachträglich noch hinzugefügt werden. Schlage solche Erweiterungen und Verbesserungen frühzeitig bei der Planung dem Entwickler vor. Was davon in welcher Form übernommen wird, entscheidet er.
 
 Erweitere nie den bereits realisierten Funktionsumfang im Code, wenn das nicht vorher mit dem Nutzer im Detail festgelegt wurde.
 

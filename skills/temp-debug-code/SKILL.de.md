@@ -28,7 +28,7 @@ Findest Du eine solche Festlegung erst später, gilt sie **ab dann** und überst
 
 Alles Weitere hängt an einer einzigen Unterscheidung:
 
-**Erreichst Du den Dateibaum des Projekts unmittelbar — mit Werkzeugen, die seine Dateien lesen und schreiben?** In Claude Code ist das so. Auf claude.ai und in Claude Desktop nicht: Dort arbeitest Du über den Nutzer, er ist die Hand am Quelltext.
+**Erreichst Du den Dateibaum des Projekts unmittelbar — mit Werkzeugen, die seine Dateien lesen und schreiben?** In Claude Code ist das so. Auf claude.ai und in Claude Desktop (Chat + Cowork) nicht: Dort arbeitest Du über den Nutzer, er ist die Hand am Quelltext.
 
 > **Projektwissen ist nicht der Dateibaum.** Findest Du Dateien unter `/mnt/project/` oder an einer vergleichbaren Stelle, sind das **Kopien**. Wer dort etwas ändert, ändert nichts am Projekt des Nutzers. Ein Fund dort beweist keinen Vollzugriff.
 

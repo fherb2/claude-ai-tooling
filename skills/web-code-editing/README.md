@@ -1,16 +1,20 @@
 # web-code-editing — Code-Bearbeitung auf claude.ai
 
-*Stand: 2026-08-29*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
-**✅☑ Fertig und nutzbar.** Skilltext in beiden Sprachen, Frontmatter gesetzt; die Erprobung als hochgeladener Skill steht noch aus (siehe „Stand und Offenes").
+**✅☑ Fertig und nutzbar.** Skilltext in beiden Sprachen, Frontmatter gesetzt; die Erprobung als hochgeladener Skill steht noch aus (siehe „Stand und Offenes"). — Benutzbar für Claude.ai / Claude Desktop (Chat + Cowork).
 
 **Der Skill regelt das Erstellen und Ändern von Code auf claude.ai für ein bestehendes Projekt** — mit drei Kernen: Quellen vollständig sichern, bevor geschrieben wird; geänderte Dateien mechanisch als Download zurückgeben statt sie aus dem Kontext neu zu diktieren; kleine Änderungen als Vorher/Ersetzen-Schema im Chat. Er ist **nur für claude.ai** (Zielwelt „nur web", `skill-dev-doc.md` Kapitel 9.4): In Claude Code schreibt das Edit-Werkzeug direkt in die Dateien, dort ist nichts davon nötig.
 
 ## Installation
 
-Custom Skills kommen auf claude.ai als ZIP in die Skill-Einstellungen (Pro/Max/Team/Enterprise, Code-Ausführung eingeschaltet). Gewählt wird eine Sprachfassung — `SKILL.de.md` oder `SKILL.en.md` —, sie muss umbenannt nach `SKILL.md` ins ZIP gepackt werden. Das ZIP wird `web-code-editing.zip` benannt: claude.ai übernimmt den ZIP-Dateinamen als Skill-Namen. Weitere Dateien gehören nicht dazu; die READMEs werden im ZIP nicht benötigt.
+1. **Paket herunterladen.** `downloads/web-code-editing_de_web.zip`
+
+2. **Hochladen.** Im dafür vorgesehenen Verwaltungsfeld für Skills der Anwendung das Archiv hochladen. Der Skill gilt danach für Dein Konto — nicht für Deine Organisation, und nicht gleichzeitig in Claude Code.
+
+Ein stiller Trigger entfällt hier: Der Skill löst über seine `description` aus oder wird mit `/web-code-editing` aufgerufen. Ob die `description` allein zuverlässig genug auslöst, ist noch nicht erprobt — siehe „Stand und Offenes“.
 
 ## Details
 

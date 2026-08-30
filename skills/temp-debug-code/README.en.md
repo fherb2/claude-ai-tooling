@@ -1,16 +1,16 @@
 # temp-debug-code — Marking of temporary debug code
 
-*Last updated: 2026-08-29*
+*Last updated: 2026-08-30*
 
 *[Deutsche Fassung](README.md)*
 
-**✅☑ Finished and usable.** Instructions complete, frontmatter set, silent triggers for both environments present, German and English version available.
+**✅☑ Finished and usable.** Instructions complete, frontmatter set, silent triggers for both environments present, German and English version available. — With differences in content between the version for claude.ai / Claude Desktop (Chat + Cowork) and Claude Code.
 
 **Gives every line that comes into being purely for tracking down a fault a fixed, searchable mark** — inserted debug and `print` output as well as original code disabled for the duration of the search. All marks begin with the same character sequence, so a single search run finds, without exception, every change that came into being for debugging. The entire purpose rests on that: the original state stays fully restorable — without memory and by someone who was not there.
 
 The second part of the skill is the cleaning up: before a cause found is reported or the actual correction written, Claude checks whether debug code is still standing in the source — including code from an earlier task — and either removes it or puts it to the user.
 
-**Where Claude does not reach the files itself** — on claude.ai and in Claude Desktop — a second subject comes in: which probe runs where, and how it is handed to the user. There it is also **their** decision whether anything is marked at all, because they enter the lines and take them out again.
+**Where Claude does not reach the files itself** — on claude.ai and in Claude Desktop (Chat + Cowork) — a second subject comes in: which probe runs where, and how it is handed to the user. There it is also **their** decision whether anything is marked at all, because they enter the lines and take them out again.
 
 **Not** meant is debug code intended to stay in the source permanently: output behind a debug flag, behind a log level or behind a configuration variable. That is regular program code, is not marked, and follows the usual rules of the project.
 
@@ -23,40 +23,42 @@ The skill is split so that a session only carries the instructions that apply to
 | File | Content | When loaded |
 | --- | --- | --- |
 | `SKILL.md` | Scope · the project's rules come first · the environment question · the branch | always |
-| `rules-local.md` | Claude does everything itself: marking duty, self-test, cleaning up, the way back | with direct file access |
-| `user-choice.md` | Short version with an example, so the user can decide | when Claude works through the user |
-| `rules-handover.md` | Where the probe has to run, how it stays small, how it is handed over | likewise, in every case |
-| `marks.md` | The marks themselves: five marks, three cases, nesting, labels | from either rules file, once marking happens |
+| `rules-local.en.md` | Claude does everything itself: marking duty, self-test, cleaning up, the way back | with direct file access |
+| `user-choice.en.md` | Short version with an example, so the user can decide | when Claude works through the user |
+| `rules-handover.en.md` | Where the probe has to run, how it stays small, how it is handed over | likewise, in every case |
+| `marks.en.md` | The marks themselves: five marks, three cases, nesting, labels | from either rules file, once marking happens |
 
 The marks stand **once per language**. They are character-identical in both environments; what differs is only who sets them and who runs the search.
 
 ## Installation
 
-1. **Choose the target location.** The skill applies either to all of the user's projects or to a single one:
+This skill has **two silent triggers** — one for each environment. Which one is the right one is taken off your hands by the package: it already contains the matching one, under the name `CLAUDE-snippet.md`.
 
-   | Location | Path                                 | Applies to                 |
-   | -------- | ------------------------------------ | -------------------------- |
-   | Personal | `~/.claude/skills/temp-debug-code/`  | all of the user's projects |
-   | Project  | `.claude/skills/temp-debug-code/`    | this project only          |
+### Claude Code
 
-   On claude.ai and in Claude Desktop the folder is uploaded as a ZIP through *Customize → Skills* instead.
+1. **Download the package.** `downloads/temp-debug-code_en_local.zip`
 
-2. **Copy one language version of the folder `temp-debug-code/`.** Every file exists twice, distinguished by `.de.` and `.en.`. All files of the chosen language come along, README included. The chosen SKILL version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; that name and no other is recognized. The other files keep their names, because the `SKILL.md` refers to them. The date lines later show which state the installation is from.
+2. **Unpack it.** The archive contains a folder `temp-debug-code/` with all the files. Unpack it into `~/.claude/skills/` — then the skill applies to all projects — or into `.claude/skills/` in the project, then only there. An existing folder of the same name is replaced; nothing old is left behind.
 
-3. **Adopt the matching silent trigger.** There are **two**, and only one is adopted:
+3. **Adopt the silent trigger.** You have to do this by hand. Claude then recognizes more easily from the context whether the skill should be loaded. To do it: from `CLAUDE-snippet.md`, **everything below the separator line** goes into the `CLAUDE.md` of the chosen location. The italic text above it stays behind; the file itself stays in the skill folder and shows by its date line which state the adopted trigger is from.
 
-   | Environment | File | Target |
-   | --- | --- | --- |
-   | Claude Code | `CLAUDE-snippet-local.md` | `~/.claude/CLAUDE.md` or the project's `CLAUDE.md` |
-   | claude.ai, Claude Desktop | `CLAUDE-snippet-handover.md` | the instruction field — globally or per project |
+   Without this step the skill only takes effect when called explicitly with `/temp-debug-code`.
 
-   What is adopted is **everything below the separator line**; the italic text above it stays behind. The snippet files stay at the target location; only the instruction file takes effect, and their date lines show the state of the adopted trigger.
+### claude.ai and Claude Desktop (Chat + Cowork)
 
-   Without this step the skill only takes effect when called explicitly with `/temp-debug-code`. That matters especially here: the cause is Claude's own action, or its proposal — the user asks "why does this come out as 3?", and the decision to add a `print` line is Claude's. There is no request the `description` could be matched against.
+1. **Download the package.** `downloads/temp-debug-code_en_web.zip`
+
+2. **Upload it.** Upload the archive in the application's management area for skills. The skill then applies to your account — not to your organization, and not at the same time in Claude Code.
+
+3. **Adopt the silent trigger.** You have to do this by hand. Claude then recognizes more easily from the context whether the skill should be loaded. To do it: from `CLAUDE-snippet.md` in the archive, **everything below the separator line** goes into the instruction field — globally for the account or for the single project.
+
+   Without this step the skill only takes effect when called explicitly with `/temp-debug-code`.
+
+**Why the trigger matters especially here:** the cause is Claude's own action, or its proposal — the user asks "why does this come out as 3?", and the decision to add a `print` line is Claude's. There is no request the `description` could be matched against.
 
 ## Details
 
-**The marks.** Five of them, to be kept character by character: ` @@~DEBUG >>label<< ~@@ ` on every individually inserted debug line, ` @@~DEBUG: ORIGINAL >>label<< ~@@ ` on every disabled original line, ` @@~DEBUG: START >>label<< ~~~~~~~~~~~~@@ ` and ` @@~DEBUG: END >>label<< ~~~~~~~~~~~~@@ ` around blocks of five debug lines or more, plus the separator line ` @@~~~~~~~~~~~~~~~~~~~~~~~~@@ ` before every START and after every END. The exact cases and examples for Python, C-like languages and shell are in `marks.md`.
+**The marks.** Five of them, to be kept character by character: ` @@~DEBUG >>label<< ~@@ ` on every individually inserted debug line, ` @@~DEBUG: ORIGINAL >>label<< ~@@ ` on every disabled original line, ` @@~DEBUG: START >>label<< ~~~~~~~~~~~~@@ ` and ` @@~DEBUG: END >>label<< ~~~~~~~~~~~~@@ ` around blocks of five debug lines or more, plus the separator line ` @@~~~~~~~~~~~~~~~~~~~~~~~~@@ ` before every START and after every END. The exact cases and examples for Python, C-like languages and shell are in `marks.en.md`.
 
 **Why `@@~` is the frame.** The frame character must not collide with the comment marker of any language, must not be a regex metacharacter, must have no special meaning in the shell, and must practically never occur in source code — what is searched for is `@@~`, not `@@` on its own. Checked and rejected: `%%`, because `%%~` is common syntax in Windows batch files (`%%~dp0`); `!!`, because an interactive Bash resolves `!!` as history expansion even inside double quotes, so the self-test command would silently do something else; `||`, because `|` is a metacharacter and would force escaping; and `§`, because it does not exist on US keyboards. The two collisions of `@@` — Ruby's class variables and the hunk headers in diffs — do not hit the search pattern, because no tilde ever follows there. Whoever adapts the skill should therefore not swap the frame for a more convenient character.
 
@@ -80,7 +82,7 @@ The marks stand **once per language**. They are character-identical in both envi
 
 ## Status and open points
 
-**Status:** instructions complete, frontmatter set, two silent triggers, description in the third person. On 29 August 2026 the marks were recast completely — the frame `@@~` instead of the old double hash, a label per debugging effort, nesting, separator lines — and the skill was at the same time split into a common part and two environment branches. Both language versions came into being together.
+**Status:** instructions complete, frontmatter set, two silent triggers, description in the third person. On 29 August 2026 the marks were recast completely — the frame `@@~` instead of the old double hash, a label per debugging effort, nesting, separator lines — and on 30 August the skill was split into a common part and two environment branches. Both language versions came into being together.
 
 **Open:** the new form of the marks and the split have never been in use. That does not make the skill unusable — its first use is at the same time its trial. Untested in particular is whether an uploaded skill on claude.ai actually pulls the files it refers to.
 

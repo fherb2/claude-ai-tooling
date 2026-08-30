@@ -1,8 +1,8 @@
 # pedantic-text-editing — text editing with fidelity to detail
 
-*Last updated: 2026-08-28*
+*Last updated: 2026-08-30*
 
-**✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`.
+**✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`. — Usable with Claude Code.
 
 **The skill confines the intervention in a text to exactly the places the user has approved — and afterwards proves that nothing else changed.** It applies to texts whose wording is itself the product: essays, applications, talks, letters, book chapters, expert opinions. The emphasis is not on finding errors — Claude can do that without a skill — but on bounding the intervention: that while a comma is corrected, no half-sentence gets rewritten in passing, no "presumably" deleted, no two sentences merged, no quotation marks unified across the whole text.
 
@@ -12,24 +12,13 @@ To that end it separates three kinds of finding — rule violation, matter of fa
 
 ## Installation
 
-1. **Choose the target location.** The skill applies either to all of the user's projects or to one only:
+1. **Download the package.** `downloads/pedantic-text-editing_en_local.zip`
 
-   | Location | Path                                      | Applies to                 |
-   | -------- | ----------------------------------------- | -------------------------- |
-   | Personal | `~/.claude/skills/pedantic-text-editing/` | all of the user's projects |
-   | Project  | `.claude/skills/pedantic-text-editing/`   | this project only          |
+2. **Unpack it.** The archive contains a folder `pedantic-text-editing/` with all the files. Unpack it into `~/.claude/skills/` — then the skill applies to all projects — or into `.claude/skills/` in the project, then only there. An existing folder of the same name is replaced; nothing old is left behind.
 
-2. **Copy one language version.** The folder name stays unchanged. One complete language version is copied:
+There is no silent trigger here: the skill fires reliably through its `description` or is called with `/pedantic-text-editing`.
 
-   | German         | English        |
-   | -------------- | -------------- |
-   | `SKILL.de.md`  | `SKILL.en.md`  |
-   | `rules.de.md`  | `rules.en.md`  |
-   | `README.md`    | `README.en.md` |
-
-   Plus **`apply_findings.py`** — the script is language-independent and belongs to both versions. Without it Claude would have to carry out every approved change one at a time, which makes a full round take very long.
-
-   **Mandatory in this is only that the chosen SKILL version is called `SKILL.md` at the target location** — Claude Code recognizes no other name. Whether it is renamed for that or additionally placed makes no difference. Rules file and script keep their names: the `SKILL.md` points to the rules, those point to the script, and these pointers are the only way either gets loaded at all. Whoever renames carries the pointers along.
+Besides the skill text and the rules, the package also holds **`apply_findings.py`**. The script is language-independent and the same in both language versions. Without it Claude would have to carry out every approved change one by one, which makes a full round take a very long time.
 
 ## Details
 

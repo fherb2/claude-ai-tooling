@@ -1,10 +1,10 @@
 # Skills für Claude Code
 
-*Stand: 2026-08-29*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
-Wiederverwendbare Skills für Claude Code, samt der Trigger, die sie auslösen. Dieses Verzeichnis ist die Quelle — hier werden die Skills entwickelt und gepflegt. Wirksam werden sie erst, wenn sie an ihren Zielort kopiert wurden (Kapitel 3).
+Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + Cowork), samt der Trigger, die sie auslösen. Dieses Verzeichnis ist die Quelle — hier werden die Skills entwickelt und gepflegt. Wirksam werden sie erst, wenn sie am Zielort installiert sind (Kapitel 3).
 
 ## 1 Die Skills im Einzelnen
 
@@ -17,7 +17,11 @@ Wiederverwendbare Skills für Claude Code, samt der Trigger, die sie auslösen. 
 | [`pedantic-text-editing/`](pedantic-text-editing/README.md)<br>✅☑ | **Textbearbeitung mit Detailtreue** — jede Änderung einzeln zur Freigabe, außerhalb der freigegebenen Stellen kein geändertes Zeichen, und hinterher der Nachweis über den Diff. Für Texte, deren Wortlaut selbst das Produkt ist; nicht für Quellcode und softwarebegleitende Dokumentation. |
 | [`temp-debug-code/`](temp-debug-code/README.md)<br>✅☑               | **Eindeutige Kennzeichnung von Code, der nur für einen laufenden Debugging-Vorgang zugefügt oder geändert wird** — nicht für Debug-Code, der dauerhaft im Quelltext bleiben soll.                                                                                                                                                 |
 | [`in-depth-online-literature-research/`](in-depth-online-literature-research/README.md)<br>✅☑ | **Gründliche Quellen- und Literaturrecherche, die nicht zu früh aufgibt** — systematischer Wechsel von Suchbegriffen, Kanälen und Suchebenen, Verifikationspflicht für jede Suchzusammenfassung, und statt „nichts gefunden“ ein Bericht über die noch offenen Suchwege. |
+| [`🚧_software-dev-doc-fh/`](🚧_software-dev-doc-fh/README.md)            | **Dokumentationsstandard für die Planung vor der Kodierung und die laufende Mitschrift des Implementierten** — was umgesetzt wird, welche Festlegungen getroffen wurden und warum so und nicht anders. Softwareprojektbegleitende Dokumentation als Basis für Coding, Fehlersuche und späterer Schluss- und Anwenderdokumentation. |
+| [`🚧_software-task-detection/`](🚧_software-task-detection/README.md)  | **Erkennen, dass eine Anfrage auf zu schreibende oder zu ändernde Software hinausläuft** — auch wenn sie Wörter wie „Code“ oder „programmieren“ nie benutzt. Bisher eine festgehaltene Idee samt Messergebnis, noch kein Skill.                                                                                                  |
+| [`🚧_translation-task/`](🚧_translation-task/README.md)                  | **Übersetzung von Dokumenten mit softwareentwicklungsnahem Inhalt** — README-Dateien, Konzept- und Implementierungsdokumente, Anleitungen. Nicht auf eine Sprachrichtung festgelegt.                                                                                                                                                 |
 | [`web-code-editing/`](web-code-editing/README.md)<br>✅☑ | **Code-Bearbeitung auf claude.ai**: Quellen vollständig sichern (Projektwissen liegt als Dateien unter `/mnt/project/`), geänderte Dateien mechanisch als Download zurückgeben statt sie neu zu diktieren, kleine Änderungen als Vorher/Ersetzen-Schema im Chat. Nur für claude.ai.                                                                                                                             |
+| [`🚧_zotero-use/`](🚧_zotero-use/README.md) | **Claude direkt an die eigene Zotero-Bibliothek anbinden** — neue Einträge samt PDF anlegen, gezielt in Metadaten und Volltext suchen, Sammlungen verwalten. Bisher eine festgehaltene Idee samt recherchierter Architektur, noch kein Skill. |
 
 (✅ deutsche Fassung fertig und nutzbar · ☑ englische Fassung fertig und nutzbar · 🚧 in Arbeit · ⚠️ mit Vorbehalt)
 
@@ -39,29 +43,34 @@ Was Skills sind, wie sie aufgebaut sind und wie Claude Code sie lädt, beschreib
 
 Die von Anthropic vorgesehene Technik löst einen Skill über seine `description` aus: Passt sie zur Anfrage, wird der Skill geladen. Das funktioniert gut, wenn der Nutzer etwas verlangt, das dem Skill offensichtlich entspricht. Es funktioniert nicht oder schlecht, wenn der Auslöser eine Beobachtung ist, die niemand im Chat ausspricht — etwa dass gerade eine zweite Claude-Instanz oder der Nutzer im selben Repository arbeitet, obwohl der Chat die Hoheit über Commits trägt. Für solche Fälle liegt für einen Skill ein zusätzlicher Absatz in der `CLAUDE.md` des Zielorts, der die Bedingung benennt und auf den Skill verweist. Er heißt in diesem Projekt **stiller Trigger**, weil ihn üblicherweise niemand explizit für eine Aufgabe aufruft und niemand sieht: Er wirkt aus dem Hintergrund im Denkvorgang der KI, ohne dass der Nutzer etwas davon merkt. Er soll gewährleisten, dass der Skill so früh wie möglich wirkt — auch dann, wenn die KI die Übereinstimmung zwischen seiner `description` und der aktuellen Aufgabe von sich aus für zu schwach hielte, um ihn zu laden.
 
-Skills, die einen solchen Trigger brauchen, bringen dafür eine Datei `CLAUDE-snippet.md` in ihrem Ordner mit. Ihr Inhalt wird der `CLAUDE.md` derselben Ebene per Hand zugefügt.
+Skills, die einen solchen Trigger brauchen, bringen dafür eine `CLAUDE-snippet`-Datei mit; im Installationspaket heißt sie `CLAUDE-snippet.md`. Ihr Inhalt wird per Hand übernommen — das ist der einzige Schritt der Installation, den kein Paket abnehmen kann.
 
-**In welchen Sprachen ein Skill vorliegt, ist von Fall zu Fall verschieden.** Die meisten gibt es hier nur auf Deutsch; ihre Dateien tragen dann kein Sprachkürzel und werden unverändert kopiert. Nur wo es mehrere Fassungen gibt, tragen `SKILL.md` und `CLAUDE-snippet.md` ein Sprachkürzel vor der Endung — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Installiert wird dann genau eine Sprachversion, und die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die `README.md` bildet die Ausnahme: Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel — GitHub und GitLab zeigen beim Browsen eines Ordners automatisch nur eine Datei namens exakt `README.md` an, ein Sprachkürzel würde das verhindern (Näheres in `skill-dev-doc.md`, Kapitel 5.1). Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Fassung an sich gegenüber allen Chat-Sprachen kompatibel sein sollte.
+**In welchen Sprachen ein Skill vorliegt, ist von Fall zu Fall verschieden.** Wo es mehrere Fassungen gibt, tragen die Dateien hier im Repository ein Sprachkürzel vor der Endung — `SKILL.de.md`/`SKILL.en.md`, `rules.de.md`/`rules.en.md`. Welche davon mitkommt, entscheidet das gewählte Paket; die Umbenennung nach `SKILL.md`, die Claude Code voraussetzt, geschieht beim Packen. Die `README.md` bildet im Repository die Ausnahme: Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel — GitHub und GitLab zeigen beim Browsen eines Ordners automatisch nur eine Datei namens exakt `README.md` an, ein Sprachkürzel würde das verhindern (Näheres in `skill-dev-doc.md`, Kapitel 5.1). Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Fassung an sich gegenüber allen Chat-Sprachen kompatibel sein sollte.
 
 Der Ordnername ist in allen Fassungen derselbe und trägt nie ein Kürzel; dasselbe gilt für den Skill-Namen im Frontmatter und damit für den Aufruf `/<skill-name>`.
 
 ### Installation
 
-1. **Zielort (Wirkungsebene) wählen.** Ein Skill gilt entweder für alle Projekte des Nutzers oder nur für eines:
+**Ein fertiger Skill wird als Archiv installiert, nicht als Ordner zusammenkopiert.** Die Archive liegen im Unterordner `downloads/` des jeweiligen Skills, eines je Sprache und Zielwelt:
 
+| Name | Für |
+| --- | --- |
+| `<skill>_de_local.zip` | Claude Code, deutsche Fassung |
+| `<skill>_de_web.zip` | claude.ai und Claude Desktop (Chat + Cowork), deutsche Fassung |
+| `<skill>_en_local.zip` | Claude Code, englische Fassung |
+| `<skill>_en_web.zip` | claude.ai und Claude Desktop (Chat + Cowork), englische Fassung |
 
-   | Ort         | Pfad                                     | Gilt für                 |
-   | ----------- | ---------------------------------------- | ------------------------- |
-   | Persönlich | `~/.claude/skills/<skill-name>/SKILL.md` | alle Projekte des Nutzers |
-   | Projekt     | `.claude/skills/<skill-name>/SKILL.md`   | nur dieses Projekt        |
-2. **Den Ordner kopieren — alle Dateien.** Er hat hier bereits genau die Struktur des Zielorts und behält seinen Namen. Dateien einer anderen Sprache müssen nicht mit; alles Übrige gehört dazu, denn ein Skill kann mehr enthalten als `SKILL`, `README` und `CLAUDE-snippet` — etwa einen nachgeladenen Regelteil oder ein Skript, ohne das er nicht arbeitet. Die Datumszeilen der mitkopierten Dateien zeigen später, von welchem Stand die Installation ist. **Danach die SKILL-Datei der gewählten Sprache nach `SKILL.md` umbenennen:** Exakt diesen Namen setzt Claude Code voraus, eine `SKILL.de.md` für sich ist kein Skill. Statt umzubenennen darf sie auch zusätzlich unter diesem Namen liegen; ebenso darf eine `README.en.md` bei englischer Installation zu `README.md` werden. Alle übrigen Dateien behalten ihren Namen — die `SKILL.md` verweist auf sie, und ein umbenannter Regelteil wird nicht mehr gefunden.
-3. **Stillen Trigger übernehmen, falls vorhanden.** Liegt im Ordner eine `CLAUDE-snippet`-Datei, wird ihr Inhalt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts übernommen — bei einem persönlichen Skill in `~/.claude/CLAUDE.md`, bei einem Projekt-Skill in dessen `CLAUDE.md`. Der Text oberhalb der Trennlinie ist die Anleitung dazu und wird nicht mitkopiert. Die Snippet-Datei selbst bleibt am Zielort liegen — in der Sprache, in der ihr Inhalt übernommen wurde: Wirksam ist allein die `CLAUDE.md`, die Datei daneben ist das Vergleichsstück, an dem sich später ablesen lässt, ob der übernommene Trigger noch dem Stand der Quelle entspricht.
+Welche Kombinationen es für einen Skill überhaupt gibt, sagt der Vermerk hinter seinem Statushinweis; **die genauen Schritte stehen in seiner eigenen README.** Im Archiv liegt ein Ordner mit dem Namen des Skills, darin alle Dateien der gewählten Sprache — `SKILL.md`, `README.md`, gegebenenfalls nachgeladene Regeldateien, Skripte und `CLAUDE-snippet.md`. Das Aussortieren und Umbenennen, das früher Handarbeit war, nimmt das Paket ab.
 
-Die `README` des Skills gehört mit an den Zielort: Sie ist seine Anwenderdokumentation, und die `SKILL.md` darf bei Nachfragen für Begründungen auf sie verweisen — fehlt sie, fallen Antworten auf Warum-Fragen dünner aus.
+**In Claude Code** wird das Archiv nach `~/.claude/skills/` entpackt — dann gilt der Skill für alle Projekte des Nutzers — oder nach `.claude/skills/` im Projekt, dann nur dort. **In claude.ai und Claude Desktop (Chat + Cowork)** wird es im dafür vorgesehenen Verwaltungsfeld für Skills hochgeladen und gilt danach für das Konto.
+
+**Der stille Trigger bleibt Handarbeit.** Liegt im Paket eine `CLAUDE-snippet.md`, kommt **alles unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts beziehungsweise in das Anweisungsfeld der Anwendung. Der kursive Text darüber ist die Anleitung dazu und bleibt zurück; die Datei selbst bleibt liegen und ist das Vergleichsstück, an dessen Datumszeile sich später ablesen lässt, ob der übernommene Trigger noch dem Stand der Quelle entspricht.
+
+Ohne diesen Schritt funktioniert der Skill weiterhin — aber nur, wenn er ausdrücklich mit `/<skill-name>` aufgerufen wird oder die KI an Hand der `description` auf ihn ausreichend aufmerksam geworden ist.
+
+Die `README` des Skills liegt im Paket und gehört an den Zielort: Sie ist seine Anwenderdokumentation, und die `SKILL.md` darf bei Nachfragen für Begründungen auf sie verweisen — fehlt sie, fallen Antworten auf Warum-Fragen dünner aus.
 
 **Nichts davon ist Dogma.** Die Installation ist Sache des Nutzers; Claude unterstützt sie, überwacht sie aber nicht. Weder wird ungefragt geprüft, ob eine Installation vollständig oder aktuell ist, noch, ob eine `CLAUDE.md` zum mitgelieferten Snippet passt. Geprüft und benannt wird nur, wenn der Nutzer es ausdrücklich verlangt.
-
-Ohne Schritt 3 funktioniert der Skill weiterhin — aber nur, wenn er ausdrücklich mit `/<skill-name>` aufgerufen wird oder die KI an Hand der Description auf den Skill ausreichend aufmerksam geworden ist.
 
 ### Beim Anpassen eines Triggers
 

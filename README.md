@@ -1,10 +1,12 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-08-27*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
-Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Claude Desktop und Claude Code. Eigenständige Bausteine, jeder mit eigener Dokumentation in seinem Ordner. Diese Seite ist nur die Übersicht. Nutze die verlinkten READMEs in den Bausteinen.
+Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Claude Desktop (Chat + Cowork) und Claude Code. Eigenständige Bausteine, jeder mit eigener Dokumentation in seinem Ordner. Diese Seite ist nur die Übersicht. Nutze die verlinkten READMEs in den Bausteinen.
+
+**Claude Cowork im Einzelnen ist hier noch nicht berücksichtigt.** Die seit Sommer 2026 verfügbare Variante verhält sich in einem entscheidenden Punkt anders als die drei oben genannten: Sie arbeitet über angebundene Ordner direkt auf dem Rechner des Nutzers. Was in diesem Repository steht — Zielwelten, Skills, Arbeitsabläufe — bezieht sich deshalb genau genommen auf claude.ai-Chat, Claude Desktop Chat und Claude Code.
 
 ## Was es gibt
 
@@ -58,7 +60,7 @@ Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche 
 
 **Zweck: Anweisungen aus CLAUDE.md raus und Aufgabenbeschreibungen wiederverwendbar machen.** Skills starten auch ohne ein passendes „Trigger-Wort“.
 
-Wiederverwendbare Skills für Claude Code: Anweisungen, die nicht dauerhaft in `CLAUDE.md`-Dateien Kontext kosten, sondern erst geladen werden, wenn sie gebraucht werden.
+Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + Cowork): Anweisungen, die nicht dauerhaft in `CLAUDE.md`-Dateien Kontext kosten, sondern erst geladen werden, wenn sie gebraucht werden. Jeder fertige Skill liegt als Installationspaket bereit — ein Archiv je Sprache und Zielwelt, im Unterordner `downloads/` des Skills.
 
 Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Situationen, die niemand ausspricht. Der Anthropic-Standard, einen Skill aktiv vom Nutzer zu starten oder im Skill über `description:` per Trigger-Wörter im Chat automatisch zu starten, erweitert das Konzept der stillen Trigger auch ein Start aus dem Kontext des Chats heraus. Das ist keine Claude-Code-Erweiterung, sondern wird über besondere Formulierungsregeln in CLAUDE.md erreicht. Details zur Nachnutzung in diesem Baustein.
 
