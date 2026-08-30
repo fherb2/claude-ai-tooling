@@ -255,7 +255,7 @@ Prüfbar: Auf jede `SKILL.md`, die beide Bedingungen erfüllt und trotzdem ihren
 
 **Wie gepackt wird.** `zip -9 -o -X`, die Einträge in sortierter Reihenfolge übergeben (`find … | LC_ALL=C sort | zip … -@`). Der Reihe nach: `-9` kostet bei diesen Dateigrößen nichts und spart beim Herunterladen; `-o` setzt das Datum des Archivs auf das der jüngsten enthaltenen Datei, womit man dem Paket ansieht, von welchem Stand es ist; `-X` lässt uid, gid und Zeitzonen-Extras weg, die sonst von Rechner zu Rechner verschieden ausfallen. Die Dateien selbst behalten ihre eigene mtime (`cp -p` beim Zusammenstellen). Zusammen mit der sortierten Reihenfolge ergibt gleicher Inhalt damit gleiche Bytes — ein Neubau ohne Änderung erzeugt keinen neuen Blob in git.
 
-**Die Auswahl ist Handarbeit, die Prüfung nicht.** Welche Dateien ins Paket gehören und welche drei umbenannt werden, entscheidet die Instanz für jeden Skill neu; dafür gibt es bewusst kein Skript — ein Skill wird ein- bis dreimal in seinem Leben gepackt, und ein Skript müsste bei jeder Strukturänderung nachgezogen werden. Nach dem Packen wird der Inhalt jedes Archivs aufgelistet und angesehen, ob die Dateiliste stimmt; dass jede Datei, auf die aus dem Paket heraus verwiesen wird, auch darin liegt, prüft das Werkzeug aus Anhang A. Beide Werkzeuge stehen dort als Quelltext, samt der Lücke, die auch sie zusammen nicht schließen.
+**Die Auswahl ist Handarbeit, die Prüfung nicht.** Welche Dateien ins Paket gehören und welche drei umbenannt werden, entscheidet die Instanz für jeden Skill neu; dafür gibt es bewusst kein Skript — ein Skill wird ein- bis dreimal in seinem Leben gepackt, und ein Skript müsste bei jeder Strukturänderung nachgezogen werden. Nach dem Packen wird der Inhalt jedes Archivs aufgelistet und angesehen, ob die Dateiliste stimmt; die beiden Fragen, die sich mechanisch beantworten lassen, übernehmen die Werkzeuge aus Anhang A — ob jede Datei, auf die aus dem Paket heraus verwiesen wird, auch darin liegt (A.2), und ob das Paket noch dem Stand seiner Quellen entspricht (A.3). Der Aktualitätsprüfer gehört dabei an das Ende **jeder** Sitzung, in der an einem Skill gearbeitet wurde: Ein Paket veraltet nicht beim Packen, sondern bei der nächsten Änderung danach.
 
 ---
 
@@ -442,11 +442,11 @@ Prüfbar: Auf jeden Skill ohne Gruppenangabe in dieser Tabelle lässt sich zeige
 
 ## Anhang A — Packen und Prüfen
 
-Die beiden Werkzeuge, mit denen die Pakete aus 5.3 entstehen und geprüft werden, stehen hier als Quelltext und nicht als Datei im Repo. Das ist Absicht: So muss der Code bei jedem Gebrauch durch den Kontext der Instanz, die ihn benutzt — er wird gelesen, bevor er läuft, statt ungelesen ausgeführt zu werden. Bei zwei bis drei Läufen im Leben eines Skills ist das der bessere Tausch. Der Preis ist bekannt: Der Code läuft nie in der Fassung, in der er hier steht, ein Tippfehler fällt erst beim nächsten Gebrauch auf. Wer ihn dabei findet, zieht diesen Anhang nach.
+Die drei Werkzeuge, mit denen die Pakete aus 5.3 entstehen und geprüft werden, stehen hier als Quelltext und nicht als Datei im Repo. Das ist Absicht: So muss der Code bei jedem Gebrauch durch den Kontext der Instanz, die ihn benutzt — er wird gelesen, bevor er läuft, statt ungelesen ausgeführt zu werden. Bei zwei bis drei Läufen im Leben eines Skills ist das der bessere Tausch. Der Preis ist bekannt: Der Code läuft nie in der Fassung, in der er hier steht, ein Tippfehler fällt erst beim nächsten Gebrauch auf. Wer ihn dabei findet, zieht diesen Anhang nach.
 
 Die Prosa-Code-Grenze der Arbeitsanweisungen (§2.2) steht dem nicht entgegen. Sie schützt Konzept- und Implementierungsdokumente eines Produkts davor, den Code vorwegzunehmen, gegen den sie später geprüft werden. Diese Datei ist kein solches Dokument, sondern die laufende Anweisung und Definition des Vorhabens selbst — und die beiden Werkzeuge sind kein Produkt, sondern Werkbank. Für Skill-Texte und Implementierungsdokumentation bleibt die Grenze unverändert.
 
-**Was beide zusammen nicht leisten:** Eine Datei, die ins Paket gehört, auf die aber nirgends ein Verweis zeigt, fehlt unbemerkt. Der Packer kennt nur seine Argumentliste, der Prüfer nur die Namen, die im Text vorkommen. Diese eine Lücke schließt allein der Blick auf die Dateiliste.
+**Was auch alle drei zusammen nicht leisten:** Eine Datei, die ins Paket gehört, auf die aber nirgends ein Verweis zeigt, fehlt unbemerkt. Der Packer kennt nur seine Argumentliste, der Verweisprüfer nur die Namen, die im Text vorkommen, und der Aktualitätsprüfer nur das, was bereits im Archiv liegt. Keines der drei kann wissen, was fehlt — diese eine Lücke schließt allein der Blick auf die Dateiliste.
 
 ### A.1 Der Packer
 
@@ -483,7 +483,7 @@ echo "$ZIPNAME  $(stat -c%s "$OUT") Bytes  Archivdatum $(stat -c%y "$OUT" | cut 
 
 Laut scheitert er in drei Fällen: bei einer fehlenden Datei (`FEHLT:`, Exitcode 1), bei einem Skill mit Unterordner, weil das Zielverzeichnis im Staging nicht angelegt wird, und bei einem Doppelpunkt im Dateinamen, weil das Paar dann falsch zerlegt und die Quelle nicht gefunden wird. Still bleibt allein die in der Argumentliste vergessene Datei.
 
-### A.2 Der Prüfer
+### A.2 Der Verweisprüfer
 
 Öffnet jedes gebaute Archiv, sammelt alle Verweise auf `.md`- und `.py`-Dateien ein — die in Backticks ebenso wie die als Markdown-Link — und meldet, welche davon im Archiv nicht liegen. `CLAUDE.md` ist ausgenommen: Sie liegt am Zielort, nicht im Paket. Ausgeführt aus `skills/` heraus prüft er über `*/downloads/*.zip` alle Pakete aller Skills auf einmal.
 
@@ -511,3 +511,22 @@ for zp in sorted(glob.glob("*/downloads/*.zip")):
 Meldet er für jedes Archiv `ok`, ist jeder namentliche Verweis auflösbar. Sonst nennt er zu jedem Fehlverweis die Datei, in der er steht, damit die Korrektur nicht gesucht werden muss.
 
 **Zwei Fundarten meldet er, die keine Fehler sind,** und das mit Absicht: Verweise auf Dateien des Repositories, die nie in ein Paket gehören (`skill-dev-doc.md` etwa), und Dateinamen, die bloß als Beispiel in Prosa oder Tabellen stehen. Beide auszufiltern hieße, dem Werkzeug eine Liste von Ausnahmen mitzugeben, die selbst gepflegt werden müsste — und eine übersehene Ausnahme verschwiege dann einen echten Fehler. Sie werden deshalb beim Ansehen des Ergebnisses aussortiert, nicht im Werkzeug.
+
+### A.3 Der Aktualitätsprüfer
+
+Beantwortet die Frage, die die beiden anderen nicht stellen: **Ist das Paket noch auf dem Stand seiner Quellen?** Er vergleicht jede Datei im Archiv byte-weise gegen die Dateien im Skill-Ordner und meldet, was mit keiner mehr übereinstimmt.
+
+Der Vergleich läuft über den Inhalt, nicht über den Namen. Deshalb braucht das Werkzeug die Umbenennungsregeln aus 5.3 nicht zu kennen: Eine `SKILL.de.md`, die im Paket `SKILL.md` heißt, findet ihren Partner trotzdem. Ausgeführt wird er wie A.2 aus `skills/` heraus.
+
+```python
+import zipfile, glob, pathlib
+for zp in sorted(glob.glob("*/downloads/*.zip")):
+    src = {p.read_bytes() for p in pathlib.Path(zp.split("/")[0]).iterdir() if p.is_file()}
+    z = zipfile.ZipFile(zp)
+    bad = [n.split("/", 1)[1] for n in z.namelist() if not n.endswith("/") and z.read(n) not in src]
+    print(f"{'ok' if not bad else 'VERALTET':9} {zp.split('/')[-1]}" + (f"  -> {', '.join(bad)}" if bad else ""))
+```
+
+**Er gehört an das Ende jeder Sitzung, in der an einem Skill gearbeitet wurde** — nicht nur an das Ende des Packens. Der Anlass ist nämlich meistens ein späterer: Am 30. August 2026 sind die beiden `web-code-editing`-Pakete veraltet, weil nach dem Packen und nach dem Release noch ein Absatz in beide READMEs kam. Aufgefallen ist das nur zufällig, beim Erproben des Packers aus A.1 gegen ein bestehendes Archiv.
+
+Zwei Grenzen: Tragen zwei Dateien denselben Inhalt, würde eine Verwechslung nicht auffallen — für den Zweck belanglos, weil das Paket dann trotzdem korrekten Inhalt trägt. Und er sieht nur in den Skill-Ordner selbst, nicht in Unterordner.
