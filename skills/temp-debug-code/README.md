@@ -2,15 +2,33 @@
 
 *Stand: 2026-08-29*
 
-**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung vorhanden.
+*[English version](README.en.md)*
+
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stille Trigger für beide Umgebungen vorhanden, deutsche und englische Fassung vorhanden.
 
 **Versieht jede Zeile, die nur zur Fehlersuche entsteht, mit einer festen, suchbaren Marke** — eingefügte Debug- und `print`-Ausgaben ebenso wie Originalcode, der für die Dauer der Fehlersuche stillgelegt wird. Alle Marken beginnen mit derselben Zeichenfolge, deshalb findet ein einziger Suchlauf restlos jede Änderung, die zum Debuggen entstanden ist. Darauf beruht der ganze Zweck: Der Originalzustand bleibt vollständig wiederherstellbar — ohne Erinnerung und auch von jemandem, der nicht dabei war.
 
 Der zweite Teil des Skills ist das Aufräumen: Bevor eine gefundene Ursache gemeldet oder die eigentliche Korrektur geschrieben wird, prüft Claude, ob noch Debug-Code im Quelltext steht — auch solcher aus einem früheren Auftrag —, und entfernt ihn beziehungsweise legt ihn dem Nutzer vor.
 
+**Wo Claude die Dateien nicht selbst erreicht** — auf claude.ai und in Claude Desktop —, kommt ein zweiter Gegenstand hinzu: welche Probe wo ausgeführt wird und wie sie dem Nutzer übergeben wird. Dort entscheidet außerdem **er**, ob überhaupt markiert wird, denn er trägt die Zeilen ein und baut sie wieder aus.
+
 **Nicht** gemeint ist Debug-Code, der dauerhaft im Quelltext bleiben soll: Ausgaben hinter einem Debug-Flag, hinter einer Log-Stufe oder hinter einer Konfigurationsvariablen. Das ist regulärer Programmcode, wird nicht markiert und folgt den üblichen Regeln des Projekts.
 
-**Die Regeln binden Claude, nicht den Nutzer.** Sie gelten für Debug-Code, den Claude schreibt. Vorgefundene Markierungen werden nicht an ihnen gemessen: Der Nutzer markiert, wie er will, und bekommt keinen Hinweis auf eine abweichende Schreibweise. Nach fremden Resten sucht Claude nur, wenn er darum gebeten wird — und dann wird jede Fundstelle einzeln mit dem Nutzer geklärt, bevor sich etwas ändert.
+**Die Regeln binden Claude, nicht den Nutzer.** Sie gelten für Debug-Code, den Claude schreibt oder vorschlägt. Vorgefundene Markierungen werden nicht an ihnen gemessen: Der Nutzer markiert, wie er will, und bekommt keinen Hinweis auf eine abweichende Schreibweise. Nach fremden Resten sucht Claude nur, wenn er darum gebeten wird — und dann wird jede Fundstelle einzeln mit dem Nutzer geklärt, bevor sich etwas ändert.
+
+## Aufbau
+
+Der Skill ist geteilt, damit in einer Sitzung nur die Anweisungen im Kontext liegen, die für die vorliegende Lage gelten:
+
+| Datei | Inhalt | wann geladen |
+| --- | --- | --- |
+| `SKILL.md` | Geltungsbereich · Vorrang der Projektvorgaben · die Umgebungsfrage · Verzweigung | immer |
+| `rules-local.md` | Claude macht alles selbst: Kennzeichnungspflicht, Selbsttest, Aufräumen, Rückbau | bei unmittelbarem Dateizugriff |
+| `user-choice.md` | Kurzfassung mit Beispiel, damit der Nutzer entscheiden kann | wenn Claude über den Nutzer arbeitet |
+| `rules-handover.md` | Wo die Probe laufen muss, wie sie klein bleibt und wie sie übergeben wird | ebenso, in jedem Fall |
+| `marks.md` | Die Marken selbst: fünf Marken, drei Fälle, Verschachtelung, Kennungen | aus einer der beiden Regeldateien, sobald gekennzeichnet wird |
+
+Die Marken stehen **einmal je Sprache**. Sie sind in beiden Umgebungen zeichengleich; verschieden ist nur, wer sie setzt und wer den Suchlauf ausführt.
 
 ## Installation
 
@@ -21,15 +39,24 @@ Der zweite Teil des Skills ist das Aufräumen: Bevor eine gefundene Ursache geme
    | Persönlich  | `~/.claude/skills/temp-debug-code/`   | alle Projekte des Nutzers |
    | Projekt     | `.claude/skills/temp-debug-code/`     | nur dieses Projekt        |
 
-2. **Eine Sprachversion des Ordners `temp-debug-code/` kopieren.** `SKILL` und `CLAUDE-snippet` liegen je zweimal vor — `SKILL.de.md`/`SKILL.en.md`, `CLAUDE-snippet.de.md`/`CLAUDE-snippet.en.md`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; Claude Code erkennt ausschließlich diesen Namen. Die Datumszeilen zeigen später, von welchem Stand die Installation ist.
+   Auf claude.ai und in Claude Desktop wird der Ordner stattdessen als ZIP über *Customize → Skills* hochgeladen.
 
-3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` — passend zur gewählten Sprachfassung — kommt **unterhalb der Trennlinie** in die `CLAUDE.md` des Zielorts — bei persönlicher Installation in `~/.claude/CLAUDE.md`, bei einer Projektinstallation in die `CLAUDE.md` des Projekts. Der kursive Text oberhalb der Trennlinie wird nicht mitkopiert. Die Snippet-Dateien bleiben am Zielort liegen; wirksam ist allein die `CLAUDE.md`, ihre Datumszeilen zeigen den Stand des übernommenen Triggers.
+2. **Eine Sprachversion des Ordners `temp-debug-code/` kopieren.** Jede Datei liegt zweimal vor, unterschieden durch `.de.` und `.en.`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; erkannt wird ausschließlich dieser Name. Die übrigen Dateien behalten ihre Namen, denn die `SKILL.md` verweist auf sie. Die Datumszeilen zeigen später, von welchem Stand die Installation ist.
 
-   Ohne diesen Schritt wirkt der Skill nur bei ausdrücklichem Aufruf mit `/temp-debug-code`. Das ist hier besonders folgenreich: Der Auslöser ist Claudes eigene Handlung — der Nutzer fragt „warum kommt hier 3 raus?", und die Entscheidung, eine `print`-Zeile einzubauen, fällt Claude selbst. Es gibt also keine Anfrage, gegen die die `description` abgeglichen werden könnte.
+3. **Den passenden stillen Trigger übernehmen.** Es gibt **zwei**, und nur einer wird übernommen:
+
+   | Umgebung | Datei | Ziel |
+   | --- | --- | --- |
+   | Claude Code | `CLAUDE-snippet-local.md` | `~/.claude/CLAUDE.md` oder die `CLAUDE.md` des Projekts |
+   | claude.ai, Claude Desktop | `CLAUDE-snippet-handover.md` | das Anweisungsfeld — global oder je Projekt |
+
+   Übernommen wird **alles unterhalb der Trennlinie**; der kursive Text darüber bleibt zurück. Die Snippet-Dateien bleiben am Zielort liegen; wirksam ist allein die Anweisungsdatei, ihre Datumszeilen zeigen den Stand des übernommenen Triggers.
+
+   Ohne diesen Schritt wirkt der Skill nur bei ausdrücklichem Aufruf mit `/temp-debug-code`. Das ist hier besonders folgenreich: Der Auslöser ist Claudes eigene Handlung beziehungsweise ihr Vorschlag — der Nutzer fragt „warum kommt hier 3 raus?“, und die Entscheidung, eine `print`-Zeile einzubauen, fällt Claude. Es gibt also keine Anfrage, gegen die die `description` abgeglichen werden könnte.
 
 ## Details
 
-**Die Marken.** Fünf Stück, zeichengenau einzuhalten: ` @@~DEBUG >>kennung<< ~@@ ` an jeder einzeln eingefügten Debug-Zeile, ` @@~DEBUG: ORIGINAL >>kennung<< ~@@ ` an jeder stillgelegten Originalzeile, ` @@~DEBUG: START >>kennung<< ~~~~~~~~~~~~@@ ` und ` @@~DEBUG: END >>kennung<< ~~~~~~~~~~~~@@ ` um Blöcke ab fünf Debug-Zeilen, dazu die Trennzeile ` @@~~~~~~~~~~~~~~~~~~~~~~~~@@ ` vor jedem START und nach jedem END. Die genauen Fälle und Beispiele für Python, C-artige Sprachen und Shell stehen in der `SKILL.md`.
+**Die Marken.** Fünf Stück, zeichengenau einzuhalten: ` @@~DEBUG >>kennung<< ~@@ ` an jeder einzeln eingefügten Debug-Zeile, ` @@~DEBUG: ORIGINAL >>kennung<< ~@@ ` an jeder stillgelegten Originalzeile, ` @@~DEBUG: START >>kennung<< ~~~~~~~~~~~~@@ ` und ` @@~DEBUG: END >>kennung<< ~~~~~~~~~~~~@@ ` um Blöcke ab fünf Debug-Zeilen, dazu die Trennzeile ` @@~~~~~~~~~~~~~~~~~~~~~~~~@@ ` vor jedem START und nach jedem END. Die genauen Fälle und Beispiele für Python, C-artige Sprachen und Shell stehen in `marks.md`.
 
 **Warum `@@~` der Rahmen ist.** Das Rahmenzeichen darf nicht mit dem Kommentarzeichen einer Sprache kollidieren, kein Regex-Metazeichen sein, keine Sonderbedeutung in der Shell haben und in Quelltext praktisch nicht vorkommen — gesucht wird nach `@@~`, nicht nach `@@` allein. Geprüft und verworfen wurden: `%%`, weil `%%~` in Windows-Batch gängige Syntax ist (`%%~dp0`); `!!`, weil eine interaktive Bash `!!` auch in doppelten Anführungszeichen als History-Expansion auflöst und der Selbsttest-Befehl damit stillschweigend etwas anderes täte; `||`, weil `|` ein Metazeichen ist und Escaping erzwänge; und `§`, weil es auf US-Tastaturen nicht existiert. Die beiden Kollisionen von `@@` — Rubys Klassenvariablen und die Hunk-Köpfe in Diffs — treffen das Suchmuster nicht, weil dort nie eine Tilde folgt. Wer den Skill anpasst, sollte den Rahmen deshalb nicht gegen ein bequemeres Zeichen tauschen.
 
@@ -39,16 +66,22 @@ Der zweite Teil des Skills ist das Aufräumen: Bevor eine gefundene Ursache geme
 
 **Kennungen und Verschachtelung.** Jede Marke trägt zwischen `>>` und `<<` die Kennung ihres Debug-Vorhabens. Sie ist nötig, weil Debug-Vorhaben ineinander entstehen: Ein zweites beginnt mitten im ersten, und beim Aufräumen des inneren muss erkennbar bleiben, welche stillgelegte Zeile zum äußeren gehört. Ohne Kennung wäre das nur aus der Lage im Code zu erraten — und eine falsche Zuordnung reaktiviert Originalcode, den das noch laufende Vorhaben stillgelegt hat. Der Schaden sieht dann wie ein Programmfehler aus, nicht wie ein Aufräumfehler. Die Kennung benennt deshalb die Frage, der nachgegangen wird, nicht die Codestelle: Zwei Vorhaben in derselben Funktion bekämen sonst dieselbe.
 
-**Der Selbsttest.** Nach dem Schreiben der Debug-Änderungen läuft `grep -rn '@@~DEBUG' .` und die Trefferzahl wird gegen die Zahl der Änderungen gehalten: jede Blockmarkierung zählt zwei Treffer, jede sonstige markierte Zeile einen. Stimmen die Zahlen nicht, fehlt eine Marke. Beim Aufräumen läuft stattdessen `grep -rn '@@~' .` — dieses Muster findet zusätzlich die Trennzeilen, die sonst liegenblieben.
+**Der Selbsttest.** Nach dem Schreiben der Debug-Änderungen läuft `grep -rn '@@~DEBUG' .` und die Trefferzahl wird gegen die Zahl der Änderungen gehalten: jede Blockmarkierung zählt zwei Treffer, jede sonstige markierte Zeile einen. Stimmen die Zahlen nicht, fehlt eine Marke. Beim Aufräumen läuft stattdessen `grep -rn '@@~' .` — dieses Muster findet zusätzlich die Trennzeilen, die sonst liegenblieben. **Wo Claude keinen Dateizugriff hat, führt der Nutzer diese Läufe aus**; Claude nennt ihm das Muster und die erwartete Trefferzahl.
+
+**Warum der Nutzer entscheidet, wenn Claude die Dateien nicht erreicht.** Dort kostet jede Marke ihn Arbeit — er trägt sie ein und baut sie aus. Also legt Claude ihm die Wahl einmal vor, kurz und mit einem Beispiel, und hält sich an seine Antwort. Lehnt er ab, wird gefragt, ob eine einfachere Markierung gewünscht ist; sein Vorschlag gilt dann unverändert und wird nicht beurteilt. Eine Rückbauliste führt Claude nicht — der Chat trägt sie bereits.
+
+**Warum die Methodenschritte nur im Handover-Fall stehen.** Mit unmittelbarem Dateizugriff entscheidet Claude selbst, wie debuggt wird, wie gestartet und wie ausgewertet wird; das ist Handwerk und braucht keine Regel. Erst wenn der Nutzer dazwischensitzt, wird die Wahl der Probe zur Frage — weil jeder Schritt ihn Arbeit kostet und weil die eigene Ausführungsumgebung nicht seine ist.
 
 **Originalcode wird nie gelöscht,** nur auskommentiert. Die stillgelegte Zeile ist die einzige verlässliche Quelle für den Rückweg — sie steht im Suchlauf, im Diff und noch dort, wenn jemand anders aufräumt.
 
 **Aufräumen richtet sich nach dem Auftrag, nicht nach dem Alter.** Debug-Code aus dem laufenden Auftrag entfernt Claude selbständig; Debug-Code aus einem abgeschlossenen Auftrag legt er dem Nutzer vor. Lehnt der Nutzer ab, kommt dieselbe Stelle erst bei einem neuen Tag, einem neuen Chat oder auf ausdrücklichen Auftrag wieder zur Sprache. **Entschieden wird dabei nie per Skript:** Der Suchlauf findet die Marken, was an einer Fundstelle geschieht, prüft Claude an ihr selbst — Markierungen können völlig anders gesetzt sein, als die Regeln es vorsehen.
 
-**Der Anker im Trigger.** Der Absatz in der `CLAUDE.md` bindet an die eigene Handlung, und der Satz „auch dann, wenn der Nutzer nicht von Debugging gesprochen hat" ist der wirksame Teil. Sein zweiter Absatz ist der Anker für das Aufräumen; ohne ihn feuert der Skill nur beim Einfügen und nie beim Entfernen. Beim Anpassen an ein Projekt dürfen beide verschoben, aber nicht weggelassen werden.
+**Die Anker in den Triggern.** Beide Snippets binden an Claudes eigene Handlung, nicht an eine Anfrage des Nutzers — im einen Fall an das Einfügen, im anderen an den Vorschlag. Der Satz „auch dann, wenn der Nutzer nicht von Debugging gesprochen hat“ ist jeweils der wirksame Teil. Das Handover-Snippet hat zusätzlich den Auftrag, die Frage nach der Kennzeichnung rechtzeitig auszulösen — nämlich bevor der Nutzer die erste Zeile von Hand einträgt.
 
 ## Stand und Offenes
 
-**Status:** Anweisungen vollständig, Frontmatter gesetzt, Wortlaut überarbeitet, stiller Trigger vorhanden, Description in der dritten Person. Am 29. August 2026 sind die Marken vollständig neu gefasst worden — Rahmen `@@~` statt der alten Doppelraute, Kennung je Debug-Vorhaben, Verschachtelung, Trennzeilen —, und beide Sprachfassungen sind dabei gemeinsam nachgezogen worden. Die Erprobung am Zielort findet statt, wenn der Skill dort gebraucht wird.
+**Status:** Anweisungen vollständig, Frontmatter gesetzt, zwei stille Trigger, Description in der dritten Person. Am 29. August 2026 sind die Marken vollständig neu gefasst worden — Rahmen `@@~` statt der alten Doppelraute, Kennung je Debug-Vorhaben, Verschachtelung, Trennzeilen — und der Skill ist zugleich in einen gemeinsamen Teil und zwei Umgebungszweige geteilt worden. Beide Sprachfassungen sind dabei gemeinsam entstanden.
 
-**Offen:** Die neue Markenform war noch nie im Einsatz. Das macht den Skill nicht unbenutzbar — sein erster Einsatz ist zugleich ihre Erprobung.
+**Offen:** Die neue Markenform und die Teilung waren noch nie im Einsatz. Das macht den Skill nicht unbenutzbar — sein erster Einsatz ist zugleich ihre Erprobung. Ungeprüft ist insbesondere, ob ein hochgeladener Skill auf claude.ai die nachgeladenen Dateien tatsächlich zieht.
+
+**Bewusst offen gelassen:** Ob der Skill auf claude.ai überhaupt installiert wird, ist eine Nutzungsentscheidung und keine technische Frage. Die Description kostet dort dauerhaft Platz in der Skill-Listung, ob sie auslöst oder nicht.
