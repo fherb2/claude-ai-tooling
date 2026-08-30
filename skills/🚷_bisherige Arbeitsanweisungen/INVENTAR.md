@@ -218,10 +218,9 @@ Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb
 
 ### 5.4 Offene Fragen an den Entwickler
 
-1. Stimmt die in Kapitel 2 vermutete Reihenfolge der Fassungen (CAM → SCH‑A → BIRD → SCH‑B; MOD als Ableger)? Sie beruht allein auf Textbefunden. Für **CAM als Basisfassung** ist der Befund seit dem 29. August 2026 stark: Die Vorlage MUSTER ist damit byte-identisch. Über die Reihenfolge der späteren Ausbaustufen sagt das nichts — insoweit bleibt die Frage offen.
-2. Soll claude.ai weiterhin als Arbeitsumgebung bedient werden? Davon hängt ab, ob die Einträge aus 5.1 in `web-code-editing` einfließen oder nur dokumentarisch bleiben.
-3. T22: Sind Code-Style-Beispiele in Konzept-/Implementierungsdokumenten weiterhin erlaubte Ausnahme?
-4. T19: Welche der beiden debug-Parameter-Fassungen gilt, falls der Test-Skill entsteht?
+1. Stimmt die in Kapitel 2 vermutete Reihenfolge der Fassungen (CAM → SCH‑A → BIRD → SCH‑B; MOD als Ableger)? Antwort: Diese Reihenfolge spielt keine entscheidende Rolle.
+2. T22: Sind Code-Style-Beispiele in Konzept-/Implementierungsdokumenten weiterhin erlaubte Ausnahme? Antwort: Wird geklärt, wenn der entsprechende Punkt in ein Skill überführt wird.
+3. T19: Welche der beiden debug-Parameter-Fassungen gilt, falls der Test-Skill entsteht? Antwort: Wird geklärt, wenn der entsprechende Punkt in ein Skill überführt wird.
 
 ## 6 Erledigte Einträge
 
