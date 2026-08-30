@@ -1,10 +1,10 @@
 # correct-zaaack-md-editor-mistakes — beschädigten Leerraum in Markdown-Tabellen finden und beheben
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
-✅☑ **Fertig und benutzbar, in beiden Sprachfassungen.** Werkzeuge, Skilltext und stiller Trigger stehen, das Frontmatter ist gesetzt. Was noch offen ist, steht im Schlussabschnitt — es hindert den Einsatz nicht.
+✅☑ **Fertig und benutzbar, in beiden Sprachfassungen.** Werkzeuge, Skilltext und stiller Trigger stehen, das Frontmatter ist gesetzt. Was noch offen ist, steht im Schlussabschnitt — es hindert den Einsatz nicht. — Benutzbar mit Claude Code.
 
 ## Überblick
 

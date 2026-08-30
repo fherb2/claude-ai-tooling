@@ -1,8 +1,8 @@
 # pedantic-text-editing — text editing with fidelity to detail
 
-*Last updated: 2026-08-28*
+*Last updated: 2026-08-30*
 
-**✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`.
+**✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`. — Usable with Claude Code.
 
 **The skill confines the intervention in a text to exactly the places the user has approved — and afterwards proves that nothing else changed.** It applies to texts whose wording is itself the product: essays, applications, talks, letters, book chapters, expert opinions. The emphasis is not on finding errors — Claude can do that without a skill — but on bounding the intervention: that while a comma is corrected, no half-sentence gets rewritten in passing, no "presumably" deleted, no two sentences merged, no quotation marks unified across the whole text.
 

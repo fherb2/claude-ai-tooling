@@ -4,7 +4,7 @@
 
 *[Deutsche Fassung](README.md)*
 
-**✅☑ Finished and usable.** Instructions complete, frontmatter set, silent triggers for both environments present, German and English version available.
+**✅☑ Finished and usable.** Instructions complete, frontmatter set, silent triggers for both environments present, German and English version available. — With differences in content between the version for claude.ai / Claude Desktop (Chat + Cowork) and Claude Code.
 
 **Gives every line that comes into being purely for tracking down a fault a fixed, searchable mark** — inserted debug and `print` output as well as original code disabled for the duration of the search. All marks begin with the same character sequence, so a single search run finds, without exception, every change that came into being for debugging. The entire purpose rests on that: the original state stays fully restorable — without memory and by someone who was not there.
 

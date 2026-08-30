@@ -1,10 +1,10 @@
 # parallel-sessions — mehrere Claude-Sitzungen gleichzeitig im selben Repository, sauber getrennt über Git-Worktrees
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
-**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden; deutsche und englische Fassung.
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden; deutsche und englische Fassung. — Benutzbar mit Claude Code.
 
 **Gibt jeder gleichzeitig arbeitenden Claude-Sitzung ihren eigenen Git-Worktree mit eigener Werkbank und macht damit die Frage überflüssig, welche Sitzung committen darf.** Zwei Sitzungen im selben Arbeitsbaum überschreiben einander lautlos — das Tückische ist nicht der Konflikt, den Git melden würde, sondern das unbemerkte Mitwandern fremder Zwischenstände. Der Skill trennt die Sitzungen physisch: je Sitzung ein Worktree, darin eine kurzlebige Werkbank vom Integrationsbranch, Abschluss per Squash-Merge. Zentrale Dateien, die überall aktuell sein müssen (Projekt-CLAUDE.md, Editor-Konfiguration, `.gitignore`), liegen auf einem eigenen orphanen **Infra-Branch** und werden nicht gemergt, sondern von jeder Sitzung per `git restore --source` in den eigenen Worktree geholt. Für Projekte ohne dieses Modell enthält der Skill als Rückfallweg die alte Sofortregel: erst die Git-Schreibhoheit klären, dann arbeiten.
 

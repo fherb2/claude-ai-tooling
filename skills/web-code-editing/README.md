@@ -1,10 +1,10 @@
 # web-code-editing — Code-Bearbeitung auf claude.ai
 
-*Stand: 2026-08-29*
+*Stand: 2026-08-30*
 
 *[English version](README.en.md)*
 
-**✅☑ Fertig und nutzbar.** Skilltext in beiden Sprachen, Frontmatter gesetzt; die Erprobung als hochgeladener Skill steht noch aus (siehe „Stand und Offenes").
+**✅☑ Fertig und nutzbar.** Skilltext in beiden Sprachen, Frontmatter gesetzt; die Erprobung als hochgeladener Skill steht noch aus (siehe „Stand und Offenes"). — Benutzbar für Claude.ai / Claude Desktop (Chat + Cowork).
 
 **Der Skill regelt das Erstellen und Ändern von Code auf claude.ai für ein bestehendes Projekt** — mit drei Kernen: Quellen vollständig sichern, bevor geschrieben wird; geänderte Dateien mechanisch als Download zurückgeben statt sie aus dem Kontext neu zu diktieren; kleine Änderungen als Vorher/Ersetzen-Schema im Chat. Er ist **nur für claude.ai** (Zielwelt „nur web", `skill-dev-doc.md` Kapitel 9.4): In Claude Code schreibt das Edit-Werkzeug direkt in die Dateien, dort ist nichts davon nötig.
 
