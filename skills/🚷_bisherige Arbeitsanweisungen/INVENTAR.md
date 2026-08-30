@@ -6,7 +6,7 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behält seine Nummer für immer, auch wenn er erledigt ist und nach Kapitel 6 wandert (analog zur Fahrplan-Nummerierungsregel des Repos). Jede Nummer kommt genau einmal vor — in Kapitel 4 oder in Kapitel 6.
 
-**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13 und T16.
+**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15 und T16.
 
 ## 1 Die Quelldateien
 
@@ -56,8 +56,8 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T11 | ✅ | Teil-Artefakte ab ~2 A4-Seiten           | –   | –   | –   | ✓   | ⊘     | –     |
 | T12 | ✅ | Nur besprochenen, notwendigen Code       | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T13 | ✅ | Funktionsumfang nie ungefragt erweitern  | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T14 |  | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T15 |  | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T14 | ✅ | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     |
+| T15 | ✅ | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T16 | ✅ | DEBUG-Kennzeichnung von Probe-Code       | –   | –   | ✓   | –   | (✓)   | ✓     |
 | T17 |  | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T18 |  | Testfreundliche Funktionsanlage          | –   | –   | ✓   | ✓   | ✓     | ✓     |
@@ -78,22 +78,6 @@ Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien u
 Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und eine Einordnung gegenüber dem heutigen Regelwerk (globale `~/.claude/CLAUDE.md`, hier „§…“, und die Skills dieses Repos). Die Einordnung trägt eine von vier Kategorien: **[claude.ai-Mechanik]** — an das Web-Frontend gebunden, in Claude Code gegenstandslos; **[abgedeckt]** — inhaltlich im heutigen Regelwerk enthalten; **[teilweise abgedeckt]**; **[nicht abgedeckt]** — Kandidat für eine Neuzusammenstellung.
 
 ### D Debugging und Tests
-
-#### T14 Kurze Ursachensuche als `python -c`-Einzeiler
-
-**Aussage:** Kurze Debuggings zur Ursachensuche als Kommandozeilen-Einzeiler (`python -c "..."`) formulieren; der Nutzer führt sie aus und gibt das Ergebnis in den Chat zurück.
-
-**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich.
-
-**Einordnung:** **[claude.ai-Mechanik]** in der Form (der Umweg über den Nutzer entfällt — Claude Code führt kurzlaufende Analysen nach §1.6 selbst aus). Der methodische Kern — die kleinste reproduzierende Probe vor der großen Instrumentierung — ist im heutigen Regelwerk nirgends festgehalten und wäre ein möglicher Baustein eines Debugging-Methodik-Skills.
-
-#### T15 Umfassenderes Debugging als eigenes Skript
-
-**Aussage:** Größere Debugging-Aufbauten als eigenes Skript/Artefakt liefern, das im Projekt ausgeführt wird.
-
-**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich.
-
-**Einordnung:** **[claude.ai-Mechanik]** in der Form, Kern wie T14. In Claude Code übernimmt das Scratchpad bzw. das Repo diese Rolle.
 
 #### T17 Unit-Tests mit pytest: CI-fähig und von der Kommandozeile startbar
 
@@ -196,7 +180,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
 
-T14 (Form) und T15 (Form) — ihr methodischer Kern steht in 5.3. T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 ist am 29. August 2026 geschlossen** (Entscheidung des Entwicklers): Die damals offene Prüffrage, ob die Chat-Suche projektübergreifend arbeitet, ist beantwortet — auf claude.ai durchsucht sie ohnehin nur die Chats des eigenen Projekts. Der Punkt braucht also kein Zuhause; sein Eintrag steht in Kapitel 6. **T5 ist am selben Tag geschlossen:** Die Vorwissen-Definition wird für die Arbeit mit Claude nicht mehr gebraucht; auch sein Eintrag steht in Kapitel 6. Damit ist diese Gruppe bis auf T14 und T15 abgearbeitet.
+T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und stehen in Kapitel 6. **T4 ist am 29. August 2026 geschlossen** (Entscheidung des Entwicklers): Die damals offene Prüffrage, ob die Chat-Suche projektübergreifend arbeitet, ist beantwortet — auf claude.ai durchsucht sie ohnehin nur die Chats des eigenen Projekts. Der Punkt braucht also kein Zuhause; sein Eintrag steht in Kapitel 6. **T5 ist am selben Tag geschlossen:** Die Vorwissen-Definition wird für die Arbeit mit Claude nicht mehr gebraucht; auch sein Eintrag steht in Kapitel 6. **T14 und T15 sind ebenfalls am 29. August 2026 geschlossen:** Ihre Form war claude.ai-Mechanik, ihr methodischer Kern ist in die Regeldatei `rules-handover` des Skills `temp-debug-code` eingegangen. Damit ist diese Gruppe vollständig abgearbeitet.
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
@@ -212,9 +196,8 @@ Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb
 - **Python-Test-Konventionen (T17, T18, T19):** der größte ungenutzte Block — pytest CI+CLI, testfreundliche Funktionsanlage, debug-Parameter. Kandidat für einen neuen Skill; bei T19 vorher genau eine der zwei unverträglichen Fassungen festlegen. Abgrenzung zu `temp-debug-code` ist sauber (dauerhafter vs. temporärer Debug-Code).
 - **Konzept-/Findungsphasen-Arbeitsmodus (T23, T24, T26-Kern):** Alternativen aktiv einbringen, erklären statt kodieren, fremde Lösungen recherchieren. Kandidat als Zusatz zu §2.1 oder als eigener Phasen-Baustein/Skill.
 - **Generalisierbarkeit (T25):** Design-Leitlinie; Zuordnung offen (in `common-code-generation` oder projektspezifisch belassen), Spannungsfeld zu dessen Regeln gegen ungefragten Mehrumfang (vormals T12/T13) beachten.
-- **Debugging-Methodik-Kern (T14/T15):** „kleinste reproduzierende Probe zuerst“ — kleiner möglicher Baustein, falls je ein Debugging-Methodik-Skill entsteht.
 - **Status-Protokoll-Detailregeln (T20):** Vergleichsmaterial für den Ausbau von `software-dev-doc-fh` (Referenzieren statt Ausschreiben, Missverständnisfestigkeit, API-Rümpfe als Schrittbeschreibung); der append-only-Mechanismus selbst ist durch Fahrplan/Status bewusst abgelöst.
-- **Kleinigkeiten:** Duzen (T1), ggf. Code-Style-Beispiel-Ausnahme (T22).
+- **Kleinigkeiten:** ggf. Code-Style-Beispiel-Ausnahme (T22).
 
 ### 5.4 Offene Fragen an den Entwickler
 
@@ -359,6 +342,26 @@ Die **Passagen in den Quelldateien** sind noch am selben Tag erneut entfernt wor
 **Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B; CAM ohne „bereits realisierten“.
 
 **Einordnung:** **[abgedeckt]** — wortgleich in `common-code-generation` enthalten.
+
+#### T14 Kurze Ursachensuche als `python -c`-Einzeiler
+
+**Verarbeitet:** Skill `temp-debug-code`, Regeldatei `rules-handover`, 29. August 2026 · Gruppe D (Debugging und Tests). Die claude.ai-Mechanik ist dort nicht übernommen, sondern ersetzt: Nicht mehr „gib dem Nutzer einen Einzeiler“, sondern erst die Frage, **wo der Fehler lebt** — reicht die Logik, führt Claude die Probe selbst aus; hängt sie an der Umgebung des Nutzers, gehört sie auf seinen Rechner. Die Form des Einzeilers ist dabei eine von drei sprachabhängigen Ausprägungen geworden.
+
+**Aussage:** Kurze Debuggings zur Ursachensuche als Kommandozeilen-Einzeiler (`python -c "..."`) formulieren; der Nutzer führt sie aus und gibt das Ergebnis in den Chat zurück.
+
+**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich.
+
+**Einordnung:** **[claude.ai-Mechanik]** in der Form (der Umweg über den Nutzer entfällt — Claude Code führt kurzlaufende Analysen nach §1.6 selbst aus). Der methodische Kern — die kleinste reproduzierende Probe vor der großen Instrumentierung — ist im heutigen Regelwerk nirgends festgehalten und wäre ein möglicher Baustein eines Debugging-Methodik-Skills.
+
+#### T15 Umfassenderes Debugging als eigenes Skript
+
+**Verarbeitet:** Skill `temp-debug-code`, Regeldatei `rules-handover`, 29. August 2026 · Gruppe D (Debugging und Tests). Das eigene Skript ist dort Stufe 3 der Eskalationsleiter — es kommt, wenn ein einzelner Aufruf nicht mehr trägt. Neu gegenüber der Quelle ist die Stufe darüber: Erst wenn auch ein Skript von außen nicht herankommt, wird in den Quelltext eingegriffen, und ab dort greift die Kennzeichnung.
+
+**Aussage:** Größere Debugging-Aufbauten als eigenes Skript/Artefakt liefern, das im Projekt ausgeführt wird.
+
+**Fundstellen:** BIRD, CAM, SCH‑A, SCH‑B wortgleich.
+
+**Einordnung:** **[claude.ai-Mechanik]** in der Form, Kern wie T14. In Claude Code übernimmt das Scratchpad bzw. das Repo diese Rolle.
 
 #### T16 Kennzeichnung von temporärem Probe-Code
 
