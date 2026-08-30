@@ -1,6 +1,6 @@
 # 🚧 zotero-use — Idee, noch kein Skill
 
-*Stand: 2026-08-25*
+*Stand: 2026-08-30*
 
 Claude direkt mit der eigenen Zotero-Bibliothek arbeiten lassen: neue Einträge samt PDF anlegen, gezielt in Metadaten und Volltext suchen, Sammlungen umsortieren — ausgehend vom ursprünglichen Wunsch, Literaturfunde schon während der Recherche in einer zotero-fertigen Form festzuhalten, statt sie nachträglich aus einem Chat-Export herauszuklauben.
 
@@ -36,7 +36,7 @@ Ein zotero.org-Konto ist **kostenlos**. Bezahlt wird nur Zoteros eigener Dateisp
 
 Dies ist das erste konkrete Beispiel für ein „Thema jenseits des Codens" im Sinne von `skill-dev-doc.md`, Kapitel 8.3 — reine Literatur-/Referenzverwaltung, kein Software-Kontext. Ein späterer Skill dazu muss entsprechend deklariert sein, nicht an einen Coding-Trigger gebunden.
 
-**Zur Verpackung:** Skills laufen inzwischen produktübergreifend — dieselbe `SKILL.md` in Claude Code, Claude Desktop und Claude Cowork (Stand August 2026, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein fertiger Skill hier müsste also nicht auf Claude Code beschränkt bleiben.
+**Zur Verpackung:** Skills laufen inzwischen produktübergreifend — dieselbe `SKILL.md` in Claude Code und Claude Desktop (Chat + Cowork) (Stand August 2026, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein fertiger Skill hier müsste also nicht auf Claude Code beschränkt bleiben.
 
 ## Offen
 

@@ -1,8 +1,8 @@
 # Chats-Export
 
-*Last updated: 2026-08-27*
+*Last updated: 2026-08-30*
 
-**Fetches chats from claude.ai projects and stores them as searchable JSON files in a Claude Code project** — for finding earlier context again, not for continuing them at that point. (On claude.ai they can of course be continued, and then updated again in the Claude Code project.) Anthropic doesn't offer a way to do this itself: chats cannot be moved between accounts, nor between claude.ai, Claude Desktop, and Claude Code. This folder rebuilds the two routes that actually work — the account export and claude.ai's internal web endpoints — plus a script that treats both alike.
+**Fetches chats from claude.ai projects and stores them as searchable JSON files in a Claude Code project** — for finding earlier context again, not for continuing them at that point. (On claude.ai they can of course be continued, and then updated again in the Claude Code project.) Anthropic doesn't offer a way to do this itself: chats cannot be moved between accounts, nor between claude.ai, Claude Desktop (Chat + Cowork), and Claude Code. This folder rebuilds the two routes that actually work — the account export and claude.ai's internal web endpoints — plus a script that treats both alike.
 
 ## The skill
 

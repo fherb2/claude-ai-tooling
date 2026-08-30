@@ -1,12 +1,12 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-08-29*
+*Last updated: 2026-08-30*
 
 *[Deutsche Fassung](README.md)*
 
-Tools / components for the daily work with Claude — claude.ai, Claude Desktop and Claude Code. Self-contained components, each with its own documentation in its folder. This page is the overview only. Use the linked READMEs inside the components.
+Tools / components for the daily work with Claude — claude.ai, Claude Desktop (Chat + Cowork) and Claude Code. Self-contained components, each with its own documentation in its folder. This page is the overview only. Use the linked READMEs inside the components.
 
-**Claude Cowork is not covered here yet.** The variant available since summer 2026 differs from the three named above in one decisive respect: through connected folders it works directly on the user's machine. What this repository says — target worlds, skills, workflows — therefore refers to claude.ai Chat, Claude Desktop and Claude Code.
+**Claude Cowork in detail is not covered here yet.** The variant available since summer 2026 differs from the three named above in one decisive respect: through connected folders it works directly on the user's machine. What this repository says — target worlds, skills, workflows — therefore refers, strictly speaking, to claude.ai Chat, Claude Desktop Chat and Claude Code.
 
 ## What there is
 

@@ -1,6 +1,6 @@
 # in-depth-online-literature-research — research that does not give up too early
 
-*Last updated: 2026-08-26*
+*Last updated: 2026-08-30*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version available. No silent trigger needed (reasons under "Details").
 
@@ -23,7 +23,7 @@ The skill applies to **every kind of research** — literature, facts, documents
 
 2. **Copy one language version of the folder `in-depth-online-literature-research/`.** The `SKILL` exists twice — `SKILL.de.md` and `SKILL.en.md`. All files of the chosen language come along, README included. The chosen version is called `SKILL.md` at the target location — whether renamed or additionally placed makes no difference; Claude Code recognizes that name and no other. The date line later shows which state the installation is from.
 
-The skill also works in claude.ai and in Claude Desktop: the same `SKILL.md` runs in every Claude product it is bound into. The source map is dropped wherever there is no file access.
+The skill also works in claude.ai and in Claude Desktop (Chat + Cowork): the same `SKILL.md` runs in every Claude product it is bound into. The source map is dropped wherever there is no file access.
 
 ## Details
 
