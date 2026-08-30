@@ -2,8 +2,8 @@
 
 *Diese Datei ist kein Teil des Skills. Sie enthält den stillen Trigger für
 Umgebungen mit unmittelbarem Zugriff auf den Dateibaum — Claude Code. Für
-claude.ai und Claude Desktop (Chat + Cowork) gilt stattdessen
-`CLAUDE-snippet-handover.de.md`; übernommen wird immer nur eine der beiden.
+claude.ai und Claude Desktop (Chat + Cowork) gilt ein anderer Trigger; er
+liegt im Paket für diese Umgebungen. Übernommen wird immer nur einer.
 Beim Installieren: alles unterhalb der Trennlinie in die `CLAUDE.md` des
 Zielorts übernehmen; diese Datei bleibt dort liegen, wirksam ist allein die
 `CLAUDE.md`. Der Skill läuft ohne den Trigger nur bei ausdrücklichem
