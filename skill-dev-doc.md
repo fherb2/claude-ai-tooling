@@ -198,6 +198,14 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 
 **Ein Skill, der nach dem Auslösen erst klärt, ob er überhaupt angewendet wird, trägt seine Regeln nicht in der `SKILL.md`.** Sie enthält dann nur dreierlei: den Geltungsbereich, die Klärung samt Absage, und die Anweisung, bei Zustimmung eine zweite Datei desselben Ordners zu lesen (`${CLAUDE_SKILL_DIR}/<datei>.md`). Alles Weitere steht in dieser zweiten Datei. **Sie heißt einheitlich `rules.md`**, bei mehreren Sprachfassungen `rules.de.md`/`rules.en.md` nach 5.1 (Festlegung des Entwicklers vom 26. August 2026; Dateinamen sind englisch).
 
+**Braucht ein Skill mehr als eine nachgeladene Datei**, tragen sie sprechende Namen statt Nummern — englisch, kleingeschrieben, mit Bindestrichen, dazu das Sprachkürzel nach 5.1 (Festlegung des Entwicklers vom 29. August 2026). Drei Rollen sind dabei zu unterscheiden:
+
+- **Ein Regelzweig** heißt `rules-<zweig>.md`. Trennt der Zweig zwei Zielwelten, benennt er nicht das Produkt, sondern die Fähigkeit, an der die Regeln hängen — `rules-local` gegen `rules-handover` statt `rules-code` gegen `rules-web`. Ein Produktname altert mit jedem neuen Produkt, eine Fähigkeit nicht.
+- **Was mehrere Zweige gemeinsam brauchen**, bekommt eine eigene Datei, die die Zweige ihrerseits nachladen. Sonst steht derselbe Inhalt mehrfach da und driftet auseinander — die Kette `SKILL.md` → Regelzweig → gemeinsame Datei ist ausdrücklich zulässig; das Verbot in 2.3 betrifft nur Verweise auf **andere Skills**.
+- **Ein Klärungsschritt vor dem Regelteil** — etwa eine Entscheidung, die der Nutzer treffen muss — steht in einer eigenen Datei und lädt danach den Regelzweig. So kostet ein Nein nur die Klärungsseite.
+
+Beleg für die Bauform ist `temp-debug-code` (29. August 2026): `SKILL.md` → `rules-local` beziehungsweise `user-choice` → `rules-handover`, beide Zweige laden bei Bedarf `marks`.
+
 Der Grund steckt im Ladeverhalten (1.2): Weitere Dateien im Skill-Ordner lädt Claude nur, wenn die `SKILL.md` ausdrücklich auf sie verweist — und was einmal geladen ist, bleibt für den Rest der Sitzung im Kontext. Ein Skill, der auf eine Lage auslöst, in der er oft doch nicht zum Zug kommt, schleppt seinen vollen Text sonst in jeder dieser Sitzungen mit, ohne je benutzt zu werden. Mit der Teilung kostet er dann nur die Klärungsseite.
 
 **Zwei Skills wären der falsche Weg** — sie müssten gemeinsam installiert werden, und 2.3 verbietet ohnehin, dass ein Skill auf einen anderen verweist. Die zweite Datei im selben Ordner löst beides.
@@ -353,13 +361,13 @@ Der teuerste Fall ist deshalb nicht der große Skill, sondern der **selten gebra
 
 ### 9.4 Zuordnung der vorhandenen Skills
 
-Stand 28. August 2026. „Web-Fassung" nennt die Nutzungsentscheidung, nicht die technische Möglichkeit.
+Stand 29. August 2026. „Web-Fassung“ nennt die Nutzungsentscheidung, nicht die technische Möglichkeit.
 
 | Skill | Gruppe | Web-Fassung | Grund |
 | --- | --- | --- | --- |
 | `common-code-generation` | web + code | ja | Reine Verhaltensregeln, fasst keine Dateien an. Ein Wort ändert sich: der Ablageort der Plan-Regel |
 | `in-depth-online-literature-research` | web + code | ja | Websuche gibt es beidseitig; die Quellenkarte kann Claude dort nicht schreiben, nur vorschlagen |
-| `temp-debug-code` | web + code | offen | Marken gelten unverändert; der `grep`-Selbsttest braucht eine Fassung ohne Shell. Ob auf claude.ai überhaupt debuggt wird, entscheidet der Entwickler |
+| `temp-debug-code` | web + code | ja, gebaut | Seit dem 29. August 2026 in ein Tor und zwei Regelzweige geteilt (5.2): Mit Dateizugriff handelt Claude selbst, sonst entscheidet der Nutzer über die Kennzeichnung, und die Methodenleiter kommt hinzu. Die Suchläufe führt dort er aus, nicht Claude. Ob der Skill auf claude.ai installiert wird, bleibt Nutzungsentscheidung nach 9.3 |
 | `pedantic-text-editing` | web + code | offen, aber machbar | Ersetzungsskript existiert (`apply_findings.py`), der mechanische Rückweg über `/mnt/user-data/outputs` ist beobachtet (1.4) — eine Web-Fassung könnte das Detailtreue-Versprechen halten. Ob sie gebaut wird, entscheidet der Entwickler |
 | `correct-zaaack-md-editor-mistakes` | nur code | — | Die Werkzeuge liefen im Container, aber die Markdown-Dateien des Nutzers kommen nicht hinein und die Korrektur nicht zurück |
 | `parallel-sessions` | nur code | — | Git-Worktrees haben auf claude.ai keinen Gegenstand |
