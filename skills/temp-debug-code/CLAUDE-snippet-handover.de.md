@@ -2,8 +2,8 @@
 
 *Diese Datei ist kein Teil des Skills. Sie enthält den stillen Trigger für
 Umgebungen ohne unmittelbaren Zugriff auf den Dateibaum — claude.ai und
-Claude Desktop (Chat + Cowork). Für Claude Code gilt stattdessen
-`CLAUDE-snippet-local.de.md`; übernommen wird immer nur eine der beiden.
+Claude Desktop (Chat + Cowork). Für Claude Code gilt ein anderer Trigger; er
+liegt im Paket für Claude Code. Übernommen wird immer nur einer.
 Beim Installieren: alles unterhalb der Trennlinie in das Anweisungsfeld des
 Zielorts übernehmen — global für das Konto oder je Projekt. Der Skill läuft
 ohne den Trigger nur bei ausdrücklichem `/temp-debug-code`-Aufruf.*

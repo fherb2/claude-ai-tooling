@@ -23,40 +23,42 @@ Der Skill ist geteilt, damit in einer Sitzung nur die Anweisungen im Kontext lie
 | Datei | Inhalt | wann geladen |
 | --- | --- | --- |
 | `SKILL.md` | Geltungsbereich · Vorrang der Projektvorgaben · die Umgebungsfrage · Verzweigung | immer |
-| `rules-local.md` | Claude macht alles selbst: Kennzeichnungspflicht, Selbsttest, Aufräumen, Rückbau | bei unmittelbarem Dateizugriff |
-| `user-choice.md` | Kurzfassung mit Beispiel, damit der Nutzer entscheiden kann | wenn Claude über den Nutzer arbeitet |
-| `rules-handover.md` | Wo die Probe laufen muss, wie sie klein bleibt und wie sie übergeben wird | ebenso, in jedem Fall |
-| `marks.md` | Die Marken selbst: fünf Marken, drei Fälle, Verschachtelung, Kennungen | aus einer der beiden Regeldateien, sobald gekennzeichnet wird |
+| `rules-local.de.md` | Claude macht alles selbst: Kennzeichnungspflicht, Selbsttest, Aufräumen, Rückbau | bei unmittelbarem Dateizugriff |
+| `user-choice.de.md` | Kurzfassung mit Beispiel, damit der Nutzer entscheiden kann | wenn Claude über den Nutzer arbeitet |
+| `rules-handover.de.md` | Wo die Probe laufen muss, wie sie klein bleibt und wie sie übergeben wird | ebenso, in jedem Fall |
+| `marks.de.md` | Die Marken selbst: fünf Marken, drei Fälle, Verschachtelung, Kennungen | aus einer der beiden Regeldateien, sobald gekennzeichnet wird |
 
 Die Marken stehen **einmal je Sprache**. Sie sind in beiden Umgebungen zeichengleich; verschieden ist nur, wer sie setzt und wer den Suchlauf ausführt.
 
 ## Installation
 
-1. **Zielort wählen.** Der Skill gilt entweder für alle Projekte des Nutzers oder nur für eines:
+Dieser Skill hat **zwei stille Trigger** — einen für jede Umgebung. Welcher der richtige ist, nimmt Dir das Paket ab: Es enthält bereits den passenden, unter dem Namen `CLAUDE-snippet.md`.
 
-   | Ort         | Pfad                                  | Gilt für                  |
-   | ----------- | ------------------------------------- | ------------------------- |
-   | Persönlich  | `~/.claude/skills/temp-debug-code/`   | alle Projekte des Nutzers |
-   | Projekt     | `.claude/skills/temp-debug-code/`     | nur dieses Projekt        |
+### Claude Code
 
-   Auf claude.ai und in Claude Desktop (Chat + Cowork) wird der Ordner stattdessen als ZIP über *Customize → Skills* hochgeladen.
+1. **Paket herunterladen.** `downloads/temp-debug-code_de_local.zip`
 
-2. **Eine Sprachversion des Ordners `temp-debug-code/` kopieren.** Jede Datei liegt zweimal vor, unterschieden durch `.de.` und `.en.`. Mit gehören alle Dateien der gewählten Sprache, README eingeschlossen. Die gewählte SKILL-Fassung heißt am Zielort `SKILL.md` — ob umbenannt oder zusätzlich abgelegt, ist gleichgültig; erkannt wird ausschließlich dieser Name. Die übrigen Dateien behalten ihre Namen, denn die `SKILL.md` verweist auf sie. Die Datumszeilen zeigen später, von welchem Stand die Installation ist.
+2. **Entpacken.** Das Archiv enthält einen Ordner `temp-debug-code/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-3. **Den passenden stillen Trigger übernehmen.** Es gibt **zwei**, und nur einer wird übernommen:
+3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` kommt **alles unterhalb der Trennlinie** in die `CLAUDE.md` des gewählten Orts. Der kursive Text darüber bleibt zurück; die Datei selbst bleibt im Skill-Ordner liegen und zeigt an ihrer Datumszeile, von welchem Stand der übernommene Trigger ist.
 
-   | Umgebung | Datei | Ziel |
-   | --- | --- | --- |
-   | Claude Code | `CLAUDE-snippet-local.md` | `~/.claude/CLAUDE.md` oder die `CLAUDE.md` des Projekts |
-   | claude.ai, Claude Desktop (Chat + Cowork) | `CLAUDE-snippet-handover.md` | das Anweisungsfeld — global oder je Projekt |
+   Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/temp-debug-code`.
 
-   Übernommen wird **alles unterhalb der Trennlinie**; der kursive Text darüber bleibt zurück. Die Snippet-Dateien bleiben am Zielort liegen; wirksam ist allein die Anweisungsdatei, ihre Datumszeilen zeigen den Stand des übernommenen Triggers.
+### claude.ai und Claude Desktop (Chat + Cowork)
 
-   Ohne diesen Schritt wirkt der Skill nur bei ausdrücklichem Aufruf mit `/temp-debug-code`. Das ist hier besonders folgenreich: Der Auslöser ist Claudes eigene Handlung beziehungsweise ihr Vorschlag — der Nutzer fragt „warum kommt hier 3 raus?“, und die Entscheidung, eine `print`-Zeile einzubauen, fällt Claude. Es gibt also keine Anfrage, gegen die die `description` abgeglichen werden könnte.
+1. **Paket herunterladen.** `downloads/temp-debug-code_de_web.zip`
+
+2. **Hochladen.** Im dafür vorgesehenen Verwaltungsfeld für Skills der Anwendung das Archiv hochladen. Der Skill gilt danach für Dein Konto — nicht für Deine Organisation, und nicht gleichzeitig in Claude Code.
+
+3. **Stillen Trigger übernehmen.** Das musst Du händisch tun. Claude erkennt dann leichter aus dem Kontext heraus, ob der Skill geladen werden soll. Dazu: Aus `CLAUDE-snippet.md` im Archiv kommt **alles unterhalb der Trennlinie** in das Anweisungsfeld — global für das Konto oder für das einzelne Projekt.
+
+   Ohne diesen Schritt wirkt der Skill nur beim ausdrücklichen Aufruf mit `/temp-debug-code`.
+
+**Warum der Trigger hier besonders zählt:** Der Auslöser ist Claudes eigene Handlung beziehungsweise ihr Vorschlag — der Nutzer fragt „warum kommt hier 3 raus?“, und die Entscheidung, eine `print`-Zeile einzubauen, fällt Claude. Es gibt also keine Anfrage, gegen die die `description` abgeglichen werden könnte.
 
 ## Details
 
-**Die Marken.** Fünf Stück, zeichengenau einzuhalten: ` @@~DEBUG >>kennung<< ~@@ ` an jeder einzeln eingefügten Debug-Zeile, ` @@~DEBUG: ORIGINAL >>kennung<< ~@@ ` an jeder stillgelegten Originalzeile, ` @@~DEBUG: START >>kennung<< ~~~~~~~~~~~~@@ ` und ` @@~DEBUG: END >>kennung<< ~~~~~~~~~~~~@@ ` um Blöcke ab fünf Debug-Zeilen, dazu die Trennzeile ` @@~~~~~~~~~~~~~~~~~~~~~~~~@@ ` vor jedem START und nach jedem END. Die genauen Fälle und Beispiele für Python, C-artige Sprachen und Shell stehen in `marks.md`.
+**Die Marken.** Fünf Stück, zeichengenau einzuhalten: ` @@~DEBUG >>kennung<< ~@@ ` an jeder einzeln eingefügten Debug-Zeile, ` @@~DEBUG: ORIGINAL >>kennung<< ~@@ ` an jeder stillgelegten Originalzeile, ` @@~DEBUG: START >>kennung<< ~~~~~~~~~~~~@@ ` und ` @@~DEBUG: END >>kennung<< ~~~~~~~~~~~~@@ ` um Blöcke ab fünf Debug-Zeilen, dazu die Trennzeile ` @@~~~~~~~~~~~~~~~~~~~~~~~~@@ ` vor jedem START und nach jedem END. Die genauen Fälle und Beispiele für Python, C-artige Sprachen und Shell stehen in `marks.de.md`.
 
 **Warum `@@~` der Rahmen ist.** Das Rahmenzeichen darf nicht mit dem Kommentarzeichen einer Sprache kollidieren, kein Regex-Metazeichen sein, keine Sonderbedeutung in der Shell haben und in Quelltext praktisch nicht vorkommen — gesucht wird nach `@@~`, nicht nach `@@` allein. Geprüft und verworfen wurden: `%%`, weil `%%~` in Windows-Batch gängige Syntax ist (`%%~dp0`); `!!`, weil eine interaktive Bash `!!` auch in doppelten Anführungszeichen als History-Expansion auflöst und der Selbsttest-Befehl damit stillschweigend etwas anderes täte; `||`, weil `|` ein Metazeichen ist und Escaping erzwänge; und `§`, weil es auf US-Tastaturen nicht existiert. Die beiden Kollisionen von `@@` — Rubys Klassenvariablen und die Hunk-Köpfe in Diffs — treffen das Suchmuster nicht, weil dort nie eine Tilde folgt. Wer den Skill anpasst, sollte den Rahmen deshalb nicht gegen ein bequemeres Zeichen tauschen.
 

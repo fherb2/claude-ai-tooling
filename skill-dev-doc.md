@@ -249,6 +249,12 @@ Prüfbar: Auf jede `SKILL.md`, die beide Bedingungen erfüllt und trotzdem ihren
 
 **Alle übrigen Dateien behalten ihren Namen** — und das ist kein Schönheitsfehler, sondern der Grund, warum das Packen einfach bleibt: Die `SKILL.md` nennt die nachgeladenen Dateien beim Namen. Hieße `rules-local.de.md` im Paket plötzlich `rules-local.md`, müsste jeder Verweis im Text mitgezogen werden, und genau das geht still schief. Die drei umbenannten Dateien sind davon nicht betroffen: Auf die `SKILL.md` verweist niemand, und README und Snippet werden nur von der Installationsanleitung genannt, die den neuen Namen ohnehin verwendet.
 
+**Daraus folgt für jeden Verweis auf eine nachgeladene Datei: mit Sprachkürzel.** Die README nennt sie `rules-local.de.md`, die englische Fassung `rules-local.en.md` — nicht `rules-local.md`. Der kürzere Name stimmt nirgends: weder im Repo noch im Paket. Aufgefallen ist das erst bei der Prüfung des ersten gepackten Skills, dessen Aufbau-Tabelle alle vier nachgeladenen Dateien ohne Kürzel führte (30. August 2026).
+
+**Und die Kopfnotiz eines Snippets nennt die andere Zielwelt-Fassung nicht beim Namen.** Sie liegt im Paket nicht daneben, sondern in einem anderen Archiv; ein Dateiname an dieser Stelle zeigt beim Nutzer ins Leere. Der Verweis geht deshalb auf das andere **Paket**, nicht auf die andere Datei.
+
+**Wie gepackt wird.** `zip -9 -o -X`, die Einträge in sortierter Reihenfolge übergeben (`find … | LC_ALL=C sort | zip … -@`). Der Reihe nach: `-9` kostet bei diesen Dateigrößen nichts und spart beim Herunterladen; `-o` setzt das Datum des Archivs auf das der jüngsten enthaltenen Datei, womit man dem Paket ansieht, von welchem Stand es ist; `-X` lässt uid, gid und Zeitzonen-Extras weg, die sonst von Rechner zu Rechner verschieden ausfallen. Die Dateien selbst behalten ihre eigene mtime (`cp -p` beim Zusammenstellen). Zusammen mit der sortierten Reihenfolge ergibt gleicher Inhalt damit gleiche Bytes — ein Neubau ohne Änderung erzeugt keinen neuen Blob in git.
+
 **Geprüft wird von Hand, nicht von einem Skript.** Nach dem Packen wird der Inhalt jedes Archivs aufgelistet und angesehen: ob die Dateiliste stimmt und ob jede Datei, auf die aus dem Paket heraus verwiesen wird, auch darin liegt. Ein Bauskript gibt es bewusst nicht — ein Skill wird ein- bis dreimal in seinem Leben gepackt, ein Skript müsste bei jeder Strukturänderung nachgezogen werden und kostet mehr, als es spart.
 
 ---
