@@ -19,6 +19,8 @@ Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behä
 | MUSTER  | `muster-fuer-projektanweisungen.md`                                        | Die **Vorlage**, die der Entwickler pflegte und in neue Projekte kopierte — keine Anweisung eines einzelnen Projekts. **Byte-identisch mit CAM** (per `cmp` geprüft, 29.08.2026) und deshalb ohne eigene Spalte in der Themenmatrix; ihr Beitrag ist die Herkunft, nicht der Inhalt. |
 | SCH‑A  | `Scheludko-Zelle allgemein.txt`                                            | Projektspezifischer Kopf (Planungsphase, Hintergrunddateien) plus „Allgemeine Anweisungen“-Block in einer eigenständigen Zwischenvariante.                                                             |
 | SCH‑B  | `Scheludko-Zelle Bildverarbeitung.txt`                                     | Bis auf**einen Satz** textgleich mit BIRD (per Diff geprüft): SCH‑B ergänzt im Vorher/Ersetzen-Schema die Regel, „Vorher“/„Nachher“ vor den Block statt hinein zu schreiben.                       |
+| LOK     | `CLAUDE_lokal.md`                                                          | Neuaufbau der globalen `~/.claude/CLAUDE.md` vom 31. August 2026: oben Snippets und stille Trigger (der verteilte Lösungsstand), darunter „NOCH EINZUORDNEN“ — **nur dieser Teil ist Inventar** (T28–T50 und T22). |
+| WEB     | `CLAUDE_web.md`                                                            | Neuaufbau der Anweisungsfelder beider claude.ai-Konten (Pro und Team führen denselben Text), gleicher Aufbau; Inventar ist auch hier nur der „NOCH EINZUORDNEN“-Teil. |
 
 **Stand der Dateien:** Die sechs ursprünglichen Quelldateien sind abgearbeitet und aus dem Arbeitsordner entfernt — die beiden byte-gleichen CAM-Dateien am 27. August 2026, ALLG, MOD, BIRD, SCH‑A und SCH‑B am 31. August 2026, jeweils nachdem ihre letzten Posten einzeln entschieden waren. Ihre unveränderten Fassungen liegen weiter in `original/`. Im Arbeitsordner verblieben ist `muster-fuer-projektanweisungen.md` mit dem Testblock T17–T19.
 
@@ -37,47 +39,74 @@ MUSTER zählt nicht als siebter Text, sondern erklärt die Verwandtschaft: Es is
 3. **BIRD und SCH‑B (erweiterte Fassung):** Vorher/Ersetzen-Schema ausformuliert, explizite Artefakt-Kriterien (wann Artefakt, wann Chat), DEBUG-Kennzeichnung in der ausführlichsten Form, Status-Protokoll mit Chat-Referenzen und „Nur, wenn bereits erledigt“-Klausel, Konzept-Artefakte mit Chatlängen-Vorsorge. SCH‑B ist BIRD plus ein Satz (Beschriftung außerhalb des Blocks) — mutmaßlich die jüngste Fassung des Blocks.
 4. **MOD:** übernimmt die erweiterte Artefakt-Mechanik aus BIRD/SCH‑B und verallgemeinert sie durchgängig von „Code“ auf „Code/Dokumenteninhalte“ — passend zu einem Projekt, das noch keine Software schreibt.
 
+LOK und WEB stehen außerhalb dieser Verwandtschaft: Sie sind am 31. August 2026 aus den Snippets des Repos und dem Restbestand der alten Anweisungen neu aufgebaut worden und sind die jüngsten Quellen dieses Inventars.
+
 ## 3 Themenmatrix
 
 Legende der Quellenspalten: ✓ enthalten · (✓) in abgewandelter Form enthalten · ⊘ ausdrücklich ausgeklammert · – nicht enthalten. Die Varianten stehen beim jeweiligen Eintrag — in Kapitel 4, für die verarbeiteten Themen in Kapitel 6.
 
 Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk: **✅ heißt abgearbeitet** — der Posten ist in einen Skill überführt (oder bewusst verworfen), und seine Passagen sind aus den Quelldateien entfernt. Ohne Vermerk steht er noch offen.
 
-| Nr. |  | Thema                                    | ALLG | MOD  | BIRD | CAM  | SCH‑A | SCH‑B |
-| --- | --- | ---------------------------------------- | ---- | ---- | ---- | ---- | ------ | ------ |
-| T1  | ✅ | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
-| T2  | ✅ | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     |
-| T3  | ✅ | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     |
-| T4  | ✅ | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     |
-| T5  | ✅ | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     |
-| T6  | ✅ | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     |
-| T7  | ✅ | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     |
-| T8  | ✅ | Wann Artefakt, wann Chat                 | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
-| T9  | ✅ | Artefakte nicht nachträglich ändern    | –   | (✓) | ✓   | (✓) | (✓)   | ✓     |
-| T10 | ✅ | Vorher/Ersetzen-Schema                   | –   | (✓) | ✓   | –   | –     | (✓)   |
-| T11 | ✅ | Teil-Artefakte ab ~2 A4-Seiten           | –   | –   | –   | ✓   | ⊘     | –     |
-| T12 | ✅ | Nur besprochenen, notwendigen Code       | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T13 | ✅ | Funktionsumfang nie ungefragt erweitern  | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T14 | ✅ | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T15 | ✅ | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T16 | ✅ | DEBUG-Kennzeichnung von Probe-Code       | –   | –   | ✓   | –   | (✓)   | ✓     |
-| T17 |  | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T18 |  | Testfreundliche Funktionsanlage          | –   | –   | ✓   | ✓   | ✓     | ✓     |
-| T19 |  | debug-Parameter-Konvention               | –   | –   | ✓   | (✓) | ✓     | ✓     |
-| T20 | ✅ | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     |
-| T21 | ✅ | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     |
-| T22 | ✅ | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
-| T23 | ✅ | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
-| T24 | ✅ | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
-| T25 | ✅ | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
-| T26 | ✅ | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     |
-| T27 | ✅ | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     |
+| Nr. |  | Thema                                    | ALLG | MOD  | BIRD | CAM  | SCH‑A | SCH‑B | LOK | WEB |
+| --- | --- | ---------------------------------------- | ---- | ---- | ---- | ---- | ------ | ------ | --- | --- |
+| T1  | ✅ | Chat Deutsch, Duzen                      | (✓) | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T2  | ✅ | Code Englisch (inkl. Kommentare)         | (✓) | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T3  | ✅ | Dokumentsprache Deutsch/projektabhängig | ✓   | –   | –   | –   | –     | –     | –   | –   |
+| T4  | ✅ | Chat-Suche nur im Projekt                | –   | –   | ✓   | –   | ✓     | ✓     | –   | –   |
+| T5  | ✅ | Vorwissen-Definition                     | –   | –   | ✓   | –   | ✓     | ✓     | –   | –   |
+| T6  | ✅ | Ankündigen + Freigabe vor Artefakt      | –   | ✓   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T7  | ✅ | Offene Fragen vor Artefaktbeginn klären | –   | ✓   | ✓   | (✓) | ✓     | ✓     | –   | –   |
+| T8  | ✅ | Wann Artefakt, wann Chat                 | –   | (✓) | ✓   | (✓) | (✓)   | ✓     | –   | –   |
+| T9  | ✅ | Artefakte nicht nachträglich ändern    | –   | (✓) | ✓   | (✓) | (✓)   | ✓     | –   | –   |
+| T10 | ✅ | Vorher/Ersetzen-Schema                   | –   | (✓) | ✓   | –   | –     | (✓)   | –   | –   |
+| T11 | ✅ | Teil-Artefakte ab ~2 A4-Seiten           | –   | –   | –   | ✓   | ⊘     | –     | –   | –   |
+| T12 | ✅ | Nur besprochenen, notwendigen Code       | –   | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T13 | ✅ | Funktionsumfang nie ungefragt erweitern  | –   | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T14 | ✅ | Debug-Einzeiler`python -c`               | –   | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T15 | ✅ | Umfassendes Debugging als eigenes Skript | –   | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T16 | ✅ | DEBUG-Kennzeichnung von Probe-Code       | –   | –   | ✓   | –   | (✓)   | ✓     | –   | –   |
+| T17 |  | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T18 |  | Testfreundliche Funktionsanlage          | –   | –   | ✓   | ✓   | ✓     | ✓     | –   | –   |
+| T19 |  | debug-Parameter-Konvention               | –   | –   | ✓   | (✓) | ✓     | ✓     | –   | –   |
+| T20 | ✅ | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     | –   | –   |
+| T21 | ✅ | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     | –   | –   |
+| T22 |  | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     | ✓   | ✓   |
+| T23 | ✅ | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     | –   | –   |
+| T24 | ✅ | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     | –   | –   |
+| T25 | ✅ | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     | –   | –   |
+| T26 | ✅ | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     | –   | –   |
+| T27 | ✅ | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     | –   | –   |
+| T28 |  | Projekt-CLAUDE.md ergänzt, kopiert nicht | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T29 |  | Computer-Fragen zuerst verorten          | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
+| T30 |  | Änderungen außerhalb nur mit Freigabe    | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
+| T31 |  | LFS-Prüfung beim ersten Git-Kontakt      | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T32 |  | Markdown: ein Absatz, eine Zeile         | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T33 |  | Deutsche Prosa nicht per Heredoc         | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T34 |  | Projektwurzel aufgeräumt                 | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T35 |  | Projektordner .claude/                   | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T36 |  | Plan vor Ausführung                      | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
+| T37 |  | Abweichung heißt anhalten                | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
+| T38 |  | Rückfragen                               | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T39 |  | Erlaubt / nie ohne Zustimmung            | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T40 |  | Werkbank-Modell (Commits und Branches)   | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T41 |  | Kleinigkeiten: Regel statt Rückfrage     | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T42 |  | Kontext-Haushalt                         | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T43 |  | Anthropic-Werkzeuge: Beleglage           | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T44 |  | Umgang mit importierten Chats            | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T45 |  | Ablage/Format fremder Chat-Quellen       | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T46 |  | Methodik: Geltung und Phasen             | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T47 |  | Dokumentstruktur                         | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T48 |  | Die drei Segmente                        | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T49 |  | Arbeitsschleife der Implementierung      | –   | –   | –   | –   | –     | –     | ✓   | –   |
+| T50 |  | Fahrplan und Status                      | –   | –   | –   | –   | –     | –     | ✓   | –   |
 
 Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien ursprünglich enthielten, unabhängig davon, ob ein Thema inzwischen verarbeitet und aus ihnen entfernt ist. Wer den ursprünglichen Wortlaut braucht, findet ihn im Unterordner `original/`. Die Einträge der abgehakten Posten stehen in Kapitel 6.
 
 ## 4 Die Anweisungen im Einzelnen
 
 Jeder Eintrag nennt die Kernaussage, die Fundstellen mit ihren Varianten und eine Einordnung gegenüber dem heutigen Regelwerk (globale `~/.claude/CLAUDE.md`, hier „§…“, und die Skills dieses Repos). Die Einordnung trägt eine von vier Kategorien: **[claude.ai-Mechanik]** — an das Web-Frontend gebunden, in Claude Code gegenstandslos; **[abgedeckt]** — inhaltlich im heutigen Regelwerk enthalten; **[teilweise abgedeckt]**; **[nicht abgedeckt]** — Kandidat für eine Neuzusammenstellung.
+
+Seit dem 31. August 2026 ist die globale `~/.claude/CLAUDE.md` selbst inventarisiert (Quelle LOK). Die „§…“-Verweise älterer Einträge zeigen damit in Inventar-Material: §1.9 ist T42, §2.1 ist T46, §2.2 ist T22.
 
 ### D Debugging und Tests
 
@@ -110,6 +139,222 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 **Einordnung:** **[nicht abgedeckt]** — Kandidat für den Test-Skill (T17/T18). Zu klären ist dabei auch das Verhältnis zu T16 (Kapitel 6), heute im Skill `temp-debug-code`: T19 beschreibt **dauerhaft** im Code verbleibende Debug-Pfade, die dieser Skill ausdrücklich von seinen Regeln ausnimmt — die beiden ergänzen sich, überschneiden sich also nicht.
 
+### G Anweisungsebenen und Projektspezifik
+
+#### T28 Projekt-CLAUDE.md ergänzt, kopiert nicht
+
+**Aussage:** Die projekteigene `<projekt>/.claude/CLAUDE.md` ist keine Kopie der globalen Datei, sondern enthält ausschließlich Abweichendes und Zusätzliches; projektspezifische Festlegungen stehen nie global, sondern dort bzw. in Segment 2 der Implementierungsdoku.
+
+**Fundstellen:** nur LOK (Rest der alten Vorrede).
+
+**Einordnung:** **[teilweise abgedeckt]** — das Snippet „Vorrang der Anweisungsebenen" regelt, welche Ebene gewinnt, aber nicht, was auf welche Ebene **gehört**. Der zweite Teil ist die eigentliche Hygiene-Regel und nirgends sonst festgehalten.
+
+### H Umgebung und Wirkungsgrenzen
+
+#### T29 Computer-Fragen zuerst verorten
+
+**Aussage:** Bei einer Frage oder einem Problem zu einem Computer zuerst klären, ob der Computer gemeint ist, auf dem diese Instanz läuft, bevor selbständig darauf gesucht wird.
+
+**Fundstellen:** LOK (Allgemeine Regeln) und WEB, wortverwandt.
+
+**Einordnung:** **[nicht abgedeckt]** — einer der wenigen Posten, die in beiden Umgebungen wörtlich gebraucht werden.
+
+#### T30 Keine Änderungen außerhalb des freigegebenen Bereichs
+
+**Aussage:** Änderungen außerhalb des freigegebenen Ordners bzw. der Projektwurzel und Konfigurationsänderungen an Software oder laufenden Systemkomponenten nur nach Erklärung und ausdrücklicher Freigabe.
+
+**Fundstellen:** LOK (Allgemeine Regeln und 1.2, dort in der am 31. August verallgemeinerten Fassung) und WEB.
+
+**Einordnung:** **[teilweise abgedeckt]** — das Freigaben-Snippet regelt die Freigabe-Semantik, nicht die räumliche Grenze. Schutzregel-Charakter: Nach der Begründungslinie von `common-code-generation` („ein Skill wird nur wahrscheinlich geladen, eine Schutzregel muss sicher greifen") ist das eher Anweisungs- als Skill-Material.
+
+#### T31 LFS-Prüfung beim ersten Git-Kontakt
+
+**Aussage:** In jeder Sitzung bei der ersten Anwendung eines Git-Befehls prüfen, ob das Projekt LFS vorsieht (`.gitattributes`); wenn ja und git-lfs fehlt, dringend hinweisen und die Installation anbieten.
+
+**Fundstellen:** nur LOK.
+
+**Einordnung:** **[nicht abgedeckt]** — Kandidat für `parallel-sessions` ist es nicht (anderes Thema); denkbar als Mini-Baustein eines künftigen Git-Skills oder als Snippet.
+
+#### T34 Projektwurzel aufgeräumt
+
+**Aussage:** Werkzeug- und Konfigurationsdateien liegen in ihren Unterordnern (`.claude/`, `.vscode/`, …); in der Wurzel steht nur, was seinen Ablageort nicht wählen kann (`.gitignore`, …).
+
+**Fundstellen:** nur LOK (1.2, Fassung vom 31. August).
+
+**Einordnung:** **[nicht abgedeckt]**.
+
+#### T35 Der Projektordner `.claude/`
+
+**Aussage:** `<projekt>/.claude/` darf angelegt werden; `arbeitsdaten.json` trägt sitzungsübergreifende Angaben (deutscher Name bewusst, gegen Kollision mit Engine-Dateien); der Ordner wird mitversioniert (Arbeit über mehrere Rechner), die `.gitignore` darf ihn nicht ausschließen; Credentials gehören nicht hinein, Funde werden sofort gemeldet; zwischen Rechnern zu teilende Berechtigungen gehören in `.claude/settings.json`, nicht in `settings.local.json` (Workspace-Trust, nicht-interaktiver Modus).
+
+**Fundstellen:** nur LOK (1.2).
+
+**Einordnung:** **[nicht abgedeckt]** — hängt an T40: `arbeitsdaten.json` dient dort dem Namen des Hauptpfads. Fällt T40, ist der Rest eigenständig tragfähig.
+
+### A Sprache und Kontextquellen — wieder geöffnet am 31. August 2026
+
+Die Gruppe war mit T1, T3 und T4 geschlossen; die neuen Quelldateien tragen zwei weitere Sprach- und Schreibregeln.
+
+#### T32 Markdown-Formatierung: ein Absatz, eine Zeile
+
+**Aussage:** Markdown-Dateien standardmäßig mit einem Absatz je Zeile; CLAUDE.md-Dateien ausgenommen (von Hand sinnvoll umbrochen).
+
+**Fundstellen:** nur LOK (1.1).
+
+**Einordnung:** **[nicht abgedeckt]** als Anweisung — die `.markdownlint.jsonc` dieses Repos setzt die Folge (MD013 aus) bereits um, aber nur hier. Kandidat für ein Snippet oder einen Schreibregel-Skill.
+
+#### T33 Deutsche Prosa nicht durch Heredocs
+
+**Aussage:** Deutsche Prosa wird mit dem Write-/Edit-Werkzeug in Dateien geschrieben, nie über ein Skript in einem Heredoc — deutsche Anführungszeichen und Gedankenstriche beenden dort Zeichenketten vorzeitig (dreimal passiert am 13./14. August 2026); deutsche Anführungszeichen immer paarweise.
+
+**Fundstellen:** nur LOK (1.1).
+
+**Einordnung:** **[nicht abgedeckt]** — Kandidat für `common-code-generation` ist es nur bedingt (es geht um Prosa in Dateien, nicht um Code); tragfähig auch als Snippet. Die Erfahrung dieses Repos bestätigt die Regel laufend.
+
+### I Plan-, Frage- und Freigabedisziplin
+
+#### T36 Plan vor Ausführung
+
+**Aussage:** Keine Dateiänderung ohne vorgelegten, vollständigen und erklärenden Plan. Vollständig heißt: je Datei, je Stelle — was entfällt, was hinzukommt, warum, mit unmittelbaren und mittelbaren Auswirkungen, ausdrücklich auch über das Arbeitsziel hinaus. Der Plan beschreibt Absicht und Wirkung, nicht den Wortlaut (Dokumente: Passage für Passage; Code: adressierbare Einheiten statt Kontrollfluss); ist das nicht möglich, ist der Schritt zu groß. Der Plan umfasst genau den nächsten Schritt. WEB ergänzt: Ob der Plan als Datei oder im Chat vorgelegt wird, entscheidet der Nutzer — vorher fragen.
+
+**Fundstellen:** LOK (1.3) ausführlich; WEB als Kurzfassung mit dem Ablage-Zusatz. In beiden ist der Freigabe-Teil bereits durch Verweis auf das Snippet ersetzt (31. August 2026).
+
+**Einordnung:** **[teilweise abgedeckt]** — die Freigabe-Semantik trägt das Snippet „Freigaben werden erteilt, nicht gefolgert"; die Plan-Pflicht selbst, die Vollständigkeitsdefinition und die Prosa-statt-Code-Regel stehen nirgends sonst. Schutzregel-Charakter wie T30.
+
+#### T37 Abweichung heißt anhalten
+
+**Aussage:** Trägt der zugestimmte Plan bei der Ausführung nicht: anhalten, Lage schildern, neu fragen — nie stillschweigend abweichen.
+
+**Fundstellen:** LOK (1.4) und WEB.
+
+**Einordnung:** **[nicht abgedeckt]** — Gegenstück zum Freigaben-Snippet, dort aber nicht enthalten.
+
+#### T38 Rückfragen
+
+**Aussage:** Vor jeder Rückfrage prüfen, ob die Projektdokumentation antwortet; Mehrdeutigkeit der Doku ist ein Defekt (benennen, Korrektur vorschlagen); widersprechen sich Code und Doku: anhalten und fragen — beide Seiten können falsch sein.
+
+**Fundstellen:** nur LOK (1.5).
+
+**Einordnung:** **[nicht abgedeckt]**.
+
+#### T39 Ohne Rückfrage erlaubt / nie ohne Zustimmung
+
+**Aussage:** Erlaubt ohne Nachfrage: Lesen, Suchen, Tests, kurzlaufende Analysen ohne Seiteneffekte, Checkpoint-Commits auf der Werkbank (T40). Nie ohne Zustimmung: push, Pakete installieren/aktualisieren, Container bauen, langlaufende Jobs (insbesondere GPU), Dateien löschen. Projekte dürfen verschärfen.
+
+**Fundstellen:** nur LOK (1.6).
+
+**Einordnung:** **[teilweise abgedeckt]** — `parallel-sessions` führt für Worktree-Projekte eigene, vorgehende Freigabestufen; die konkreten Listen hier gelten darüber hinaus und stehen nirgends sonst. Der Werkbank-Punkt hängt an T40.
+
+#### T41 Wiederkehrende Kleinigkeiten: Regel statt Rückfrage
+
+**Aussage:** Keine Plan-Ausnahme für Trivialänderungen; wiederholt sich dieselbe Kleinigkeit, wird die zugrunde liegende Regel einmal geklärt und am dafür vorgesehenen Ort festgeschrieben — danach entfällt die Rückfrage dauerhaft.
+
+**Fundstellen:** nur LOK (1.8).
+
+**Einordnung:** **[nicht abgedeckt]**.
+
+### J Git-Arbeitsmodell ohne Worktree-Vereinbarung
+
+#### T40 Commits und Branches: das Werkbank-Modell
+
+**Aussage:** Für Projekte ohne `.claude/git-worktree-model.json`: zwei Branches (Hauptpfad des Nutzers, Werkbank `claude-workbench` für Claude), fünf Prüfschritte vor jedem Wechsel auf die Werkbank (fetch/status, Hauptpfad erfragen, Vorsprung prüfen, Unverschmolzenes melden, Hauptpfadname in `arbeitsdaten.json`), Checkpoint-Commits nur auf der Werkbank, Abschluss als Squash-Merge mit anschließendem Neuableiten der Werkbank samt `push -u` (Upstream-Falle vom 13. August 2026).
+
+**Fundstellen:** nur LOK (1.7) — der mit Abstand längste Restposten.
+
+**Einordnung:** **[teilweise abgedeckt]** — in Worktree-Projekten vollständig durch `parallel-sessions` ersetzt, und die Datei sagt das selbst. Für Projekte **ohne** das Modell trägt der Skill nur die Schreibhoheits-Sofortregel; das Werkbank-Verfahren ist nirgends übernommen. Zu entscheiden: als zweiter Regelzweig in `parallel-sessions`, als eigener Skill — oder sterben lassen, wenn künftig jedes betroffene Projekt das Worktree-Modell bekommt.
+
+### E Projektgedächtnis über Chat-Grenzen — wieder geöffnet am 31. August 2026
+
+Die Gruppe war mit T20, T21 und T22 geschlossen; die neuen Quelldateien tragen drei weitere Posten desselben Feldes.
+
+#### T42 Kontext-Haushalt
+
+**Aussage:** Führt das Projekt Fahrplan und Statusdatei, ist bei knapp werdendem Kontext die nächste Handlung die Detaillierung des Fahrplans — vor jeder Komprimierung, nie danach, nicht weiterkodieren. Am Ende jeder Arbeitssitzung Fahrplan und Status aktualisieren: Sie sind das Übergabemedium zwischen Maschinen und Sessions.
+
+**Fundstellen:** nur LOK (1.9).
+
+**Einordnung:** **[nicht abgedeckt]** — und tragend: Mehrere frühere Schließungen (T21, zuvor T5-Umfeld) berufen sich auf genau diese Regel als „§1.9". Wird sie zu einem Skill, müssen die Verweise der Kapitel-6-Einträge ihr Ziel behalten.
+
+#### T44 Umgang mit importierten Chats
+
+**Aussage:** Ein Chat-Import ist nur das Hinzufügen durchsuchbaren Inhalts — keine Widerspruchsprüfung beim Import; Chats sind historische Information. Chronologie zuerst über Benennung, dann über Inhalt, sonst den Nutzer fragen (Dateidatum nur als Hilfsangabe). Kollisionsprüfung ausschließlich auf Anfrage; Auflösung innerhalb der Chats ist Weiterentwicklung, keine Kollision; gegen Doku/Code gibt es keinen automatischen Vorrang. Ob eine Aussage Festlegung oder Zwischenstand ist, entscheidet die Chronologie.
+
+**Fundstellen:** nur LOK (1.11).
+
+**Einordnung:** **[nicht abgedeckt]** — der Skill `chat-export` holt Chats, regelt aber ihre Deutung nicht. Dessen Implementierungsdoku sieht in 3.3 ausdrücklich einen **eigenen künftigen Skill** für das Durchsuchen eines vorhandenen Archivs vor; T44 ist das inhaltliche Material dafür.
+
+#### T45 Ablage und Format importierter Chats aus fremden Quellen
+
+**Aussage:** Für claude.ai-Chats gilt der Skill `chat-export` (Verweis steht seit dem 31. August in der Quelldatei selbst). Für Chats aus anderen Quellen: Ablage unter `<projekt>/.claude/imported_chats/` (mitversioniert), Überführung nach JSON mit `role` user/assistant, `metadata`-Objekt mit `chat_date`, `imported_at`, `predecessor`/`successor` (nur wenn zweifelsfrei; nachträgliche Ergänzung erlaubt), Beispielschema im Wortlaut.
+
+**Fundstellen:** nur LOK (1.12).
+
+**Einordnung:** **[teilweise abgedeckt]** — der claude.ai-Fall ist durch den Skill erledigt; offen ist allein das Schema für fremde Quellen. Kandidat: derselbe künftige Archiv-Skill wie bei T44.
+
+### K Anthropic-Werkzeuge und Beleglage
+
+#### T43 Aussagen über Claude Code und die Anthropic-Werkzeuge
+
+**Aussage:** Fragen zu Anthropic-Werkzeugen nie aus dem Basiswissen beantworten, sondern gegen die aktuelle offizielle Dokumentation recherchieren, mit Quellenangabe. Belegte Fakten, eigene Beobachtung und Community-Wissen getrennt ausweisen. Die Doku kann veraltet sein: Widerspricht sie der Beobachtung, wird der Widerspruch benannt, nicht stillschweigend gegen die Beobachtung aufgelöst.
+
+**Fundstellen:** nur LOK (1.10).
+
+**Einordnung:** **[nicht abgedeckt]** — verwandt mit `in-depth-online-literature-research` (Verifikationspflicht), aber eine andere Regel: dort Recherchemethode, hier ein Antwortverbot aus Basiswissen samt Beleglage-Trennung. Die Beleglage-Trennung ist zugleich Vorgabe 2.1 der chat-export-Doku — dieselbe Denkfigur, unabhängig formuliert. Kandidat für einen eigenen kleinen Skill oder ein Snippet.
+
+### L Projektmethodik: Konzept- und Implementierungsdoku
+
+Der zusammenhängende Block der Softwareprojekt-Methodik — Kandidat ist das Vorhaben `software-dev-doc-fh` (Fahrplan-Schritt 5), das genau diesen Standard kodifizieren soll; die lokal installierten Werkzeug-Skills `konzept-segmentierung` und `konsistenzpruefung` setzen Teile davon bereits um, ihre Zugehörigkeit klärt derselbe Fahrplanschritt.
+
+#### T46 Geltungsbereich und Phasen
+
+**Aussage:** Die Methodik gilt nur für Vorhaben, in denen Quellcode entsteht; Vorhaben ohne Quellcode wählen eine einfachere Form und benennen die Abweichung in der projekteigenen CLAUDE.md. Vier Phasen: Findung (offen, Prosa, nichts ist Festlegung), Fixierung (Ideen werden Vorgaben, erste finale APIs), Segmentierung (Neuschreiben als dreigeteiltes Dokument, Skill `/segmentierung`, erster Fahrplan), Implementierung (Doku wird parallel zum Code gepflegt).
+
+**Fundstellen:** nur LOK (Vorrede-Rest und 2.1).
+
+**Einordnung:** **[nicht abgedeckt]** als verteilbarer Skill; `/segmentierung` existiert nur lokal beim Entwickler.
+
+#### T22 Prosa-Code-Grenze — wiedereröffnet am 31. August 2026
+
+Am 30. August ohne Skill-Zuhause geschlossen („die Regel gilt bereits über §2.2 und bleibt dort"); der Eintrag samt Begründung stand in Kapitel 6. Wiedereröffnet, weil die Anweisungsdateien, in denen die Regel lebt, jetzt selbst Inventar sind: Werden sie zu Skills durchgearbeitet, braucht auch diese Regel ein Zuhause. Die am 30. August entschiedenen Streitpunkte bleiben entschieden — zwei Ausnahmen, keine Code-Style-Beispiele, keine Ausdehnung auf Fahrplan und Status; die WEB-Fassung ist am 31. August entsprechend angeglichen worden.
+
+**Aussage:** Konzept- und Implementierungsdokumente enthalten keinen Implementierungscode. Genau zwei Ausnahmen: final beschlossene API-Signaturen und Nutzungsbeispiele bzw. -beispielschnipsel. Begründung (bindend): Code im Konzept macht die Prüfung von Code gegen Konzept wertlos; Prosa hält den mitgedachten Kontext; aus Prosa entsteht die Anwenderdokumentation.
+
+**Fundstellen:** LOK (2.2) und WEB, seit dem 31. August wortgleich in der Sache. Historisch ALLG (Wortlaut in `original/`).
+
+**Einordnung:** **[nicht abgedeckt]** als Skill — Teil des Methodik-Blocks dieser Gruppe.
+
+#### T47 Dokumentstruktur
+
+**Aussage:** Ordner `running_implementation_doc/` (anpassbar); eine Datei je Segment 1 und 2, eine je Hauptkapitel von Segment 3, dazu Fahrplan und Status; numerische Präfixe in Leseordnung; Segmente als Überschriften 1. Ordnung so gesetzt, dass das Verketten in Dateireihenfolge ein gültiges Gesamtdokument ergibt.
+
+**Fundstellen:** nur LOK (2.3).
+
+**Einordnung:** **[nicht abgedeckt]** — mit bekannter, dokumentierter Abweichung in diesem Repo (Dateiname `work-plan.md` statt `fahrplan.md`, Projekt-CLAUDE.md).
+
+#### T48 Die drei Segmente
+
+**Aussage:** Segment 1 Zusammenhänge (Workflow-Sicht, Querverweise als Suchweg, Quelle der Anwenderdoku); Segment 2 Vorgaben (projektweite, prüfbare Festlegungen — Aufnahmetest: auf eine Datei zeigen und „das verletzt diese Vorgabe" sagen können); Segment 3 Einheiten (je Hauptkapitel eine geschlossene Einheit). Jede Aussage hat genau ein normatives Zuhause.
+
+**Fundstellen:** nur LOK (2.4).
+
+**Einordnung:** **[nicht abgedeckt]** als verteilbarer Skill; praktisch umgesetzt in den Implementierungsdokus dieses Repos.
+
+#### T49 Arbeitsschleife der Implementierung
+
+**Aussage:** Tagesaufgabe aus dem Fahrplan; betroffene Segment-3-Sektion vollständig laden, Segment 1 gezielt durchsuchen, Segment 2 gilt parallel; bei übergreifenden Entscheidungen über Segment 1 die betroffenen Sektionen finden und Auswirkungen rückwärts einpflegen; zu jedem Codierungsschritt gehört der Doku-Vorschlag in den Plan — Doku und Code im Wechsel.
+
+**Fundstellen:** nur LOK (2.5).
+
+**Einordnung:** **[nicht abgedeckt]**.
+
+#### T50 Fahrplan und Status
+
+**Aussage:** Fahrplan: die nächsten Schritte in aufgabenangemessener Detaillierung, Erledigtes fliegt raus, Detaillierung vor jeder Kompression vertiefen. Status: ausschließlich abgearbeitete Fahrplaneinträge, keine Entscheidungen — die gehören sofort in das zuständige Segment.
+
+**Fundstellen:** nur LOK (2.6).
+
+**Einordnung:** **[nicht abgedeckt]** — bildet mit T42 ein Paar (T42 sagt wann, T50 sagt was); eine spätere Skill-Fassung sollte beide zusammen denken.
+
 ## 5 Zusammenfassung für die Neuzusammenstellung
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
@@ -123,6 +368,11 @@ Derzeit leer. Die letzten Einträge (T21, T22) sind am 30./31. August 2026 gesch
 ### 5.3 Nicht oder nur teilweise abgedeckt — Kandidaten
 
 - **Python-Test-Konventionen (T17, T18, T19):** der größte ungenutzte Block — pytest CI+CLI, testfreundliche Funktionsanlage, debug-Parameter. Kandidat für einen neuen Skill; bei T19 vorher genau eine der zwei unverträglichen Fassungen festlegen. Abgrenzung zu `temp-debug-code` ist sauber (dauerhafter vs. temporärer Debug-Code).
+
+- **Projektmethodik-Block (T46–T50, T22):** Kandidat ist `software-dev-doc-fh` (Fahrplan-Schritt 5); die lokalen Werkzeug-Skills `konzept-segmentierung` und `konsistenzpruefung` setzen Teile bereits um. T42 und T50 bilden ein Paar und gehören zusammen gedacht.
+- **Archiv-Skill für importierte Chats (T44, T45):** In der Implementierungsdoku von `chat-export` (3.3) ist ein eigener Skill für das Durchsuchen eines vorhandenen Archivs bereits vorgesehen — T44/T45 sind sein Material.
+- **Werkbank-Modell (T40):** als zweiter Regelzweig von `parallel-sessions`, als eigener Skill — oder sterben lassen, wenn betroffene Projekte künftig das Worktree-Modell bekommen.
+- **Einzelposten (T31 LFS, T33 Heredoc, T43 Beleglage):** je klein; als Snippet oder Mini-Skill denkbar, Zuschnitt offen.
 
 ### 5.4 Offene Fragen an den Entwickler
 
@@ -343,18 +593,6 @@ Was bleibt, ist Arbeitsmodus eines einzelnen Projekts in einer bestimmten Lage �
 **Fundstellen:** nur MOD, ein Absatz.
 
 **Einordnung:** **[teilweise abgedeckt]** — siehe oben.
-
-#### T22 Prosa-Code-Grenze in Konzept- und Implementationsdokumenten
-
-**Entschieden:** Kein Skill-Zuhause, 30. August 2026 · Gruppe E (Projektgedächtnis über Chat-Grenzen). Die Regel gilt bereits über §2.2 und bleibt dort; ein Skill entsteht daraus nicht.
-
-**Aussage:** Konzept- und Implementationsdokumente (auch Fahrplan-/Statusdokumente) enthalten keinen Implementierungscode. Genau zwei Ausnahmen: final beschlossene API-Signaturen sowie Nutzungs- **und Code-Style-Beispiele**.
-
-**Fundstellen:** nur ALLG, ein Absatz — der letzte, den diese Quelldatei noch enthielt.
-
-**Einordnung:** **[abgedeckt]** durch §2.2. Mit dem Abhaken ist auch die vermerkte Abweichung erledigt, und zwar ohne eigene Entscheidung: Da nichts übernommen wird, gilt §2.2 unverändert weiter. Zwei Punkte sind damit stillschweigend zugunsten von §2.2 entschieden. Erstens die Code-Style-Beispiele: ALLG zählt drei Ausnahmen auf, kündigt aber selbst „genau zwei“ an — die Quelle widerspricht sich, §2.2 mit zwei Ausnahmen ist die widerspruchsfreie Fassung. Zweitens die Reichweite: ALLG bezieht Fahrplan- und Statusdokumente ausdrücklich ein, §2.2 nennt nur Konzept- und Implementierungsdokumente. Wer eine der beiden Fragen später doch anders beantworten will, ändert §2.2, nicht dieses Inventar.
-
-Verwandt: Am selben Tag wurde in `skill-dev-doc.md` Anhang A festgehalten, dass §2.2 dort nicht greift — die Datei ist die laufende Anweisung des Vorhabens selbst und kein Konzeptdokument eines Produkts. Das ist dieselbe Reichweitenfrage aus der anderen Richtung.
 
 #### T20 Das „Status Protokoll“
 
