@@ -35,6 +35,8 @@ If the first call reports "Browser extension is not connected" or "Claude in Chr
 - On claude.ai, under Settings → Connectors, "Claude in Chrome" is turned on for this account. Does not act retroactively on already-open tabs.
 - In Chrome, under Settings → Downloads, "Ask where to save each file before downloading" is **off**. Otherwise the first download opens a file dialog, and a dialog blocks the connection entirely.
 
+If all three are met and it still does not work, or the connection breaks off in the middle of a run, then read `${CLAUDE_SKILL_DIR}/bridge-diagnosis.en.md`. It says which message belongs to which layer and what is explicitly **not** a cause — in particular that different accounts in Chrome and Claude Code are not one. Do not read it beforehand: as a rule the file is not needed.
+
 ### Name the account
 
 Open your own tab. You only ever see your own tabs, never the user's — a claude.ai tab opened beforehand is neither necessary nor reachable.
