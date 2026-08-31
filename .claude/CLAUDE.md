@@ -50,7 +50,7 @@ Besuchers. Der Begriff „Fahrplan" bleibt in der deutschen Prosa
 unverändert; nur der Dateiname folgt der Sichtbarkeit (Festlegung des
 Entwicklers vom 27. August 2026). Betroffen sind alle drei: die
 repository-weite `work-plan.md` in der Wurzel,
-`home-.claude-sharing/work-plan.md` und `chat-export/work-plan-v2.md`.
+`home-.claude-sharing/work-plan.md` und `skills/chat-export/work-plan-v2.md`.
 
 Zwei Präzisierungen: Bei Skill-Ordnern ist der Name die Schnittstelle —
 Ordnername, Frontmatter-Feld `name` und Slash-Aufruf sind dasselbe; eine
