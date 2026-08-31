@@ -57,7 +57,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 # sits here beside the tests -- it is nobody's tool, only this test's yardstick
 # for vorgabe 2.5.
 SOURCE_DIR = _HERE
-CONVERT_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
+CONVERT_DIR = os.path.dirname(_HERE)
 sys.path.insert(0, SOURCE_DIR)
 sys.path.insert(0, CONVERT_DIR)
 
