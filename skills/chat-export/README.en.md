@@ -18,7 +18,7 @@ What results from this are archive files, not chats you can continue. An importe
 
 This skill needs no silent trigger: it fires through its `description` or is called with `/chat-export`. And renaming the instruction file falls away — inside the package it is already called `SKILL.md`, in the language the package name states.
 
-Besides the instruction file the folder holds three more files: the helper script `chat_export_convert.py`, without which the skill does not work; this README as documentation for you; and `bridge-diagnosis.en.md`, a failure diagnosis for the Chrome connection that Claude reads only when it actually goes wrong.
+Besides the instruction file the folder holds four more files: the helper script `chat_export_convert.py`, without which the skill does not work; `inspect_export.py`, which lets you examine an account-export ZIP when you want to know what is actually inside it; this README as documentation for you; and `bridge-diagnosis.en.md`, a failure diagnosis for the Chrome connection that Claude reads only when it actually goes wrong.
 
 ## Usage
 

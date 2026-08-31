@@ -18,7 +18,7 @@ Was dabei entsteht, sind Archivdateien, keine fortsetzbaren Chats. Ein importier
 
 Einen stillen Trigger braucht dieser Skill nicht: Er löst über seine `description` aus oder wird mit `/chat-export` aufgerufen. Und das Umbenennen der Anweisungsdatei entfällt — im Paket heißt sie schon `SKILL.md`, in der Sprache, die der Paketname nennt.
 
-Im Ordner liegen neben der Anweisungsdatei drei weitere Dateien: das Hilfsskript `chat_export_convert.py`, ohne das der Skill nicht arbeitet; diese README als Dokumentation für dich; und `bridge-diagnosis.de.md`, eine Fehlerdiagnose zur Chrome-Anbindung, die Claude nur liest, wenn sie wirklich klemmt.
+Im Ordner liegen neben der Anweisungsdatei vier weitere Dateien: das Hilfsskript `chat_export_convert.py`, ohne das der Skill nicht arbeitet; `inspect_export.py`, mit dem sich ein Kontoexport-ZIP untersuchen lässt, wenn Du wissen willst, was tatsächlich darin steckt; diese README als Dokumentation für dich; und `bridge-diagnosis.de.md`, eine Fehlerdiagnose zur Chrome-Anbindung, die Claude nur liest, wenn sie wirklich klemmt.
 
 ## Bedienung
 
