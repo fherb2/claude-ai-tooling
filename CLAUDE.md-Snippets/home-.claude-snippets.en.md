@@ -18,4 +18,4 @@ When you want to store information in the memory area and the following question
 
 # Earlier sessions as a source
 
-When you need the course of an earlier session — when something was decided, in what order and on what grounds — then search the transcripts under `~/.claude/projects/<project-path-with-hyphens>/`: one JSONL file per session. Date them by the first timestamp inside the content, not by the file time, which a sync between machines shifts.
+When you need the course of an earlier chat session — when something was decided, in what order and on what grounds — or when you want to research facts from earlier chat sessions that were never noted down outside the session, then search the transcripts under `~/.claude/projects/<project-path-with-hyphens>/`: one JSONL file per session. Date them by the first timestamp inside the content, not by the file time, which a sync between machines shifts.
