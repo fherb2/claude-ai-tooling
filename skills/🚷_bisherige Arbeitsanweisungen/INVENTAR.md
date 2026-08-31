@@ -20,6 +20,8 @@ Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behä
 | SCH‑A  | `Scheludko-Zelle allgemein.txt`                                            | Projektspezifischer Kopf (Planungsphase, Hintergrunddateien) plus „Allgemeine Anweisungen“-Block in einer eigenständigen Zwischenvariante.                                                             |
 | SCH‑B  | `Scheludko-Zelle Bildverarbeitung.txt`                                     | Bis auf**einen Satz** textgleich mit BIRD (per Diff geprüft): SCH‑B ergänzt im Vorher/Ersetzen-Schema die Regel, „Vorher“/„Nachher“ vor den Block statt hinein zu schreiben.                       |
 
+**Stand der Dateien:** Die sechs ursprünglichen Quelldateien sind abgearbeitet und aus dem Arbeitsordner entfernt — die beiden byte-gleichen CAM-Dateien am 27. August 2026, ALLG, MOD, BIRD, SCH‑A und SCH‑B am 31. August 2026, jeweils nachdem ihre letzten Posten einzeln entschieden waren. Ihre unveränderten Fassungen liegen weiter in `original/`. Im Arbeitsordner verblieben ist `muster-fuer-projektanweisungen.md` mit dem Testblock T17–T19.
+
 Die Dateisystem-Daten stammen alle vom Kopiertag und taugen nicht zur zeitlichen Einordnung. Die Chronologie der Fassungen ist unten aus Textbefunden erschlossen und entsprechend als Vermutung gekennzeichnet.
 
 ## 2 Verwandtschaft der Texte
@@ -62,14 +64,14 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T17 |  | pytest: CI-fähig und CLI-startbar       | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T18 |  | Testfreundliche Funktionsanlage          | –   | –   | ✓   | ✓   | ✓     | ✓     |
 | T19 |  | debug-Parameter-Konvention               | –   | –   | ✓   | (✓) | ✓     | ✓     |
-| T20 |  | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     |
-| T21 |  | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     |
+| T20 | ✅ | Status Protokoll                         | –   | –   | ✓   | (✓) | ✓     | ✓     |
+| T21 | ✅ | Konzept-Artefakte                        | –   | –   | ✓   | (✓) | (✓)   | ✓     |
 | T22 | ✅ | Prosa-Code-Grenze                        | ✓   | –   | –   | –   | –     | –     |
 | T23 | ✅ | Findungsphase: Alternativen erwünscht   | –   | ✓   | –   | –   | –     | –     |
 | T24 | ✅ | Planungsphase: erklären statt kodieren  | –   | –   | –   | –   | ✓     | –     |
 | T25 | ✅ | Generalisierbarkeit von Lösungen        | –   | ✓   | –   | –   | –     | –     |
 | T26 | ✅ | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     |
-| T27 |  | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     |
+| T27 | ✅ | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     |
 
 Die Matrix ist vollständig und bleibt es: Sie bildet ab, was die Quelldateien ursprünglich enthielten, unabhängig davon, ob ein Thema inzwischen verarbeitet und aus ihnen entfernt ist. Wer den ursprünglichen Wortlaut braucht, findet ihn im Unterordner `original/`. Die Einträge der abgehakten Posten stehen in Kapitel 6.
 
@@ -108,34 +110,6 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 **Einordnung:** **[nicht abgedeckt]** — Kandidat für den Test-Skill (T17/T18). Zu klären ist dabei auch das Verhältnis zu T16 (Kapitel 6), heute im Skill `temp-debug-code`: T19 beschreibt **dauerhaft** im Code verbleibende Debug-Pfade, die dieser Skill ausdrücklich von seinen Regeln ausnimmt — die beiden ergänzen sich, überschneiden sich also nicht.
 
-### E Projektgedächtnis über Chat-Grenzen
-
-#### T20 Das „Status Protokoll“
-
-**Aussage:** Auf Wunsch des Nutzers (dann aber konsequent) wird ein Protokoll geführt — Artefaktname immer „Status Protokoll“, Datei `status_protokoll.md`, Markdown. Zweck: Erhalt des Bearbeitungsstands über mehrere Chats. Es wird **ausschließlich angehängt**, bestehende Einträge bleiben unverändert. Inhalt je Eintrag: die nächste anstehende Aufgabe; wo schon definiert, Funktions-/Klassenrümpfe als API-Beschreibung des nächsten Schritts; erledigte Teilschritte und Fehlschläge (nur wenn tatsächlich geschehen); Aufgaben-/Konzeptänderungen; Erfahrungen, die zum Verständnis der Lösung nötig sind. Beim Übergeben eines Protokolls: vollständig lesen, Stand analysieren, **Chronologie beachten** — was oben „offen“ ist, kann unten erledigt sein. Formulierung so ausführlich, dass spätere Missverständnisse ohne zusätzliches Vorwissen ausgeschlossen sind; vorhandenes Vorwissen (T5) wird referenziert statt ausgeschrieben.
-
-**Fundstellen:** CAM in der Basisfassung (ohne Chat-Referenzen, ohne „Nur, wenn bereits erledigt“, „Aufgabenänderungen“ statt „Aufgaben-/Konzeptänderungen“); BIRD, SCH‑A, SCH‑B in der erweiterten Fassung (Chat-Namen als Referenz zur Entlastung des Protokolls; „immer nur wird angehangen“; Referenzieren des Vorwissens, „damit Du an der richtigen Stelle suchst“).
-
-**Einordnung:** **[teilweise abgedeckt]** — der Zweck (Übergabemedium zwischen Sitzungen) lebt heute in Fahrplan und Status (§2.6, §1.9) und im Vorhaben `software-dev-doc-fh` weiter. Der **Mechanismus ist aber gegenläufig**: Das Status Protokoll war append-only und chronologisch — der Leser musste die Chronologie auflösen; Fahrplan/Status arbeiten ersetzend — Erledigtes fliegt raus, Nummern bleiben stabil. Die alten Detailregeln (Referenzieren statt Ausschreiben; „so ausführlich, dass ohne Vorwissen kein Missverständnis möglich ist“; Funktionsrümpfe als API-Beschreibung des nächsten Schritts) sind erprobtes Vergleichsmaterial für den weiteren Ausbau von `software-dev-doc-fh`.
-
-#### T21 Konzept-Artefakte
-
-**Aussage:** Beim Erarbeiten eines Konzepts (Code-Strukturen, APIs) entsteht spätestens am Ende der Konzipierung ein Konzept-Artefakt (Markdown). Der Auftrag kommt vom Nutzer, Claude darf es aber vorschlagen. Nicht zu früh anlegen (wegen des Artefakt-Änderungsproblems T9, Kapitel 6 — im Skill `web-code-editing` zeitlos neu gefasst); in der erweiterten Fassung zusätzlich: rechtzeitig **vor** Erreichen des Chatlängen-Limits sichern, mit Reserve von einigen Chat-Blöcken für die Besprechung des Konzepts.
-
-**Fundstellen:** CAM und SCH‑A in der Basisfassung; BIRD und SCH‑B erweitert („in der Regel“, „Vielleicht habe ich es nur vergessen“, Chatlängen-Vorsorge).
-
-**Einordnung:** **[abgedeckt]** der Sache nach: Das Phasenmodell §2.1 (Findung → Fixierung → Segmentierung) ist der ausgebaute Nachfolger des Konzept-Artefakts, und die Chatlängen-Vorsorge entspricht exakt §1.9 (vor jeder Komprimierung den Fahrplan detaillieren). Der Timing-Gedanke „nicht zu früh festschreiben“ lebt in §2.1 als Findungsphase weiter.
-
-### F Projektphase und Arbeitsmodus
-
-#### T27 Projektspezifische Hintergrunddateien als Kontext
-
-**Aussage:** Bestimmte Projektdateien („Grob-Analyse v1.md“ als grundlegender Kontext, „closedLoop7_1_hifiberry.py“ für Details der bisherigen Methoden) beschreiben Zweck und alte Herangehensweise, **nicht** das neue Entwicklungsziel — neue Erkenntnisse dürfen die dort beschriebenen Schritte ersetzen; die während der Chats entstehenden Dateien sind Teil des neuen Ziels.
-
-**Fundstellen:** nur SCH‑A.
-
-**Einordnung:** kein wiederverwendbarer Inhalt, aber ein wiederverwendbares **Muster**: die ausdrückliche Statuszuweisung an Kontextdateien („Hintergrund, nicht Vorgabe“ vs. „Teil des Ziels“). In der Claude-Code-Welt ist das die Rolle der Projekt-CLAUDE.md bzw. von Segment 1 der Implementierungsdoku. Als Muster festhaltenswert, als Text obsolet.
-
 ## 5 Zusammenfassung für die Neuzusammenstellung
 
 ### 5.1 claude.ai-Mechanik — in Claude Code gegenstandslos
@@ -144,16 +118,11 @@ T8–T11 sind am 28. August 2026 in `skills/web-code-editing/` verarbeitet und s
 
 ### 5.2 Bereits abgedeckt — mit den festgestellten Abweichungen
 
-| Einträge    | Heutiger Ort                  | Abweichung/Anmerkung                                                                                                                    |
-| ------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| T21          | §2.1, §1.9                  | —                                                                                                                                      |
-
-Hier stehen nur Einträge, die das **Regelwerk** bereits abdeckt und die deshalb offen bleiben — sie sind Referenzmaterial für die noch ausstehende Durcharbeitung der globalen CLAUDE.md. Wovon bereits ein **Skill** gebaut wurde, gilt als erledigt und steht mit seiner Zuordnung in Kapitel 6.
+Derzeit leer. Die letzten Einträge (T21, T22) sind am 30./31. August 2026 geschlossen worden; ihre Abweichungen stehen bei den Einträgen in Kapitel 6. Die Rubrik bleibt stehen: Sie füllt sich wieder, sobald die Durcharbeitung der neuen Anweisungsdateien Posten liefert, die das Regelwerk bereits abdeckt.
 
 ### 5.3 Nicht oder nur teilweise abgedeckt — Kandidaten
 
 - **Python-Test-Konventionen (T17, T18, T19):** der größte ungenutzte Block — pytest CI+CLI, testfreundliche Funktionsanlage, debug-Parameter. Kandidat für einen neuen Skill; bei T19 vorher genau eine der zwei unverträglichen Fassungen festlegen. Abgrenzung zu `temp-debug-code` ist sauber (dauerhafter vs. temporärer Debug-Code).
-- **Status-Protokoll-Detailregeln (T20):** Vergleichsmaterial für den Ausbau von `software-dev-doc-fh` (Referenzieren statt Ausschreiben, Missverständnisfestigkeit, API-Rümpfe als Schrittbeschreibung); der append-only-Mechanismus selbst ist durch Fahrplan/Status bewusst abgelöst.
 
 ### 5.4 Offene Fragen an den Entwickler
 
@@ -386,3 +355,33 @@ Was bleibt, ist Arbeitsmodus eines einzelnen Projekts in einer bestimmten Lage �
 **Einordnung:** **[abgedeckt]** durch §2.2. Mit dem Abhaken ist auch die vermerkte Abweichung erledigt, und zwar ohne eigene Entscheidung: Da nichts übernommen wird, gilt §2.2 unverändert weiter. Zwei Punkte sind damit stillschweigend zugunsten von §2.2 entschieden. Erstens die Code-Style-Beispiele: ALLG zählt drei Ausnahmen auf, kündigt aber selbst „genau zwei“ an — die Quelle widerspricht sich, §2.2 mit zwei Ausnahmen ist die widerspruchsfreie Fassung. Zweitens die Reichweite: ALLG bezieht Fahrplan- und Statusdokumente ausdrücklich ein, §2.2 nennt nur Konzept- und Implementierungsdokumente. Wer eine der beiden Fragen später doch anders beantworten will, ändert §2.2, nicht dieses Inventar.
 
 Verwandt: Am selben Tag wurde in `skill-dev-doc.md` Anhang A festgehalten, dass §2.2 dort nicht greift — die Datei ist die laufende Anweisung des Vorhabens selbst und kein Konzeptdokument eines Produkts. Das ist dieselbe Reichweitenfrage aus der anderen Richtung.
+
+#### T20 Das „Status Protokoll“
+
+**Entschieden:** Kein Skill-Zuhause, 31. August 2026 · Gruppe E (Projektgedächtnis über Chat-Grenzen). Der Mechanismus ist durch Fahrplan und Status (§2.6, §1.9) bewusst abgelöst, und zwar gegenläufig: append-only und chronologisch dort, ersetzend hier — ihn in einen Skill zu heben, hieße die Ablösung zurückzunehmen. Die erprobten Detailregeln (Referenzieren statt Ausschreiben, Missverständnisfestigkeit ohne Vorwissen, Funktions-/Klassenrümpfe als API-Beschreibung des nächsten Schritts) bleiben als Vergleichsmaterial für den Ausbau von `software-dev-doc-fh` — der Wortlaut steht in diesem Eintrag, ein offener Posten ist dafür nicht nötig.
+
+**Aussage:** Auf Wunsch des Nutzers (dann aber konsequent) wird ein Protokoll geführt — Artefaktname immer „Status Protokoll“, Datei `status_protokoll.md`, Markdown. Zweck: Erhalt des Bearbeitungsstands über mehrere Chats. Es wird **ausschließlich angehängt**, bestehende Einträge bleiben unverändert. Inhalt je Eintrag: die nächste anstehende Aufgabe; wo schon definiert, Funktions-/Klassenrümpfe als API-Beschreibung des nächsten Schritts; erledigte Teilschritte und Fehlschläge (nur wenn tatsächlich geschehen); Aufgaben-/Konzeptänderungen; Erfahrungen, die zum Verständnis der Lösung nötig sind. Beim Übergeben eines Protokolls: vollständig lesen, Stand analysieren, **Chronologie beachten** — was oben „offen“ ist, kann unten erledigt sein. Formulierung so ausführlich, dass spätere Missverständnisse ohne zusätzliches Vorwissen ausgeschlossen sind; vorhandenes Vorwissen (T5) wird referenziert statt ausgeschrieben.
+
+**Fundstellen:** CAM in der Basisfassung (ohne Chat-Referenzen, ohne „Nur, wenn bereits erledigt“, „Aufgabenänderungen“ statt „Aufgaben-/Konzeptänderungen“); BIRD, SCH‑A, SCH‑B in der erweiterten Fassung (Chat-Namen als Referenz zur Entlastung des Protokolls; „immer nur wird angehangen“; Referenzieren des Vorwissens, „damit Du an der richtigen Stelle suchst“).
+
+**Einordnung:** **[teilweise abgedeckt]** — der Zweck (Übergabemedium zwischen Sitzungen) lebt in Fahrplan und Status weiter. Nicht abgedeckt war allein der Halbsatz „dann aber auch konsequent nutzen“ — die Pflicht, ein einmal begonnenes Dokument durchzuhalten; der Entwickler hat entschieden, ihn nicht zu übernehmen.
+
+#### T21 Konzept-Artefakte
+
+**Entschieden:** Kein Skill-Zuhause, 31. August 2026 · Gruppe E (Projektgedächtnis über Chat-Grenzen). Der Sache nach abgedeckt: Das Phasenmodell §2.1 ist der ausgebaute Nachfolger des Konzept-Artefakts, die Chatlängen-Vorsorge entspricht §1.9. Die eine Nuance, die T21 ausdrücklicher fasste — der **Vorlauf**: „einige Chat-Blöcke übrig“ statt §1.9s „wird der Kontext knapp“ —, wurde im Chat besprochen; der Entwickler hat entschieden, dass §1.9 das trägt.
+
+**Aussage:** Beim Erarbeiten eines Konzepts (Code-Strukturen, APIs) entsteht spätestens am Ende der Konzipierung ein Konzept-Artefakt (Markdown). Der Auftrag kommt vom Nutzer, Claude darf es aber vorschlagen. Nicht zu früh anlegen (wegen des Artefakt-Änderungsproblems T9 — im Skill `web-code-editing` zeitlos neu gefasst); in der erweiterten Fassung zusätzlich: rechtzeitig **vor** Erreichen des Chatlängen-Limits sichern, mit Reserve von einigen Chat-Blöcken für die Besprechung des Konzepts.
+
+**Fundstellen:** CAM und SCH‑A in der Basisfassung; BIRD und SCH‑B erweitert („in der Regel“, „Vielleicht habe ich es nur vergessen“, Chatlängen-Vorsorge).
+
+**Einordnung:** **[abgedeckt]** — der Timing-Gedanke „nicht zu früh festschreiben“ lebt in §2.1 als Findungsphase weiter.
+
+#### T27 Projektspezifische Hintergrunddateien als Kontext
+
+**Entschieden:** Kein Skill-Zuhause, 31. August 2026 · Gruppe F (Projektphase und Arbeitsmodus). Reine Projektspezifik, dieselbe Begründungslinie wie T25: Welche Dateien eines konkreten Projekts Hintergrund sind und welche das neue Entwicklungsziel tragen, gehört in die Anweisungen des jeweiligen Projekts, nicht in eine allgemeine Regel.
+
+**Aussage:** Bestimmte Projektdateien („Grob-Analyse v1.md“ als grundlegender Kontext, „closedLoop7_1_hifiberry.py“ für Details der bisherigen Methoden) beschreiben Zweck und alte Herangehensweise, **nicht** das neue Entwicklungsziel — neue Erkenntnisse dürfen die dort beschriebenen Schritte ersetzen; die während der Chats entstehenden Dateien sind Teil des neuen Ziels.
+
+**Fundstellen:** nur SCH‑A.
+
+**Einordnung:** **[nicht abgedeckt]** als allgemeine Regel — und bewusst nicht aufgenommen. Der verallgemeinerbare Kern (Hintergrund von Ziel unterscheiden) wäre erst dann ein Kandidat, wenn er in mehr als einem Projekt gebraucht würde.
