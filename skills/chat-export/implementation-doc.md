@@ -4,6 +4,8 @@
 
 Was hier steht, ist damit Zusage und nicht Arbeitsstand. Ein Widerspruch **innerhalb dieser Doku** oder zwischen **Doku und Code** ist ein Defekt und wird behoben, nicht erklärt.
 
+Am 22. August 2026 hat eine unabhängige Claude-Instanz die Logik gegen die Ziele dieser Doku geprüft; alle Befunde sind behoben. Ein eigener Befundbericht dazu existiert nicht — diese Angabe ist alles, was davon erhalten ist.
+
 ---
 
 Vier Teile. **Teil 1** beschreibt, was gebaut wird, wie es zusammenwirkt und wie es benutzt wird. **Teil 2** hält die Vorgaben, die quer über alle Werkzeuge gelten. **Teil 3** hält je Skript die Festlegungen, die dort umgesetzt werden, samt dem Kontext, der dafür erarbeitet wurde. **Teil 4** ist die Prüfliste gegenüber der laufenden Anthropic-Entwicklung. Teil 1 verweist für Details nach 2 und 3 und wiederholt sie nicht.
@@ -605,6 +607,8 @@ Drei Festlegungen tragen den Entwurf, und alle drei stehen dort normativ:
 Das angestrebte Verhalten ist in `SKILL.de.md`/`SKILL.en.md` und der `README.md`/`README.en.md` des Skills umgesetzt (Anwenderdokumentation, Bedienung und Hintergrund getrennt). Die Mechanik der Browser-Anbindung samt ihrer Fallstricke steht dauerhaft in `chrome-access.de.md`/`chrome-access.en.md` — nicht befristet, weil sie sich bei jeder künftigen Anthropic-Änderung an der Bridge wieder als Nachschlagewerk eignet.
 
 **Der Anweisungsblock für die `CLAUDE.md` des Zielprojekts bleibt bewusst außerhalb der Skill-README.** Das Durchsuchen eines vorhandenen Archivs ist eine eigene Aufgabe und bekommt einen eigenen Skill; `SKILL.md` und das Skript sehen den Block noch vor, was daraus wird, entscheidet sich mit jenem Skill.
+
+**Für eine künftige Fassung vorgemerkt: die Teilung der Anweisungsdatei** (Durchsicht vom 25. August 2026). Die `SKILL.md` lädt mit 167 Zeilen vollständig und bricht hart ab, wenn die Browser-Werkzeuge nicht an der Nachricht hängen — ein häufiger und damit teurer Ausgang. Eine Abhilfe nach dem Teilungsmuster aus `skill-dev-doc.md` 5.2 (dünne Klärung, Regeln nachgeladen) setzt voraus, dass zuerst die Vorgaben **dieses** Vorhabens geprüft werden, statt jenes Muster unbesehen zu übertragen. Ein Schritt ist das noch nicht — deshalb steht es hier und nicht in `work-plan-v2.md`.
 
 ---
 
