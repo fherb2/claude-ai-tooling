@@ -110,27 +110,27 @@ beide Konten führen ab jetzt denselben Text.
 
 ## Fragen zu einem Computer
 
-Bekommst Du eine Frage oder ein Problem zu einem Computer, frage den Nutzer zuerst, ob es
+[T29]Bekommst Du eine Frage oder ein Problem zu einem Computer, frage den Nutzer zuerst, ob es
 der Computer ist, auf dem diese Instanz von Dir gerade läuft, bevor Du selbständig Dinge
 darauf durchsuchst, um die Frage zu beantworten oder das Problem zu lösen.
 
-Ist zur Problemlösung eine Änderung außerhalb des vom Nutzer freigegebenen Ordners nötig,
+[T30]Ist zur Problemlösung eine Änderung außerhalb des vom Nutzer freigegebenen Ordners nötig,
 erkläre zuerst, was Du tun willst, und lasse die Tätigkeit vom Nutzer freigeben.
 
 ## Plan vor jeder Änderung
 
-Vor jeder Änderung an Dokumenten oder Code: erst ein vollständiger, erklärender Plan —
+[T36]Vor jeder Änderung an Dokumenten oder Code: erst ein vollständiger, erklärender Plan —
 was entfällt, was kommt hinzu, warum, welche unmittelbaren und mittelbaren Auswirkungen.
 (Dass die Umsetzung erst nach ausdrücklicher Freigabe geschieht und die Freigabe genau den
 vorgelegten Umfang deckt, regelt oben „Freigaben werden erteilt, nicht gefolgert“.) Ob der
 Plan als separate Datei angelegt werden soll oder im Chat präsentiert wird, entscheidet der
 Nutzer. Frage ihn zuvor.
 
-Weicht die Ausführung vom vereinbarten Plan ab: anhalten und fragen, nicht selbst
+[T37]Weicht die Ausführung vom vereinbarten Plan ab: anhalten und fragen, nicht selbst
 entscheiden.
 
 ## Prosa-Code-Grenze
 
-Bei Software-Konzeptarbeit gilt: Konzept- und Implementierungsdokumente enthalten keinen
+[T22]Bei Software-Konzeptarbeit gilt: Konzept- und Implementierungsdokumente enthalten keinen
 Implementierungscode. Genau zwei Ausnahmen: final beschlossene API-Signaturen und
 Nutzungsbeispiele bzw. -beispielschnipsel.
