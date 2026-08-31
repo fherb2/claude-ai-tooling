@@ -28,7 +28,7 @@ Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + 
 
 ### chat-export weicht in zwei Punkten ab
 
-**Er führt seine eigene Implementierungsdoku und seinen eigenen Fahrplan.** `implementation-doc.md` und `work-plan-v2.md` liegen in seinem Ordner, daneben der systematische Testweg zur Chrome-Anbindung, ein Diagnoseskript und die Testsuite. Der Grund ist der Umfang: Dieser Skill ist erheblich komplexer als das Definieren einer `SKILL.md` — er bringt ein Werkzeug von 90 KB mit, das über zwei völlig verschiedene Datenquellen dasselbe Ergebnis liefern muss, und diese Zusage ist von einem eigenen Test bewacht. Das Entwicklungsmaterial reist nicht mit ins Installationspaket (Vorgaben, Kapitel 5).
+**Er führt seine eigene Implementierungsdoku und seinen eigenen Fahrplan.** `implementation-doc.md` und `work-plan-v2.md` liegen in seinem Ordner, daneben der systematische Testweg zur Chrome-Anbindung und die Testsuite. Der Grund ist der Umfang: Dieser Skill ist erheblich komplexer als das Definieren einer `SKILL.md` — er bringt ein Werkzeug von 90 KB mit, das über zwei völlig verschiedene Datenquellen dasselbe Ergebnis liefern muss, und diese Zusage ist von einem eigenen Test bewacht. Das Entwicklungsmaterial reist nicht mit ins Installationspaket (Vorgaben, Kapitel 5).
 
 **Und seine README trägt bewusst keinen Statushinweis**, nur die Bedienung: Was ein Nutzer kopiert, soll ihm sagen, wie es benutzt wird, und nicht, wie weit die Entwicklung ist. Der Stand steht deshalb hier.
 

@@ -28,7 +28,7 @@ Reusable skills for Claude Code, claude.ai and Claude Desktop (Chat + Cowork), t
 
 ### chat-export deviates in two respects
 
-**It carries its own implementation documentation and its own roadmap.** `implementation-doc.md` and `work-plan-v2.md` sit in its folder, alongside the systematic test path for the Chrome connection, a diagnostic script and the test suite. The reason is scale: this skill is considerably more complex than defining a `SKILL.md` — it brings along a 90 KB tool that has to deliver the same result across two entirely different data sources, and that promise is guarded by a test of its own. The development material does not travel into the installation package (guidelines, chapter 5).
+**It carries its own implementation documentation and its own roadmap.** `implementation-doc.md` and `work-plan-v2.md` sit in its folder, alongside the systematic test path for the Chrome connection and the test suite. The reason is scale: this skill is considerably more complex than defining a `SKILL.md` — it brings along a 90 KB tool that has to deliver the same result across two entirely different data sources, and that promise is guarded by a test of its own. The development material does not travel into the installation package (guidelines, chapter 5).
 
 **And its README deliberately carries no status note**, only the usage: what a user copies should tell them how it is used, not how far the development has come. That is why the state stands here.
 
