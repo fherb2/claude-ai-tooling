@@ -1,4 +1,4 @@
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-31*
 
 # Planning
 
@@ -15,3 +15,7 @@ When you want to store information in the memory area and the following question
 - you may put it into your own memory area (`~/.claude`),
 - you should put it into the project (`<project>/.claude` or somewhere else)
 - or you should merely remember it within the context of this session.
+
+# Earlier sessions as a source
+
+When you need the course of an earlier session — when something was decided, in what order and on what grounds — then search the transcripts under `~/.claude/projects/<project-path-with-hyphens>/`: one JSONL file per session. Date them by the first timestamp inside the content, not by the file time, which a sync between machines shifts.

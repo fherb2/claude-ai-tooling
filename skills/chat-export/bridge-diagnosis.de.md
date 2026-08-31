@@ -8,6 +8,8 @@ Der Zweck ist die Abgrenzung. Die teuerste Diagnose ist die, die den Nutzer zu e
 
 **Verschiedene Konten in Chrome und in Claude Code sind kein Fehler.** Die Bridge folgt allein der claude.ai-Websitzung, die im Tab gerade aktiv ist — unabhängig davon, an welchem Konto diese Claude-Code-Sitzung hängt. Zweimal unabhängig reproduziert, einmal nach vollständigem Rechner-Neustart mit von Anfang an verschiedenen Konten. Schick den Nutzer also nicht zum Angleichen der Konten.
 
+Dass dieser Irrtum wiederkehrt, hat einen Grund: **Anthropics eigene Fehlermeldung behauptet die Kontogleichheit** — „Please ensure the Claude browser extension is installed and running, and that you are logged into claude.ai with the same account as Claude Code.“ Eine Fehlermeldung zählt mögliche Ursachen auf; sie belegt keine Bedingung. Wer sie liest und den Testweg nicht kennt, schreibt die Pflicht erneut hin — in der Anwenderdokumentation dieses Skills ist genau das neun Tage lang passiert.
+
 **Ein Kontowechsel im Tab bricht eine stehende Bridge nicht.** Ebenfalls zweimal reproduziert, das zweite Mal mit vertauschten Rollen. Nach dem Wechsel liefert der Tab prompt die neue Organisation, ohne dass sich die Bridge neu anmelden muss.
 
 **Die Bridge ist nicht auf claude.ai beschränkt.** Navigation und Skriptausführung funktionieren auch auf fremden Domains. Ein Fehlschlag beim claude.ai-Aufruf ist deshalb noch kein Befund über die Anbindung.

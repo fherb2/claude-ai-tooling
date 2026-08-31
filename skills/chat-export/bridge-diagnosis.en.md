@@ -8,6 +8,8 @@ The purpose is delimitation. The most expensive diagnosis is the one that sends 
 
 **Different accounts in Chrome and in Claude Code are not an error.** The bridge follows only the claude.ai web session currently active in the tab — regardless of which account this Claude Code session hangs on. Reproduced twice independently, once after a full machine restart with different accounts from the start. So do not send the user off to align accounts.
 
+There is a reason this misconception keeps coming back: **Anthropic's own error message claims the accounts must match** — "Please ensure the Claude browser extension is installed and running, and that you are logged into claude.ai with the same account as Claude Code." An error message lists possible causes; it does not establish a condition. Anyone who reads it without knowing the test path writes the requirement down again — which is exactly what happened in this skill's user documentation for nine days.
+
 **Switching accounts in the tab does not break a standing bridge.** Also reproduced twice, the second time with the roles swapped. After the switch the tab promptly returns the new organization, without the bridge having to log in again.
 
 **The bridge is not confined to claude.ai.** Navigation and script execution work on other domains too. A failure on the claude.ai call is therefore not yet a finding about the connection.
