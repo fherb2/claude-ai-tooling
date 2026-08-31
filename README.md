@@ -14,10 +14,8 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | Baustein                                                      | Anliegen                                                                                                                                                                                                                                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.md)<br>✅ | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
-| [`chat-export/`](chat-export/README.md)<br>✅ | **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert in lokale Claude-Instanzen** (Claude Code) **übertragen** — was Anthropic bisher nicht bietet.                                            |
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
 | [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit „stillem“ Trigger**.                                                   |
-
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
 
 (✅ einsatzbereit · 🚧 in Arbeit · ⚠️ mit Vorbehalt · ☑ abh. vom Skill)
@@ -38,16 +36,6 @@ Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[
 
 **Stand:** produktiv — Näheres in der [README des Bausteins](pack-source-to-txt/README.md).
 
-## chat-export
-
-**Zweck:** **Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten bzw. nach Projekten sortiert und in lokale Claude-Instanzen (Claude Code) zu importieren**, unterstützt Anthropic derzeit (08/2026) nicht. – Mit diesem Tooling geht's doch.
-
-Die vorhandene Datenexport-Schnittstelle ist dazu nicht unmittelbar geeignet und wird mit diesem Tooling nur mittelbar benutzt. Das Hilfsmittel unterstützt den Import nach Projekten getrennt und erlaubt auch das „Nachladen“ bereits beim letzten Import begonnener Chats. Keine simple 1-klick-Lösung. – Statt dessen überhaupt erst mal eine Lösung.
-
-Bedient wird es über den Claude-Code-Skill `chat-export`, der durch beide Wege führt — den Kontoexport und die internen Web-Endpunkte von Claude.ai über den angemeldeten Chrome.
-
-**Stand:** Einsatzbereit. An echten Daten in mehreren unabhängigen Sitzungen erprobt, zuletzt an vier realen Projekten mit 171 Chats — Ergebnis gegen die tatsächliche Export-ZIP verifiziert. Am 22. August 2026 zusätzlich von einer unabhängigen Instanz gegen die Doku-Ziele geprüft; alle Befunde behoben. Näheres in der [README des Bausteins](chat-export/README.md).
-
 ## home-.claude-sharing
 
 **Zweck: Hält den Arbeitszustand von Claude Desktop und Claude Code — Konfiguration, Sitzungsprotokolle, Projektgedächtnis — über Syncthing zwischen mehreren Rechnern synchron. – Rechnerwechsel zwischen Home und Office oder remote und lokal. Benötigt dabei kein VPN oder lokales Netz.**
@@ -61,6 +49,8 @@ Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche 
 **Zweck: Anweisungen aus CLAUDE.md raus und Aufgabenbeschreibungen wiederverwendbar machen.** Skills starten auch ohne ein passendes „Trigger-Wort“.
 
 Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + Cowork): Anweisungen, die nicht dauerhaft in `CLAUDE.md`-Dateien Kontext kosten, sondern erst geladen werden, wenn sie gebraucht werden. Jeder fertige Skill liegt als Installationspaket bereit — ein Archiv je Sprache und Zielwelt, im Unterordner `downloads/` des Skills.
+
+Der umfangreichste unter ihnen ist **`chat-export`**: Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten oder nach Projekten sortiert in eine lokale Claude-Code-Installation zu holen, unterstützt Anthropic derzeit (08/2026) nicht — mit diesem Skill geht es doch, über den angemeldeten Chrome oder aus einem Kontoexport-ZIP. Er ist der einzige Skill mit eigener Implementierungsdoku und eigenem Fahrplan; warum, steht in der [README des Bausteins](skills/README.md).
 
 Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Situationen, die niemand ausspricht. Der Anthropic-Standard, einen Skill aktiv vom Nutzer zu starten oder im Skill über `description:` per Trigger-Wörter im Chat automatisch zu starten, erweitert das Konzept der stillen Trigger auch ein Start aus dem Kontext des Chats heraus. Das ist keine Claude-Code-Erweiterung, sondern wird über besondere Formulierungsregeln in CLAUDE.md erreicht. Details zur Nachnutzung in diesem Baustein.
 

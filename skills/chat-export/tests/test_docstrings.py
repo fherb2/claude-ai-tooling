@@ -44,7 +44,9 @@ import sys
 _HERE = os.path.dirname(os.path.abspath(__file__))
 TESTS_DIR = _HERE
 PROJECT_DIR = os.path.dirname(_HERE)
-SKILL_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
+# The same folder as PROJECT_DIR since the skill moved into skills/, but kept
+# apart on purpose: only chat_export_convert.py ships with the skill.
+SKILL_DIR = PROJECT_DIR
 
 FAILURES = []
 

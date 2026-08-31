@@ -35,6 +35,8 @@ Melden sie beim ersten Aufruf "Browser extension is not connected" oder "Claude 
 - Auf claude.ai unter Einstellungen → Connectors ist "Claude in Chrome" für dieses Konto eingeschaltet. Wirkt nicht rückwirkend auf schon offene Tabs.
 - In Chrome unter Einstellungen → Downloads ist "Speicherort für jede Datei vor dem Download abfragen" **aus**. Sonst öffnet der erste Download einen Dateidialog, und ein Dialog blockiert die Anbindung vollständig.
 
+Sind alle drei erfüllt und es klemmt trotzdem, oder reißt die Anbindung mitten im Lauf ab, dann lies `${CLAUDE_SKILL_DIR}/bridge-diagnosis.de.md`. Dort steht, welche Meldung welche Schicht betrifft und was ausdrücklich **keine** Ursache ist — insbesondere, dass verschiedene Konten in Chrome und Claude Code keine sind. Vorher nicht lesen: Im Regelfall wird die Datei nicht gebraucht.
+
 ### Konto nennen
 
 Leg dir einen eigenen Tab an. Du siehst ausschließlich deine eigenen Tabs, nie die des Nutzers — ein vorab geöffneter claude.ai-Tab ist weder nötig noch erreichbar.
