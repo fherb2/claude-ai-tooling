@@ -1,6 +1,8 @@
 # chat-export — Bring chats from claude.ai into your project
 
-*Last updated: 2026-08-26*
+*Last updated: 2026-08-31*
+
+*Usable with Claude Code.*
 
 **This skill fetches chats from your claude.ai projects and stores them as searchable JSON files in the project Claude Code is currently running in.** They are meant for finding earlier context again: what was once discussed in a chat is afterward findable in the project, instead of sitting only in the account.
 
@@ -10,14 +12,13 @@ What results from this are archive files, not chats you can continue. An importe
 
 ## Installation
 
-Copy the folder `skills/chat-export/` with its entire contents to one of the two locations:
+1. **Download the package.** `downloads/chat-export_en_local.zip`
 
-| Location | Path | Applies to |
-| -------- | ---- | ---------- |
-| Personal | `~/.claude/skills/chat-export/`         | all your projects |
-| Project  | `<project>/.claude/skills/chat-export/` | only this project |
+2. **Unpack it.** The archive contains a folder `chat-export/` with all the files. Unpack it into `~/.claude/skills/` — then the skill applies to all your projects — or into `.claude/skills/` in the project, then only there. An existing folder of the same name is replaced; nothing old is left behind.
 
-The folder contains two language versions of the instruction file, `SKILL.de.md` and `SKILL.en.md`. Transfer the version you want to the target location and rename **that one, there,** to `SKILL.md` — Claude Code only recognizes this exact name; leave the other version in place or delete it. The rest — the helper script and this README as documentation for you — stays unchanged.
+This skill needs no silent trigger: it fires through its `description` or is called with `/chat-export`. And renaming the instruction file falls away — inside the package it is already called `SKILL.md`, in the language the package name states.
+
+Besides the instruction file the folder holds three more files: the helper script `chat_export_convert.py`, without which the skill does not work; this README as documentation for you; and `bridge-diagnosis.en.md`, a failure diagnosis for the Chrome connection that Claude reads only when it actually goes wrong.
 
 ## Usage
 

@@ -1,6 +1,8 @@
 # chat-export — Chats aus claude.ai in dein Projekt holen
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-31*
+
+*Benutzbar mit Claude Code.*
 
 **Dieser Skill holt Chats aus deinen claude.ai-Projekten und legt sie als durchsuchbare JSON-Dateien in dem Projekt ab, in dem Claude Code gerade läuft.** Gedacht sind sie zum Wiederfinden früheren Zusammenhangs: Was in einem Chat einmal besprochen wurde, steht danach im Projekt und ist auffindbar, statt nur im Konto zu liegen.
 
@@ -10,15 +12,13 @@ Was dabei entsteht, sind Archivdateien, keine fortsetzbaren Chats. Ein importier
 
 ## Installation
 
-Kopiere den Ordner `skills/chat-export/` mit seinem gesamten Inhalt an einen der beiden Orte:
+1. **Paket herunterladen.** `downloads/chat-export_de_local.zip`
 
+2. **Entpacken.** Das Archiv enthält einen Ordner `chat-export/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle deine Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-| Ort         | Pfad                                    | Gilt für           |
-| ----------- | --------------------------------------- | ------------------- |
-| Persönlich | `~/.claude/skills/chat-export/`         | alle deine Projekte |
-| Projekt     | `<projekt>/.claude/skills/chat-export/` | nur dieses Projekt  |
+Einen stillen Trigger braucht dieser Skill nicht: Er löst über seine `description` aus oder wird mit `/chat-export` aufgerufen. Und das Umbenennen der Anweisungsdatei entfällt — im Paket heißt sie schon `SKILL.md`, in der Sprache, die der Paketname nennt.
 
-Der Ordner enthält zwei Sprachfassungen der Anweisungsdatei, `SKILL.de.md` und `SKILL.en.md`. Übertrage die gewünschte Fassung an den Zielort und benenne **dort** genau diese eine in `SKILL.md` um — Claude Code erkennt nur diesen Namen, die jeweils andere Fassung lässt du liegen oder löschst sie. Der Rest — das Hilfsskript und diese README zur Dokumentation für dich — bleibt unverändert.
+Im Ordner liegen neben der Anweisungsdatei drei weitere Dateien: das Hilfsskript `chat_export_convert.py`, ohne das der Skill nicht arbeitet; diese README als Dokumentation für dich; und `bridge-diagnosis.de.md`, eine Fehlerdiagnose zur Chrome-Anbindung, die Claude nur liest, wenn sie wirklich klemmt.
 
 ## Bedienung
 
