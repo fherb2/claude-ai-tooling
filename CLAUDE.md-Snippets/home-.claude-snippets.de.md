@@ -20,4 +20,4 @@ Wenn Du Informationen im Memory-Bereich ablegen willst und die folgende Frageste
 
 # Frühere Sitzungen als Quelle
 
-Brauchst Du den Verlauf einer früheren Chat-Sitzung — wann etwas entschieden wurde, in welcher Reihenfolge und mit welcher Begründung —, oder möchtest Du Fakten früherer Chat-Sitzung recherchieren, die nicht außerhalb der Sitzung notiert wurde, dann durchsuche die Protokolle unter `~/.claude/projects/<projektpfad-mit-bindestrichen>/`: eine JSONL-Datei je Sitzung. Datiere sie über den ersten Zeitstempel im Inhalt und nicht über die Dateizeit, die eine Synchronisation zwischen Rechnern verschiebt.
+Brauchst Du den Verlauf einer früheren Chat-Sitzung — wann etwas entschieden wurde, in welcher Reihenfolge und mit welcher Begründung —, oder möchtest Du Fakten früherer Chat-Sitzungen recherchieren, die nicht außerhalb der Sitzung notiert wurden, dann durchsuche die Protokolle unter `~/.claude/projects/<projektpfad-mit-bindestrichen>/`: eine JSONL-Datei je Sitzung. Datiere sie über den ersten Zeitstempel im Inhalt und nicht über die Dateizeit, die eine Synchronisation zwischen Rechnern verschiebt.
