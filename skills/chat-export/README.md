@@ -1,6 +1,8 @@
 # chat-export — Chats aus claude.ai in dein Projekt holen
 
-*Stand: 2026-08-26*
+*Stand: 2026-08-31*
+
+*Benutzbar mit Claude Code.*
 
 **Dieser Skill holt Chats aus deinen claude.ai-Projekten und legt sie als durchsuchbare JSON-Dateien in dem Projekt ab, in dem Claude Code gerade läuft.** Gedacht sind sie zum Wiederfinden früheren Zusammenhangs: Was in einem Chat einmal besprochen wurde, steht danach im Projekt und ist auffindbar, statt nur im Konto zu liegen.
 
@@ -10,15 +12,13 @@ Was dabei entsteht, sind Archivdateien, keine fortsetzbaren Chats. Ein importier
 
 ## Installation
 
-Kopiere den Ordner `skills/chat-export/` mit seinem gesamten Inhalt an einen der beiden Orte:
+1. **Paket herunterladen.** `downloads/chat-export_de_local.zip`
 
+2. **Entpacken.** Das Archiv enthält einen Ordner `chat-export/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle deine Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-| Ort         | Pfad                                    | Gilt für           |
-| ----------- | --------------------------------------- | ------------------- |
-| Persönlich | `~/.claude/skills/chat-export/`         | alle deine Projekte |
-| Projekt     | `<projekt>/.claude/skills/chat-export/` | nur dieses Projekt  |
+Einen stillen Trigger braucht dieser Skill nicht: Er löst über seine `description` aus oder wird mit `/chat-export` aufgerufen. Und das Umbenennen der Anweisungsdatei entfällt — im Paket heißt sie schon `SKILL.md`, in der Sprache, die der Paketname nennt.
 
-Der Ordner enthält zwei Sprachfassungen der Anweisungsdatei, `SKILL.de.md` und `SKILL.en.md`. Übertrage die gewünschte Fassung an den Zielort und benenne **dort** genau diese eine in `SKILL.md` um — Claude Code erkennt nur diesen Namen, die jeweils andere Fassung lässt du liegen oder löschst sie. Der Rest — das Hilfsskript und diese README zur Dokumentation für dich — bleibt unverändert.
+Im Ordner liegen neben der Anweisungsdatei vier weitere Dateien: das Hilfsskript `chat_export_convert.py`, ohne das der Skill nicht arbeitet; `inspect_export.py`, mit dem sich ein Kontoexport-ZIP untersuchen lässt, wenn Du wissen willst, was tatsächlich darin steckt; diese README als Dokumentation für dich; und `bridge-diagnosis.de.md`, eine Fehlerdiagnose zur Chrome-Anbindung, die Claude nur liest, wenn sie wirklich klemmt.
 
 ## Bedienung
 
@@ -40,7 +40,7 @@ Punkt 1 und 3 entsprechen dabei der vollständigen Installation der Claude Chrom
 
 4. **Chrome läuft.** Ein Fenster genügt; claude.ai selbst muss nicht offen sein, der Skill legt sich seinen eigenen Tab an.
 5. **Claude Code läuft in dem Projekt, in das importiert werden soll.** Das Ziel ist immer das Projekt, in dem du gerade arbeitest — der Skill holt die Chats dorthin, wo die Sitzung steht. Du kannst auch die VSCode Claude Code Extension dazu verwenden.
-6. Du musst zuerst **die Bridge zwischen Claude Code und der Chrome Claude Extension herstellen**. Zu diesem Zweck musst du dich zuerst *in Chrome mit dem gleichen Konto anmelden wie in Claude Code*. Rufe dann in Chrome mal das Claude Chat Fenster der Claude Chrome Extension auf: Wenn es startet und nicht meldet, dass noch eine Anmeldung stattfinden muss, ist es ok. Wenn es auch erst eine Anmeldung benötigt, melde es an. Spätestens jetzt ist die Claude Chrome Extension wirklich mit dem Konto verbunden. Ausführlich protokollierte Fehlerbilder beim Herstellen dieser Bridge und was jeweils geholfen hat, stehen in [`chrome-access.de.md`](../../chrome-access.de.md).
+6. Du musst zuerst **die Bridge zwischen Claude Code und der Chrome Claude Extension herstellen**. Am einfachsten ist es, wenn Du in Chrome dasselbe Konto benutzt wie in Claude Code — **nötig ist das aber nicht.** Die Bridge folgt allein der claude.ai-Sitzung, die im Tab gerade offen ist; zweimal geprüft, davon einmal nach vollständigem Rechner-Neustart mit von Anfang an verschiedenen Konten. Anthropics eigene Fehlermeldung behauptet die Kontogleichheit trotzdem — nimm sie als eine mögliche Ursache unter mehreren, nicht als Bedingung. Rufe dann in Chrome mal das Claude Chat Fenster der Claude Chrome Extension auf: Wenn es startet und nicht meldet, dass noch eine Anmeldung stattfinden muss, ist es ok. Wenn es auch erst eine Anmeldung benötigt, melde es an. Spätestens jetzt ist die Claude Chrome Extension wirklich mit dem Konto verbunden. Kommt die Bridge dennoch nicht zustande oder reißt sie später ab, sag es Claude: Der Skill bringt eine eigene Fehlerdiagnose mit und ordnet die Meldungen ihrer Ursache zu. Der vollständige Testweg mit allen protokollierten Fehlerbildern liegt im Repository dieses Skills.
 7. **Stelle jetzt aus Claude Code die Bridge her**, indem du am Prompt "@browser" übergibst. (Den meist angehängten Vorschlag kannst du abwenden, indem du hinter @browser noch ein Leerzeichen setzt.)
 8. **Frage abschließend Claude Code**, ob es einen Tab in Chrome öffnen kann. Erst wenn das funktioniert, steht die Bridge tatsächlich.
 9. Falls Du **aus einem anderen Claude-Account Chats importieren** möchtest, kannst du dich jetzt in einem neuen Tab in Chrome bei Claude.ai abmelden und mit dem anderen Konto anmelden. Ein E-Mail-Turn ist dabei wahrscheinlich fällig. Die Bridge bricht dabei nicht.

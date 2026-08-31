@@ -22,8 +22,19 @@ Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + 
 | [`🚧_translation-task/`](🚧_translation-task/README.md)                  | **Übersetzung von Dokumenten mit softwareentwicklungsnahem Inhalt** — README-Dateien, Konzept- und Implementierungsdokumente, Anleitungen. Nicht auf eine Sprachrichtung festgelegt.                                                                                                                                                 |
 | [`web-code-editing/`](web-code-editing/README.md)<br>✅☑ | **Code-Bearbeitung auf claude.ai**: Quellen vollständig sichern (Projektwissen liegt als Dateien unter `/mnt/project/`), geänderte Dateien mechanisch als Download zurückgeben statt sie neu zu diktieren, kleine Änderungen als Vorher/Ersetzen-Schema im Chat. Nur für claude.ai.                                                                                                                             |
 | [`🚧_zotero-use/`](🚧_zotero-use/README.md) | **Claude direkt an die eigene Zotero-Bibliothek anbinden** — neue Einträge samt PDF anlegen, gezielt in Metadaten und Volltext suchen, Sammlungen verwalten. Bisher eine festgehaltene Idee samt recherchierter Architektur, noch kein Skill. |
+| [`chat-export/`](chat-export/README.md)<br>✅☑ | **Chats aus claude.ai in das laufende Projekt holen** — als durchsuchbare JSON-Dateien, über den angemeldeten Chrome oder aus einem Kontoexport-ZIP; auch Nachtragen bereits geholter Chats. Führt eine eigene Implementierungsdoku (siehe unten). |
 
 (✅ deutsche Fassung fertig und nutzbar · ☑ englische Fassung fertig und nutzbar · 🚧 in Arbeit · ⚠️ mit Vorbehalt)
+
+### chat-export weicht in zwei Punkten ab
+
+**Er führt seine eigene Implementierungsdoku und seinen eigenen Fahrplan.** `implementation-doc.md` und `work-plan-v2.md` liegen in seinem Ordner, daneben der systematische Testweg zur Chrome-Anbindung und die Testsuite. Der Grund ist der Umfang: Dieser Skill ist erheblich komplexer als das Definieren einer `SKILL.md` — er bringt ein Werkzeug von 90 KB mit, das über zwei völlig verschiedene Datenquellen dasselbe Ergebnis liefern muss, und diese Zusage ist von einem eigenen Test bewacht. Das Entwicklungsmaterial reist nicht mit ins Installationspaket (Vorgaben, Kapitel 5).
+
+**Und seine README trägt bewusst keinen Statushinweis**, nur die Bedienung: Was ein Nutzer kopiert, soll ihm sagen, wie es benutzt wird, und nicht, wie weit die Entwicklung ist. Der Stand steht deshalb hier.
+
+**Stand:** Gebaut, an echten Daten in drei unabhängigen Sitzungen erprobt und einsetzbar — zuletzt an einem Großlauf über vier reale claude.ai-Projekte mit 171 Chats, dessen Ergebnis gegen die tatsächliche Export-ZIP verifiziert wurde: 171 von 171 gefunden, keine Abweichung. Beide Wege, Kontoexport und Web-Endpunkte, liefern nachweislich dasselbe Ergebnis. Am 22. August 2026 hat eine unabhängige Instanz die Logik gegen die Ziele der Doku geprüft; alle Befunde sind behoben.
+
+**Offen:** Was diese Fassung nicht leistet, steht in `implementation-doc.md`, Kapitel 1.8 — kurz gefasst: ein Ordner je Quellprojekt, und dieser Ordner samt Protokoll ist der Zustand. Die nächste Ausbaustufe umreißt `work-plan-v2.md`, zwei Komplexe noch ohne Schritte. Für eine künftige Fassung vorgemerkt ist die Teilung der Anweisungsdatei; die Begründung samt Messwert steht in der Doku, Kapitel 3.3.
 
 ## 2 Zweck
 

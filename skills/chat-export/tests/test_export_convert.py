@@ -74,9 +74,10 @@ import zipfile
 _HERE = os.path.dirname(os.path.abspath(__file__))
 # The converter lives with the skill, not under source/: it is the one script
 # the skill ships, and the skill folder carries exactly the structure it will
-# have at its destination (skills/implementation-doc.md 1.1). One maintained copy,
-# so nothing can drift.
-SOURCE_DIR = os.path.join(os.path.dirname(_HERE), "skills", "chat-export")
+# have at its destination (skill-dev-doc.md 1.1). One maintained copy, so
+# nothing can drift. Since the skill moved into skills/, that folder is the
+# parent of this one and carries the development material as well.
+SOURCE_DIR = os.path.dirname(_HERE)
 sys.path.insert(0, SOURCE_DIR)
 
 import chat_export_convert as cec

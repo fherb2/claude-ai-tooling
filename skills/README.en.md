@@ -22,8 +22,19 @@ Reusable skills for Claude Code, claude.ai and Claude Desktop (Chat + Cowork), t
 | [`🚧_translation-task/`](🚧_translation-task/README.md) (in German) | **Translation of documents whose content is close to software development** — README files, concept and implementation documents, guides. Not tied to one direction of translation. |
 | [`web-code-editing/`](web-code-editing/README.en.md)<br>✅☑ | **Editing code on claude.ai**: secure the sources completely (project knowledge sits as files under `/mnt/project/`), return changed files mechanically as downloads instead of re-dictating them, small changes as a before/replace scheme in the chat. For claude.ai only.                                                        |
 | [`🚧_zotero-use/`](🚧_zotero-use/README.md) (in German) | **Connecting Claude directly to one's own Zotero library** — creating new entries with a PDF, searching metadata and full text in a targeted way, managing collections. So far an idea on record along with its researched architecture, not yet a skill. |
+| [`chat-export/`](chat-export/README.en.md)<br>✅☑ | **Bring chats from claude.ai into the running project** — as searchable JSON files, via the logged-in Chrome or from an account-export ZIP; topping up chats already fetched works too. Carries its own implementation documentation (see below). |
 
 (✅ German version finished and usable · ☑ English version finished and usable · 🚧 in progress · ⚠️ with reservations)
+
+### chat-export deviates in two respects
+
+**It carries its own implementation documentation and its own roadmap.** `implementation-doc.md` and `work-plan-v2.md` sit in its folder, alongside the systematic test path for the Chrome connection and the test suite. The reason is scale: this skill is considerably more complex than defining a `SKILL.md` — it brings along a 90 KB tool that has to deliver the same result across two entirely different data sources, and that promise is guarded by a test of its own. The development material does not travel into the installation package (guidelines, chapter 5).
+
+**And its README deliberately carries no status note**, only the usage: what a user copies should tell them how it is used, not how far the development has come. That is why the state stands here.
+
+**State:** Built, tested against real data across three independent sessions, and ready for use — most recently in a large-scale run across four real claude.ai projects with 171 chats, whose result was verified against the actual export ZIP: 171 of 171 found, no discrepancy. Both routes, the account export and the web endpoints, demonstrably yield the same result. On 22 August 2026 an independent instance reviewed the logic against the goals stated in the documentation; every finding has been fixed.
+
+**Open:** What this version does not do is set out in `implementation-doc.md`, chapter 1.8 (German) — in short: one folder per source project, and that folder together with its protocol is the state. The next stage is outlined in `work-plan-v2.md` (German), two complexes with no steps yet. Noted for a future version is the split of the instruction file; the reasoning and the measurement are in the documentation, chapter 3.3.
 
 ## 2 Purpose
 
