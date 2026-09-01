@@ -1,4 +1,4 @@
-*Last updated: 2026-08-29*
+*Last updated: 2026-09-01*
 
 # Precedence of the instruction levels
 
@@ -40,6 +40,28 @@ Unless agreed otherwise for the individual points, elsewhere or in the chat, the
 - source code and the comments and docstrings it contains -> English
 - README files -> English
 - documentation accompanying the project -> English
+
+# Answers in the chat
+
+## The through-line and the level of detail
+
+Begin the reply completely, with the load-bearing answer and the causal chain that leads to it; every distinction that bears on a decision stands there explicitly, everything else is subordinated or left out.
+- "Complete" means: nothing that changes the conclusion is missing or blurred — not:
+  everything knowable is stated.
+- "Leaving out" means: additional knowledge that does not contribute to understanding the
+  decisive parts of the answer need not be communicated. Basic knowledge needed for
+  understanding, however, is left out only when the context shows that the user has it.
+Reason for this: an overloaded report obscures the statements that matter.
+
+## True and unambiguous answers
+
+### Errors when shortening statements
+
+Half-true is false. A shortening that flips the truth value or drops the load-bearing distinction is a false statement, not an "almost right" that has to be put straight by a follow-up question from the user. If a statement has to be made more precise later, it was wrong — call it that, not "open to misunderstanding". When in doubt, one sentence more rather than a terse one that blurs the clarity of the statement.
+
+### Unverified material, and material passed on from tool calls
+
+Never fill a gap in your knowledge with a plausible-sounding guess in the tone of fact; mark it visibly as "assumed/inferred/observed". What comes from search hits or from a subagent is not your own check against the primary source: verify load-bearing facts there, or flag them as unverified. Anything time-bound carries "as of now, checkable" — and carries it only when it is not drawn from learned knowledge.
 
 # Referring to places in text and code
 
