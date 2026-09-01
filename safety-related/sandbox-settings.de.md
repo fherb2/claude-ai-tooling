@@ -1,6 +1,6 @@
 # Sandbox- und Werkzeug-Settings: Snippets mit Parameterbeschreibung
 
-*Stand: 2026-09-01 · Ergänzung zu [bericht.md](bericht.md) in diesem Ordner. Alle Angaben gegen die Claude-Code-Doku (code.claude.com/docs/en/sandboxing, .../settings, .../permissions, .../permission-modes) am 1. September 2026 geprüft.*
+*Stand: 2026-09-01 · Alle Angaben gegen die Claude-Code-Doku (code.claude.com/docs/en/sandboxing, .../settings, .../permissions, .../permission-modes) am 1. September 2026 geprüft.*
 
 Ziel dieser Datei: fertige `settings.json`-Snippets zum Übernehmen, und darunter je Parameter **eine Zeile** (Parameter — Beschreibung), damit man die Sandbox-Doku nicht querlesen muss. `settings.json` ist striktes JSON und trägt **keine** Kommentare; deshalb stehen die Erklärungen hier als Listen neben den Blöcken.
 
@@ -13,7 +13,7 @@ Die Sandbox und die eingebauten Agent-Werkzeuge sind zwei getrennte Wirkungsflä
 
 Die beiden greifen ineinander: `Read`-Deny- und `Edit`-Regeln aus Bereich B fließen zusätzlich in die Dateikonfiguration der Sandbox ein, und `WebFetch(domain:…)`-Regeln in deren Netz-Allowlist. Eine Angabe wirkt dadurch oft auf beiden Flächen.
 
-Alle Blöcke gehören in `~/.claude/settings.json` (User-Settings, gelten für alle Projekte). Für ein Team gehören dieselben Inhalte stattdessen in server-managed settings (claude.ai-Konsole) bzw. per MDM in eine `managed-settings.json`; siehe [bericht.md](bericht.md), Kapitel 8.
+Alle Blöcke gehören in `~/.claude/settings.json` (User-Settings, gelten für alle Projekte). Für ein Team gehören dieselben Inhalte stattdessen in server-managed settings (claude.ai-Konsole) bzw. per MDM in eine `managed-settings.json`.
 
 ---
 
@@ -110,8 +110,8 @@ Deckt Read/Edit/Write/WebFetch ab. Die `Read`-Deny-Regeln hier verdoppeln bewuss
       "Read(~/.docker/config.json)",
       "Read(~/.netrc)",
       "Read(~/.git-credentials)",
-      "Read(**/.env)",
-      "Read(**/.env.*)"
+      "Read(//**/.env)",
+      "Read(//**/.env.*)"
     ],
     "allow": [
       "WebFetch(domain:github.com)",
@@ -154,7 +154,7 @@ Bereich A1 und Bereich B zusammengeführt zu einer `~/.claude/settings.json` (Al
       "Read(~/.ssh/**)", "Read(~/.aws/**)", "Read(~/.gnupg/**)",
       "Read(~/.kube/**)", "Read(~/.config/gcloud/**)",
       "Read(~/.docker/config.json)", "Read(~/.netrc)",
-      "Read(~/.git-credentials)", "Read(**/.env)", "Read(**/.env.*)"
+      "Read(~/.git-credentials)", "Read(//**/.env)", "Read(//**/.env.*)"
     ],
     "allow": [
       "WebFetch(domain:github.com)",
@@ -169,7 +169,7 @@ Bereich A1 und Bereich B zusammengeführt zu einer `~/.claude/settings.json` (Al
 ## Hinweise vor dem Übernehmen
 
 - **Versionen:** `sandbox.filesystem.denyRead` und `sandbox.network.strictAllowlist` brauchen neuere Claude-Code-Versionen (strictAllowlist ab v2.1.219). `claude --version` prüfen; abgelehnte Schlüssel meldet `claude doctor`.
-- **Pfad-Prefix in User-Settings:** In `~/.claude/settings.json` löst ein `.`-Pfad auf `~/.claude` auf, nicht aufs Projekt. Deshalb hier durchgängig `~/`-Pfade; projektrelative Muster (`**/.env`) laufen über `permissions.deny`.
+- **Pfad-Prefix in User-Settings:** In `~/.claude/settings.json` löst ein `.`-Pfad auf `~/.claude` auf, nicht aufs Projekt, und ein Muster wie `**/.env` ist an das aktuelle Verzeichnis gebunden — es greift damit nicht in jedem Projekt. Deshalb hier durchgängig `~/` für Home-Pfade und `//` für dateisystemweite Muster: `//**/.env` matcht `.env` überall.
 - **Deny ist absolut:** Eine User-`Read`-Deny lässt sich nicht per Projekt-`allow` ausnehmen (deny gewinnt immer). Braucht ein einzelnes Projekt Lesezugriff auf z. B. eine Beispiel-`.env`, die User-Deny enger fassen.
 - **Wirksamkeit prüfen:** Nach dem Eintragen empirisch abtasten (Lesen außerhalb des Projekts, Schreiben in `/etc`, Netz zu nicht gelistetem Host) — nur das zeigt die real durchgesetzte Grenze, nicht die Doku. Ein Kommando, das an der Sandbox vorbeilief, trägt den Prompt-Titel „Bash command (unsandboxed)".
-- **Kein Sicherheitsbeweis:** Diese Regeln senken die Wahrscheinlichkeit von Fehlzugriffen, sind aber eine client-seitige Steuerung, keine unüberwindbare Grenze (siehe [bericht.md](bericht.md), Kapitel 3, 5 und 9). Die harte Grenze für hohe Risiken bleibt die Struktur: Sandbox aktiviert **plus** Container/VM mit gefiltertem Egress.
+- **Kein Sicherheitsbeweis:** Diese Regeln senken die Wahrscheinlichkeit von Fehlzugriffen, sind aber eine client-seitige Steuerung, keine unüberwindbare Grenze. Die harte Grenze für hohe Risiken bleibt die Struktur: Sandbox aktiviert **plus** Container/VM mit gefiltertem Egress.
