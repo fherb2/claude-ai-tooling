@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-01*
 
 *[English version](README.en.md)*
 
@@ -17,6 +17,7 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
 | [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit „stillem“ Trigger**.                                                   |
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
+| [`safety-related/`](safety-related/)<br>✅ | **Konfigurationen und Hinweise zur sicheren Nutzung von Claude**: fertige `settings.json`-Blöcke für die Bash-Sandbox und die Werkzeug-Berechtigungen, jeder Parameter in einer Zeile erklärt. |
 
 (✅ einsatzbereit · 🚧 in Arbeit · ⚠️ mit Vorbehalt · ☑ abh. vom Skill)
 
@@ -67,6 +68,14 @@ Nicht zu verwechseln mit den `CLAUDE-snippet.md`-Dateien im Baustein `skills/`: 
 **Einen Baustein sollte man immer übernehmen: „Vorrang der Anweisungsebenen“.** Er klärt, welche Ebene gilt, wenn zwei Anweisungen einander widersprechen. Ohne ihn wird in diesem Fall willkürlich eine der beiden Regeln gewählt — belegt für Claude Code, das alle gefundenen `CLAUDE.md`-Dateien aneinanderhängt, statt sie einander überschreiben zu lassen ([memory](https://code.claude.com/docs/en/memory)). Bemerkbar macht sich das als Rückfrage an einer Stelle, an der keine nötig wäre, oder als überraschendes Verhalten. Der Baustein ist vier Zeilen lang und kann nichts kaputt machen.
 
 **Stand:** Einsatzbereit, in beiden Sprachfassungen — Näheres in der [README des Bausteins](CLAUDE.md-Snippets/README.md).
+
+## safety-related
+
+**Zweck: Konfigurationen und Hinweise zur sicheren Nutzung von Claude.** Fertige `settings.json`-Blöcke, die den Zugriff von Claude Code auf Dateisystem und Netz eingrenzen — zum Übernehmen, ohne die Sandbox-Dokumentation querlesen zu müssen.
+
+Abgedeckt sind zwei Wirkungsflächen, die leicht verwechselt werden: die **Bash-Sandbox** (`sandbox.*`), die das Betriebssystem durchsetzt und die Bash samt aller Kindprozesse umschließt, und die **Berechtigungen der Agent-Werkzeuge** (`permissions.*`) für Read, Edit, Write und WebFetch, die an der Sandbox vorbeilaufen. Erst beide zusammen schließen etwa einen Geheimnis-Pfad vollständig. Zu jedem Parameter steht eine Zeile, was er bewirkt.
+
+**Stand:** Einsatzbereit, in beiden Sprachfassungen — [`sandbox-settings.de.md`](safety-related/sandbox-settings.de.md) · [`.en.md`](safety-related/sandbox-settings.en.md). Der Ordner hat bewusst keine eigene README; die beiden Dateien erklären sich selbst.
 
 ## Anwendungshinweise
 

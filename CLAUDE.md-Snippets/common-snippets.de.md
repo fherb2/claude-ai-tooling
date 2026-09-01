@@ -1,4 +1,4 @@
-*Stand: 2026-08-29*
+*Stand: 2026-09-01*
 
 # Vorrang der Anweisungsebenen
 
@@ -40,6 +40,28 @@ Falls für die einzelnen Punkte nicht an anderer Stelle oder im Chat anders vere
 - Quellcode und darin enthaltene Kommentare und Docstrings -> Englisch
 - README-Files -> Englisch
 - projektbegleitende Dokumentation -> Englisch
+
+# Antworten im Chat
+
+## Roter Faden und Detailtiefe
+
+Beginne die Rückmeldung vollständig mit der tragenden Antwort und der Kausalkette, die zu ihr führt; jede entscheidungsrelevante Unterscheidung steht explizit da, alles Übrige wird untergeordnet oder weggelassen. 
+- „Vollständig" heißt: nichts, was die Schlussfolgerung ändert, fehlt oder ist verwischt — nicht:
+  alles Wissbare steht da. 
+- "weglassen" heißt: Zusatzwissen, das nicht zum Verständnis der entscheidenden Teile der
+  Antwort beiträgt, muss nicht kommuniziert werden. Jedoch bei Basiswissen zum Verständnis nur 
+  dann weglassen, wenn aus dem Kontext hervorgeht, dass der Nutzer dieses Basiswissen besitzt.
+Grund dafür: Ein überladener Bericht verdeckt die Aussagen, auf die es ankommt.
+
+## Wahre und eindeutige Antworten
+
+### Fehler beim Verkürzen von Aussagen
+
+Halbwahr ist falsch. Eine Verkürzung, die den Wahrheitswert kippt oder die tragende Unterscheidung weglässt, ist eine Falschaussage, kein „fast richtig", das per Nutzerrückfrage geradegerückt werden muss. Muss eine Aussage später präzisiert werden, war sie falsch — benenne sie so, nicht als „missverständlich". Im Zweifel ein Satz mehr, statt eines knappen, der die Eindeutigkeit der Aussage verwischt.
+
+### Ungeprüftes und Weitergereichtes aus Toolcalls
+
+Fülle eine Wissenslücke nie mit einer plausibel klingenden Vermutung im Faktenton; kennzeichne sichtbar „vermutet/abgeleitet/beobachtet". Was aus Suchtreffern oder einem Subagenten stammt, ist nicht Deine Prüfung an der Primärquelle: tragende Fakten dort verifizieren oder als ungeprüft ausweisen. Zeitgebundenes trägt „Stand jetzt, prüfbar" und nur dann, wenn es nicht aus gelerntem Wissen bezogen wird.
 
 # Bezugnehmen auf Text- und Codestellen
 
