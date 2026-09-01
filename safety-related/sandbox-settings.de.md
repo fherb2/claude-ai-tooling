@@ -1,110 +1,119 @@
 # Sandbox- und Werkzeug-Settings: Snippets mit Parameterbeschreibung
 
-*Stand: 2026-09-01 · Alle Angaben gegen die Claude-Code-Doku (code.claude.com/docs/en/sandboxing, .../settings, .../permissions, .../permission-modes) am 1. September 2026 geprüft.*
+*Stand: 2026-09-01 · Angaben gegen die Claude-Code-Doku, eine Hersteller-Referenzkonfiguration, das Bedrohungsmodell von Trail of Bits und vier Bug-Reports im Claude-Code-Repository geprüft. Quellen am Ende.*
 
-**Geltungsbereich:** Linux und macOS; unter Windows nur über WSL2 — nativ läuft die Sandbox dort nicht, und Pfade würden anders geschrieben (`//c/**/.env` statt `//**/.env`). Einzige dokumentierte macOS-Abweichung: Beim Credential-*Masking* blockt macOS die Datei, statt den Wert zu ersetzen; die reinen `deny`-Regeln hier sind davon nicht betroffen.
+**Geltungsbereich:** Linux und macOS; unter Windows nur über WSL2 — nativ läuft die Sandbox dort nicht, und Pfade würden anders geschrieben (`//c/**/.env` statt `//**/.env`).
 
-Ziel dieser Datei: fertige `settings.json`-Snippets zum Übernehmen, und darunter je Parameter **eine Zeile** (Parameter — Beschreibung), damit man die Sandbox-Doku nicht querlesen muss. `settings.json` ist striktes JSON und trägt **keine** Kommentare; deshalb stehen die Erklärungen hier als Listen neben den Blöcken.
+**Herkunft jedes Blocks ist angegeben:** *[Doku]* = aus Anthropics Beispielen, *[NVIDIA]* = aus der Hersteller-Referenz für Container, *[angepasst]* = daraus abgeleitet.
+
+## Das Wichtigste zuerst
+
+Wer nur eine Aussage mitnimmt, dann diese: **Gegenüber dem eigenen System schützt verlässlich nur eine Grenze außerhalb von Claude Code** — Container, VM oder ein eingehauster Nutzer. Die Einstellungen in dieser Datei sind **Steuerung**, nicht Systemschutz: Sie bremsen den alltäglichen Übereifer und stellen im Auto-Modus die eine Frage, auf die es ankommt.
+
+Konkret für heute:
+
+- **Was zuverlässig arbeitet:** die Berechtigungsebene (`permissions.*`) — Read-Sperren, Bypass-Sperre, die `ask`-Regel am Sandbox-Ausstieg. Sie hängt nicht an bubblewrap.
+- **Was mit Vorbehalt arbeitet:** die Sandbox-Dateiebene. `denyRead` ist dokumentiert, aber nachweislich nicht immer durchgesetzt, und die Doku-Empfehlung zum Sperren des Homes ist ein bekannter, ungefixter Bug.
+- **Was heute abrät:** die Sandbox dauerhaft einzuschalten, während man mit **git-Worktrees** arbeitet — dann scheitern alle git-Kommandos.
 
 ## Wer was sichert
 
-Bevor man Regeln schreibt, lohnt die Frage, was überhaupt noch offen ist. Drei Schichten — und nur die dritte braucht eine Regel:
+Vier Schichten, und nur die letzten beiden brauchen eine Regel von Dir:
 
-- **Schreibzugriffe: der Sandbox-Default.** Die Schreibseite ist eine Allowlist — erlaubt sind nur Arbeitsverzeichnis, Session-Temp und ausdrücklich hinzugefügte Verzeichnisse; **alles andere ist gesperrt**, ohne dass es jemand aufzählen müsste. `/etc`, `/usr`, fremde Projekte, die Home-Wurzel: zu.
-- **Fremde Daten: das Betriebssystem.** Claude Code läuft mit den Rechten des Nutzers, nicht mehr. Root-eigene Dateien und fremde Home-Verzeichnisse sind schon durch die Dateirechte unerreichbar; eine Regel fügt dort nichts hinzu.
-- **Die eigenen Daten beim Lesen: hier, und nur hier, braucht es eine Regel.** Der Lese-Default der Sandbox ist offen (bis auf wenige Engine-Pfade) — und im Home liegen praktisch alle Geheimnisse.
+- **Schreibzugriffe: der Sandbox-Default.** Die Schreibseite ist eine Allowlist — erlaubt sind nur Arbeitsverzeichnis, Session-Temp und hinzugefügte Verzeichnisse; alles andere ist gesperrt, ohne Aufzählung. `/etc`, `/usr`, fremde Projekte: zu.
+- **Fremde Daten: das Betriebssystem.** Claude Code läuft mit den Rechten des Nutzers. Root-eigene Dateien und fremde Home-Verzeichnisse sind schon durch die Dateirechte unerreichbar.
+- **Eigene Geheimnisse: `sandbox.credentials`.** Dafür gibt es einen eigenen Mechanismus — und nur er erreicht auch **Umgebungsvariablen**. Ein Token in `GITHUB_TOKEN` wird von keiner Pfadliste erfasst.
+- **Selbst-Rechteausweitung: Schreibschutz der eigenen Konfiguration.** Wer die `settings.json` oder einen Hook schreiben kann, erweitert sich selbst die Rechte für den nächsten Lauf.
 
-## Warum eine Sperrliste hier nicht trägt
+Wichtig für die Einordnung: **Was die Sandbox überhaupt umfasst**, sagt die Doku kategorisch — „The sandbox isolates Bash subprocesses. Other tools operate under different boundaries." Memory schreiben, Sitzungsprotokolle führen, Skills laden sind Operationen der Engine, keine Bash-Kindprozesse; `sandbox.denyRead` erreicht sie nicht und schränkt Claude dort auch nicht ein.
 
-Naheliegend wäre, die bekannten Geheimnis-Pfade aufzuzählen: `~/.ssh`, `~/.aws` und so weiter. Das trägt nicht. Thunderbird hält Mailkonten samt Passwörtern, Browserprofile halten Sitzungs-Cookies, dazu kommen Passwortmanager, Wallets, VPN-Konfigurationen, Credential-Stores von Editoren, `~/.config/<beliebig>` — und morgen wird Software installiert, die heute niemand auf dem Zettel hat. Eine solche Liste ist **schon beim Schreiben unvollständig** und veraltet mit jeder Installation.
+## Der Stand der Sandbox heute: vier belegte Einschränkungen
 
-Tragfähig ist die **Umkehrung**: das Home sperren und freigeben, was die Arbeit braucht. Aus „jedes Geheimnis aufzählen" (unbegrenzt, veraltend) wird „aufzählen, was gebraucht wird" (klein, stabil) — und ein Fehler dabei **fällt auf**, weil ein Kommando scheitert, statt still zu lecken.
+Diese vier stammen aus Bug-Reports im Claude-Code-Repository und sind der Grund, warum die Empfehlungen unten so ausfallen, wie sie ausfallen.
 
-Die Systempfade bleiben dabei offen, und das ist richtig: `/usr`, `/lib`, Zertifikate und Locale werden von jedem Kommando gebraucht und enthalten keine Nutzergeheimnisse.
+**1. Die Doku-Empfehlung zum Sperren des Homes ist defekt.** [Issue #40941](https://github.com/anthropics/claude-code/issues/40941) meldet exakt das Beispiel aus der Doku (`denyRead: ["~/"]` plus `allowRead: ["."]`): falsches Arbeitsverzeichnis, Shell-Resets, `ls` und `git status` scheitern. Der Melder: „The offending line is `"denyRead": ["~/"]`. Removing this line consistently fixes the problem." Labels `bug`, `has repro` — **closed as not planned** (30. März 2026).
 
-## Die zwei Wirkungsflächen
+**2. Ein fehlerhafter Dateibereich kann die Sandbox am Start hindern.** [Issue #50781](https://github.com/anthropics/claude-code/issues/50781): `bwrap: Can't create file at …: Read-only file system`, und damit scheitert **jedes** Bash-Kommando. Ursache: Die Sandbox markiert Pfade per `denyWithinAllow` als read-only, und bwraps eigene Initialisierung will genau dort schreiben — „The sandbox cannot bootstrap itself." Besonders zu wissen: **`dangerouslyDisableSandbox` hilft dann nicht**, „because bwrap runs before this flag takes effect". Closed as not planned (19. April 2026).
 
-Sandbox und Agent-Werkzeuge sind getrennt, und beide brauchen eine Regel:
+**3. `denyRead` wird nicht zuverlässig durchgesetzt.** [Issue #61208](https://github.com/anthropics/claude-code/issues/61208), Titel „Security: denyRead in sandbox not working": Mit `denyRead: ["//**"]` und einer engen `allowRead`-Liste konnte weiterhin überall gelesen werden; die Varianten `["/"]` und `["~/"]` ebenso wirkungslos. Labels `area:security`, `bug` — **closed as not planned** (21. Mai 2026). Praktische Folge: **Kein `denyRead`-Eintrag gilt als wirksam, bevor Du ihn selbst abgetastet hast.**
 
-- **Bereich A – Sandbox (`sandbox.*`)** deckt **Bash und alle davon gestarteten Kindprozesse** ab, OS-durchgesetzt (bubblewrap/Seatbelt). Ein `python script.py` über Bash ist damit eingehaust.
-- **Bereich B – Agent-Werkzeuge (`permissions.*`)** deckt **Read, Edit, Write, WebFetch** ab. Diese laufen nicht durch die Sandbox, sondern über das Berechtigungssystem.
-
-Die beiden greifen ineinander: `Read`-Deny- und `Edit`-Regeln aus Bereich B fließen zusätzlich in die Dateikonfiguration der Sandbox ein, und `WebFetch(domain:…)`-Regeln in deren Netz-Allowlist. Eine Angabe wirkt dadurch oft auf beiden Flächen.
-
-Alle Blöcke gehören in `~/.claude/settings.json` (User-Settings, gelten für alle Projekte). Für ein Team gehören dieselben Inhalte stattdessen in server-managed settings (claude.ai-Konsole) bzw. per MDM in eine `managed-settings.json`.
+**4. Sandbox und git-Worktrees vertragen sich nicht.** [Issue #80278](https://github.com/anthropics/claude-code/issues/80278) — **offen und von Maintainern reproduziert** (22. Juli 2026): Die Sandbox maskiert `.git/config.worktree` mit einem lese-verweigerten `/dev/null`-Bind-Mount, worauf **alle** git-Kommandos scheitern, auch `git status`. Ausgelöst wird `extensions.worktreeConfig=true` automatisch von `git worktree` und `git sparse-checkout`. Die Workarounds sind alle unschön: `excludedCommands: ["git *"]` (nimmt ganze Shell-Aufrufe aus der Sandbox), `allowUnsandboxedCommands: true` oder Dateisystem-Isolation ganz aus.
 
 ---
 
 ## Bereich A – Sandbox
 
-### Snippet A1 – die empfohlene Grundform: Home zu, Arbeit auf
+### A1 – Geheimnisse schützen *[Doku]* — die heute praktikable Form
+
+Der vorgesehene Weg, aus der Sandbox-Doku. Erfasst Dateien **und** Umgebungsvariablen:
 
 ```json
 {
   "sandbox": {
     "enabled": true,
-    "filesystem": {
-      "denyRead": ["~/"],
-      "allowRead": ["~/git"]
-    }
-  }
-}
-```
-
-`~/git` durch den Ort ersetzen, an dem die eigenen Projekte liegen. Der speziellere Pfad gewinnt, deshalb genügt das eine Paar: Das Home ist gesperrt, der Arbeitsbereich wieder offen, alles Übrige im Home — Thunderbird, Browserprofile, Passwortmanager, was auch immer noch dazukommt — bleibt zu, ohne je aufgezählt worden zu sein.
-
-**Einlaufphase einplanen.** Manches im Home wird legitim gelesen: `~/.gitconfig`, Paket-Caches, Toolchains wie `~/.cargo`, `~/.rustup`, `~/.nvm`, `~/.pyenv`. Die sperrt die Umkehrung mit, und Kommandos scheitern, bis der Pfad in `allowRead` steht. Das ist gewollt sichtbar: laufen lassen, den gescheiterten Pfad ablesen, ergänzen. Welche Pfade nötig sind, hängt vom eigenen Werkzeugkasten ab.
-
-**Ankerregel beachten.** In User-Settings löst `.` auf `~/.claude` auf, nicht aufs Projekt — deshalb oben ein `~/`-Pfad statt `.`. Wer stattdessen projektweise freigeben will, legt das `allowRead` in die **Projekt**-`.claude/settings.json`; nur dort zeigt `.` auf die Projektwurzel.
-
-### Snippet A2 – Minimalvariante, wenn nicht umgekehrt werden soll
-
-Sperrt nur die bekanntesten Geheimnis-Pfade. **Schwächer als A1**, weil sie alles übersieht, was nicht auf der Liste steht — als Einstieg brauchbar, nicht als Ziel.
-
-```json
-{
-  "sandbox": {
-    "enabled": true,
-    "filesystem": {
-      "denyRead": [
-        "~/.ssh",
-        "~/.aws",
-        "~/.gnupg",
-        "~/.kube",
-        "~/.config",
-        "~/.local/share",
-        "~/.mozilla",
-        "~/.thunderbird",
-        "~/.netrc",
-        "~/.npmrc",
-        "~/.pypirc",
-        "~/.git-credentials",
-        "~/.password-store"
+    "credentials": {
+      "files": [
+        { "path": "~/.aws/credentials", "mode": "deny" },
+        { "path": "~/.ssh", "mode": "deny" }
+      ],
+      "envVars": [
+        { "name": "GITHUB_TOKEN", "mode": "deny" },
+        { "name": "NPM_TOKEN", "mode": "deny" }
       ]
     }
   }
 }
 ```
 
-### Snippet A3 – zusätzlich für unbeaufsichtigten Lauf / fremden Code
+Beide Listen sind um Deine eigenen Fälle zu ergänzen — was dazugehört, steht unten unter „Was Du selbst festlegen musst".
 
-Verschärft: harter Abbruch statt fail-open, kein Unsandboxed-Ausweg, Netz als strikte Allowlist.
+### A2 – Selbst-Rechteausweitung verhindern *[NVIDIA]*
+
+Claude Code schützt einige Pfade selbst; die Hersteller-Referenz setzt sie zusätzlich explizit:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyWrite": [
+        "~/.claude/settings.json",
+        "~/.claude/hooks",
+        "~/.claude.json",
+        "~/.claude/credentials.json"
+      ],
+      "denyRead": [
+        "~/.claude.json",
+        "~/.claude/credentials.json"
+      ]
+    }
+  }
+}
+```
+
+### A3 – Härtung für unbeaufsichtigten Lauf *[Doku]*
 
 ```json
 {
   "sandbox": {
     "enabled": true,
     "failIfUnavailable": true,
-    "allowUnsandboxedCommands": false,
-    "filesystem": {
-      "denyRead": ["~/"],
-      "allowRead": ["~/git"]
-    },
+    "allowUnsandboxedCommands": false
+  }
+}
+```
+
+Und wenn das Netz eng geführt werden soll *[angepasst, Domains nach Trail of Bits]*:
+
+```json
+{
+  "sandbox": {
     "network": {
       "strictAllowlist": true,
       "allowedDomains": [
-        "registry.npmjs.org", "*.npmjs.org",
-        "github.com", "*.githubusercontent.com",
+        "api.anthropic.com",
+        "github.com", "raw.githubusercontent.com",
+        "registry.npmjs.org",
         "pypi.org", "files.pythonhosted.org"
       ]
     }
@@ -112,39 +121,62 @@ Verschärft: harter Abbruch statt fail-open, kein Unsandboxed-Ausweg, Netz als s
 }
 ```
 
+### A4 – Home-Umkehrung *[Doku] — derzeit defekt, nicht verwenden*
+
+Die Doku beschreibt, wie sich das ganze Home sperren und nur die Arbeit freigeben ließe. Das wäre der einzige Weg, der auch Thunderbird, Browserprofile und künftig installierte Software erfasst, **ohne sie aufzuzählen** — und genau deshalb wäre er der bessere:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyRead": ["~/"],
+      "allowRead": ["."]
+    }
+  }
+}
+```
+
+Laut Doku gehört das in die Projekt-`.claude/settings.json`, weil `.` nur dort auf die Projektwurzel zeigt. Für mehrere Projekte ließe es sich aufteilen — `enabled` und `denyRead` in die User-Settings, `allowRead: ["."]` je Projekt —, denn „when you define the same filesystem array in multiple settings scopes, Claude Code merges them, combining paths from every scope".
+
+**Trotzdem: nicht verwenden.** Genau diese Konfiguration ist als Bug gemeldet (#40941, oben), und ein eigener Versuch am 1. September 2026 hat sie bestätigt: Der Sandbox-Aufbau brach ab mit `bwrap: Can't create file at <projekt>/.mcp.json: Read-only file system`, danach lief kein einziges Bash-Kommando mehr. Der Block steht hier, damit man ihn wiedererkennt — nicht zum Übernehmen.
+
 ### Parameter (Bereich A)
 
-- `sandbox.enabled` — schaltet die Bash-Sandbox ein; ohne dieses `true` greift keine der übrigen `sandbox.*`-Angaben.
-- `sandbox.failIfUnavailable` — bei `true` bricht Claude Code ab, wenn die Sandbox mangels bubblewrap/socat oder auf unsupported Plattform nicht starten kann, statt (Default) ungeschützt weiterzulaufen (fail-open).
-- `sandbox.allowUnsandboxedCommands` — bei `false` („Strict sandbox mode") wird der Ausweg `dangerouslyDisableSandbox` komplett ignoriert; ein Kommando muss dann sandboxbar sein oder in `excludedCommands` stehen. Default `true`.
-- `sandbox.autoAllowBashIfSandboxed` — bei `true` (Default) laufen sandboxbare Bash-Kommandos ohne Rückfrage; auf `false` setzen, wenn trotz Sandbox jedes Bash-Kommando einen Prompt bekommen soll.
-- `sandbox.filesystem.denyRead` — Pfade, die innerhalb der Sandbox **nicht** gelesen werden dürfen (OS-Ebene, gilt auch für Subprozesse). In der Grundform steht hier das ganze Home.
-- `sandbox.filesystem.allowRead` — gibt einzelne Pfade innerhalb eines gesperrten Bereichs wieder frei; **der speziellere Pfad gewinnt**. Das ist der Schlüssel zur Umkehrung.
-- `sandbox.filesystem.allowWrite` — erlaubt Schreiben außerhalb der Default-Schreibzone (Arbeitsverzeichnis, `$TMPDIR`), falls ein Subprozess wie `terraform`/`npm` an einen festen Ort schreiben muss.
-- `sandbox.filesystem.denyWrite` — sperrt Schreiben in einzelnen Pfaden innerhalb der erlaubten Zone.
-- `sandbox.filesystem.disabled` — schaltet die **Datei**-Isolation ganz ab und behält nur die Netz-Isolation; nur für Workloads setzen, denen man Selbst-Rechteausweitung nicht zutraut (Default aus lassen).
-- `sandbox.network.allowedDomains` — Domain-Allowlist für ausgehenden Verkehr aus der Sandbox; leer = kein Netz. Erste Verbindung zu einer nicht gelisteten Domain löst sonst Prompt/Klassifikator aus. So eng wie möglich halten.
-- `sandbox.network.strictAllowlist` — bei `true` werden nicht gelistete Hosts **abgewiesen** statt nachgefragt; wirkt nur aus User-/Managed-/CLI-Settings, nicht aus Repo-Dateien.
-- `sandbox.network.deniedDomains` — Blocklist mit Vorrang, um einzelne Hosts sicher auszuschließen, auch wenn sie sonst zugelassen wären.
-- `sandbox.network.tlsTerminate` — der Proxy terminiert TLS selbst (nötig für Credential-Masking mit `injectHosts`); fortgeschritten, löst im Team-Fall einen Freigabedialog aus.
-- `sandbox.credentials` — deklariert Geheimnis-Dateien/-Variablen zum Schutz vor sandboxed Kommandos: `mode: "deny"` sperrt sie (Datei-Read verweigert, Env-Variable entfernt), `mode: "mask"` zeigt dem Kommando nur einen Platzhalter, den der Proxy erst Richtung erlaubter `injectHosts` durch den echten Wert ersetzt. Ein reiner `deny`-Block braucht im Team-Fall keine Nutzerfreigabe, ein `mask`-Block schon.
+- `sandbox.enabled` — schaltet die Bash-Sandbox ein. Für alle Projekte gehört sie laut Doku in die User-Settings.
+- `sandbox.credentials.files` — Geheimnis-Dateien: `mode: "deny"` verweigert den Read innerhalb der Sandbox; `mode: "mask"` zeigt einen Platzhalter, den der Proxy nur Richtung erlaubter `injectHosts` ersetzt (braucht `network.tlsTerminate`).
+- `sandbox.credentials.envVars` — dasselbe für Umgebungsvariablen; `deny` entfernt sie vor jedem sandboxed Kommando. **Der einzige Weg, Token im Environment zu erwischen.**
+- `sandbox.filesystem.denyRead` — Pfade, die sandboxed Kommandos nicht lesen dürfen (OS-Ebene, gilt auch für Subprozesse). **Wirksamkeit einzeln prüfen, siehe Einschränkung 3.**
+- `sandbox.filesystem.allowRead` — gibt Pfade innerhalb eines gesperrten Bereichs wieder frei; der speziellere Pfad gewinnt.
+- `sandbox.filesystem.denyWrite` — sperrt Schreiben in einzelnen Pfaden innerhalb der erlaubten Zone; in A2 gegen Selbst-Rechteausweitung.
+- `sandbox.filesystem.allowWrite` — erlaubt Schreiben außerhalb der Default-Schreibzone (Doku-Beispiel: `["~/.kube", "/tmp/build"]`).
+- `sandbox.filesystem.disabled` — schaltet die Datei-Isolation ganz ab, behält nur die Netz-Isolation. Einer der Workarounds für Einschränkung 4 — mit dem entsprechenden Verlust.
+- `sandbox.failIfUnavailable` — bei `true` Abbruch, statt (Default) ungeschützt weiterzulaufen (fail-open).
+- `sandbox.allowUnsandboxedCommands` — bei `false` („Strict sandbox mode") wird `dangerouslyDisableSandbox` ignoriert. Achtung: Gegen einen gescheiterten Sandbox-**Aufbau** (Einschränkung 2) hilft der Ausweg ohnehin nicht.
+- `sandbox.autoAllowBashIfSandboxed` — Default `true`: sandboxbare Kommandos laufen ohne Prompt. Die NVIDIA-Referenz setzt bewusst `false`.
+- `sandbox.excludedCommands` — Kommandos, die außerhalb der Sandbox laufen dürfen. Einer der Workarounds für Einschränkung 4 (`["git *"]`) — nimmt dann aber ganze Shell-Aufrufe heraus.
+- `sandbox.enableWeakerNestedSandbox` — nötig **innerhalb von Containern**: bubblewrap läuft dort reduziert und kann kein frisches `/proc` mounten. Schwächt die Isolation; außerhalb von Containern nicht setzen.
+- `sandbox.network.allowedDomains` / `strictAllowlist` / `deniedDomains` / `tlsTerminate` — Domain-Allowlist, hartes Abweisen statt Nachfragen, Blocklist mit Vorrang, TLS-Terminierung als Voraussetzung fürs Masking.
 
 ---
 
 ## Bereich B – Agent-Werkzeuge (`permissions.*`)
 
-Deckt Read/Edit/Write/WebFetch ab. Zwei Dinge sind hier anders als in Bereich A:
+**Diese Ebene funktioniert.** Sie hängt nicht an bubblewrap und ist von den vier Einschränkungen oben nicht betroffen. Zwei Eigenheiten:
 
-**Es gibt schon eine Grenze.** Für lesende Werkzeuge ist laut Doku keine Zustimmung nötig „within the working directory and additional directories" — außerhalb also **schon**. Im Manual-Modus fragt Claude dort nach; im Auto-Modus entscheidet an dieser Grenze der Klassifikator statt des Nutzers.
+**Es gibt schon eine Grenze.** Für lesende Werkzeuge ist laut Doku keine Zustimmung nötig „within the working directory and additional directories" — außerhalb also schon. Im Manual-Modus fragt Claude dort; im Auto-Modus entscheidet der Klassifikator.
 
-**Die Umkehrung funktioniert hier nicht.** Bei `permissions` gewinnt `deny` immer und lässt sich durch kein `allow` wieder aufmachen. Ein `Read(~/**)`-Deny wäre deshalb nicht projektweise ausnehmbar. Was bleibt, ist eine gezielte Sperre der wertvollsten Pfade — bewusst unvollständig, als Ergänzung zur Arbeitsverzeichnis-Grenze, nicht als deren Ersatz.
+**Die Umkehrung funktioniert hier nicht.** Bei `permissions` gewinnt `deny` immer und lässt sich durch kein `allow` wieder aufmachen.
 
-### Snippet B1
+### B1 – Geheimnisse, Bypass-Sperre, Ebenenfrage *[angepasst]*
 
 ```json
 {
   "permissions": {
     "disableBypassPermissionsMode": "disable",
+    "ask": [
+      "Bash(dangerouslyDisableSandbox:true)"
+    ],
     "deny": [
       "Read(~/.ssh/**)",
       "Read(~/.aws/**)",
@@ -164,55 +196,83 @@ Deckt Read/Edit/Write/WebFetch ab. Zwei Dinge sind hier anders als in Bereich A:
 }
 ```
 
-### Parameter (Bereich B)
+Die `ask`-Regel ist der wirksamste einzelne Eintrag: Der Auto-Modus bleibt überall erhalten, und nur das eine Ereignis „raus aus der Sandbox" wird Dir zwingend vorgelegt — durchgesetzt vom Client, nicht vom Modell.
 
-- `permissions.disableBypassPermissionsMode` — Wert `"disable"` sperrt den Modus `--dangerously-skip-permissions`; wirkt aus jedem Scope, auch aus User-Settings, und taugt so als Selbstschutz gegen ein versehentliches Aushebeln aller Regeln.
-- `permissions.deny` — Liste harter Verbote, zuerst ausgewertet und durch keine andere Ebene aufhebbar. `Read(<pfad>)` sperrt das Read-Werkzeug (und speist zugleich die Sandbox-`denyRead`); `Bash(<cmd> *)` sperrt ein Kommando (fragil gegen Umgehung — nur als Defense-in-depth, nicht als alleinige Grenze).
-- `permissions.ask` — wie `deny`, aber statt zu blocken wird nachgefragt. Besonders nützlich als `Bash(dangerouslyDisableSandbox:true)`: Dann bleibt der Auto-Modus überall erhalten, und nur das eine Ereignis „raus aus der Sandbox" wird dem Nutzer vorgelegt.
-- `permissions.allow` — Vorab-Freigaben ohne Rückfrage; greift erst, nachdem der Ordner „getrusted" ist. Hier trägt es die `WebFetch(domain:…)`-Regeln.
-- `WebFetch(domain:<host>)` — als `allow`-Eintrag: erlaubt dem WebFetch-Werkzeug diesen Host **und** öffnet ihn in der Sandbox-Netz-Allowlist. Eine Angabe, zwei Wirkungen; ersetzt für erlaubte Ziele das Roh-`curl` über Bash.
-- `permissions.additionalDirectories` — zusätzliche Verzeichnisse, die als Arbeitsbereich gelten; erweitert zugleich die Schreibzone der Sandbox. Nur setzen, wenn der Agent bewusst außerhalb des Projektordners arbeiten soll.
-
----
-
-## Komplettblock für einen Solo-Rechner
-
-Grundform A1 und Bereich B zusammengeführt zu einer `~/.claude/settings.json`. Für unbeaufsichtigten Betrieb die drei Zusatzschlüssel aus A3 (`failIfUnavailable`, `allowUnsandboxedCommands`, `network`) ergänzen.
+### B2 – Umgebungsverändernde Kommandos sperren *[NVIDIA]*
 
 ```json
 {
-  "sandbox": {
-    "enabled": true,
-    "filesystem": {
-      "denyRead": ["~/"],
-      "allowRead": ["~/git"]
-    }
-  },
   "permissions": {
-    "disableBypassPermissionsMode": "disable",
-    "ask": [
-      "Bash(dangerouslyDisableSandbox:true)"
-    ],
     "deny": [
-      "Read(~/.ssh/**)", "Read(~/.aws/**)", "Read(~/.gnupg/**)",
-      "Read(~/.netrc)", "Read(~/.npmrc)", "Read(~/.git-credentials)",
-      "Read(~/.password-store/**)", "Read(//**/.env)", "Read(//**/.env.*)"
+      "Bash(sudo *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(docker *)",
+      "Bash(podman *)"
     ],
-    "allow": [
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:docs.claude.com)"
+    "ask": [
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }
 ```
 
+**Vorbehalt:** Bash-Deny-Regeln sind gegen gezielte Umgehung fragil (Variablen, Interpreter-Wrapping) — Defense-in-depth, keine Grenze.
+
+### Parameter (Bereich B)
+
+- `permissions.disableBypassPermissionsMode` — `"disable"` sperrt `--dangerously-skip-permissions`; wirkt aus jedem Scope, auch aus User-Settings.
+- `permissions.deny` — harte Verbote, zuerst ausgewertet, durch keine Ebene aufhebbar. `Read(<pfad>)` sperrt das Read-Werkzeug und speist zugleich die Sandbox-`denyRead`.
+- `permissions.ask` — wie `deny`, aber es wird gefragt. Als `Bash(dangerouslyDisableSandbox:true)` die gezielte Ebenenfrage am Sandbox-Ausstieg.
+- `permissions.allow` — Vorab-Freigaben; greifen erst, nachdem der Ordner „getrusted" ist.
+- `WebFetch(domain:<host>)` — erlaubt dem WebFetch-Werkzeug diesen Host **und** öffnet ihn in der Sandbox-Netz-Allowlist.
+- `permissions.additionalDirectories` — zusätzliche Arbeitsverzeichnisse; erweitert zugleich die Schreibzone der Sandbox.
+
 ---
+
+## Was Du selbst festlegen musst
+
+Weil die Umkehrung ausfällt, bleibt nur die Aufzählung — und deren Preis trägst Du, dauerhaft:
+
+**Eine Inventur Deiner Geheimnisse.** Niemand kann sie für Dich machen, sie hängt an Deiner installierten Software. Durchzugehen wären mindestens: Schlüssel (`~/.ssh`, `~/.gnupg`); Cloud-CLIs (`~/.aws`, `~/.config/gcloud`, `~/.azure`, `~/.kube`, `~/.docker/config.json`); Paketquellen (`~/.npmrc`, `~/.pypirc`, `~/.cargo/credentials.toml`, `~/.m2/settings.xml`); Git (`~/.netrc`, `~/.git-credentials`); Passwortverwaltung (`~/.password-store`, `~/.local/share/keyrings`, KeePass-Dateien — die liegen irgendwo); Mail (`~/.thunderbird`, Evolution); Browser (`~/.mozilla`, `~/.config/google-chrome`, Chromium, Brave); Messenger; VPN-Konfigurationen; Editor-Credential-Stores (JetBrains, VS Code); Backup-Werkzeuge (restic-, borg-Passwörter); und die Shell-History, in der Tokens landen.
+
+**Eine zweite Inventur im Environment.** Tokens in Umgebungsvariablen erwischt keine Pfadliste — nur `sandbox.credentials.envVars`. Was bei Dir gesetzt ist, weißt nur Du.
+
+**Pflege auf beiden Flächen.** Jeder Pfad braucht einen Eintrag für das Read-Werkzeug und einen für die Sandbox. Teilweise automatisch, weil Read-Denys in die Sandbox einfließen — aber nur teilweise.
+
+**Fortschreibung ohne Auslöser.** Jede neu installierte Anwendung kann eine neue Geheimnisablage mitbringen, und nichts erinnert Dich daran. Das ist die strukturelle Schwäche der Aufzählung: Sie verschwindet nicht, sie wandert nur von der Maschine zu Dir.
+
+**Empirische Nachkontrolle.** Wegen Einschränkung 3 gilt kein Eintrag als wirksam, bevor Du ihn abgetastet hast: Lesen versuchen, Ergebnis ansehen.
+
+**Und akzeptieren, was nicht abdeckbar ist:** vergessene Orte, Shell-History, Reste in `/tmp`, alles was ein laufender Prozess im Speicher hält.
+
+## Was nur Container oder VM leisten
+
+Alles oben ist **client-seitige Steuerung**. Gegenüber dem eigenen System schützt verlässlich nur eine Grenze, die außerhalb von Claude Code liegt. Das ist nicht eine Meinung, sondern die Übereinstimmung aller geprüften Quellen: Anthropic empfiehlt für den Bypass-Modus „only … in isolated environments like containers, VMs"; Anthropic betreibt sein eigenes Cowork-Produkt mit Claude in einer VM; ein systematischer macOS-Vergleich kam zum Schluss „the VM boundary is the security boundary"; und Trail of Bits' gesamter Ansatz ist ein Container.
+
+**Aber auch das nicht grenzenlos:**
+
+- Ein Container schützt **den Host**, nicht seinen **Inhalt**. Trail of Bits sagt ausdrücklich, dass In-Container-Credentials nicht isoliert sind — „Claude, GitHub, and other tokens provided to container are simply accessible inside it". Das gemountete Projektverzeichnis ist echt und beschreibbar.
+- **DNS bleibt ein Exfiltrationskanal**, auch mit Domain-Allowlist.
+- **VS Code schwächt die Grenze:** Trail of Bits warnt, dass „Reopen in Container" eine RPC-Brücke öffnet, über die Code aus dem Container **Kommandos auf dem Host** ausführen kann, und empfiehlt für nicht vertrauenswürdigen Code das Terminal statt VS Code.
+
+Die vernünftige Aufteilung ist deshalb: **Container/VM als Grenze für das, was es wert ist** — unbeaufsichtigte Läufe, fremder Code, Firmen- und OT-Rechner. **Die Einstellungen als Steuerung darin** — sie bremsen den alltäglichen Übereifer und stellen die eine Frage, die zählt.
 
 ## Hinweise vor dem Übernehmen
 
-- **Die Netzlisten addieren sich.** Die wirksame Allowlist der Sandbox ist `sandbox.network.allowedDomains` **plus** die Domains aus den `WebFetch(domain:…)`-Allow-Regeln. Eine Domain kann deshalb in beiden Blöcken stehen — das ist gewollt, damit jeder Block für sich kopierbar bleibt, und schadet nicht. Umgekehrt heißt es: Wer eine Domain für WebFetch freigibt, öffnet sie auch für Bash.
-- **Versionen:** `sandbox.filesystem.denyRead`/`allowRead` und `sandbox.network.strictAllowlist` brauchen neuere Claude-Code-Versionen (strictAllowlist ab v2.1.219). `claude --version` prüfen; abgelehnte Schlüssel meldet `claude doctor`.
-- **Pfad-Prefix in User-Settings:** In `~/.claude/settings.json` löst ein `.`-Pfad auf `~/.claude` auf, nicht aufs Projekt, und ein Muster wie `**/.env` ist an das aktuelle Verzeichnis gebunden — es greift damit nicht in jedem Projekt. Deshalb hier durchgängig `~/` für Home-Pfade und `//` für dateisystemweite Muster: `//**/.env` matcht `.env` überall.
-- **Deny ist absolut:** Eine User-`Read`-Deny lässt sich nicht per Projekt-`allow` ausnehmen (deny gewinnt immer). Braucht ein einzelnes Projekt Lesezugriff auf z. B. eine Beispiel-`.env`, die User-Deny enger fassen. In der Sandbox ist das anders — dort ist `allowRead` innerhalb von `denyRead` genau der vorgesehene Weg.
-- **Wirksamkeit prüfen:** Nach dem Eintragen empirisch abtasten (Lesen im Home außerhalb des Arbeitsbereichs, Schreiben in `/etc`, Netz zu nicht gelistetem Host) — nur das zeigt die real durchgesetzte Grenze, nicht die Doku. Ein Kommando, das an der Sandbox vorbeilief, trägt den Prompt-Titel „Bash command (unsandboxed)".
-- **Kein Sicherheitsbeweis:** Diese Regeln senken die Wahrscheinlichkeit von Fehlzugriffen, sind aber eine client-seitige Steuerung, keine unüberwindbare Grenze. Die harte Grenze für hohe Risiken bleibt die Struktur: Sandbox aktiviert **plus** Container/VM mit gefiltertem Egress.
+- **Erst in einer Wegwerf-Sitzung probieren.** Eine fehlerhafte Sandbox-Dateikonfiguration kann den Sandbox-**Aufbau** zum Scheitern bringen — dann läuft gar kein Bash mehr, und der Notausstieg greift nicht (Einschränkung 2).
+- **Mit git-Worktrees: Sandbox besser aus**, bis #80278 behoben ist.
+- **Die Netzlisten addieren sich.** Wirksam ist `allowedDomains` **plus** die Domains der `WebFetch(domain:…)`-Regeln. Wer eine Domain für WebFetch freigibt, öffnet sie auch für Bash.
+- **Pfad-Prefix in User-Settings:** `.` löst dort auf `~/.claude` auf, nicht aufs Projekt, und `**/.env` ist an das aktuelle Verzeichnis gebunden. Deshalb `~/` für Home-Pfade und `//` für dateisystemweite Muster: `//**/.env` matcht `.env` überall.
+- **Deny ist absolut:** Eine User-`Read`-Deny lässt sich nicht per Projekt-`allow` ausnehmen. In der Sandbox ist das anders — dort ist `allowRead` innerhalb von `denyRead` der vorgesehene Weg.
+- **Änderungen wirken sofort:** „When you edit these filesystem lists during a session, Claude Code applies the change to the running session" — für einen Test braucht es keine neue Sitzung.
+- **Kein Sicherheitsbeweis.** Diese Regeln senken die Wahrscheinlichkeit von Fehlzugriffen. Mehr behaupten sie nicht.
+
+## Quellen
+
+**Claude-Code-Doku:** [Sandboxing](https://code.claude.com/docs/en/sandboxing) · [Permissions](https://code.claude.com/docs/en/permissions) · [Settings](https://code.claude.com/docs/en/settings) · [Settings-Referenz](https://code.claude.com/docs/en/settings-reference)
+
+**Referenzkonfigurationen:** NVIDIA AI Workbench, [Configure Claude Code Sandboxing in a Project Container](https://docs.nvidia.com/ai-workbench/user-guide/latest/quickstart/quickstart-claude-sandbox.html) · Trail of Bits, [claude-code-devcontainer](https://github.com/trailofbits/claude-code-devcontainer)
+
+**Bug-Reports:** [#40941](https://github.com/anthropics/claude-code/issues/40941) Doku-Empfehlung bricht das Arbeitsverzeichnis · [#50781](https://github.com/anthropics/claude-code/issues/50781) bwrap kann sich nicht bootstrappen · [#61208](https://github.com/anthropics/claude-code/issues/61208) `denyRead` nicht durchgesetzt · [#80278](https://github.com/anthropics/claude-code/issues/80278) git-Worktrees brechen (offen)
