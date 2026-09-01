@@ -285,3 +285,7 @@ Fertigstellung und vor dem ersten Einsatz (Kopie an das Installationsziel)
 wird dieser Prä-Teil dann entfernt und bleibt entfernt. Somit kollidiert der
 Ordnername nicht mit anderen Vorgaben und den Bedingungen an der
 Installationsstelle.
+
+# Nutzertexte
+
+Wo der Nutzer Texte editiert und erstellt hat: Bitte prüfe vor einem Commit auf Rechtschreib- und Grammatikfehler und frage ihn, ob Du die sofort mit korrigieren darfst.
