@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-08-30*
+*Last updated: 2026-09-01*
 
 *[Deutsche Fassung](README.md)*
 
@@ -17,6 +17,7 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md) (in German)<br>⚠️ | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
 | [`skills/`](skills/README.en.md)<br>☑ | Instead of many CLAUDE.md instructions: **have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger**.                                                |
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.en.md)<br>✅ | **Ready-made blocks of text for instruction files**: paragraphs to be copied out one by one, for the `CLAUDE.md` of a local installation and for the places where claude.ai takes instructions. |
+| [`safety-related/`](safety-related/)<br>✅ | **Configurations and notes for using Claude safely**: ready-made `settings.json` blocks for the Bash sandbox and the tool permissions, with one line of explanation per parameter. |
 
 (✅ ready to use · 🚧 in progress · ⚠️ with reservations · ☑ depends on the skill)
 
@@ -67,6 +68,14 @@ Not to be confused with the `CLAUDE-snippet.md` files in the `skills/` component
 **One block should always be taken over: "Precedence of the instruction levels".** It settles which level holds when two instructions contradict each other. Without it, one of the two rules is picked arbitrarily in that case — documented for Claude Code, which concatenates all discovered `CLAUDE.md` files instead of letting them override each other ([memory](https://code.claude.com/docs/en/memory)). It shows up as a question asked where none would be needed, or as surprising behavior. The block is four lines long and nothing can go wrong with it.
 
 **Status:** ready to use, in both language versions — more in the [component's README](CLAUDE.md-Snippets/README.en.md).
+
+## safety-related
+
+**Purpose: configurations and notes for using Claude safely.** Ready-made `settings.json` blocks that narrow Claude Code's access to the file system and the network — ready to adopt, without having to read through the sandbox documentation.
+
+Two enforcement surfaces are covered, and they are easily confused: the **Bash sandbox** (`sandbox.*`), enforced by the operating system, which encloses Bash and every child process it spawns, and the **permissions of the agent tools** (`permissions.*`) for Read, Edit, Write and WebFetch, which run past the sandbox. Only both together fully close a path holding secrets. Every parameter carries one line saying what it does.
+
+**Status:** ready to use, in both language versions — [`sandbox-settings.de.md`](safety-related/sandbox-settings.de.md) · [`.en.md`](safety-related/sandbox-settings.en.md). The folder deliberately has no README of its own; the two files speak for themselves.
 
 ## Usage notes
 
