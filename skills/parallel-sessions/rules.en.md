@@ -2,6 +2,19 @@
 
 These rules hold from now on for the whole session. Reasons and finer points live in the README of this skill folder (`${CLAUDE_SKILL_DIR}`) — consult it when the user asks follow-up questions, instead of reconstructing. The file name is not reliable for this: it may have been renamed during installation. Look inside the folder; if you do not find it, answer without it.
 
+<!-- TEMP ISSUE-80278 ANFANG -->
+
+## Known collision: Bash sandbox and worktrees
+
+Before the session's first `git worktree` command runs (session start or continuing on another machine), check in two steps:
+
+1. **Is the Bash sandbox running in this session?** Detectable from context alone, without a tool call: a system reminder describing an active sandbox policy (mentioning, among other things, "Bash tool commands run in a sandbox"), or a notice that the sandbox was just disabled ("has been disabled"), means "on"; the absence of any such notice means "off". Undocumented behavior, observed in this form on 2 September 2026 — not a `settings.json` check, which is spread across several scopes and could therefore mislead. If it is not running: skip the rest of this section, continue as normal.
+2. **Only if it is running:** fetch [issue #80278](https://github.com/anthropics/claude-code/issues/80278) via WebFetch. Reason: the sandbox masks `.git/config.worktree` as soon as `git worktree` sets `extensions.worktreeConfig=true` — after that every Git command fails, including `git status`.
+   - Still "open": point the user to the collision and ask whether the sandbox can be turned off now or whether worktree mode is dispensable at the moment. Depending on the answer, continue with the worktree model or agree with the user how collisions will be ruled out.
+   - No longer "open": report to the user that the fix in the issue needs analyzing and this section needs revising — and that the revised version also needs reinstalling on other machines, because the skill sits there only as a copy. Then continue as normal.
+
+<!-- TEMP ISSUE-80278 ENDE -->
+
 ## The working model
 
 Four branch roles, whose concrete names `.claude/git-worktree-model.json` defines (fields: `integration_branch`, `release_branch`, `workbench_prefix`, `worktree_dir`, `infra_branch`, `infra_files`):
