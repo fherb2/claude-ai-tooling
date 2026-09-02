@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-09-01*
+*Stand: 2026-09-02*
 
 *[English version](README.en.md)*
 
@@ -15,7 +15,7 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.md)<br>✅ | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
-| [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit „stillem“ Trigger**.                                                   |
+| [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit „stillem“ Trigger** — und seit September 2026 auch **garantierte Fähigkeiten mit Hook-Auslöser**.                                                   |
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
 | [`safety-related/`](safety-related/)<br>✅ | **Konfigurationen und Hinweise zur sicheren Nutzung von Claude**: fertige `settings.json`-Blöcke für die Bash-Sandbox und die Werkzeug-Berechtigungen, jeder Parameter in einer Zeile erklärt. |
 
@@ -54,6 +54,8 @@ Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + 
 Der umfangreichste unter ihnen ist **`chat-export`**: Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten oder nach Projekten sortiert in eine lokale Claude-Code-Installation zu holen, unterstützt Anthropic derzeit (08/2026) nicht — mit diesem Skill geht es doch, über den angemeldeten Chrome oder aus einem Kontoexport-ZIP. Er ist der einzige Skill mit eigener Implementierungsdoku und eigenem Fahrplan; warum, steht in der [README des Bausteins](skills/README.md).
 
 Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Situationen, die niemand ausspricht. Der Anthropic-Standard, einen Skill aktiv vom Nutzer zu starten oder im Skill über `description:` per Trigger-Wörter im Chat automatisch zu starten, erweitert das Konzept der stillen Trigger auch ein Start aus dem Kontext des Chats heraus. Das ist keine Claude-Code-Erweiterung, sondern wird über besondere Formulierungsregeln in CLAUDE.md erreicht. Details zur Nachnutzung in diesem Baustein.
+
+Seit September 2026 leben hier auch **garantierte Fähigkeiten**: Bausteine, deren Auslöser kein stiller Trigger ist, sondern ein **Hook** — ein Ereignis-Einhänger der Claude-Code-Engine, der garantiert läuft, wo ein Skill nur wahrscheinlich lädt. Installiert werden sie genauso (Paket entpacken); nur wandert statt eines CLAUDE.md-Snippets ein Eintrag in die `settings.json`. Erster dieser Art: **`recall-skills-after-compact`** — nach jeder Kontext-Kompression bekommt die Instanz die Liste der zuvor geladenen Skills in den Kontext gespielt und legt sie dem Nutzer vor; der entscheidet, was neu geladen wird.
 
 **Stand:** Der Stand der einzelnen Skills wird in der [zugehörigen README](skills/README.md) einzeln ausgewiesen.
 
