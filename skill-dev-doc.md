@@ -193,6 +193,10 @@ Für den Aufbau folgt daraus, abweichend von Kapitel 5:
 - **Der Skriptpfad im Settings-Eintrag muss stabil bleiben.** Eine Umbenennung des Ordners bricht den Hook **still** — Fehler eines Hooks landen nur im Debug-Log. Das gehört in die Grenzen-Sektion der README.
 - **Das Skript scheitert still und mit Exit 0.** Ein Hook, der bei einem Fehler lärmt oder abbricht, stört jede Sitzung; Fehler gehen auf stderr, stdout bleibt leer.
 
+- **Was ein Hook der Instanz in den Kontext legt, ist eine Anweisung — und wird als solche befolgt.** Deshalb trägt der Text nur, was zu tun ist, und ausdrücklich die Grenze dessen; jede mitgelieferte Erklärung des Mechanismus lädt zum Nachforschen ein. Belegt am ersten Praxistest von `recall-skills-after-compact` (2. September 2026): Die Fassung mit erklärendem Satz führte dazu, dass die Instanz die gesamte Skill-Installation prüfte, statt bloß eine Liste vorzulegen.
+
+**Was eine Kompaktierung für die stillen Trigger dieses Repos bedeutet** (dokumentiert, [Explore the context window](https://code.claude.com/docs/en/context-window), am 2. September 2026 am laufenden System bestätigt): „The skill listing does not reload" — die Beschreibungsliste der verfügbaren Skills wird nach einer Verdichtung **nicht** wieder eingespielt. Ein stiller Trigger in der CLAUDE.md überlebt zwar (die wird neu geladen), zeigt danach aber ins Leere. Wer Triggerempfindlichkeit misst (Kapitel 4.2), misst deshalb nur den unkomprimierten Fall; für den Zustand danach ist die Verfügbarkeit die Grenze, nicht die Formulierung.
+
 Erster Baustein dieser Art: `recall-skills-after-compact`.
 
 ### 5.1 Sprachfassungen

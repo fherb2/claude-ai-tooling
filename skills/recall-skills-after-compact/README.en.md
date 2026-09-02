@@ -4,7 +4,7 @@
 
 *[Deutsche Fassung](README.md)*
 
-**✅ Finished and usable.** Script tested against real transcripts and error cases; the field test on a real compaction is still pending (see "State and open points").
+**✅ Finished and usable.** Tested against real transcripts and error cases, and proven in the field on a real compaction on 2 September 2026.
 
 **After every context compaction this capability presents the instance — and through it the user — with the list of skills already loaded in the session.** The decision whether and which of them to reload stays with the user; nothing is reloaded on its own. This is the repository's first **guaranteed capability**: it is triggered not by a silent trigger but by a **hook** — an event handler of the Claude Code engine that always runs on its event. In addition it can be invoked by hand at any time: `/recall-skills-after-compact` answers, mid-session, the question "which skills have been loaded here so far?" — the same script, second ignition path.
 
@@ -43,8 +43,14 @@
 
 **Status:** Built and tested on 2 September 2026 — against three real transcripts (among them a 15 MB session with three skills across six invocations; count identical to an independent manual tally) and three error cases (empty input, missing path, no JSON — all silent on stdout, exit 0).
 
+**Field test passed on 2 September 2026.** In a real compaction the hook fired, the engine recorded it as `hook_success`, and the list then stood in the instance's context, which presented it to the user. That also proves the shell resolves `$HOME` in the hook command — until then it was only an inference from the docs.
+
+**What the test additionally brought to light, and why the capability matters more than expected.** The instance found that after the compaction only three of eleven installed skills were available to it. That is not a defect but documented behavior: "The skill listing does not reload", or "Skill descriptions don't reload" ([Explore the context window](https://code.claude.com/docs/en/context-window)). After a compaction the instance is therefore missing the description listing — **no silent trigger can fire any more**. The reminder list is thus not a convenience but, after a compaction, the only way to learn that anything is missing at all.
+
+**Why the output is this terse and this explicit.** In the same test the instance did more than asked: it checked whether the named skills were still loadable and analyzed the entire skill installation for that. The original wording had invited this by explaining the cap mechanism along the way. Since then the output carries no explanation, only the list and the explicit boundary: report, verify nothing, investigate nothing — "an informational notice, not a task".
+
 **Why the entry uses `$HOME` instead of a placeholder.** The first field test on 2 September 2026 failed, and precisely here: the settings entry still carried the literal placeholder from the snippet, `python3` did not find the file, and because a hook's errors only go to the debug log the failure stayed invisible — the compaction ran, the list did not come. A placeholder that looks like a finished path gets pasted and overlooked. Since then the block carries `$HOME` (the shell resolves it, since hooks are shell commands per the docs), so nothing needs adjusting for the standard location, and the snippet carries a check that verifies the entry without a compaction.
 
-**Open:** The field test on a real compaction, now with the corrected entry.
+**Open:** Nothing. The capability has been proven in the field.
 
 **License:** CC0-1.0, like the other skills of this repository.
