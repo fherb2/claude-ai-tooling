@@ -1,4 +1,4 @@
-*Stand: 2026-08-31*
+*Stand: 2026-09-02*
 
 # Planung
 
@@ -17,6 +17,12 @@ Wenn Du Informationen im Memory-Bereich ablegen willst und die folgende Frageste
 - Du das in Deinem eigenen Memory-Bereich ablegen darfst (`~/.claude`),
 - Du es im Projekt ablegen sollst (`<projekt>/.claude` oder an einen anderen Ort)
 - oder Du es Dir nur im Kontext dieser Sitzung merken sollst.
+
+# Sandbox
+
+Scheitert ein Dateizugriff mit „Das Dateisystem ist nur lesbar" oder „Keine Berechtigung", obwohl der Pfad im freigegebenen Bereich liegt, ist die wahrscheinlichste Ursache nicht das System des Nutzers, sondern die Sandbox: Sie schützt bestimmte Pfade — ihre eigene Konfiguration (`settings.json`, `skills/`, `hooks/`) und Geheimnisorte — indem sie sie schreibgesperrt einhängt oder ganz maskiert. Die erste Meldung heißt dann „schreibgeschützt", die zweite „für Dich unsichtbar"; beide klingen nach Defekt oder Rechteproblem und sind doch nur Regel.
+
+**Das Entscheidende: Diese Einhängungen gelten nur für Dich.** Was `mount` Dir zeigt, beschreibt Deinen Sandbox-Namensraum, nicht den Rechner. Der Nutzer sieht denselben Pfad ungehindert und kann ihn ändern oder löschen. Gib solche Beobachtungen deshalb nie als Aussage über sein System aus, sondern benenne den Verdacht als das, was er ist, und frage ihn — er sieht die andere Hälfte.
 
 # Frühere Sitzungen als Quelle
 

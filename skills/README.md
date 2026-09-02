@@ -1,6 +1,6 @@
 # Skills für Claude Code
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-02*
 
 *[English version](README.en.md)*
 
@@ -23,6 +23,7 @@ Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + 
 | [`web-code-editing/`](web-code-editing/README.md)<br>✅☑ | **Code-Bearbeitung auf claude.ai**: Quellen vollständig sichern (Projektwissen liegt als Dateien unter `/mnt/project/`), geänderte Dateien mechanisch als Download zurückgeben statt sie neu zu diktieren, kleine Änderungen als Vorher/Ersetzen-Schema im Chat. Nur für claude.ai.                                                                                                                             |
 | [`🚧_zotero-use/`](🚧_zotero-use/README.md) | **Claude direkt an die eigene Zotero-Bibliothek anbinden** — neue Einträge samt PDF anlegen, gezielt in Metadaten und Volltext suchen, Sammlungen verwalten. Bisher eine festgehaltene Idee samt recherchierter Architektur, noch kein Skill. |
 | [`chat-export/`](chat-export/README.md)<br>✅☑ | **Chats aus claude.ai in das laufende Projekt holen** — als durchsuchbare JSON-Dateien, über den angemeldeten Chrome oder aus einem Kontoexport-ZIP; auch Nachtragen bereits geholter Chats. Führt eine eigene Implementierungsdoku (siehe unten). |
+| [`recall-skills-after-compact/`](recall-skills-after-compact/README.md)<br>✅☑ | **Nach jeder Kontext-Kompression an die zuvor geladenen Skills erinnern** — garantierte Fähigkeit mit Hook-Auslöser statt stillem Trigger: installiert wie ein Skill, verdrahtet über einen `settings.json`-Eintrag; zusätzlich auf Zuruf per `/recall-skills-after-compact`. |
 
 (✅ deutsche Fassung fertig und nutzbar · ☑ englische Fassung fertig und nutzbar · 🚧 in Arbeit · ⚠️ mit Vorbehalt)
 
