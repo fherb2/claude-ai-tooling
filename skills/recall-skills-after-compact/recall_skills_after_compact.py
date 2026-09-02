@@ -99,12 +99,10 @@ def main():
         ]
         lines.extend(skill_lines(calls))
         lines.append(
-            "The harness re-injects invoked SKILL.md bodies only within token caps, "
-            "and lazily loaded rules files are not re-injected at all."
-        )
-        lines.append(
-            "Present this list to the user and let them decide which skills to "
-            "re-invoke now. Do not re-invoke anything on your own."
+            "Report this list to the user and let them decide what to re-invoke. "
+            "Nothing else: do not re-invoke anything yourself, do not check whether "
+            "these skills are still available, do not investigate their installation. "
+            "This is an informational notice, not a task."
         )
     print("\n".join(lines))
     return 0

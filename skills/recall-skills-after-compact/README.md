@@ -4,7 +4,7 @@
 
 *[English version](README.en.md)*
 
-**✅ Fertig und nutzbar.** Skript gegen reale Transkripte und Fehlerfälle getestet; der Praxistest an einer echten Kompression steht noch aus (siehe „Stand und Offenes").
+**✅ Fertig und nutzbar.** Gegen reale Transkripte und Fehlerfälle getestet und am 2. September 2026 an einer echten Kompaktierung im Feld erprobt.
 
 **Nach jeder Kontext-Kompression legt diese Fähigkeit der Instanz — und über sie dem Nutzer — die Liste der in der Sitzung bereits geladenen Skills vor.** Die Entscheidung, ob und welche davon neu geladen werden, bleibt beim Nutzer; es wird nichts selbständig nachgeladen. Dies ist die erste **garantierte Fähigkeit** dieses Repos: Ausgelöst wird sie nicht über einen stillen Trigger, sondern über einen **Hook** — einen Ereignis-Einhänger der Claude-Code-Engine, der bei seinem Ereignis immer läuft. Zusätzlich lässt sie sich jederzeit von Hand aufrufen: `/recall-skills-after-compact` beantwortet mitten in der Sitzung die Frage „welche Skills waren hier schon geladen?" — dasselbe Skript, zweiter Zündweg.
 
@@ -43,8 +43,14 @@
 
 **Status:** Gebaut und getestet am 2. September 2026 — gegen drei reale Transkripte (darunter eine 15-MB-Sitzung mit drei Skills in sechs Aufrufen; Zählung deckungsgleich mit unabhängiger Handauszählung) und drei Fehlerfälle (leerer Input, fehlender Pfad, kein JSON — alle still auf stdout, Exit 0).
 
+**Praxistest bestanden am 2. September 2026.** In einer echten Kompaktierung feuerte der Hook, die Engine verbuchte ihn als `hook_success`, und die Liste stand danach im Kontext der Instanz, die sie dem Nutzer vorlegte. Damit ist zugleich belegt, dass die Shell `$HOME` im Hook-Kommando auflöst — vorher war das nur ein Schluss aus der Doku.
+
+**Was der Test zusätzlich zutage förderte, und warum die Fähigkeit wichtiger ist als gedacht.** Die Instanz stellte fest, dass ihr nach der Kompaktierung von elf installierten Skills nur noch drei zur Verfügung standen. Das ist kein Defekt, sondern dokumentiertes Verhalten: „The skill listing does not reload" bzw. „Skill descriptions don't reload" ([Explore the context window](https://code.claude.com/docs/en/context-window)). Nach einer Kompaktierung fehlt der Instanz also die Beschreibungsliste — **kein stiller Trigger kann mehr feuern**. Die Erinnerungsliste ist damit nicht bloß eine Bequemlichkeit, sondern nach einer Verdichtung der einzige Weg, überhaupt zu erfahren, dass etwas fehlt.
+
+**Warum die Ausgabe so knapp und so ausdrücklich ist.** Im selben Test tat die Instanz mehr als verlangt: Sie prüfte, ob die genannten Skills überhaupt noch ladbar sind, und analysierte dafür die gesamte Skill-Installation. Die ursprüngliche Fassung hatte das eingeladen, weil sie den Deckel-Mechanismus miterklärte. Seither enthält die Ausgabe keine Erklärung mehr, sondern die Liste und die ausdrückliche Grenze: berichten, nichts nachprüfen, nichts nachforschen — „an informational notice, not a task".
+
 **Warum der Eintrag `$HOME` benutzt statt eines Platzhalters.** Der erste Praxistest am 2. September 2026 schlug fehl, und zwar an genau dieser Stelle: Der Settings-Eintrag trug noch den wörtlichen Platzhalter aus dem Snippet, `python3` fand die Datei nicht, und weil Hook-Fehler nur ins Debug-Log gehen, blieb der Fehlschlag unsichtbar — die Kompression lief, die Liste kam nicht. Ein Platzhalter, der wie ein fertiger Pfad aussieht, wird eingefügt und übersehen. Seither steht `$HOME` im Block (die Shell löst es auf, denn Hooks sind laut Doku Shell-Kommandos), sodass beim Standard-Ablageort nichts mehr anzupassen ist, und das Snippet trägt eine Probe, die den Eintrag ohne Kompression prüft.
 
-**Offen:** Der Praxistest an einer echten Kompression, jetzt mit dem korrigierten Eintrag.
+**Offen:** Nichts. Die Fähigkeit ist im Feld erprobt.
 
 **Lizenz:** CC0-1.0, wie die übrigen Skills dieses Repositories.

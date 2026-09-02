@@ -10,12 +10,6 @@ Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
-## 10 `recall-skills-after-compact`: Praxistest an einer echten Kompression
-
-**Unmittelbar nächster Schritt.** Der Baustein ist gebaut, dokumentiert, gepackt und geprüft (2. September 2026) — offen ist allein die Erprobung im Feld. Dafür: den Settings-Eintrag verdrahten (Block steht in der README des Bausteins; Ebene wählt der Entwickler, in diesem Repo liegt `.claude/settings.json` auf dem Infra-Branch), dann in einer Sitzung mit mindestens einem Skill-Aufruf eine Kompression auslösen. Erwartet wird, dass die Liste als Kontext-Notiz auftaucht und die Instanz sie von sich aus vorlegt. Vorgesehener Prüffall ist die Sitzung `abb54fdb…`, bei der ohnehin bald wieder eine Kompression ansteht.
-
-Schlägt der Test an: Ergebnis in der README des Bausteins unter „Stand und Offenes" festhalten, den offenen Punkt dort streichen, diesen Fahrplanschritt entfernen. Schlägt er fehl: Ursache klären, bevor die Bauform in `skill-dev-doc.md` 5.0 als bewährt gilt.
-
 ## 3 Anweisungs-Inventar zuordnen
 
 Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner) werden einzeln zugeordnet. Der Ordner entfällt erst, wenn **alle** Posten in Skills eingepflegt sind — mit ihm dann auch `original/`. Solange auch nur einer offen ist, bleibt beides stehen. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `skill-dev-doc.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `skill-dev-doc.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
