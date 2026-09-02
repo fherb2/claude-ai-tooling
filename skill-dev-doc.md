@@ -157,6 +157,7 @@ Jeder Skill liegt unter `skills/<skill-name>/`. Der Ordnername trägt **kein** S
 - **`SKILL.md`** — verpflichtend. Frontmatter mit `name` (gleich dem Ordnernamen), `description` (der reguläre Trigger, nach Kapitel 2 formuliert) und `license`. Letzteres ist reine Deklaration für den Leser: „Claude Code accepts the field but doesn't act on it“ (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Welche Lizenz gewählt wird, gibt Anthropic nicht vor (recherchiert am 14. August 2026); hier gilt einheitlich CC0, begründet in der Gesamt-README. Für den Umfang empfiehlt dieselbe Quelle, unter 500 Zeilen zu bleiben — eine Empfehlung, keine harte Grenze.
 - **`README.md`** — verpflichtend. Die gesamte Dokumentation dieses Skills: was er leistet, wie er installiert wird, seine Feinheiten, sein Arbeitsstand und seine offenen Punkte. Aufbau nach 6.1; unter der Überschrift die Datumszeile (Projekt-CLAUDE.md, „Datumszeilen“).
 - **`CLAUDE-snippet.md`** — nur bei Skills mit stillem Trigger. Aufbau: ganz oben die Datumszeile (Projekt-CLAUDE.md, „Datumszeilen“), darunter eine kursive Kopfnotiz, die erklärt, was mit der Datei zu geschehen hat, darunter eine Trennlinie, darunter der zu übernehmende Absatz im Wortlaut. Die Trennlinie ist die maßgebliche Grenze: Was darunter steht, wird in die `CLAUDE.md` des Zielorts übernommen, was darüber steht — Datumszeile eingeschlossen — nicht.
+- **`settings-json-snippet.md`** — nur bei Fähigkeiten mit Hook-Auslöser (5.0), und dann anstelle der `CLAUDE-snippet.md`. Gleicher Aufbau, gleiche Trennlinien-Regel; sie trägt den `settings.json`-Eintrag statt eines CLAUDE.md-Absatzes.
 - **Weitere Dateien** — nur, wenn die `SKILL.md` ausdrücklich auf sie verweist; sonst werden sie nie geladen (1.2).
 - **`downloads/`** — die fertig geschnürten Installationspakete (5.3). Er gehört **nicht** an den Zielort; beim Packen bleibt er außen vor.
 - **Entwicklungsmaterial** — Implementierungsdoku, eigener Fahrplan, Testsuite, Belegmaterial. Ein Werkzeug, das dem **Anwender** dient, gehört nicht dazu, auch wenn es der Diagnose dient: Es wandert mit. Es gehört ebenfalls nicht an den Zielort. Diesen Fall gibt es bisher einmal, bei `chat-export`; die Begründung steht in der `README.md` von `skills/`.
@@ -174,6 +175,23 @@ Jeder Skill liegt unter `skills/<skill-name>/`. Der Ordnername trägt **kein** S
 **Zusatzdateien, die zur Laufzeit gelesen oder geschrieben werden,** spricht der Skill über `${CLAUDE_SKILL_DIR}` an. Der Platzhalter wird laut offizieller Doku nur in Claude Code tatsächlich ersetzt; in claude.ai bliebe ein solcher Verweis wörtlicher Text bzw. die nötigen Datei-Werkzeuge fehlen ganz (belegt, [Extend Claude with skills](https://code.claude.com/docs/en/skills)). Ein Skill, der in beiden Umgebungen laufen soll, kann daraus seine Umgebung erkennen: Gelingt der Zugriff auf einen echten, aufgelösten Pfad, läuft er lokal.
 
 **Zum `name`:** Kleinbuchstaben, Ziffern und Bindestriche, höchstens 64 Zeichen, keine XML-Tags, nicht die reservierten Wörter „anthropic“ und „claude“. Anthropic empfiehlt die Verlaufsform (`processing-pdfs`) und lässt Substantiv- und Handlungsformen ausdrücklich als Alternative zu (belegt, [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)); die Skills hier folgen der Substantivform. Kodiert ein Skill die Arbeitsweise einer bestimmten Person statt einer allgemein gültigen, gehört ein Kürzel in den Namen (`software-dev-doc-fh`). Das macht im Namen sichtbar, dass es andere Arbeitsweisen gibt, und lädt dazu ein, dafür einen eigenen Skill zu schreiben, statt diesen zu verbiegen.
+
+### 5.0 Fähigkeiten mit Hook-Auslöser
+
+**Nicht jede Fähigkeit wird von einem Trigger ausgelöst; manche von einem Ereignis der Engine.** Ein **Hook** ist technisch nur ein Eintrag in einer `settings.json`, der bei einem bestimmten Ereignis ein Kommando ausführt — kein Ordner wird dafür eingelesen, keine Datei automatisch gefunden (belegt, [Automate actions with hooks](https://code.claude.com/docs/en/hooks-guide): „To create a hook, add a `hooks` block to a settings file"). Für den Nutzer ist das dennoch dasselbe wie ein Skill: eine Fähigkeit, die er installiert, damit Claude sich in einer bestimmten Lage richtig verhält. **Deshalb leben solche Bausteine ebenfalls unter `skills/`** und nicht in einem eigenen Verzeichnis (Festlegung des Entwicklers vom 2. September 2026). Der Unterschied, den der Nutzer erlebt, ist nicht die Bauart, sondern die Verlässlichkeit: Ein stiller Trigger zieht wahrscheinlich, ein Hook läuft garantiert.
+
+Wann welche Form: **Braucht die Fähigkeit Urteilsvermögen, ist sie ein Skill; muss sie garantiert stattfinden, braucht sie einen Hook.** Beides zusammen geht — der Hook stößt deterministisch an, sein stdout legt der Instanz die situative Anweisung in den Kontext. Ein Skill kann Hooks auch selbst in seinem Frontmatter definieren; die greifen aber erst **nach** seinem ersten Aufruf und taugen deshalb nicht dafür, den Skill überhaupt garantiert auszulösen.
+
+Für den Aufbau folgt daraus, abweichend von Kapitel 5:
+
+- **Statt `CLAUDE-snippet.md` eine `settings-json-snippet.md`**, gleich gebaut und gleich behandelt: Datumszeile ganz oben, darunter die kursive Kopfnotiz, darunter die Trennlinie, darunter der zu übernehmende Block. Übernommen wird auch hier nur, was unterhalb der Trennlinie steht; die Datei bleibt am Zielort liegen und ist an ihrer Datumszeile als Vergleichsstück lesbar. Sie ist die vierte Datei, die beim Packen umbenannt wird (5.3): `settings-json-snippet.<sprache>.md` → `settings-json-snippet.md`. Zwei Dinge gehören zwingend in ihre Kopfnotiz, weil sie ein CLAUDE.md-Schnipsel nicht kennt: dass JSON **eingefügt statt angehängt** wird (vorhandener `hooks`-Schlüssel, vorhandenes Ereignis-Array), und dass der Skriptpfad anzupassen ist und danach stabil bleiben muss.
+- **Die Sprachfassungen unterscheiden sich nur in der Kopfnotiz.** Der Block unterhalb der Trennlinie ist JSON und in beiden Fassungen zeichengleich.
+- **Die `SKILL.md` bleibt trotzdem sinnvoll** — als schlanker Zweitzugang „auf Zuruf" mit `disable-model-invocation: true`. Dann steht ihre Description laut Doku **nicht** in der Skill-Listung, die Fähigkeit kostet also keinen Dauerkontext und ist doch als `/kommando` verfügbar. Zugleich ist der Ordner damit ein regulärer Skill-Ordner; ein Ordner ohne `SKILL.md` unter `skills/` ist nirgends dokumentiert und wäre eine unbelegte Annahme.
+- **Zielwelt ist immer nur `local`.** Hooks gibt es auf claude.ai nicht; es entstehen also nur `_de_local`- und `_en_local`-Pakete (5.3).
+- **Der Skriptpfad im Settings-Eintrag muss stabil bleiben.** Eine Umbenennung des Ordners bricht den Hook **still** — Fehler eines Hooks landen nur im Debug-Log. Das gehört in die Grenzen-Sektion der README.
+- **Das Skript scheitert still und mit Exit 0.** Ein Hook, der bei einem Fehler lärmt oder abbricht, stört jede Sitzung; Fehler gehen auf stderr, stdout bleibt leer.
+
+Erster Baustein dieser Art: `recall-skills-after-compact`.
 
 ### 5.1 Sprachfassungen
 
@@ -312,6 +330,10 @@ Wörtlich zu übernehmen, mit dem Namen des Skills statt `<skill>` und dem Kürz
 
 Der dritte Schritt entfällt bei Skills ohne stillen Trigger ersatzlos. Das Verwaltungsfeld ist bewusst nicht mit seinem heutigen Namen genannt: Der Weg dorthin ändert sich, die Sache nicht.
 
+**Vorlage C — Fähigkeit mit Hook-Auslöser (5.0):** wie Vorlage A, aber der dritte Schritt lautet nicht „Stillen Trigger übernehmen", sondern **„Hook verdrahten"**, und er verweist auf `settings-json-snippet.md` statt den Block selbst abzudrucken — dort steht er samt allem, was beim Einfügen zu beachten ist. In der README bleiben nur zwei Sätze: was ohne diesen Schritt fehlt (in der Regel bleibt die Fähigkeit per Slash-Aufruf erreichbar, der garantierte Auslöser fehlt), und wo die `settings.json` im jeweiligen Projekt liegt. Ein vierter Schritt nennt die Probe, an der der Nutzer die Wirksamkeit erkennt.
+
+Der Grund für die Aufteilung ist derselbe wie beim stillen Trigger: Was der Nutzer irgendwohin kopiert, gehört in eine Datei, die mitreist und ihren Stand ausweist — nicht in Prosa, die beim Kopieren zurückbleibt. Die README sagt **dass** und **wozu**, das Snippet sagt **was** und **wie**.
+
 ### 6.2 Gesamt-README
 
 Die `README.md` dieses Ordners ist der Einstieg in das Vorhaben: Sie sagt, wozu es das gibt, wie ein Skill installiert wird und welche Skills es gibt. Was ein einzelner Skill leistet, steht nicht hier, sondern in seiner eigenen README (6.1). Verlangter Aufbau:
@@ -438,6 +460,7 @@ Stand 30. August 2026. „Web-Fassung“ nennt die Nutzungsentscheidung, nicht d
 | `correct-zaaack-md-editor-mistakes` | nur code | — | Die Werkzeuge liefen im Container, aber die Markdown-Dateien des Nutzers kommen nicht hinein und die Korrektur nicht zurück |
 | `parallel-sessions` | nur code | — | Git-Worktrees haben auf claude.ai keinen Gegenstand |
 | `chat-export` | nur code | — | Braucht Browser-Anbindung und ein Skript auf dem Rechner des Nutzers |
+| `recall-skills-after-compact` | nur code | — | Fähigkeit mit Hook-Auslöser (5.0); Hooks und Sitzungstranskripte gibt es nur in Claude Code |
 
 `web-code-editing` ist zugeordnet: **nur web** — er regelt Quellen und Rückgabewege des Web-Frontends; in Claude Code schreibt das Edit-Werkzeug direkt in die Dateien (fertiggestellt in beiden Sprachfassungen am 29. August 2026, Erprobung als hochgeladener Skill offen). Die Skills, die nur unter `~/.claude/skills/` liegen (`konzept-segmentierung`, `konsistenzpruefung`), sind hier nicht bewertet — sie sind nicht im Repo.
 
