@@ -26,7 +26,7 @@
 
 2. **Entpacken.** Das Archiv enthält einen Ordner `recall-skills-after-compact/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt die Fähigkeit für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
-3. **Hook verdrahten.** Das musst Du händisch tun. Alles dazu steht in `settings-json-snippet.md`: der fertige Eintrag unterhalb der Trennlinie, darüber wohin er gehört, wie er in eine bestehende `settings.json` eingefügt wird und welcher Pfad anzupassen ist. Die Datei bleibt danach im Skill-Ordner liegen; ihre Datumszeile zeigt, von welchem Stand der übernommene Eintrag ist.
+3. **Hook verdrahten.** Das musst Du händisch tun. Alles dazu steht in `settings-json-snippet.md`: der fertige Eintrag unterhalb der Trennlinie, darüber wohin er gehört, wie er in eine bestehende `settings.json` eingefügt wird und — falls Du nicht nach `~/.claude/skills/` entpackt hast — wie der Pfad anzupassen ist. Dort steht auch eine Probe, die den Eintrag sofort prüft, ohne auf eine Kompression zu warten; führe sie aus, denn ein falscher Pfad fällt sonst nirgends auf. Die Datei bleibt danach im Skill-Ordner liegen; ihre Datumszeile zeigt, von welchem Stand der übernommene Eintrag ist.
 
    Ohne diesen Schritt wirkt nur der Slash-Aufruf `/recall-skills-after-compact`; der garantierte Auslöser bei Kompression fehlt. In diesem Repository liegt die `settings.json` auf dem Infra-Branch — dort wird sie geändert.
 
@@ -43,6 +43,8 @@
 
 **Status:** Gebaut und getestet am 2. September 2026 — gegen drei reale Transkripte (darunter eine 15-MB-Sitzung mit drei Skills in sechs Aufrufen; Zählung deckungsgleich mit unabhängiger Handauszählung) und drei Fehlerfälle (leerer Input, fehlender Pfad, kein JSON — alle still auf stdout, Exit 0).
 
-**Offen:** Der Praxistest an einer echten Kompression — die nächste anstehende lange Sitzung führt ihn aus.
+**Warum der Eintrag `$HOME` benutzt statt eines Platzhalters.** Der erste Praxistest am 2. September 2026 schlug fehl, und zwar an genau dieser Stelle: Der Settings-Eintrag trug noch den wörtlichen Platzhalter aus dem Snippet, `python3` fand die Datei nicht, und weil Hook-Fehler nur ins Debug-Log gehen, blieb der Fehlschlag unsichtbar — die Kompression lief, die Liste kam nicht. Ein Platzhalter, der wie ein fertiger Pfad aussieht, wird eingefügt und übersehen. Seither steht `$HOME` im Block (die Shell löst es auf, denn Hooks sind laut Doku Shell-Kommandos), sodass beim Standard-Ablageort nichts mehr anzupassen ist, und das Snippet trägt eine Probe, die den Eintrag ohne Kompression prüft.
+
+**Offen:** Der Praxistest an einer echten Kompression, jetzt mit dem korrigierten Eintrag.
 
 **Lizenz:** CC0-1.0, wie die übrigen Skills dieses Repositories.
