@@ -2,6 +2,19 @@
 
 Diese Regeln gelten ab jetzt für die gesamte Sitzung. Begründungen und Feinheiten stehen in der README dieses Skill-Ordners (`${CLAUDE_SKILL_DIR}`) — zieh sie bei Nachfragen des Nutzers heran, statt zu rekonstruieren. Der Dateiname ist dabei nicht verlässlich: Beim Installieren kann umbenannt worden sein. Sieh im Ordner nach; findest Du sie nicht, antworte ohne sie.
 
+<!-- TEMP ISSUE-80278 ANFANG -->
+
+## Bekannte Kollision: Bash-Sandbox und Worktrees
+
+Bevor der erste `git worktree`-Befehl dieser Sitzung läuft (Sitzungsbeginn oder Fortsetzen auf einem anderen Rechner), zweistufig prüfen:
+
+1. **Läuft die Bash-Sandbox in dieser Sitzung?** Erkennbar allein am Kontext, ohne Werkzeugaufruf: Ein System-Reminder, der eine aktive Sandbox-Policy beschreibt (u. a. „Bash tool commands run in a sandbox"), oder eine Meldung, dass die Sandbox gerade abgeschaltet wurde („has been disabled"), zeigt „an"; fehlt jeder solche Hinweis, gilt „aus". Undokumentiertes Verhalten, in dieser Form beobachtet am 2. September 2026 — keine `settings.json`-Prüfung, die über mehrere Scopes verteilt und dadurch potentiell irreführend wäre. Läuft sie nicht: Rest dieses Abschnitts überspringen, normal fortfahren.
+2. **Nur wenn sie läuft:** [Issue #80278](https://github.com/anthropics/claude-code/issues/80278) per WebFetch abrufen. Grund: Die Sandbox maskiert `.git/config.worktree`, sobald `git worktree` `extensions.worktreeConfig=true` setzt — danach scheitert jedes Git-Kommando, auch `git status`.
+   - Steht dort weiterhin „open": den Nutzer auf die Kollision hinweisen und fragen, ob die Sandbox jetzt abschaltbar ist oder der Worktree-Modus gerade entbehrlich. Je nach Antwort mit dem Worktree-Modell fortfahren oder mit dem Nutzer absprechen, wie Kollisionen ausgeschlossen werden.
+   - Steht dort nicht mehr „open": dem Nutzer melden, dass die Lösung im Issue zu analysieren und dieser Abschnitt zu überarbeiten ist — und dass die überarbeitete Fassung auch auf anderen Rechnern neu zu installieren ist, weil der Skill dort nur als Kopie liegt. Danach normal fortfahren.
+
+<!-- TEMP ISSUE-80278 ENDE -->
+
 ## Das Arbeitsmodell
 
 Vier Branch-Rollen, deren konkrete Namen `.claude/git-worktree-model.json` festlegt (Felder: `integration_branch`, `release_branch`, `workbench_prefix`, `worktree_dir`, `infra_branch`, `infra_files`):
