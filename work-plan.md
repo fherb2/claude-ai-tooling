@@ -10,6 +10,21 @@ Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
+## 11 `vscode-dev-container`: erster Bau und Prüfliste
+
+**Unmittelbar nächster Schritt.** Die Rezeptur ist geschrieben und in sich geprüft (Shell-Syntax, JSON, Markdown), aber **noch nie gebaut** — Docker steht dieser Sitzung nicht zur Verfügung. Solange der erste Bau aussteht, ist jede Zusage des Bausteins unbelegt.
+
+Zu tun, in dieser Reihenfolge:
+
+1. **Bauen und öffnen.** `Dockerfile`, `devcontainer.json` und `files/` in ein Testprojekt kopieren, dort **Reopen in Container**. Erwartete Stolperstellen, die dabei zuerst auffallen würden: die Umbenennung des mitgelieferten `ubuntu`-Kontos in der ersten `RUN`-Anweisung, die `pipx`-Installationen unter dem umbenannten Nutzer, und ob `${localEnv:SSH_AUTH_SOCK}` gesetzt ankommt.
+2. **Die Prüfliste aus der README des Bausteins abarbeiten** und ihr Ergebnis dort unter „Offen" festhalten. Sie prüft Pfad, Sitzungsschlüssel, Abwesenheit von `~/.ssh`, den Agenten, die Netzsperre.
+3. **Die `DOCKER-USER`-Regel je Rechner festlegen** — mit den `ACCEPT`-Ausnahmen für die dort angeschlossenen Geräte (Kameras, Messtechnik). Ohne sie ist das Firmennetz aus dem Container erreichbar; das ist der Punkt, an dem der Baustein sein drittes Schutzziel einlöst oder nicht.
+4. **Die offene Frage zu `--network host` messen**: Ob `DOCKER-USER` dort tatsächlich nicht greift, ist aus der Docker-Netzarchitektur abgeleitet und nicht nachgemessen. Der Test ist ein Verbindungsversuch auf eine interne Adresse, einmal mit Bridge- und einmal mit Host-Netz.
+
+Erst danach ist die Baustellenmarke in den beiden Wurzel-READMEs von 🚧 auf ✅ zu ändern.
+
+**Nicht Teil dieses Schritts** und getrennt zu entscheiden: die beiden Befunde an der Konfiguration des Entwicklers (die A2-Schlüssel liegen in der Benutzer-`settings.json` unter `sandbox.credentials` statt unter `sandbox.filesystem` und bleiben dadurch wirkungslos; Block A2 in `safety-related/sandbox-settings.de.md` nennt `~/.claude/credentials.json`, die Datei heißt `.credentials.json`). Beide stehen im Anhang von `safety-related/vscode-topologies.de.md`.
+
 ## 3 Anweisungs-Inventar zuordnen
 
 Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner) werden einzeln zugeordnet. Der Ordner entfällt erst, wenn **alle** Posten in Skills eingepflegt sind — mit ihm dann auch `original/`. Solange auch nur einer offen ist, bleibt beides stehen. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `skill-dev-doc.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `skill-dev-doc.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.

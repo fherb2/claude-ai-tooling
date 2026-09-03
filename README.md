@@ -17,7 +17,8 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 | [`home-.claude-sharing/`](home-.claude-sharing/README.md) (in German)<br>⚠️ | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
 | [`skills/`](skills/README.en.md)<br>☑ | Instead of many CLAUDE.md instructions: **have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger** — and, since September 2026, **guaranteed capabilities with a hook trigger** too.                                                |
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.en.md)<br>✅ | **Ready-made blocks of text for instruction files**: paragraphs to be copied out one by one, for the `CLAUDE.md` of a local installation and for the places where claude.ai takes instructions. |
-| [`safety-related/`](safety-related/)<br>✅ | **Configurations and notes for using Claude safely**: ready-made `settings.json` blocks for the Bash sandbox and the tool permissions, with one line of explanation per parameter. |
+| [`safety-related/`](safety-related/)<br>✅ | **Configurations and notes for using Claude safely**: ready-made `settings.json` blocks for the Bash sandbox and the tool permissions, with one line of explanation per parameter — plus a report on which boundary actually holds in which constellation of editor, SSH and container. |
+| [`vscode-dev-container/`](vscode-dev-container/README.en.md)<br>🚧 | **A dev container that draws the line between agent and machine**: a Dockerfile and a `devcontainer.json` with narrow mounts instead of the whole home, an SSH agent instead of key files, the network boundary on the host — meant as a base for other things to build on. |
 
 (✅ ready to use · 🚧 in progress · ⚠️ with reservations · ☑ depends on the skill)
 
@@ -79,7 +80,19 @@ Not to be confused with the `CLAUDE-snippet.md` files in the `skills/` component
 
 Two enforcement surfaces are covered, and they are easily confused: the **Bash sandbox** (`sandbox.*`), enforced by the operating system, which encloses Bash and every child process it spawns, and the **permissions of the agent tools** (`permissions.*`) for Read, Edit, Write and WebFetch, which run past the sandbox. Only both together fully close a path holding secrets. Every parameter carries one line saying what it does.
 
-**Status:** ready to use, in both language versions — [`sandbox-settings.de.md`](safety-related/sandbox-settings.de.md) · [`.en.md`](safety-related/sandbox-settings.en.md). The folder deliberately has no README of its own; the two files speak for themselves.
+Alongside them sits a **report on the access paths**: [`vscode-topologies.de.md`](safety-related/vscode-topologies.de.md) compares five constellations of local editor, SSH remote access and container, keeping apart two boundaries that are easily conflated — what a process *inside* the container can reach, and whether code from there can act on the machine the person is sitting at. It does not repeat the settings; it places them, showing where they take effect at all.
+
+**Status:** ready to use, in both language versions — [`sandbox-settings.de.md`](safety-related/sandbox-settings.de.md) · [`.en.md`](safety-related/sandbox-settings.en.md); the topology report so far in German only. The folder deliberately has no README of its own; the files speak for themselves.
+
+## vscode-dev-container
+
+**Purpose: a dev container for VS Code that draws the line between agent and machine correctly from the start.** Four mounts instead of the whole home, the SSH agent instead of the key files, the network boundary on the host rather than in the container — what is not mounted does not exist for the container, and no rule has to hold for it.
+
+What is delivered is the **recipe, not a finished image**: a Dockerfile with a C compiler, system Python, Poetry and `uv`, plus a `devcontainer.json` and the surrounding conditions. Everything essential sits in the Dockerfile rather than in a `features` block, so that it survives being derived from with `FROM` — to add JupyterLab or a vendor SDK, say.
+
+The project is normalised to `~/git/<name>`, regardless of where it sits on the host. That is not taste but a requirement: Claude Code derives the key of its session transcripts from the absolute project path, and only if that is the same everywhere does the synchronisation from [`home-.claude-sharing`](home-.claude-sharing/README.en.md) carry for sessions inside the container as well.
+
+**Status:** written and checked in itself, but **never yet built** — the first build and the checklist are still open. Details in the [component's README](vscode-dev-container/README.en.md).
 
 ## Usage notes
 
