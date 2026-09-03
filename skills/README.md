@@ -1,6 +1,6 @@
 # Skills für Claude Code
 
-*Stand: 2026-09-02*
+*Stand: 2026-09-04*
 
 *[English version](README.en.md)*
 
@@ -57,7 +57,7 @@ Die von Anthropic vorgesehene Technik löst einen Skill über seine `description
 
 Skills, die einen solchen Trigger brauchen, bringen dafür eine `CLAUDE-snippet`-Datei mit; im Installationspaket heißt sie `CLAUDE-snippet.md`. Ihr Inhalt wird per Hand übernommen — das ist der einzige Schritt der Installation, den kein Paket abnehmen kann.
 
-**In welchen Sprachen ein Skill vorliegt, ist von Fall zu Fall verschieden.** Wo es mehrere Fassungen gibt, tragen die Dateien hier im Repository ein Sprachkürzel vor der Endung — `SKILL.de.md`/`SKILL.en.md`, `rules.de.md`/`rules.en.md`. Welche davon mitkommt, entscheidet das gewählte Paket; die Umbenennung nach `SKILL.md`, die Claude Code voraussetzt, geschieht beim Packen. Die `README.md` bildet im Repository die Ausnahme: Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel — GitHub und GitLab zeigen beim Browsen eines Ordners automatisch nur eine Datei namens exakt `README.md` an, ein Sprachkürzel würde das verhindern (Näheres in `skill-dev-doc.md`, Kapitel 5.1). Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Fassung an sich gegenüber allen Chat-Sprachen kompatibel sein sollte.
+**In welchen Sprachen ein Skill vorliegt, ist von Fall zu Fall verschieden.** Wo es mehrere Fassungen gibt, tragen die Dateien hier im Repository ein Sprachkürzel vor der Endung — `SKILL.de.md`/`SKILL.en.md`, `rules.de.md`/`rules.en.md`. Welche davon mitkommt, entscheidet das gewählte Paket; die Umbenennung nach `SKILL.md`, die Claude Code voraussetzt, geschieht beim Packen. Die `README.md` bildet unterhalb der Repository-Wurzel die Ausnahme: Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel — GitHub und GitLab zeigen beim Browsen eines Ordners automatisch nur eine Datei namens exakt `README.md` an, ein Sprachkürzel würde das verhindern. In der Repository-Wurzel selbst ist es genau umgekehrt (Näheres zu beidem in `skill-dev-doc.md`, Kapitel 5.1). Welche Sprachvariante zu wählen ist, ergibt sich aus der Sprache im Chat, wobei die englische Fassung an sich gegenüber allen Chat-Sprachen kompatibel sein sollte.
 
 Der Ordnername ist in allen Fassungen derselbe und trägt nie ein Kürzel; dasselbe gilt für den Skill-Namen im Frontmatter und damit für den Aufruf `/<skill-name>`.
 

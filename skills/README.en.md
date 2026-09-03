@@ -1,6 +1,6 @@
 # Skills for Claude Code
 
-*Last updated: 2026-09-02*
+*Last updated: 2026-09-04*
 
 *[Deutsche Fassung](README.md)*
 
@@ -57,7 +57,7 @@ The technique Anthropic provides fires a skill via its `description`: if it matc
 
 Skills that need such a trigger carry a `CLAUDE-snippet` file for it; in the installation package it is called `CLAUDE-snippet.md`. Its content is adopted by hand — the one installation step no package can take off your hands.
 
-**Which languages a skill is available in differs from case to case.** Where there are several versions, the files here in the repository carry a language marker in front of the extension — `SKILL.de.md`/`SKILL.en.md`, `rules.de.md`/`rules.en.md`. Which of them comes along is decided by the package you pick; the rename to `SKILL.md` that Claude Code presupposes happens at packing time. `README.md` is the exception in the repository: with several versions only the English one carries a marker (`README.en.md`), the German one is called `README.md` with no marker at all — GitHub and GitLab, when browsing a folder, automatically display only a file named exactly `README.md`; a language marker would prevent that (see `skill-dev-doc.md`, chapter 5.1, for details). Which language version to pick follows from the language used in the chat, whereby the English version should as such be compatible with every chat language.
+**Which languages a skill is available in differs from case to case.** Where there are several versions, the files here in the repository carry a language marker in front of the extension — `SKILL.de.md`/`SKILL.en.md`, `rules.de.md`/`rules.en.md`. Which of them comes along is decided by the package you pick; the rename to `SKILL.md` that Claude Code presupposes happens at packing time. `README.md` is the exception below the repository root: with several versions only the English one carries a marker (`README.en.md`), the German one is called `README.md` with no marker at all — GitHub and GitLab, when browsing a folder, automatically display only a file named exactly `README.md`; a language marker would prevent that. In the repository root itself it is the other way round (see `skill-dev-doc.md`, chapter 5.1, for both). Which language version to pick follows from the language used in the chat, whereby the English version should as such be compatible with every chat language.
 
 The folder name is the same in all versions and never carries a marker; the same holds for the skill name in the frontmatter and hence for the `/<skill-name>` invocation.
 
