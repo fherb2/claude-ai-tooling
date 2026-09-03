@@ -1,105 +1,106 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-09-02*
+*Last updated: 2026-09-04*
 
-*[English version](README.en.md)*
+*[Deutsche Fassung](README.de.md)*
 
-Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Claude Desktop (Chat + Cowork) und Claude Code. Eigenständige Bausteine, jeder mit eigener Dokumentation in seinem Ordner. Diese Seite ist nur die Übersicht. Nutze die verlinkten READMEs in den Bausteinen.
+Tools / components for the daily work with Claude — claude.ai, Claude Desktop (Chat + Cowork) and Claude Code. Self-contained components, each with its own documentation in its folder. This page is the overview only. Use the linked READMEs inside the components.
 
-**Claude Cowork im Einzelnen ist hier noch nicht berücksichtigt.** Die seit Sommer 2026 verfügbare Variante verhält sich in einem entscheidenden Punkt anders als die drei oben genannten: Sie arbeitet über angebundene Ordner direkt auf dem Rechner des Nutzers. Was in diesem Repository steht — Zielwelten, Skills, Arbeitsabläufe — bezieht sich deshalb genau genommen auf claude.ai-Chat, Claude Desktop Chat und Claude Code.
+**Claude Cowork in detail is not covered here yet.** The variant available since summer 2026 differs from the three named above in one decisive respect: through connected folders it works directly on the user's machine. What this repository says — target worlds, skills, workflows — therefore refers, strictly speaking, to claude.ai Chat, Claude Desktop Chat and Claude Code.
 
-## Was es gibt
+## What there is
 
 
-| Baustein                                                      | Anliegen                                                                                                                                                                                                                                  |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`pack-source-to-txt/`](pack-source-to-txt/README.md)<br>✅ | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
-| [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
-| [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit „stillem“ Trigger** — und seit September 2026 auch **garantierte Fähigkeiten mit Hook-Auslöser**.                                                   |
-| [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
-| [`safety-related/`](safety-related/)<br>✅ | **Konfigurationen und Hinweise zur sicheren Nutzung von Claude**: fertige `settings.json`-Blöcke für die Bash-Sandbox und die Werkzeug-Berechtigungen, jeder Parameter in einer Zeile erklärt. |
+| Component                                                                 | What it addresses                                                                                                                                                                                                                  |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`pack-source-to-txt/`](pack-source-to-txt/README.en.md)<br>✅ | **The whole project codebase as a single file**: precise, up-to-date project context for an AI without access to the machine.                                                                                                      |
+| [`home-.claude-sharing/`](home-.claude-sharing/README.md) (in German)<br>⚠️ | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
+| [`skills/`](skills/README.en.md)<br>☑ | Instead of many CLAUDE.md instructions: **have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger** — and, since September 2026, **guaranteed capabilities with a hook trigger** too.                                                |
+| [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.en.md)<br>✅ | **Ready-made blocks of text for instruction files**: paragraphs to be copied out one by one, for the `CLAUDE.md` of a local installation and for the places where claude.ai takes instructions. |
+| [`safety-related/`](safety-related/)<br>✅ | **Configurations and notes for using Claude safely**: ready-made `settings.json` blocks for the Bash sandbox and the tool permissions, with one line of explanation per parameter. |
 
-(✅ einsatzbereit · 🚧 in Arbeit · ⚠️ mit Vorbehalt · ☑ abh. vom Skill)
+(✅ ready to use · 🚧 in progress · ⚠️ with reservations · ☑ depends on the skill)
 
-Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[`skill-dev-doc.md`](skill-dev-doc.md)** trägt die Vorgaben und das Umgebungswissen für den Bau von Skills — gleich in welchem Ordner sie entstehen —, **[`work-plan.md`](work-plan.md)** die anstehenden Arbeitsschritte. Vorhaben mit eigenem Entwicklungsstand führen daneben ihre eigene Doku und ihren eigenen Arbeitsplan.
+**Below this page the languages are the other way round.** The working language of this repository is German, so inside a folder the `README.md` is the German version and the English one carries the marker: `README.en.md` — that is the file the links above point to. Only here in the root does `README.md` hold the English version, with the German one as [`README.de.md`](README.de.md).
 
-### **Anwendungshinweise** weiter unten in dieser README:
+Two files in the project root accompany the development of every building block: **[`skill-dev-doc.md`](skill-dev-doc.md)** carries the guidelines and the environment knowledge for building skills — no matter which folder they grow in — and **[`work-plan.md`](work-plan.md)** the upcoming work steps (both in German). Projects with a development state of their own keep their own documentation and work plan alongside.
 
-* **[Aufbewahrungsdauer von Chats bei Claude Code](#aufbewahrungsdauer-von-chats-bei-claude-code)**
+### **Usage notes** further down in this README:
 
-## pack-source-to-txt (nicht auf Claude beschränkt)
+* **[Chat retention in Claude Code](#chat-retention-in-claude-code)**
 
-**Zweck:** Code-Analyse und -Weiterentwicklung auf Agent Web-Instanzen; Nutzung in schwach gesicherten Bereichen: Kein unmittelbarer Systemzugriff.
+## pack-source-to-txt (not limited to Claude)
 
-**Ein einzelnes, in sich geschlossenes Shell-Skript (`packsrc.sh`), das die Quelldateien eines Projekts in eine strukturierte Textdatei bündelt — bereit zum Hochladen in die Knowledge Base eines Web-KI-Agenten.** Jede Datei steckt in eindeutigen Metadaten-Blöcken mit laufbezogenem Zeitstempel und letztem Änderungsdatum, ein KI-lesbarer Header erklärt dem Agenten die Interpretation. Konfigurierbar sind Quellverzeichnisse, Dateiendungen, explizite Einzeldateien und Verzeichnisausschlüsse; ein Abnahmetest unter `tests/` sichert das Verhalten ab. Braucht nur Bash und die GNU-Werkzeuge, keine weiteren Abhängigkeiten.
+**Purpose:** code analysis and further development on web-based agent instances; use in weakly secured areas: no direct system access.
 
-**Hinweis:** Standard bei Claude Code ist, Chats nach 30 Tagen wegzuwerfen. Das lässt sich beliebig nach oben drehen.
+**A single, self-contained shell script (`packsrc.sh`) that bundles a project's source files into one structured text file — ready for upload to the knowledge base of a web AI agent.** Every file sits inside unambiguous metadata blocks carrying a run-related timestamp and the date of its last change, and an AI-readable header explains to the agent how to interpret them. Source directories, file extensions, explicit individual files and directory exclusions are configurable; an acceptance test under `tests/` secures the behavior. Needs nothing but Bash and the GNU tools, no further dependencies.
 
-**Stand:** produktiv — Näheres in der [README des Bausteins](pack-source-to-txt/README.md).
+**Note:** by default, Claude Code throws chats away after 30 days. That limit can be turned up as far as you like.
+
+**Status:** in production use — more in the [component's README](pack-source-to-txt/README.en.md).
 
 ## home-.claude-sharing
 
-**Zweck: Hält den Arbeitszustand von Claude Desktop und Claude Code — Konfiguration, Sitzungsprotokolle, Projektgedächtnis — über Syncthing zwischen mehreren Rechnern synchron. – Rechnerwechsel zwischen Home und Office oder remote und lokal. Benötigt dabei kein VPN oder lokales Netz.**
+**Purpose: keeps the working state of Claude Desktop and Claude Code — configuration, session logs, project memory — in sync between several machines via Syncthing. – Switching machines between home and office, or remote and local. Needs neither a VPN nor a local network for that.**
 
-Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche Kern ist der Umgang mit dem, was Syncthing bewusst nicht löst: Gleichzeitig geänderte Dateien werden als Konfliktkopien abgelegt, ein Wächter-Dienst entdeckt sie, meldet sich und führt den Nutzer gemeinsam mit Claude durch die inhaltliche Auflösung. Installationsskripte, Dienstdefinition und eine Einrichtungsanleitung für den Vermittlungsknoten liegen bei.
+An always-on NAS node acts as the intermediary. The actual core is dealing with what Syncthing deliberately leaves unsolved: files changed at the same time are put aside as conflict copies, a watcher service discovers them, reports in and guides the user, together with Claude, through resolving them by content. Installation scripts, the service definition and a setup guide for the intermediary node are included.
 
-**Stand:** Im Betrieb beim Entwickler, noch nicht zur Weitergabe freigegeben — Näheres in der [README des Bausteins](home-.claude-sharing/README.md).
+**Status:** in operation at the developer's, not yet released for distribution — more in the [component's README](home-.claude-sharing/README.md) (in German).
 
 ## skills
 
-**Zweck: Anweisungen aus CLAUDE.md raus und Aufgabenbeschreibungen wiederverwendbar machen.** Skills starten auch ohne ein passendes „Trigger-Wort“.
+**Purpose: get instructions out of CLAUDE.md and make task descriptions reusable.** Skills also start without a matching "trigger word".
 
-Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + Cowork): Anweisungen, die nicht dauerhaft in `CLAUDE.md`-Dateien Kontext kosten, sondern erst geladen werden, wenn sie gebraucht werden. Jeder fertige Skill liegt als Installationspaket bereit — ein Archiv je Sprache und Zielwelt, im Unterordner `downloads/` des Skills.
+Reusable skills for Claude Code, claude.ai and Claude Desktop (Chat + Cowork): instructions that do not permanently cost context in `CLAUDE.md` files but are loaded only once they are needed. Every finished skill comes as an installation package — one archive per language and target world, in the skill's `downloads/` subfolder.
 
-Der umfangreichste unter ihnen ist **`chat-export`**: Chats aus Claude.ai zwischen unterschiedlichen Nutzerkonten oder nach Projekten sortiert in eine lokale Claude-Code-Installation zu holen, unterstützt Anthropic derzeit (08/2026) nicht — mit diesem Skill geht es doch, über den angemeldeten Chrome oder aus einem Kontoexport-ZIP. Er ist der einzige Skill mit eigener Implementierungsdoku und eigenem Fahrplan; warum, steht in der [README des Bausteins](skills/README.md).
+The largest among them is **`chat-export`**: importing chats from Claude.ai between different user accounts, or sorted by project, into a local Claude Code installation is something Anthropic does not support at present (08/2026) — with this skill it works anyway, either via the logged-in Chrome or from an account-export ZIP. It is the only skill with its own implementation documentation and its own roadmap; the reasoning is in the [component's README](skills/README.en.md).
 
-Dazu das hier erarbeitete Konzept der **stillen Trigger** — Auslöser für Situationen, die niemand ausspricht. Der Anthropic-Standard, einen Skill aktiv vom Nutzer zu starten oder im Skill über `description:` per Trigger-Wörter im Chat automatisch zu starten, erweitert das Konzept der stillen Trigger auch ein Start aus dem Kontext des Chats heraus. Das ist keine Claude-Code-Erweiterung, sondern wird über besondere Formulierungsregeln in CLAUDE.md erreicht. Details zur Nachnutzung in diesem Baustein.
+Along with that, the concept of **silent triggers** developed here — triggers for situations nobody puts into words. The Anthropic standard has a skill either started by the user or fired automatically on trigger words given in the skill's `description:`; silent triggers extend that by a start out of the context of the chat. This is not an extension of Claude Code, but is achieved through particular rules of wording in CLAUDE.md. Details on reuse in this component.
 
-Seit September 2026 leben hier auch **garantierte Fähigkeiten**: Bausteine, deren Auslöser kein stiller Trigger ist, sondern ein **Hook** — ein Ereignis-Einhänger der Claude-Code-Engine, der garantiert läuft, wo ein Skill nur wahrscheinlich lädt. Installiert werden sie genauso (Paket entpacken); nur wandert statt eines CLAUDE.md-Snippets ein Eintrag in die `settings.json`. Erster dieser Art: **`recall-skills-after-compact`** — nach jeder Kontext-Kompression bekommt die Instanz die Liste der zuvor geladenen Skills in den Kontext gespielt und legt sie dem Nutzer vor; der entscheidet, was neu geladen wird.
+Since September 2026 this component also holds **guaranteed capabilities**: building blocks whose trigger is not a silent trigger but a **hook** — an event handler of the Claude Code engine that runs guaranteed where a skill only probably loads. They install the same way (unpack the package); only a `settings.json` entry travels to the target instead of a CLAUDE.md snippet. First of this kind: **`recall-skills-after-compact`** — after every context compaction the instance gets the list of previously loaded skills played into its context and presents it to the user, who decides what to reload.
 
-**Stand:** Der Stand der einzelnen Skills wird in der [zugehörigen README](skills/README.md) einzeln ausgewiesen.
+**Status:** the status of the individual skills is stated separately in the [corresponding README](skills/README.en.md).
 
 ## CLAUDE.md-Snippets
 
-**Zweck: Wiederkehrende Anweisungen nicht jedes Mal neu formulieren.** Fertig ausformulierte Textbausteine, die einzeln in eine Anweisungsdatei kopiert werden — in die `CLAUDE.md` einer lokalen Claude-Code-Installation oder an die Stellen, an denen claude.ai Anweisungen aufnimmt.
+**Purpose: stop rewriting recurring instructions from scratch every time.** Fully worded blocks of text to be copied one by one into an instruction file — into the `CLAUDE.md` of a local Claude Code installation, or into the places where claude.ai takes instructions.
 
-Der Schnitt zwischen den drei Dateien ist der **Wirkungsort**, nicht das Thema: Was in beiden Umgebungen wortgleich taugt, steht in `common-snippets`; was nur bei claude.ai oder nur lokal gilt, in der jeweils eigenen Datei. Ein Thema kann deshalb planmäßig in mehreren Dateien vorkommen — beim Memory etwa die Frage, *ob* etwas gespeichert werden darf, getrennt von der Frage, *wohin*.
+What separates the three files is the **place they take effect**, not the topic: whatever serves word for word in both environments sits in `common-snippets`; whatever holds only for claude.ai or only locally sits in its own file. One topic can therefore appear in several files by design — with memory, for instance, the question of *whether* something may be stored is kept apart from the question of *where*.
 
-Nicht zu verwechseln mit den `CLAUDE-snippet.md`-Dateien im Baustein `skills/`: Die sind der stille Trigger eines bestimmten Skills und ohne ihn wirkungslos. Hier stehen Anweisungen, die für sich wirken und keinen Skill hinter sich haben.
+Not to be confused with the `CLAUDE-snippet.md` files in the `skills/` component: those are the silent trigger of one particular skill and have no effect without it. What is kept here are instructions that take effect on their own and have no skill behind them.
 
-**Einen Baustein sollte man immer übernehmen: „Vorrang der Anweisungsebenen“.** Er klärt, welche Ebene gilt, wenn zwei Anweisungen einander widersprechen. Ohne ihn wird in diesem Fall willkürlich eine der beiden Regeln gewählt — belegt für Claude Code, das alle gefundenen `CLAUDE.md`-Dateien aneinanderhängt, statt sie einander überschreiben zu lassen ([memory](https://code.claude.com/docs/en/memory)). Bemerkbar macht sich das als Rückfrage an einer Stelle, an der keine nötig wäre, oder als überraschendes Verhalten. Der Baustein ist vier Zeilen lang und kann nichts kaputt machen.
+**One block should always be taken over: "Precedence of the instruction levels".** It settles which level holds when two instructions contradict each other. Without it, one of the two rules is picked arbitrarily in that case — documented for Claude Code, which concatenates all discovered `CLAUDE.md` files instead of letting them override each other ([memory](https://code.claude.com/docs/en/memory)). It shows up as a question asked where none would be needed, or as surprising behavior. The block is four lines long and nothing can go wrong with it.
 
-**Stand:** Einsatzbereit, in beiden Sprachfassungen — Näheres in der [README des Bausteins](CLAUDE.md-Snippets/README.md).
+**Status:** ready to use, in both language versions — more in the [component's README](CLAUDE.md-Snippets/README.en.md).
 
 ## safety-related
 
-**Zweck: Konfigurationen und Hinweise zur sicheren Nutzung von Claude.** Fertige `settings.json`-Blöcke, die den Zugriff von Claude Code auf Dateisystem und Netz eingrenzen — zum Übernehmen, ohne die Sandbox-Dokumentation querlesen zu müssen.
+**Purpose: configurations and notes for using Claude safely.** Ready-made `settings.json` blocks that narrow Claude Code's access to the file system and the network — ready to adopt, without having to read through the sandbox documentation.
 
-Abgedeckt sind zwei Wirkungsflächen, die leicht verwechselt werden: die **Bash-Sandbox** (`sandbox.*`), die das Betriebssystem durchsetzt und die Bash samt aller Kindprozesse umschließt, und die **Berechtigungen der Agent-Werkzeuge** (`permissions.*`) für Read, Edit, Write und WebFetch, die an der Sandbox vorbeilaufen. Erst beide zusammen schließen etwa einen Geheimnis-Pfad vollständig. Zu jedem Parameter steht eine Zeile, was er bewirkt.
+Two enforcement surfaces are covered, and they are easily confused: the **Bash sandbox** (`sandbox.*`), enforced by the operating system, which encloses Bash and every child process it spawns, and the **permissions of the agent tools** (`permissions.*`) for Read, Edit, Write and WebFetch, which run past the sandbox. Only both together fully close a path holding secrets. Every parameter carries one line saying what it does.
 
-**Stand:** Einsatzbereit, in beiden Sprachfassungen — [`sandbox-settings.de.md`](safety-related/sandbox-settings.de.md) · [`.en.md`](safety-related/sandbox-settings.en.md). Der Ordner hat bewusst keine eigene README; die beiden Dateien erklären sich selbst.
+**Status:** ready to use, in both language versions — [`sandbox-settings.de.md`](safety-related/sandbox-settings.de.md) · [`.en.md`](safety-related/sandbox-settings.en.md). The folder deliberately has no README of its own; the two files speak for themselves.
 
-## Anwendungshinweise
+## Usage notes
 
-### Aufbewahrungsdauer von Chats bei Claude Code
+### Chat retention in Claude Code
 
-Claude Code legt Chats und die zugehörigen Daten und Sicherungskopien von zu ändernden Files in `~/.claude/` ab. **Die Aufbewahrungsdauer ist standardmäßig nur 30 Tage. Wer später auf Wissen aus diesen Chats zurückgreifen will, hat keine Chance.**
+Claude Code stores chats, along with the data belonging to them and backup copies of the files it is about to change, under `~/.claude/`. **By default the retention period is a mere 30 days. Whoever wants to fall back on the knowledge in those chats later on has no chance.**
 
-Die Aufbewahrungsdauer lässt sich in `~/.claude/settings.json` mit dem Schlüssel `cleanupPeriodDays` **umkonfigurieren**.
+The retention period can be **reconfigured** in `~/.claude/settings.json` with the `cleanupPeriodDays` key.
 
-**Beispiel für 3 Jahre:**
+**Example for 3 years:**
 
 ```json
 {
   "cleanupPeriodDays": 1095
 }
-
 ```
 
-Der Schlüssel ist prinzipiell in allen Settings-Ebenen zulässig — `~/.claude/settings.json` (Nutzer), `<projekt>/.claude/settings.json`, `<projekt>/.claude/settings.local.json`.
+In principle the key is permitted at every settings level — `~/.claude/settings.json` (user), `<project>/.claude/settings.json`, `<project>/.claude/settings.local.json`.
 
-**Ausgenommen sind aber einige Pfade** — vor allem `history.jsonl` (jeder je getippte Prompt mit Zeitstempel und Projektpfad) und das Auto-Memory unter `projects/<projekt>/memory/`. Die bleiben unbefristet liegen. Wer also die Aufbewahrungsdauer als Datenschutz-Stellschraube liest, greift mit `cleanupPeriodDays` allein zu kurz; die Doku nennt dafür zusätzlich `CLAUDE_CODE_SKIP_PROMPT_HISTORY` und `claude project purge`.
+**Some paths are exempt from this, though** — above all `history.jsonl` (every prompt ever typed, with timestamp and project path) and the auto memory under `projects/<project>/memory/`. Those stay on indefinitely. So whoever reads the retention period as a privacy control does not get far with `cleanupPeriodDays` alone; for that, the documentation additionally names `CLAUDE_CODE_SKIP_PROMPT_HISTORY` and `claude project purge`.
 
-## Lizenz
+## License
 
-Dieses Repository legt keine gemeinsame Lizenz fest. Jeder Baustein regelt seine Nutzungslizenz einzeln in seiner eigenen README — dort steht auch, was zur Weitergabe / Nutzung freigegeben ist.
+This repository does not set a common license. Each component settles its license of use individually in its own README — which is also where it says what is released for distribution / use.
