@@ -216,6 +216,8 @@ Das Kürzel tragen dann beide Fassungen dieser Dateien. Wo dieses Dokument die b
 
 **Die `README.md` ist davon ausgenommen — bewusst asymmetrisch.** Bei mehreren Fassungen trägt nur die englische ein Kürzel (`README.en.md`); die deutsche heißt unverändert `README.md`, ganz ohne Kürzel. Grund (recherchiert 23. August 2026): GitHub und GitLab zeigen automatisch nur eine Datei namens exakt `README.md` an, sobald jemand einen Ordner im Web-Interface öffnet — ein Sprachkürzel verhindert das, unabhängig davon, für welche Sprache es steht. Da die Arbeitssprache dieses Repositories Deutsch ist (siehe unten), bekommt die deutsche Fassung deshalb den Vorrang: Sie ist es, die beim Browsen ohne einen Klick sichtbar wird.
 
+**Das gilt überall unterhalb der Repository-Wurzel; in der Wurzel selbst ist es umgekehrt.** Dort heißt die englische Fassung `README.md` und die deutsche `README.de.md` (Festlegung des Entwicklers vom 4. September 2026). Derselbe Mechanismus, andere Leserschaft: Was GitHub ohne einen Klick zeigt, ist in der Wurzel die Startseite des Repositories — und dies ist das einzige international gehostete Repository des Entwicklers. Wer dort ankommt, bringt die Arbeitssprache nicht mit; wer dagegen einen Ordner öffnet, steckt schon im Vorhaben. Die Asymmetrie ist deshalb keine Unstimmigkeit, die beim nächsten Aufräumen glattzuziehen wäre.
+
 **Beim Installieren darf umbenannt werden.** Die gewählte `SKILL`-Fassung muss am Zielort `SKILL.md` heißen — eine `SKILL.de.md` allein ist kein Skill —, und ebenso darf eine `README.en.md` dort zu `README.md` werden. Der Ordnername bleibt unverändert, denn er trug nie ein Kürzel. Daraus folgt, was ein installierter Ordner **nicht** verrät: Aus einem Dateinamen lässt sich die Sprache seines Inhalts nicht ableiten. Wer den Inhalt braucht, sieht hinein, statt aus dem Namen zu schließen.
 
 Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
@@ -351,7 +353,7 @@ Die `README.md` dieses Ordners ist der Einstieg in das Vorhaben: Sie sagt, wozu 
 
 Dazu ein **Lizenzabschnitt**: CC0, mit einer Aufzählung dessen, was das für den Nutzer konkret bedeutet.
 
-**Sprachfassungen.** Auch hier entscheidet der Nutzer, in welchen Sprachen die Gesamt-README vorliegt (5.1). Ihre Benennung folgt aber der Konvention der Wurzel-READMEs dieses Repositories, nicht dem Kürzel-Schema der Skill-Ordner: Die deutsche Fassung heißt `README.md`, jede weitere trägt ihr Kürzel (`README.en.md`).
+**Sprachfassungen.** Auch hier entscheidet der Nutzer, in welchen Sprachen die Gesamt-README vorliegt (5.1). Ihre Benennung folgt aber der README-Regel aus 5.1, nicht dem Kürzel-Schema der Skill-Ordner: Die deutsche Fassung heißt `README.md`, jede weitere trägt ihr Kürzel (`README.en.md`). Die beiden READMEs in der Repository-Wurzel sind dafür kein Vorbild — für sie gilt die in 5.1 beschriebene Umkehrung.
 
 ### 6.3 Fahrplan
 
