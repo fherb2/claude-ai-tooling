@@ -8,16 +8,25 @@ dessen eigene Doku oder README — nicht hierher.
 
 # Sprachen
 
-Abweichend zum sonst üblichen Verfahren, die README-Files in englisch anzulegen
-wir in diesem Projekt vorgegeben: Die README.md ist immer in deutscher Sprache
-und zusätzlich wird eine README.en.md angelegt, auf die die deutschprachige
-README ganz oben verweist. Bei Änderungen an READMEs ist die andere Sprachversion
-nachzuziehen. Welche die "vorgebende" Version ist ergibt sich aus dem Zeitpunkt
-der Änderungen: Die neusten Änderungen ergänzen / ersetzen / entfernen Bereiche
-in der anderen Sprache. Ausnahme: Fälle wo beim Übersetzen bewußt ein Begriff
+Abweichend zum sonst üblichen Verfahren, die README-Files in englisch
+anzulegen, wird in diesem Projekt vorgegeben: Die README.md eines Ordners ist
+in deutscher Sprache und zusätzlich wird eine README.en.md angelegt, auf die
+die deutschsprachige README ganz oben verweist. **In der Projektwurzel ist es
+umgekehrt**: Dort trägt die README.md die englische Fassung und die deutsche
+liegt als README.de.md daneben; beide verweisen oben aufeinander. Grund ist
+die Sichtbarkeit — GitHub zeigt beim Öffnen des Repositories die Datei namens
+exakt README.md, und dies ist das einzige international gehostete Repository
+des Entwicklers (Festlegung des Entwicklers vom 4. September 2026). Wer
+dagegen einen Ordner öffnet, steckt schon im Vorhaben, dessen Arbeitssprache
+Deutsch ist.
+
+Bei Änderungen an READMEs ist die andere Sprachversion nachzuziehen. Welche
+die "vorgebende" Version ist, ergibt sich aus dem Zeitpunkt der Änderungen:
+Die neusten Änderungen ergänzen / ersetzen / entfernen Bereiche in der
+anderen Sprache. Ausnahme: Fälle, wo beim Übersetzen bewusst ein Begriff
 weggelassen oder nicht oder anders übersetzt wurde, um keine linguistischen
-Probleme erzeugen sind keine Änderungen, die in die andere Sprache rückübertragen
-werden müssen.
+Probleme zu erzeugen, sind keine Änderungen, die in die andere Sprache
+rückübertragen werden müssen.
 
 **Und es bleibt bei diesen zwei Ebenen.** Eine dritte — eine `CLAUDE.md` in
 einem Unterordner oder eine pfadgebundene Regel unter `.claude/rules/` — ist
