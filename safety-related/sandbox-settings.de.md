@@ -1,6 +1,6 @@
 # Sandbox- und Werkzeug-Settings: Snippets mit Parameterbeschreibung
 
-*Stand: 2026-09-01 · Angaben gegen die Claude-Code-Doku, eine Hersteller-Referenzkonfiguration, das Bedrohungsmodell von Trail of Bits und vier Bug-Reports im Claude-Code-Repository geprüft. Quellen am Ende.*
+*Stand: 2026-09-07 · Angaben gegen die Claude-Code-Doku, eine Hersteller-Referenzkonfiguration, das Bedrohungsmodell von Trail of Bits und vier Bug-Reports im Claude-Code-Repository geprüft. Quellen am Ende.*
 
 **Geltungsbereich:** Linux und macOS; unter Windows nur über WSL2 — nativ läuft die Sandbox dort nicht, und Pfade würden anders geschrieben (`//c/**/.env` statt `//**/.env`).
 
@@ -60,12 +60,17 @@ Der vorgesehene Weg, aus der Sandbox-Doku. Erfasst Dateien **und** Umgebungsvari
         { "name": "GITHUB_TOKEN", "mode": "deny" },
         { "name": "NPM_TOKEN", "mode": "deny" }
       ]
+    },
+    "filesystem": {
+      "allowRead": ["~/.ssh/known_hosts", "~/.ssh/config"]
     }
   }
 }
 ```
 
 Beide Listen sind um Deine eigenen Fälle zu ergänzen — was dazugehört, steht unten unter „Was Du selbst festlegen musst".
+
+Die `allowRead`-Zeile öffnet innerhalb der `~/.ssh`-Sperre gezielt zwei Dateien wieder: `known_hosts` und `config` sind keine Geheimnisse, sondern werden für die SSH-Host-Key-Prüfung und für Git-über-SSH gebraucht. Ohne diese Ausnahme scheitert jede SSH-Verbindung mit „Host key verification failed" — auch mit geladenem Agenten, selbst wenn der private Schlüssel gar nicht gelesen werden müsste. Belegt am 7. September 2026: exakt dieser Fehlschlag, isoliert über einen direkten SSH-Testaufruf.
 
 ### A2 – Selbst-Rechteausweitung verhindern *[NVIDIA]*
 
@@ -178,7 +183,9 @@ Laut Doku gehört das in die Projekt-`.claude/settings.json`, weil `.` nur dort 
       "Bash(dangerouslyDisableSandbox:true)"
     ],
     "deny": [
-      "Read(~/.ssh/**)",
+      "Read(~/.ssh/id_*)",
+      "Read(~/.ssh/*.pem)",
+      "Read(~/.ssh/*.pub)",
       "Read(~/.aws/**)",
       "Read(~/.gnupg/**)",
       "Read(~/.netrc)",
@@ -197,6 +204,8 @@ Laut Doku gehört das in die Projekt-`.claude/settings.json`, weil `.` nur dort 
 ```
 
 Die `ask`-Regel ist der wirksamste einzelne Eintrag: Der Auto-Modus bleibt überall erhalten, und nur das eine Ereignis „raus aus der Sandbox" wird Dir zwingend vorgelegt — durchgesetzt vom Client, nicht vom Modell.
+
+**Warum hier nicht `Read(~/.ssh/**)` steht:** Auf dieser Ebene ist Deny absolut — anders als bei der Sandbox gibt es kein `allow`, das eine `deny`-Regel wieder öffnet (siehe „Deny ist absolut" weiter unten). Eine Sperre für den ganzen Ordner träfe deshalb auch `known_hosts`, und jede SSH-Verbindung schlüge mit „Host key verification failed" fehl. Die Regel muss also von vornherein eng genug sein, statt nachträglich Ausnahmen zu bekommen. Der Preis: Ein Schlüssel mit unüblichem Namen — keiner der Muster `id_*`, `*.pem`, `*.pub` — bliebe lesbar. Das ist keine Lücke, die sich schließen ließe, ohne wieder den ganzen Ordner zu sperren; sie gehört in die eigene Geheimnis-Inventur (siehe unten).
 
 ### B2 – Umgebungsverändernde Kommandos sperren *[NVIDIA]*
 
