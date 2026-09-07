@@ -28,15 +28,27 @@ RUN set -eux; \
         usermod -d "$USER_HOME" -m ubuntu; \
     fi
 
+# Three of these are not obvious, and all three were found by running the
+# container rather than by reading anything:
+#   openssh-client  - the agent socket is mounted, but without a client nothing
+#                     can use it: git over SSH has no transport, ssh-add fails.
+#   bubblewrap,     - Claude Code's own Bash sandbox needs both. Without them it
+#   socat             refuses to start at all when sandbox.failIfUnavailable is
+#                     set, which is the recommended hardening, so a session ends
+#                     before it begins. See README, "Welche Claude-Einstellungen
+#                     im Container tragen".
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
+        bubblewrap \
         build-essential \
         ca-certificates \
         git \
+        openssh-client \
         pipx \
         python3 \
         python3-venv \
+        socat \
         sudo; \
     rm -rf /var/lib/apt/lists/*
 

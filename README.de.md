@@ -92,7 +92,7 @@ Geliefert wird die **Rezeptur, kein fertiges Image**: ein Dockerfile mit C-Compi
 
 Das Projekt wird dabei auf `~/git/<Name>` normalisiert, unabhängig davon, wo es auf dem Host liegt. Das ist kein Geschmack, sondern Voraussetzung: Claude Code bildet den Schlüssel seiner Sitzungsprotokolle aus dem absoluten Projektpfad, und nur wenn der überall gleich ist, trägt der Abgleich aus [`home-.claude-sharing`](home-.claude-sharing/README.md) auch für Sitzungen im Container.
 
-**Stand:** Geschrieben und in sich geprüft, aber **noch nie gebaut** — der erste Bau und die Prüfliste stehen aus. Einzelheiten in der [README des Bausteins](vscode-dev-container/README.md).
+**Stand:** **Gebaut und im Feld gelaufen** (September 2026, zwei Rechner) — Container startet, die Claude-Erweiterung arbeitet darin, Pfad und Sitzungsschlüssel stimmen wie entworfen. Die Prüfliste in der README des Bausteins trägt eine Spalte „geprüft" mit dem, was tatsächlich beobachtet wurde. Offen bleibt, was Hardware braucht: die Netzsperre je Rechner und zwei Messungen. Einzelheiten in der [README des Bausteins](vscode-dev-container/README.md).
 
 ## Anwendungshinweise
 
