@@ -92,7 +92,7 @@ What is delivered is the **recipe, not a finished image**: a Dockerfile with a C
 
 The project is normalised to `~/git/<name>`, regardless of where it sits on the host. That is not taste but a requirement: Claude Code derives the key of its session transcripts from the absolute project path, and only if that is the same everywhere does the synchronisation from [`home-.claude-sharing`](home-.claude-sharing/README.en.md) carry for sessions inside the container as well.
 
-**Status:** written and checked in itself, but **never yet built** — the first build and the checklist are still open. Details in the [component's README](vscode-dev-container/README.en.md).
+**Status:** **built and run in the field** (September 2026, two machines) — the container starts, the Claude extension works inside it, path and session key match the design. The checklist in the component's README carries a "probed" column with what was actually observed. What remains open is what needs hardware: the network barrier per machine and two measurements. Details in the [component's README](vscode-dev-container/README.en.md).
 
 ## Usage notes
 
