@@ -2,6 +2,8 @@
 
 *Stand: 2026-09-10*
 
+*[English version](README.en.md)*
+
 **Hält den Arbeitszustand von Claude Code und Claude Desktop — Konfiguration, Sitzungsprotokolle, Projektgedächtnis — automatisch zwischen mehreren Rechnern synchron, damit derselbe Kontext überall zur Verfügung steht. Und meldet den Ausnahmefall, den eine Synchronisation nicht selbst lösen kann: die beidseitig geänderte Datei.**
 
 Der Abgleich läuft seit dem 11. August 2026, inzwischen auf drei Rechnern; auf allen drei läuft der Wächter als Dienst, und er hat echte Konflikte behandelt. Die Implementierung ist abgeschlossen, offen ist allein ein Pendant für Windows (`work-plan.md`).
@@ -72,7 +74,7 @@ Das Skript **installiert nichts stillschweigend**: Fehlt ein Paket, nennt es die
 **Der Normalfall ist ein Rechner, der schon ein eigenes, gewachsenes `~/.claude` hat** — darin stecken die Chats seiner lokalen Projekte und die aus Claude Desktop. Dieser Bestand darf nicht überschrieben werden, und genau deshalb sieht der Weg unten so aus und nicht wie ein gewöhnliches „Ordner synchronisieren": Der Erstabgleich **vereinigt** zwei gewachsene Bestände, und der Zusammenführungsschritt dabei ist eingeplant.
 
 1. **Bestand sichern.** `cp -a ~/.claude ~/.claude.vor-sync` — die einzige Rückfalllinie dieses Vorgangs. Sie wird erst am Ende aufgelöst.
-2. **Werkzeugpaket entpacken.** `downloads/claude-sync-watch.zip` aus diesem Ordner herunterladen, dann `unzip claude-sync-watch.zip -d ~`. Das legt `~/.claude-sync-watch/` mit allen benötigten Dateien an. Dieser Ort ist **Vorschrift**, keine Empfehlung: Die Dienstdefinition verweist fest darauf, und das Installationsskript verweigert den Dienst an jedem anderen Ort. Der Ordner ist versteckt; Kontrolle mit `ls -d ~/.claude-sync-watch`. Der Dienst wird hier noch **nicht** eingerichtet.
+2. **Werkzeugpaket entpacken.** `downloads/claude-sync-watch_de_local.zip` aus diesem Ordner herunterladen, dann `unzip claude-sync-watch_de_local.zip -d ~`. Das legt `~/.claude-sync-watch/` mit allen benötigten Dateien an. Dieser Ort ist **Vorschrift**, keine Empfehlung: Die Dienstdefinition verweist fest darauf, und das Installationsskript verweigert den Dienst an jedem anderen Ort. Der Ordner ist versteckt; Kontrolle mit `ls -d ~/.claude-sync-watch`. Der Dienst wird hier noch **nicht** eingerichtet.
 3. **Ausschlussliste anlegen — vor dem Teilen.** `cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore`. Warum vorher: Syncthing synchronisiert diese Datei nicht, sie muss auf jedem Rechner einzeln vorhanden sein — und fehlt sie beim ersten Abgleich, wandern die Zugangsdaten los. Was Syncthing später im Reiter *Ignore Patterns* anzeigt, ist genau diese Datei; vor dem Teilen gibt es den Reiter noch nicht.
 4. **Den Ordner in Syncthing teilen.** Vier Handgriffe, Einzelheiten in Abschnitt 7 des Setup-Guides: **Add Folder**; als **Folder ID** dieselbe Kennung wie auf den übrigen Geräten eintragen — zeichengleich, sonst gilt der Ordner als ein anderer; als „Folder Path" `~/.claude`; im Reiter **Sharing** den Knoten anhaken; speichern. Am Knoten erscheint die Rückfrage, ob der Ordner angenommen werden soll. Alle Geräte bleiben auf **Send & Receive**.
 5. **Erstabgleich abwarten.** Fertig, wenn die Oberfläche auf beiden Seiten „Up to Date" zeigt. Was dabei geschieht: Einseitig vorhandene Dateien werden verteilt; beidseitig vorhandene, inhaltlich verschiedene erzeugen Konfliktkopien mit `.sync-conflict-` im Namen. Wie viele es werden, hängt an der Divergenz der Bestände — **das ist der geplante Zusammenführungsschritt, kein Fehler.**
