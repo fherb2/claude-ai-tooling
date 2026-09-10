@@ -4,7 +4,7 @@
 
 **Hält den Arbeitszustand von Claude Code und Claude Desktop — Konfiguration, Sitzungsprotokolle, Projektgedächtnis — automatisch zwischen mehreren Rechnern synchron, damit derselbe Kontext überall zur Verfügung steht. Und meldet den Ausnahmefall, den eine Synchronisation nicht selbst lösen kann: die beidseitig geänderte Datei.**
 
-Der Abgleich läuft seit dem 11. August 2026, inzwischen auf drei Rechnern; der Wächter ist als Dienst eingerichtet und hat echte Konflikte behandelt. Die Implementierung ist abgeschlossen, offen ist allein ein Pendant für Windows (`work-plan.md`).
+Der Abgleich läuft seit dem 11. August 2026, inzwischen auf drei Rechnern; auf allen drei läuft der Wächter als Dienst, und er hat echte Konflikte behandelt. Die Implementierung ist abgeschlossen, offen ist allein ein Pendant für Windows (`work-plan.md`).
 
 ## Ziel
 
