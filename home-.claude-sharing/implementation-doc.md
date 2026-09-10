@@ -1,10 +1,10 @@
 # Implementierungsdokumentation: Syncthing-Sync für `~/.claude`
 
-Dieses Dokument ist die Konzeption des Vorhabens und wird mit Beginn der Implementierung parallel zum Code weitergepflegt. Es besteht aus drei Segmenten: **Segment 1** erklärt das System entlang der Abläufe, wie sie der Nutzer erlebt, und ist zugleich die Quelle der späteren Anwenderdokumentation. **Segment 2** enthält die projektweiten Vorgaben, die quer über den gesamten Code gelten und an denen sich jede einzelne Datei messen lassen muss. **Segment 3** beschreibt die Einheiten — Skripte, Anweisungsdateien, Datenstrukturen — jede in einem eigenen, in sich geschlossenen Kapitel. Ein **Anhang** sammelt die vor der Implementierung zu klärenden Fragen.
+Dieses Dokument beschreibt die fertige Implementierung. Es besteht aus drei Segmenten: **Segment 1** erklärt das System entlang der Abläufe, wie sie der Nutzer erlebt, und ist zugleich die Quelle der Anwenderdokumentation. **Segment 2** enthält die projektweiten Vorgaben, die quer über den gesamten Code gelten und an denen sich jede einzelne Datei messen lassen muss. **Segment 3** beschreibt die Einheiten — Skripte, Anweisungsdateien, Datenstrukturen — jede in einem eigenen, in sich geschlossenen Kapitel. **Anhang B** trägt den Code-Review vom 13. August 2026 im Wortlaut des Reviewers samt der Begründung jeder Bearbeitung; er ist die Wissensbasis eines künftigen Reviews und kein Teil der Beschreibung.
 
-Es gilt die Prosa-Code-Grenze: Dieses Dokument enthält keinen Implementierungscode. Kommandos, Dialogtexte und Dateinamen sind Schnittstellen-Fakten; endgültig beschlossene Funktionssignaturen werden erst nach ihrer Festlegung hier eingetragen — derzeit gibt es keine.
+Es gilt die Prosa-Code-Grenze: Dieses Dokument enthält keinen Implementierungscode. Kommandos, Dialogtexte, Schalter und Dateinamen sind Schnittstellen-Fakten und stehen deshalb darin.
 
-Arbeitsregeln der Entwicklung: Geschrieben wird ausschließlich im Arbeitsordner des Vorhabens (`home-.claude-sharing/` im Git-Repository `claude-ai-tooling`). Das reale `~/.claude` verändert im Normalbetrieb nur Syncthing; Entwicklungs- und Funktionstests laufen gegen eigene Testordner, nie gegen `~/.claude` (siehe 3.8). Aussagen, die noch nicht geklärt sind, tragen die Markierung **Offen** oder stehen als Frage im Anhang. Die Einrichtung von Server und Geräten ist nicht Teil dieses Dokuments — sie steht in der fortbestehenden `syncthing-synology-setup-guide.md`.
+Die Einrichtung von Server und Geräten ist nicht Teil dieses Dokuments — sie steht in der fortbestehenden `syncthing-synology-setup-guide.md`.
 
 ---
 
@@ -838,35 +838,6 @@ Das Vorhaben hat vier Pflichtdateien, und `install_service.sh` bricht ab, wenn e
 **Drei Unsicherheiten, benannt statt verschwiegen.** `/downloads`, `/ide` und `/telemetry` stehen in **keiner** offiziellen Dokumentation; ihr Ausschluss ruht auf dem Namen und auf der Beobachtung, dass nichts fehlt. Und `*.log` schließt eine ganze **Namensklasse** aus, deren Umfang niemand nachlesen kann: Schreibt Claude Code eines Tages eine `.log`, die gebraucht wird, bleibt sie lautlos zurück — der Ausschluss meldet sich nie. Ob weitere Ausschlüsse nötig oder vorhandene zu eng sind, ist offen und in Anhang A als F7 geführt.
 
 **Was die Liste nicht leistet, gehört dazu:** Ein neues Muster löscht nichts, was schon abgeglichen wurde (Messung in 1.3), und die Datei wandert nicht mit — jede Änderung ist auf **jedem** Gerät nachzutragen (2.8, dort auch die verworfene `#include`-Variante).
-
----
-
-# Anhang A: Fragenkatalog
-
-Offene Fragen des Vorhabens. Je Frage: Entscheidung treffen, Ergebnis in das zuständige Kapitel einpflegen, Frage hier streichen — eine gefallene Entscheidung lebt in der Doku, nicht in einem Vermerk über die Frage.
-
-**Zur Nummerierung:** Eine neue Frage erhält eine Nummer größer als die höchste je vergebene; beim Streichen wird **nicht** umnummeriert. Die Lücken sind gewollt — sie bewahren die historisch gewachsene Reihenfolge und halten Verweise in älteren Aufzeichnungen gültig.
-
-**F3 — Dateien in Benutzung durch die laufende Instanz.** *Zurückgestellt: nicht gelöst, Verhalten bei der Nutzung zu beobachten, möglicherweise gar nicht einschlägig.*
-
-Die Konfliktsitzung ist selbst eine laufende Claude-Instanz mit `~/.claude` als Arbeitsverzeichnis. Der Abgleich steht zu diesem Zeitpunkt bereits (1.6), die Frage ist also **rein lokal**: Kann das Überschreiben einer Datei die Instanz stören, die zeitgleich in demselben Ordner arbeitet?
-
-Für den größten Teil des Ordners ist das unwahrscheinlich — was die Instanz selbst anlegt (ihr eigenes Sitzungsprotokoll, Sitzungs- und Schnappschussdateien) trägt je Sitzung eigene Namen und kann mit einer Konfliktkopie kaum zusammentreffen. Für die wenigen gemeinsam genutzten Dateien im Ordnerkopf ist es offen.
-
-Zwei Beobachtungspunkte für die Nutzungsphase, damit später klar ist, worauf zu achten war:
-
-- Stört das Überschreiben einer Datei die laufende Sitzung sichtbar?
-- Schreibt die Instanz beim Beenden eine der aufgelösten Dateien aus einem eigenen Zwischenstand zurück und verwirft damit die Lösung unbemerkt?
-
-Tritt eines von beidem auf, wäre eine Reihenfolge-Regel (kritische Dateien zuletzt, danach Neustart der Sitzung) der naheliegende Ansatz. Bis dahin wird nichts vorgesehen. Gemeinsam mit F7 in der Beobachtungsphase zu klären. (Betrifft 3.4.)
-
-**F7 — Reale Konfliktkandidaten.** In den ersten Betriebswochen beobachten, welche Dateien tatsächlich Konfliktkopien erzeugen (auch: ob `file-history/` kollidieren kann), und daraus ableiten, ob weitere Ausschlüsse (maßgebliche Ausschlussliste in 2.8) oder Sonderbehandlungen nötig sind. (Betrifft 1.3, 1.5.)
-
-Erste Befunde aus dem Betrieb, bevor die Wochen gezählt sind: Bei der Erstverbindung zweier nicht-leerer `~/.claude` entstand **keine** Konfliktkopie; ein Wechsel des Claude-Kontos in Desktop und VSCode-Erweiterung erzeugt ebenfalls keine (Begründung in 1.3: Kontozustand liegt ausgeschlossen oder außerhalb des Ordners); und bis zum 12. August 2026 hat **keine** Claude-Instanz von sich aus einen Konflikt erzeugt. Der Konflikt, an dem die Kette geprüft wurde, musste herbeigeführt werden. Das verschiebt die Frage: Nicht „welche Dateien kollidieren?" ist bisher das Thema, sondern ob überhaupt je eine kollidiert — und wie man einen Mechanismus vertrauenswürdig hält, der monatelang nichts tut (3.8). Als erster konkreter Kandidat ist `history.jsonl` benannt: Sie wird abgeglichen und ändert sich fortlaufend.
-
-**F11 — Größenordnungsargument gegenprüfen.** 1.4 stützt die Festlegung zu den Suchlaufkosten auf die Einschätzung „einige 10 bis einige hundert Megabyte" — bewusst ohne feste Zahl, weil `~/.claude` beobachtet schnell wächst (binnen zweier Tage von 56 auf 66 MB) und jede eingesetzte Zahl in kurzer Zeit wieder veraltet wäre. Bei einem langlebigen Account mit entsprechend gewachsenem Ordner ist gegenzuprüfen, ob die Größenordnung noch zutrifft und die Suchlaufkosten weiterhin vernachlässigbar sind. (Betrifft 1.4.)
-
-**Teilweise beantwortet am 14. August 2026, und die Frage hat sich dabei verschoben.** Gemessen wurde die Wachstumsrate und die dafür entscheidende Ursache: Nicht die Nutzung bestimmt die Obergrenze, sondern `cleanupPeriodDays` — bei 1095 Tagen räumt Claude Code praktisch nie auf, und die Fortschreibung landet im Gigabyte-Bereich (Zahlen in 1.4). Damit ist nicht mehr zu klären, *ob* die Größenordnung einmal verlassen wird, sondern **wann** — und das ist ohne langlebigen Account weiterhin nicht zu messen. Offen bleibt F11 also, aber mit einem Schwellwert statt einer offenen Frage: zu überprüfen, sobald der Ordner den unteren Gigabyte-Bereich erreicht.
 
 ---
 
