@@ -96,6 +96,8 @@ Das Skript baut das Archiv aus **seinem eigenen Inhalt** neu und tauscht allein 
 
 **Die Zeitstempel gehören zur Prüfung.** Vergleicht man `unzip -l` vor und nach dem Packen, darf sich genau die Zeile der ausgetauschten Datei bewegt haben.
 
+**Der Aktualitätsprüfer aus `skill-dev-doc.md` A.3 gilt nur für Skills.** Er vergleicht den Inhalt jedes Archiveintrags gegen die Dateien im **Wurzelordner** des Bereichs — bei einem Skill liegen sie genau dort. `home-.claude-sharing` hält seine Werkzeuge dagegen in `files/`, und dann meldet der Prüfer jedes Paket als veraltet, obwohl keines es ist. Für diesen Bereich also gegen `files/` **plus** die beiden READMEs prüfen. Ein „VERALTET" ohne konkrete Abweichung in der Datei ist zuerst ein Verdacht auf diesen Fehlgriff, nicht auf ein altes Paket.
+
 ---
 
 ## 5 Der Verweisprüfer über alle Pakete

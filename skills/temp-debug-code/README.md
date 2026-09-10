@@ -1,8 +1,8 @@
 # temp-debug-code — Kennzeichnung von temporärem Debug-Code
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-10*
 
-*[English version](README.en.md)*
+*[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/temp-debug-code/README.en.md)*
 
 **✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stille Trigger für beide Umgebungen vorhanden, deutsche und englische Fassung vorhanden. — Mit inhaltlichen Unterschieden zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 

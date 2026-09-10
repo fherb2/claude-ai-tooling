@@ -1,8 +1,8 @@
 # recall-skills-after-compact — recall the loaded skills after a compaction
 
-*Last updated: 2026-09-02*
+*Last updated: 2026-09-10*
 
-*[Deutsche Fassung](README.md)*
+*[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/recall-skills-after-compact/README.md)*
 
 **✅ Finished and usable.** Tested against real transcripts and error cases, and proven in the field on a real compaction on 2 September 2026.
 
