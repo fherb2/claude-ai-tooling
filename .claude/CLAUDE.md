@@ -179,9 +179,8 @@ mit einem vollständig umgesetzten Plan vom 6. August.
 Deshalb: Ein eingespielter Plan wird **zuerst gegen den Code geprüft**, bevor
 er als Auftrag gilt. Erweist er sich als umgesetzt oder überholt, wird das
 gemeldet, damit der Entwickler ihn löscht — in `~/.claude/` zu schreiben oder
-zu löschen ist nicht unsere Sache (§1.2). Ob die Ablage per `plansDirectory`
-ins Projekt wandert, ist offene Entscheidung im Fahrplan von
-`home-.claude-sharing`.
+zu löschen ist nicht unsere Sache (§1.2). Die Ablage ließe sich per
+`plansDirectory` ins Projekt verlegen; beschlossen ist das nicht.
 
 ## Wo ein Plan steht
 
