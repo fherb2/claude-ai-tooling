@@ -1,6 +1,6 @@
 # correct-zaaack-md-editor-mistakes — find and repair damaged whitespace in Markdown tables
 
-*Last updated: 2026-08-30*
+*Last updated: 2026-09-10*
 
 *[Deutsche Fassung](README.md)*
 
@@ -77,11 +77,17 @@ Three files, and each split has its reason.
 
 **The list carries paths and counts, never line numbers.** The repair tool re-reads every file anyway and derives its repairs from the current content. A line number would be stale the moment something is saved between the two runs, and would make it edit the wrong place. For the same reason the repair step runs the scanner again instead of keeping a list.
 
-**Two lists, and the difference is the heart of the matter.** `files` is the work list and alone determines the exit code. `notes` holds what is reported but deliberately never repaired. Were the notes in the work list, the blank test could never come out clean: the exit code would stay 1 forever, and a hook would fire on every commit without there ever being anything to do. That is exactly how the first version was built, and in this repository the fault would have struck at once — `home-.claude-sharing/offener_fall_chatprotokolle.md` carries a deliberate `` `uuid`s `` in line 101.
+**Three lists, and the differences are the heart of the matter.** `files` is the work list and alone determines the exit code. `notes` holds what is reported but deliberately never repaired. Were the notes in the work list, the blank test could never come out clean: the exit code would stay 1 forever, and a hook would fire on every commit without there ever being anything to do. That is exactly how the first version was built, and in this repository the fault would have struck at once — `home-.claude-sharing/offener_fall_chatprotokolle.md` carries a deliberate `` `uuid`s `` in line 101.
 
-### The scope: `SKIP`
+**The third list, `unreadable`, is the refusal to abort.** A file that cannot be read no longer ends the run; it is skipped and named there. The reason is the kind of failure that arises otherwise: an abort leaves **no** result, and whoever only looks at the last line takes "nothing found" and "never ran" for the same thing — for a check meant to hold before every commit, that is the worst outcome. The list deliberately does **not** touch the exit code: it says the check was incomplete, not that something needs repair. So that it is not passed over regardless, the `SKILL.md` obliges the instance to report a non-empty list to the user.
 
-`SKIP` in `md_table_artifacts.py` names the path fragments that are never looked at. At present those are `/.git/` and this repository's folder of retired working instructions. **This is the one project-related setting** — whoever takes the tools into another project reviews the list first.
+### The scope: three limits
+
+**Hidden entries stay out** — every path with a segment that starts with a dot, so `.git/`, `.claude/` and their like. This is counted **relative to the path given**, and that is no nicety: it is what keeps a deliberate run **into** a dot folder possible. Whoever wants to check Markdown in there — the files of a project-local skill under `.claude/skills/`, say — calls the scanner again with that folder.
+
+**Only regular files are read.** A Bash sandbox masks the paths it must not expose by mounting a device over them: the name looks like a Markdown file, the entry is a character device, unreadable — and outside the sandbox it does not exist at all. **This is recognized by the file type, not by the shape of the mount.** That is the load-bearing decision: the shape of those mounts is not ours and may change; the file type stays the criterion. Whatever this limit does not catch, `unreadable` catches.
+
+**`SKIP` in `md_table_artifacts.py`** names the folders excluded by name — at present only this repository's folder of retired working instructions. **This is the one project-related setting**; whoever takes the tools into another project reviews the list first. The former entry `/.git/` is gone, because the dot rule covers it.
 
 `SKIP` sits in the core and not in the repair tool, so that the scope is not decided in two places.
 
