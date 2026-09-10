@@ -24,7 +24,7 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 
 **Below this page the languages are the other way round.** The working language of this repository is German, so inside a folder the `README.md` is the German version and the English one carries the marker: `README.en.md` — that is the file the links above point to. Only here in the root does `README.md` hold the English version, with the German one as [`README.de.md`](README.de.md).
 
-Two files in the project root accompany the development of every building block: **[`skill-dev-doc.md`](skill-dev-doc.md)** carries the guidelines and the environment knowledge for building skills — no matter which folder they grow in — and **[`work-plan.md`](work-plan.md)** the upcoming work steps (both in German). Projects with a development state of their own keep their own documentation and work plan alongside.
+Two files in the project root accompany the development of every building block: **[`skill-dev-doc.md`](skill-dev-doc.md)** carries the guidelines and the environment knowledge for building skills — no matter which folder they grow in — and, as a guest in its chapter 10, the rule for relieving the implementation documentation of a finished project of its development history; **[`work-plan.md`](work-plan.md)** carries the upcoming work steps. Projects with a development state of their own keep their own documentation and work plan alongside. The maintenance of the repository itself — aligning the release branch and checking READMEs, language versions and packages — is carried by the project's own skill `.claude/skills/repo-cleanup-pass/` (all of these in German).
 
 ### **Usage notes** further down in this README:
 
