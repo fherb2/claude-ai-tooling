@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-09-04*
+*Stand: 2026-09-10*
 
 *[English version](README.md)*
 
@@ -14,11 +14,11 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 | Baustein                                                      | Anliegen                                                                                                                                                                                                                                  |
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.md)<br>✅ | **Die ganze Projekt-Codebase als eine Datei**: präziser, aktueller Projektkontext für eine KI ohne Zugriff auf den Rechner.                                                                                                             |
-| [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>⚠️ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
+| [`home-.claude-sharing/`](home-.claude-sharing/README.md)<br>✅ | **Arbeit über mehrere Rechner hinweg**: Chat-Gedächtnis und Arbeitsanweisungen / Skills statt vieler Einzelner, über die Systeme verteilt: `~/.claude` auf allen Rechnern synchron, Konflikte werden gemeldet und geführt aufgelöst. |
 | [`skills/`](skills/README.md)<br>☑ | Statt vieler CLAUDE.md-Anweisungen: **Vorgaben automatisch nachladen lassen**. Erst und nur dann im Kontext, wenn tatsächlich benötigt: Claude-Code-**Skills mit „stillem“ Trigger** — und seit September 2026 auch **garantierte Fähigkeiten mit Hook-Auslöser**.                                                   |
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.md)<br>✅ | **Fertige Textbausteine für Anweisungsdateien**: einzeln herauskopierbare Absätze für die `CLAUDE.md` einer lokalen Installation und für die Stellen, an denen claude.ai Anweisungen aufnimmt. |
 | [`safety-related/`](safety-related/)<br>✅ | **Konfigurationen und Hinweise zur sicheren Nutzung von Claude**: fertige `settings.json`-Blöcke für die Bash-Sandbox und die Werkzeug-Berechtigungen, jeder Parameter in einer Zeile erklärt — dazu ein Bericht, welche Grenze in welcher Konstellation aus Editor, SSH und Container überhaupt trägt. |
-| [`vscode-dev-container/`](vscode-dev-container/README.md)<br>🚧 | **Ein Entwicklungscontainer, der die Grenze zwischen Agent und Rechner zieht**: Dockerfile und `devcontainer.json` mit schmalen Einhängungen statt des ganzen Homes, SSH-Agent statt Schlüsseldatei, Netzsperre auf dem Host — als Grundlage gedacht, auf der weiteres aufsetzt. |
+| [`vscode-dev-container/`](vscode-dev-container/README.md)<br>✅ | **Ein Entwicklungscontainer, der die Grenze zwischen Agent und Rechner zieht**: Dockerfile und `devcontainer.json` mit schmalen Einhängungen statt des ganzen Homes, SSH-Agent statt Schlüsseldatei, Netzsperre auf dem Host — als Grundlage gedacht, auf der weiteres aufsetzt. |
 
 (✅ einsatzbereit · 🚧 in Arbeit · ⚠️ mit Vorbehalt · ☑ abh. vom Skill)
 
@@ -44,9 +44,9 @@ Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[
 
 **Zweck: Hält den Arbeitszustand von Claude Desktop und Claude Code — Konfiguration, Sitzungsprotokolle, Projektgedächtnis — über Syncthing zwischen mehreren Rechnern synchron. – Rechnerwechsel zwischen Home und Office oder remote und lokal. Benötigt dabei kein VPN oder lokales Netz.**
 
-Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche Kern ist der Umgang mit dem, was Syncthing bewusst nicht löst: Gleichzeitig geänderte Dateien werden als Konfliktkopien abgelegt, ein Wächter-Dienst entdeckt sie, meldet sich und führt den Nutzer gemeinsam mit Claude durch die inhaltliche Auflösung. Installationsskripte, Dienstdefinition und eine Einrichtungsanleitung für den Vermittlungsknoten liegen bei.
+Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche Kern ist der Umgang mit dem, was Syncthing bewusst nicht löst: Gleichzeitig geänderte Dateien werden als Konfliktkopien abgelegt, ein Wächter-Dienst entdeckt sie, meldet sich und führt den Nutzer gemeinsam mit Claude durch die inhaltliche Auflösung. Installationsskripte, Dienstdefinition und eine Einrichtungsanleitung für den Vermittlungsknoten liegen bei; ausgeliefert wird es als Paket je Sprachfassung unter `downloads/`.
 
-**Stand:** Im Betrieb beim Entwickler, noch nicht zur Weitergabe freigegeben — Näheres in der [README des Bausteins](home-.claude-sharing/README.md).
+**Stand:** Im Betrieb auf drei Rechnern beim Entwickler seit dem 11. August 2026 — Näheres in der [README des Bausteins](home-.claude-sharing/README.md).
 
 ## skills
 

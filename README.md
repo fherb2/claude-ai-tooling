@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-09-04*
+*Last updated: 2026-09-10*
 
 *[Deutsche Fassung](README.de.md)*
 
@@ -14,11 +14,11 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 | Component                                                                 | What it addresses                                                                                                                                                                                                                  |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.en.md)<br>✅ | **The whole project codebase as a single file**: precise, up-to-date project context for an AI without access to the machine.                                                                                                      |
-| [`home-.claude-sharing/`](home-.claude-sharing/README.md) (in German)<br>⚠️ | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
+| [`home-.claude-sharing/`](home-.claude-sharing/README.en.md)<br>✅ | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
 | [`skills/`](skills/README.en.md)<br>☑ | Instead of many CLAUDE.md instructions: **have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger** — and, since September 2026, **guaranteed capabilities with a hook trigger** too.                                                |
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.en.md)<br>✅ | **Ready-made blocks of text for instruction files**: paragraphs to be copied out one by one, for the `CLAUDE.md` of a local installation and for the places where claude.ai takes instructions. |
 | [`safety-related/`](safety-related/)<br>✅ | **Configurations and notes for using Claude safely**: ready-made `settings.json` blocks for the Bash sandbox and the tool permissions, with one line of explanation per parameter — plus a report on which boundary actually holds in which constellation of editor, SSH and container. |
-| [`vscode-dev-container/`](vscode-dev-container/README.en.md)<br>🚧 | **A dev container that draws the line between agent and machine**: a Dockerfile and a `devcontainer.json` with narrow mounts instead of the whole home, an SSH agent instead of key files, the network boundary on the host — meant as a base for other things to build on. |
+| [`vscode-dev-container/`](vscode-dev-container/README.en.md)<br>✅ | **A dev container that draws the line between agent and machine**: a Dockerfile and a `devcontainer.json` with narrow mounts instead of the whole home, an SSH agent instead of key files, the network boundary on the host — meant as a base for other things to build on. |
 
 (✅ ready to use · 🚧 in progress · ⚠️ with reservations · ☑ depends on the skill)
 
@@ -44,9 +44,9 @@ Two files in the project root accompany the development of every building block:
 
 **Purpose: keeps the working state of Claude Desktop and Claude Code — configuration, session logs, project memory — in sync between several machines via Syncthing. – Switching machines between home and office, or remote and local. Needs neither a VPN nor a local network for that.**
 
-An always-on NAS node acts as the intermediary. The actual core is dealing with what Syncthing deliberately leaves unsolved: files changed at the same time are put aside as conflict copies, a watcher service discovers them, reports in and guides the user, together with Claude, through resolving them by content. Installation scripts, the service definition and a setup guide for the intermediary node are included.
+An always-on NAS node acts as the intermediary. The actual core is dealing with what Syncthing deliberately leaves unsolved: files changed at the same time are put aside as conflict copies, a watcher service discovers them, reports in and guides the user, together with Claude, through resolving them by content. Installation scripts, the service definition and a setup guide for the intermediary node are included; it ships as a package per language version under `downloads/`.
 
-**Status:** in operation at the developer's, not yet released for distribution — more in the [component's README](home-.claude-sharing/README.md) (in German).
+**Status:** in operation on three of the developer's machines since 11 August 2026 — more in the [component's README](home-.claude-sharing/README.en.md).
 
 ## skills
 
