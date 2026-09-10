@@ -1,6 +1,8 @@
 # common-code-generation — Allgemeine Regeln für das Erzeugen und Ändern von Code
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-10*
+
+*[English version](README.en.md)*
 
 **✅ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung vorhanden. — Keine inhaltlichen Unterschiede zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 

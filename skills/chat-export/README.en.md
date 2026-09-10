@@ -1,6 +1,8 @@
 # chat-export — Bring chats from claude.ai into your project
 
-*Last updated: 2026-08-31*
+*Last updated: 2026-09-10*
+
+*[Deutsche Fassung](README.md)*
 
 *Usable with Claude Code.*
 

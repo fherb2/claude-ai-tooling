@@ -1,6 +1,8 @@
 # common-code-generation — General rules for writing and changing code
 
-*Last updated: 2026-08-30*
+*Last updated: 2026-09-10*
+
+*[Deutsche Fassung](README.md)*
 
 **✅ Finished and usable.** Instructions complete, frontmatter set, silent trigger present, German and English version available. — No difference in content between the version for claude.ai / Claude Desktop (Chat + Cowork) and Claude Code.
 
