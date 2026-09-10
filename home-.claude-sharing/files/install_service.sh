@@ -70,6 +70,21 @@ warn() {
     sleep "$WARN_PAUSE_SECONDS"
 }
 
+# True when at least one file matches the pattern. Needed because the working
+# instruction and the message catalogue carry a language code in their name and
+# a package holds exactly one of each (doku 2.7): there is no fixed name to
+# test for. Without nullglob an unmatched pattern stays literal, and the -f
+# test then fails as it should.
+one_of() {
+    local pattern="$1" candidate
+    for candidate in $pattern; do
+        if [ -f "$candidate" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # --- Frage: Anfang (doku 3.5) -----------------------------------------------
 # Cut out and run by the test script as it stands. Do not restructure without
 # looking there.
@@ -178,11 +193,18 @@ fi
 
 # --- 2. Own files ---------------------------------------------------------
 
-for file in claude_sync_watchd.py "$UNIT_NAME" conflict-resolution.md .stignore; do
-    [ -f "$SCRIPT_DIR/$file" ] || fail \
-        "Die Datei '$file' fehlt in $SCRIPT_DIR." \
-"Alle Dateien des Vorhabens müssen in diesem Ordner liegen. Bitte den
+MISSING_FILES_HINT="Alle Dateien des Vorhabens müssen in diesem Ordner liegen. Bitte den
 Ordner 'files/' aus dem Repo vollständig hierher kopieren."
+
+for file in claude_sync_watchd.py "$UNIT_NAME" messages.py .stignore; do
+    [ -f "$SCRIPT_DIR/$file" ] || fail \
+        "Die Datei '$file' fehlt in $SCRIPT_DIR." "$MISSING_FILES_HINT"
+done
+
+for pattern in "conflict-resolution.*.md" "messages_*.py"; do
+    one_of "$SCRIPT_DIR/$pattern" || fail \
+        "Keine Datei nach dem Muster '$pattern' in $SCRIPT_DIR." \
+        "$MISSING_FILES_HINT"
 done
 
 [ -d "$SCRIPT_DIR/tools" ] || mkdir -p "$SCRIPT_DIR/tools"

@@ -1230,7 +1230,7 @@ def check_launch_failure(w: types.ModuleType, tmp_root: Path) -> None:
                           original=tmp_root / "a.txt", device="DEV")
     try:
         w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
-        w.INSTRUCTION_FILE.write_text("egal", encoding="utf-8")
+        w.instruction_file().write_text("egal", encoding="utf-8")
 
         def refusing(*args, **kwargs):
             raise OSError(2, "No such file or directory")
@@ -1275,7 +1275,7 @@ def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
                           original=watch_dir / "a.txt", device="DEV")
     try:
         w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
-        w.INSTRUCTION_FILE.write_text("egal", encoding="utf-8")
+        w.instruction_file().write_text("egal", encoding="utf-8")
         watch_dir.mkdir(parents=True, exist_ok=True)
 
         def aufzeichnen(argv, cwd):
@@ -1303,7 +1303,7 @@ def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
         # start (doku 3.3).
         check("Arbeitsanweisung folgt unmittelbar auf ihre Option",
               argv[argv.index("--append-system-prompt-file") + 1],
-              str(w.INSTRUCTION_FILE))
+              str(w.instruction_file()))
         check("Übergabetext ist das letzte Argument",
               argv[-1], w.build_handover([pair], watch_dir))
         check("Arbeitsverzeichnis ist der überwachte Ordner",
