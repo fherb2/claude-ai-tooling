@@ -24,7 +24,7 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 
 **Unterhalb dieser Seite sind die Sprachen umgekehrt verteilt.** Die Arbeitssprache dieses Repositories ist Deutsch, deshalb ist in einem Ordner die `README.md` die deutsche Fassung und die englische trägt das Kürzel: `README.en.md`. Nur hier in der Wurzel liegt in der `README.md` die englische Fassung, die deutsche daneben als `README.de.md`.
 
-Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[`skill-dev-doc.md`](skill-dev-doc.md)** trägt die Vorgaben und das Umgebungswissen für den Bau von Skills — gleich in welchem Ordner sie entstehen —, **[`work-plan.md`](work-plan.md)** die anstehenden Arbeitsschritte. Vorhaben mit eigenem Entwicklungsstand führen daneben ihre eigene Doku und ihren eigenen Arbeitsplan.
+Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[`skill-dev-doc.md`](skill-dev-doc.md)** trägt die Vorgaben und das Umgebungswissen für den Bau von Skills — gleich in welchem Ordner sie entstehen — und in Kapitel 10 als Gast die Regel, wie die Implementierungsdoku eines abgeschlossenen Vorhabens von ihrer Entstehungsgeschichte entlastet wird; **[`work-plan.md`](work-plan.md)** trägt die anstehenden Arbeitsschritte. Vorhaben mit eigenem Entwicklungsstand führen daneben ihre eigene Doku und ihren eigenen Arbeitsplan. Die Pflege des Repositories selbst — den Abgleich des Release-Zweigs und die Prüfung von READMEs, Sprachfassungen und Paketen — trägt der projekteigene Skill `.claude/skills/repo-cleanup-pass/`.
 
 ### **Anwendungshinweise** weiter unten in dieser README:
 

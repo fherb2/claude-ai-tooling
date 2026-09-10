@@ -584,7 +584,19 @@ for zp in sorted(glob.glob("*/downloads/*.zip")):
 
 Meldet er für jedes Archiv `ok`, ist jeder namentliche Verweis auflösbar. Sonst nennt er zu jedem Fehlverweis die Datei, in der er steht, damit die Korrektur nicht gesucht werden muss.
 
-**Zwei Fundarten meldet er, die keine Fehler sind,** und das mit Absicht: Verweise auf Dateien des Repositories, die nie in ein Paket gehören (`skill-dev-doc.md` etwa), und Dateinamen, die bloß als Beispiel in Prosa oder Tabellen stehen. Beide auszufiltern hieße, dem Werkzeug eine Liste von Ausnahmen mitzugeben, die selbst gepflegt werden müsste — und eine übersehene Ausnahme verschwiege dann einen echten Fehler. Sie werden deshalb beim Ansehen des Ergebnisses aussortiert, nicht im Werkzeug.
+**Vier Fundarten meldet er, die keine Fehler sind,** und das mit Absicht: Verweise auf Dateien des Repositories, die nie in ein Paket gehören (`skill-dev-doc.md` etwa); Dateinamen, die bloß als Beispiel in Prosa oder Tabellen stehen; Dateien, die am **Wirkort** liegen sollen und nicht im Paket (eine Quellenkarte im Projekt des Nutzers); und Dateien **eines anderen Skills**, auf die eine Erklärung verweist. Alle auszufiltern hieße, dem Werkzeug eine Liste von Ausnahmen mitzugeben, die selbst gepflegt werden müsste — und eine übersehene Ausnahme verschwiege dann einen echten Fehler. Sie werden deshalb beim Ansehen des Ergebnisses aussortiert, nicht im Werkzeug.
+
+**Damit das Aussortieren nicht jedes Mal von vorn beginnt, steht hier, was am 10. September 2026 geprüft und als richtig befunden wurde.** Der nächste Durchgang vergleicht dagegen, statt neu zu urteilen — und eine Meldung, die hier **nicht** steht, ist damit sofort auffällig. Von 19 Meldungen war an diesem Tag keine ein Fehler:
+
+| Meldung | Steht in | Warum kein Fehler |
+| --- | --- | --- |
+| `README.en.md` (Link) | jeder deutschen Paket-README | Der Verweis auf die andere Sprachfassung; im Paket heißt sie `README.md`. Die Umstellung auf die Repo-URL ist am 10. September 2026 beschlossen und noch offen — **bis dahin die einzige Meldung mit Substanz** |
+| `chrome-access.de.md`, `.en.md` | `chat-export`, aus `bridge-diagnosis.*.md` | Der Satz nennt den Ort selbst: „der im Repository dieses Skills unter … liegt" |
+| `rules.de.md`, `rules.en.md` | `parallel-sessions`, aus der README | Die README nennt in einer Klammer **beide** Fassungen, um die Zweiteilung zu erklären |
+| `quellenkarte.md` | `in-depth-online-literature-research`, aus der `SKILL.md` | Eine Datei, die im **Projekt des Nutzers** liegen soll, nicht im Paket |
+| `CLAUDE-snippet.md` | `recall-skills-after-compact`, aus `settings-json-snippet.*.md` | Der Satz verweist auf die Datei **anderer** Skills, um das eigene Gegenstück zu erklären |
+| `doku.md` | `correct-zaaack-md-editor-mistakes`, aus der README | Erfundener Dateiname in einem Beispiel-Prompt der Trigger-Messtabelle |
+| `implementation-doc.md`, `skill-dev-doc.md` | `chat-export`, `web-code-editing` | Dokumente des Repositories, die nie mitreisen |
 
 ### A.3 Der Aktualitätsprüfer
 
