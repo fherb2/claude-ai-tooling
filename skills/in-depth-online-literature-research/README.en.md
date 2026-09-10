@@ -1,6 +1,8 @@
 # in-depth-online-literature-research — research that does not give up too early
 
-*Last updated: 2026-08-30*
+*Last updated: 2026-09-10*
+
+*[Deutsche Fassung](README.md)*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version available. No silent trigger needed (reasons under "Details"). — No difference in content between the version for claude.ai / Claude Desktop (Chat + Cowork) and Claude Code.
 
