@@ -2,7 +2,7 @@
 
 *Last updated: 2026-09-10*
 
-*[Deutsche Fassung](README.md)*
+*[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/correct-zaaack-md-editor-mistakes/README.md)*
 
 ✅☑ **Finished and usable, in both language versions.** Tools, skill text and silent trigger are in place, the frontmatter is set. What is still open is stated in the closing section — none of it stands in the way of use. — Usable with Claude Code.
 

@@ -2,7 +2,7 @@
 
 *Stand: 2026-09-10*
 
-*[English version](README.en.md)*
+*[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/chat-export/README.en.md)*
 
 *Benutzbar mit Claude Code.*
 

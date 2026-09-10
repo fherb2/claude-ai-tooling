@@ -1,8 +1,8 @@
 # web-code-editing — Code-Bearbeitung auf claude.ai
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-10*
 
-*[English version](README.en.md)*
+*[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/web-code-editing/README.en.md)*
 
 **✅☑ Fertig und nutzbar.** Skilltext in beiden Sprachen, Frontmatter gesetzt; die Erprobung als hochgeladener Skill steht noch aus (siehe „Stand und Offenes"). — Benutzbar für Claude.ai / Claude Desktop (Chat + Cowork).
 

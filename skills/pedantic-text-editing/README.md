@@ -1,8 +1,8 @@
 # pedantic-text-editing — Textbearbeitung mit Detailtreue
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-10*
 
-*[English version](README.en.md)*
+*[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/pedantic-text-editing/README.en.md)*
 
 **✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Ein stiller Trigger ist nicht nötig: Der Skill löst zuverlässig über seine `description` aus — im Betrieb auch mit Sonnet bestätigt (25. August 2026) — oder wird mit `/pedantic-text-editing` aufgerufen. — Benutzbar mit Claude Code.
 
