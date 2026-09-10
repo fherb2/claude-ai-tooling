@@ -2,7 +2,7 @@
 
 *Last updated: 2026-09-10*
 
-*[Deutsche Fassung](README.md)*
+*[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/in-depth-online-literature-research/README.md)*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version available. No silent trigger needed (reasons under "Details"). — No difference in content between the version for claude.ai / Claude Desktop (Chat + Cowork) and Claude Code.
 

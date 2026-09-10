@@ -2,7 +2,7 @@
 
 *Last updated: 2026-09-10*
 
-*[Deutsche Fassung](README.md)*
+*[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/pedantic-text-editing/README.md)*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, German and English version present. A silent trigger is not needed: the skill fires reliably through its `description` — confirmed in practice with Sonnet as well (25 August 2026) — or is called with `/pedantic-text-editing`. — Usable with Claude Code.
 
