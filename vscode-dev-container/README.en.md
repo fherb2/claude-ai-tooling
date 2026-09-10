@@ -1,8 +1,8 @@
 # vscode-dev-container
 
-*Last updated: 2026-09-07*
+*Last updated: 2026-09-10*
 
-> Deutsche Fassung: [README.md](README.md)
+*[Deutsche Fassung](README.md)*
 
 **A dev container for VS Code that draws the line between agent and machine correctly from the start** — narrow mounts instead of the whole home, an SSH agent instead of key files, the network boundary on the host. It carries a C compiler, Python and Poetry, and is meant as a base for other things to build on.
 

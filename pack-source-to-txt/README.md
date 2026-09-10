@@ -1,6 +1,8 @@
 # Pack Source for AI
 
-*Stand: 2026-08-24*
+*Stand: 2026-09-10*
+
+*[English version](README.en.md)*
 
 Ein **Shell-Skript, das die Quelldateien eines Projekts in einer einzigen, strukturierten Textdatei bündelt** – bereit zum Hochladen in die Knowledge Base eines KI-Agenten.
 
