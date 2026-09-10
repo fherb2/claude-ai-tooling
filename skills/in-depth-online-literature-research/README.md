@@ -1,6 +1,8 @@
 # in-depth-online-literature-research — Recherche, die nicht zu früh aufgibt
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-10*
+
+*[English version](README.en.md)*
 
 **✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, deutsche und englische Fassung vorhanden. Kein stiller Trigger nötig (Begründung unter „Details"). — Keine inhaltlichen Unterschiede zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 

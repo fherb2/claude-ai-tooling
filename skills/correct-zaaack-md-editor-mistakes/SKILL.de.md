@@ -49,13 +49,19 @@ python3 "${CLAUDE_SKILL_DIR}/scan_md_tables.py" PFAD | python3 "${CLAUDE_SKILL_D
 python3 "${CLAUDE_SKILL_DIR}/scan_md_tables.py" PFAD
 ```
 
-Der Prüfer steigt von `PFAD` aus selbst bis in jeden Unterordner — ein Aufruf, nicht einer je Ordner.
+Der Prüfer steigt von `PFAD` aus selbst bis in jeden Unterordner — ein Aufruf, nicht einer je Ordner. Drei Grenzen hat sein Abstieg:
 
-Seine Ausgabe hat zwei Listen. **`files`** ist die Arbeitsliste und bestimmt allein den Rückgabewert: 1 solange etwas zu tun ist, 0 wenn nicht. **`notes`** trägt, was gemeldet aber absichtlich nie korrigiert wird, und ist **keine** offene Arbeit. Sieh die Notizen an und lege dem Nutzer vor, was darunter falsch aussieht.
+- **Versteckte Einträge bleiben außen vor** — jeder Pfad, dessen Segment mit einem Punkt beginnt. Gerechnet wird das **relativ zu `PFAD`**: Ein gezielter Lauf **in** einen Punkt-Ordner ist deshalb möglich und manchmal nötig. Liegt zu prüfendes Markdown dort — etwa in `.claude/skills/` —, rufe den Prüfer zusätzlich mit diesem Ordner als `PFAD` auf; der Lauf über die Projektwurzel erreicht ihn nicht.
+- **Nur reguläre Dateien.** Eine Bash-Sandbox maskiert Pfade, die sie nicht zeigen darf, indem sie ein Gerät darüber einhängt: ein Name, der wie eine Markdown-Datei aussieht, aber keine ist. Der Prüfer erkennt das am **Dateityp**, nicht am Aussehen der Einhängung — deshalb trägt es auch, wenn diese Einhängungen künftig anders gebaut werden.
+- **`SKIP`** in `md_table_artifacts.py` schließt Ordner nach Namen aus. Passt die Liste nicht zu diesem Projekt, sage es.
+
+Seine Ausgabe hat drei Listen. **`files`** ist die Arbeitsliste und bestimmt allein den Rückgabewert: 1 solange etwas zu tun ist, 0 wenn nicht. **`notes`** trägt, was gemeldet aber absichtlich nie korrigiert wird, und ist **keine** offene Arbeit. Sieh die Notizen an und lege dem Nutzer vor, was darunter falsch aussieht.
+
+**`unreadable` ist nie leer zu übergehen: Steht dort etwas, melde es dem Nutzer.** Diese Dateien wurden übersprungen, nicht geprüft — die Prüfung war also unvollständig, und das sieht man am Rückgabewert nicht, weil er allein an der Arbeitsliste hängt. Ein Lauf, der abbricht, hinterlässt kein Ergebnis; genau deshalb bricht er nicht mehr ab, und genau deshalb ist das Melden Pflicht.
 
 **Schritt 3 muss `"files": []` und Rückgabewert 0 ergeben.** Tut er das nicht, ist der Korrektor kaputt: nicht wiederholen, sondern dem Nutzer melden.
 
-Passt `SKIP` in `md_table_artifacts.py` nicht zu diesem Projekt, sage es. Erkennen die Werkzeuge etwas nicht als Artefakt, das eines ist, melde es und ändere es nicht selbst.
+Erkennen die Werkzeuge etwas nicht als Artefakt, das eines ist, melde es und ändere es nicht selbst.
 
 ## Was Du Dir merkst
 

@@ -2,7 +2,7 @@
 
 Diese Datei ist die Bauanleitung für **jeden Skill dieses Repositories** — gleich in welchem Ordner er entsteht. Sie lag bis zum 27. August 2026 als `skills/implementation-doc.md` in einem einzelnen Vorhaben, galt aber längst darüber hinaus: Auch `chat-export` ist ein Skill, nur einer mit eigenem Werkzeugbau, und die Projekt-`CLAUDE.md` verweist für alle Vorhaben hierher.
 
-**Kapitel 1–5 und 7 sind die Vorgaben**, die beim Schreiben jedes Skills gelten: die technischen Voraussetzungen und das Verhalten der Umgebung, die Regeln für Trigger und Dateien, die Messbefunde, auf denen diese Regeln beruhen, und das Verfahren, mit dem sich beides nachprüfen lässt. Wo eine Skill-README kurz „Vorgaben, Kapitel n“ schreibt, ist dieses Dokument gemeint. **Kapitel 6** regelt die Verwaltung des Vorhabens `skills/` — READMEs und Fahrplan —, **Kapitel 8** hält die Festlegungen der Neuordnung der Arbeitsanweisungen fest. Dem offiziellen Segmentschema der Arbeitsanweisungen (§2.3) folgt die Datei bewusst nicht; die Begründung steht zwei Absätze weiter.
+**Kapitel 1–5 und 7 sind die Vorgaben**, die beim Schreiben jedes Skills gelten: die technischen Voraussetzungen und das Verhalten der Umgebung, die Regeln für Trigger und Dateien, die Messbefunde, auf denen diese Regeln beruhen, und das Verfahren, mit dem sich beides nachprüfen lässt. Wo eine Skill-README kurz „Vorgaben, Kapitel n“ schreibt, ist dieses Dokument gemeint. **Kapitel 6** regelt die Verwaltung des Vorhabens `skills/` — READMEs und Fahrplan —, **Kapitel 8** hält die Festlegungen der Neuordnung der Arbeitsanweisungen fest. **Kapitel 10 ist ein Gast:** Es handelt nicht von Skills, sondern davon, wie die Implementierungsdoku eines abgeschlossenen Vorhabens entlastet wird — es steht hier, weil es dort, wo es gilt, von sich selbst weggeräumt würde. Dem offiziellen Segmentschema der Arbeitsanweisungen (§2.3) folgt die Datei bewusst nicht; die Begründung steht zwei Absätze weiter.
 
 **Umgebungs- und Inferenzverhalten gehört ausdrücklich hierher.** Ein Skill ist kein Softwaremodul: Statt Code entstehen sprachliche Anweisungen, und ausgeführt werden sie nicht von einem Compiler, sondern durch Inferenz. Wie die Inferenz-Maschine und ihre Umgebung sich verhalten — was geladen wird und wann, was ein Trigger auslöst, was eine Zielwelt kann und was nicht — ist deshalb kein Fremdkörper in dieser Doku, sondern ihr Gegenstand. Kapitel 1, 3 und 8.1 tun das seit jeher; seit dem 27. August 2026 ist es benannte Festlegung statt stillschweigender Praxis.
 
@@ -476,6 +476,44 @@ Prüfbar: Auf jeden Skill ohne Gruppenangabe in dieser Tabelle lässt sich zeige
 
 ---
 
+## 10 Eine fertige Implementierungsdoku entlasten
+
+**Dieses Kapitel handelt nicht von Skills, und es steht trotzdem hier — aus einem Grund, der zur Sache gehört:** Es beschreibt, wie die Implementierungsdoku eines abgeschlossenen Vorhabens von ihrer Entstehungsgeschichte befreit wird. Stünde die Regel in einer solchen Doku, räumte der nächste Durchgang sie mit weg, und beim dritten Vorhaben wäre sie neu zu erfinden. Sie braucht ein Dokument, das selbst nie Gegenstand dieses Aufräumens ist (Festlegung des Entwicklers vom 10. September 2026; erstmals angewandt auf `home-.claude-sharing`).
+
+### 10.1 Die Schnittregel
+
+**Die Festlegung bleibt, ihre Entstehungsgeschichte geht.** Der Unterschied ist am Einzelfall zu entscheiden, und dieses Paar zeigt, wo die Grenze liegt:
+
+- **Bleibt:** „Die Zeitangabe ist in Sekunden zu machen; eine Dauerangabe wie `15m` weist Zenity mit Rückgabewert 255 ab, was als Fehlschlag gälte." Wer das nicht weiß, baut den Fehler wieder ein.
+- **Entfällt:** „Gemessen, nicht angenommen; das Prüfskript nagelt die Einheit fest." Datum, Messweg und Belegverweis.
+
+Die Schutzwirkung gegen die nächste gutgemeinte Vereinfachung steckt in der **Folge** („dann bricht es so"), nicht im Messprotokoll. Wer nur die Zahl streicht und die Folge mit, nimmt der Doku genau das, was sie tragen soll.
+
+**Vier Sorten Text entfallen restlos**, überall wo sie stehen:
+
+1. Datumsangaben und Messprotokolle,
+2. verworfene Alternativen,
+3. Vorher-nachher-Erzählungen („vorher stand hier …", „im Vollzug aufgefallen"),
+4. Verweise auf Befunde, Reviews und offene Fragen.
+
+**Eine benannte Ausnahme zu Punkt 2:** Ein verworfener Weg, dessen Preis **sicherheitsrelevant** war, bleibt als **ein** Satz stehen — ohne die Geschichte seiner Prüfung. Wer ihn ganz löscht, lädt zum Wiederholen ein. Belegt am Fall `#include` in der Ausschlussliste von `home-.claude-sharing`: Fällt die eingebundene Datei auf einem frischen Gerät aus, fällt der Ausschluss der Zugangsdaten mit.
+
+### 10.2 Was ausdrücklich **nicht** mit aufgeräumt wird
+
+- **Der Review-Anhang.** Er ist Nachweis und Wissensbasis jedes künftigen Reviews — vor allem für die Befunde, die **abgelehnt** oder anders gelöst wurden: Ohne festgehaltene Begründung meldet der nächste Review sie wieder, und zwar zu Recht. Er bleibt vollständig und im Wortlaut.
+- **Passagen mit Schutzmarke.** Trägt ein Kapitel einen Vermerk, dass Änderungen nur in Absprache erfolgen, wird der Schnitt dort vorgelegt statt ausgeführt — auch wenn der Auftrag allgemein erteilt ist.
+
+Dagegen **entfallen** mit dem Abschluss: der Fragenkatalog, sobald jede Frage beantwortet ist; die Statusdatei; und der Fahrplan schrumpft auf die tatsächlich offenen Schritte.
+
+### 10.3 Zwei Randbedingungen, die den Durchgang begrenzen
+
+- **Keine Umnummerierung.** Abschnittsnummern bleiben, auch wo von einem Kapitel wenig übrig bleibt: Quelltext, Skripte und Anweisungsdateien verweisen im Klartext auf Kapitelnummern. Eine Verschiebung bricht diese Verweise stillschweigend.
+- **Keine hängenden Verweise.** Zum Durchgang gehört die Suche nach Verweisen auf das Entfernte — in den übrigen Kapiteln, im Quelltext (auch in Kommentaren und Docstrings), in den anderen Dateien des Vorhabens und in den READMEs. Ein Treffer wird mitbereinigt, nicht notiert. Und die Gegenprobe gehört dazu: Ein Treffer ist nicht automatisch ein Fehler — ein allgemeiner Regelbegriff, der zufällig so heißt wie die gelöschte Datei, bleibt stehen.
+
+**Prüfbar:** Auf jede Passage einer entlasteten Doku, die ein Datum, eine Messung oder einen Befundverweis trägt, lässt sich zeigen — das ist der Verstoß. Und auf jeden Verweis, der nach dem Durchgang ins Leere zeigt.
+
+---
+
 ## Anhang A — Packen und Prüfen
 
 Die drei Werkzeuge, mit denen die Pakete aus 5.3 entstehen und geprüft werden, stehen hier als Quelltext und nicht als Datei im Repo. Das ist Absicht: So muss der Code bei jedem Gebrauch durch den Kontext der Instanz, die ihn benutzt — er wird gelesen, bevor er läuft, statt ungelesen ausgeführt zu werden. Bei zwei bis drei Läufen im Leben eines Skills ist das der bessere Tausch. Der Preis ist bekannt: Der Code läuft nie in der Fassung, in der er hier steht, ein Tippfehler fällt erst beim nächsten Gebrauch auf. Wer ihn dabei findet, zieht diesen Anhang nach.
@@ -546,7 +584,19 @@ for zp in sorted(glob.glob("*/downloads/*.zip")):
 
 Meldet er für jedes Archiv `ok`, ist jeder namentliche Verweis auflösbar. Sonst nennt er zu jedem Fehlverweis die Datei, in der er steht, damit die Korrektur nicht gesucht werden muss.
 
-**Zwei Fundarten meldet er, die keine Fehler sind,** und das mit Absicht: Verweise auf Dateien des Repositories, die nie in ein Paket gehören (`skill-dev-doc.md` etwa), und Dateinamen, die bloß als Beispiel in Prosa oder Tabellen stehen. Beide auszufiltern hieße, dem Werkzeug eine Liste von Ausnahmen mitzugeben, die selbst gepflegt werden müsste — und eine übersehene Ausnahme verschwiege dann einen echten Fehler. Sie werden deshalb beim Ansehen des Ergebnisses aussortiert, nicht im Werkzeug.
+**Vier Fundarten meldet er, die keine Fehler sind,** und das mit Absicht: Verweise auf Dateien des Repositories, die nie in ein Paket gehören (`skill-dev-doc.md` etwa); Dateinamen, die bloß als Beispiel in Prosa oder Tabellen stehen; Dateien, die am **Wirkort** liegen sollen und nicht im Paket (eine Quellenkarte im Projekt des Nutzers); und Dateien **eines anderen Skills**, auf die eine Erklärung verweist. Alle auszufiltern hieße, dem Werkzeug eine Liste von Ausnahmen mitzugeben, die selbst gepflegt werden müsste — und eine übersehene Ausnahme verschwiege dann einen echten Fehler. Sie werden deshalb beim Ansehen des Ergebnisses aussortiert, nicht im Werkzeug.
+
+**Damit das Aussortieren nicht jedes Mal von vorn beginnt, steht hier, was am 10. September 2026 geprüft und als richtig befunden wurde.** Der nächste Durchgang vergleicht dagegen, statt neu zu urteilen — und eine Meldung, die hier **nicht** steht, ist damit sofort auffällig. Von 19 Meldungen war an diesem Tag keine ein Fehler:
+
+| Meldung | Steht in | Warum kein Fehler |
+| --- | --- | --- |
+| `README.en.md` (Link) | jeder deutschen Paket-README | Der Verweis auf die andere Sprachfassung; im Paket heißt sie `README.md`. Die Umstellung auf die Repo-URL ist am 10. September 2026 beschlossen und noch offen — **bis dahin die einzige Meldung mit Substanz** |
+| `chrome-access.de.md`, `.en.md` | `chat-export`, aus `bridge-diagnosis.*.md` | Der Satz nennt den Ort selbst: „der im Repository dieses Skills unter … liegt" |
+| `rules.de.md`, `rules.en.md` | `parallel-sessions`, aus der README | Die README nennt in einer Klammer **beide** Fassungen, um die Zweiteilung zu erklären |
+| `quellenkarte.md` | `in-depth-online-literature-research`, aus der `SKILL.md` | Eine Datei, die im **Projekt des Nutzers** liegen soll, nicht im Paket |
+| `CLAUDE-snippet.md` | `recall-skills-after-compact`, aus `settings-json-snippet.*.md` | Der Satz verweist auf die Datei **anderer** Skills, um das eigene Gegenstück zu erklären |
+| `doku.md` | `correct-zaaack-md-editor-mistakes`, aus der README | Erfundener Dateiname in einem Beispiel-Prompt der Trigger-Messtabelle |
+| `implementation-doc.md`, `skill-dev-doc.md` | `chat-export`, `web-code-editing` | Dokumente des Repositories, die nie mitreisen |
 
 ### A.3 Der Aktualitätsprüfer
 

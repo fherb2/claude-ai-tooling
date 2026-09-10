@@ -10,6 +10,12 @@ Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
+## 13 `correct-zaaack-md-editor-mistakes`: die neue Fassung installieren
+
+**Code, Texte und Pakete sind am 10. September 2026 fertig** — offen ist allein der Schritt, den nur der Entwickler tun kann: das Paket `downloads/correct-zaaack-md-editor-mistakes_de_local.zip` nach `~/.claude/skills/` entpacken. Bis dahin läuft die **alte** installierte Fassung, die an den Attrappen der Bash-Sandbox abbricht; die Änderung im Repo wirkt dort nicht von sich aus.
+
+Zur Erinnerung, was die neue Fassung leistet: Sie überspringt versteckte Einträge und nicht-reguläre Dateien und meldet unlesbare in einer dritten Liste `unreadable`, statt den Lauf zu beenden. Erkannt wird eine Sandbox-Attrappe am **Dateityp**, nicht an ihrer Gestalt.
+
 ## 12 Worktree-Modus und Infra-Branch trennen
 
 **Unmittelbar nächster Schritt.** Ausgangspunkt ist eine Beobachtung des Entwicklers vom 7. September 2026: `.claude/git-worktree-model.json` vermischt zwei Dinge, die nichts miteinander zu tun haben — die **Branch-Topologie** (Integration, Release, Infra, und welche Dateien infra-verwaltet sind) und den **Arbeitsisolations-Modus** (ob eine Sitzung Worktree und Werkbank bekommt). Das ist nicht nur unsauber: Wer Worktrees abschalten will, indem er die Datei löscht, verliert damit die Infra-Disziplin mit — und wie fragil die ist, hat derselbe Tag gezeigt (Drift zwischen `dev` und `infra`, wodurch der vorgeschriebene Abgleich zur Rücksetzungsfalle wurde, behoben mit `14f9190`).
