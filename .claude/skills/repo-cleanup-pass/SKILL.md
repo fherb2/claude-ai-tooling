@@ -79,11 +79,16 @@ git commit
 
 Eine Löschung im Release-Zweig ist Teil des Abgleichs, kein Sonderfall: Was in `dev` bewusst entfallen ist, hat dort ebenfalls nichts mehr zu suchen. Sie wird aber **benannt**, nicht nebenbei ausgeführt.
 
+**Bekannte Bedingung: `.claude/skills/` ist unter aktiver Sandbox nur lesbar.** Enthält die Übertragungsliste Dateien von dort — etwa diesen Skill selbst —, bricht `git checkout` sie mit „Das Dateisystem ist nur lesbar" ab. Der Index bekommt den richtigen Inhalt trotzdem; nur der Arbeitsbaum lässt sich nicht schreiben. Zwei Wege:
+
+- **Sauber:** die Sandbox für den Übertrag abschalten, dann greift nichts ein.
+- **Wenn sie an bleibt:** vor dem Commit ausdrücklich prüfen, dass Index und Arbeitsbaum übereinstimmen und der Index den Stand des Quellzweigs trägt — `git diff --name-only` (unversionierte Abweichungen, muss leer sein) und je Pfad `git show dev:<pfad>` gegen `git show :<pfad>`. Stimmt beides, ist der Commit vollständig; das war beim ersten Lauf so, **weil** dort dieselben Dateien schon auf der Platte lagen. Verlangte der Übertrag an dieser Stelle einen *anderen* Inhalt, bliebe er unvollständig — dann hilft nur der erste Weg.
+
 ## Schritt 4 — Gegenprobe, und zwar zweifach
 
 ```bash
 # 1. Es darf nur noch das Ausgeschlossene übrig sein:
-git diff --name-only master dev | grep -v -E '^skills/[^A-Za-z0-9]|^\.research/'
+git -c core.quotepath=false diff --name-only master dev | grep -v -E '^skills/[^A-Za-z0-9]|^\.research/'
 #    -> keine Ausgabe
 
 # 2. Jede übertragene Datei byteweise vergleichen:
@@ -93,6 +98,8 @@ xargs -0 -a "$LISTEN/take.z" -I{} sh -c \
 ```
 
 Die erste Probe fängt Vergessenes, die zweite einen misslungenen Übertrag. Beide gehören dazu; die erste allein sagt nur, dass ein Pfad existiert, nicht dass er stimmt.
+
+**`core.quotepath=false` ist in der ersten Probe nicht Kosmetik.** Ohne diese Angabe setzt Git Pfade mit Nicht-ASCII-Zeichen in Anführungszeichen — die Zeile beginnt dann mit `"` statt mit `skills/`, der Ausschlussfilter greift nicht, und die Probe meldet **alle** Baustellen-Skills als unerwartet. Beim ersten Lauf dieses Skills ist genau das passiert: 25 Fehlalarme, die wie ein misslungener Abgleich aussahen.
 
 ## Schritt 5 — Zurück auf den Entwicklungszweig
 
