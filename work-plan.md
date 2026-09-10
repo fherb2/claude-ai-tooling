@@ -37,7 +37,7 @@ Offen bleiben die drei Punkte, die Hardware oder eine Messung brauchen:
 2. **Die offene Frage zu `--network host` messen**: Ob `DOCKER-USER` dort tatsächlich nicht greift, ist aus der Docker-Netzarchitektur abgeleitet und nicht nachgemessen. Der Test ist ein Verbindungsversuch auf eine interne Adresse, einmal mit Bridge- und einmal mit Host-Netz.
 3. **Die zwei letzten Prüflistenzeilen abtasten**, die noch „offen" tragen: `git fetch` aus dem Container heraus und der Internet-Abruf.
 
-Erst danach ist die Baustellenmarke in den beiden Wurzel-READMEs von 🚧 auf ✅ zu ändern.
+**Die Baustellenmarke ist unabhängig davon schon gefallen:** Die beiden Wurzel-READMEs tragen seit dem 10. September 2026 ✅ statt 🚧 — Entscheidung des Entwicklers, gestützt auf den gelungenen Feldbau („einmal erfolgreich gelaufen, kann also verwendet werden"). Dieser Schritt hängt damit nicht mehr an der Marke, sondern nur noch an den drei Punkten oben; erledigt sind sie erst, wenn die Prüfliste in der README des Bausteins keine Zeile „offen" mehr trägt.
 
 **Nicht Teil dieses Schritts** und getrennt zu entscheiden: die beiden Befunde an der Konfiguration des Entwicklers (die A2-Schlüssel liegen in der Benutzer-`settings.json` unter `sandbox.credentials` statt unter `sandbox.filesystem` und bleiben dadurch wirkungslos; Block A2 in `safety-related/sandbox-settings.de.md` nennt `~/.claude/credentials.json`, die Datei heißt `.credentials.json`). Beide stehen im Anhang von `safety-related/vscode-topologies.de.md`.
 
