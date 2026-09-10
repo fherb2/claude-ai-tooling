@@ -28,6 +28,11 @@ local-only/
 # (chat-export/testlauf.md, Abschnitt "27c").
 /.claude/test_chat_imports/
 
+# Claude allgemein: rechnergebundene Einstellungen. Die Datei traegt lokale
+# Schalter wie die Sandbox und einzelne Rechte, die auf jedem Rechner anders
+# stehen duerfen; geteilte Rechte gehoeren nach .claude/settings.json.
+/.claude/settings.local.json
+
 # Ablage fuer Untersuchungsmaterial (echte Chatinhalte, Exportdumps): die
 # Inhalte werden nie versioniert, der Ordner selbst schon -- er ist der
 # verabredete Platz dafuer. Gilt fuer jeden so benannten Ordner, egal wie
