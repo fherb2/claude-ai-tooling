@@ -2,7 +2,7 @@
 
 *Last updated: 2026-09-10*
 
-*[Deutsche Fassung](README.md)*
+*[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.md)*
 
 **Keeps the working state of Claude Code and Claude Desktop — configuration, session transcripts, project memory — automatically in sync across several machines, so the same context is available everywhere. And it reports the exceptional case a synchronisation cannot resolve by itself: the file that was changed on both sides.**
 

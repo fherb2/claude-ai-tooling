@@ -1,8 +1,8 @@
 # parallel-sessions — several Claude sessions at the same time in the same repository, cleanly separated via Git worktrees
 
-*Last updated: 2026-09-02*
+*Last updated: 2026-09-10*
 
-*[Deutsche Fassung](README.md)*
+*[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/parallel-sessions/README.md)*
 
 **✅☑ Finished and usable.** Instructions complete, frontmatter set, silent trigger present; German and English versions available. — Usable with Claude Code.
 

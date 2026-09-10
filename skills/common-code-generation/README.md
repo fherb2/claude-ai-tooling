@@ -2,7 +2,7 @@
 
 *Stand: 2026-09-10*
 
-*[English version](README.en.md)*
+*[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/common-code-generation/README.en.md)*
 
 **✅ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung vorhanden. — Keine inhaltlichen Unterschiede zwischen der Version für Claude.ai / Claude Desktop (Chat + Cowork) sowie Claude Code.
 

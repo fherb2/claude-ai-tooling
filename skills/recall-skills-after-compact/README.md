@@ -1,8 +1,8 @@
 # recall-skills-after-compact — nach der Kompression an die geladenen Skills erinnern
 
-*Stand: 2026-09-02*
+*Stand: 2026-09-10*
 
-*[English version](README.en.md)*
+*[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/recall-skills-after-compact/README.en.md)*
 
 **✅ Fertig und nutzbar.** Gegen reale Transkripte und Fehlerfälle getestet und am 2. September 2026 an einer echten Kompaktierung im Feld erprobt.
 
