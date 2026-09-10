@@ -25,7 +25,11 @@ NBSP = ' '
 
 # Project scope: a path holding one of these is never looked at. The one
 # setting to review before using these tools in another project.
-SKIP = ('/.git/', 'bisherige Arbeitsanweisungen')
+#
+# '/.git/' used to sit here and is gone on purpose: every hidden entry is
+# skipped now, which covers it. Do not put it back -- it would only suggest
+# that the other dot folders are still being searched.
+SKIP = ('bisherige Arbeitsanweisungen',)
 
 # Artifact kinds repair_row acts on. Everything else is reported for a human
 # to look at once and must stay out of any work list: a check that keeps
@@ -109,7 +113,32 @@ def repair_text(text):
 
 
 def markdown_files(root):
-    """Every in-scope Markdown file below root, in a stable order."""
-    for path in sorted(pathlib.Path(root).rglob('*.md')):
-        if not any(skip in f'/{path.as_posix()}' for skip in SKIP):
-            yield path
+    """Every in-scope Markdown file below root, in a stable order.
+
+    Three filters, and the first one is the reason this function exists at all:
+
+    * **Regular files only.** A sandbox masks the paths it must not expose by
+      mounting a device over them -- a name that looks like a Markdown file but
+      is a character device, unreadable, and invisible from outside the sandbox.
+      Reading one raises PermissionError, and an aborted run leaves no result at
+      all: "nothing found" and "never ran" then look the same. The criterion is
+      deliberately the **file type** and not the shape of the mount, because the
+      shape is not ours and may change.
+    * **No hidden entries.** A path is dropped when one of its segments starts
+      with a dot -- counted **relative to root**, so that pointing the tool at a
+      dot folder on purpose still works.
+    * **SKIP** for folders excluded by name in this project.
+    """
+    base = pathlib.Path(root)
+    for path in sorted(base.rglob('*.md')):
+        try:
+            relative = path.relative_to(base)
+        except ValueError:                      # pragma: no cover - defensive
+            relative = path
+        if any(part.startswith('.') for part in relative.parts):
+            continue
+        if any(skip in f'/{path.as_posix()}' for skip in SKIP):
+            continue
+        if not path.is_file():
+            continue
+        yield path

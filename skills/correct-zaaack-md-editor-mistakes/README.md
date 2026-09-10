@@ -1,6 +1,6 @@
 # correct-zaaack-md-editor-mistakes — beschädigten Leerraum in Markdown-Tabellen finden und beheben
 
-*Stand: 2026-08-30*
+*Stand: 2026-09-10*
 
 *[English version](README.en.md)*
 
@@ -77,11 +77,17 @@ Drei Dateien, und die Aufteilung hat je einen Grund.
 
 **Die Liste trägt Pfade und Anzahlen, keine Zeilennummern.** Der Korrektor liest jede Datei ohnehin neu und leitet seine Reparaturen aus dem aktuellen Inhalt ab. Eine Zeilennummer wäre veraltet, sobald zwischen den beiden Läufen gespeichert wird, und würde ihn an die falsche Stelle greifen lassen. Aus dem gleichen Grund lässt die Korrekturstufe den Prüfer erneut laufen, statt eine Liste aufzubewahren.
 
-**Zwei Listen, und der Unterschied ist der Kern der Sache.** `files` ist die Arbeitsliste und bestimmt allein den Rückgabewert. `notes` trägt, was gemeldet aber absichtlich nie korrigiert wird. Wären die Notizen in der Arbeitsliste, könnte die Leerprobe nie aufgehen: Der Rückgabewert bliebe für immer 1, und ein Hook schlüge bei jedem Commit an, ohne dass es je etwas zu tun gäbe. Genau so war die erste Fassung gebaut, und in diesem Repository wäre der Fehler sofort eingetreten — `home-.claude-sharing/offener_fall_chatprotokolle.md` trägt in Zeile 101 ein gewolltes `` `uuid`s ``.
+**Drei Listen, und die Unterschiede sind der Kern der Sache.** `files` ist die Arbeitsliste und bestimmt allein den Rückgabewert. `notes` trägt, was gemeldet aber absichtlich nie korrigiert wird. Wären die Notizen in der Arbeitsliste, könnte die Leerprobe nie aufgehen: Der Rückgabewert bliebe für immer 1, und ein Hook schlüge bei jedem Commit an, ohne dass es je etwas zu tun gäbe. Genau so war die erste Fassung gebaut, und in diesem Repository wäre der Fehler sofort eingetreten — `home-.claude-sharing/offener_fall_chatprotokolle.md` trägt in Zeile 101 ein gewolltes `` `uuid`s ``.
 
-### Der Geltungsbereich: `SKIP`
+**Die dritte Liste, `unreadable`, ist der Verzicht auf einen Abbruch.** Eine Datei, die sich nicht lesen lässt, beendet den Lauf nicht mehr, sondern wird übersprungen und dort genannt. Der Grund ist die Fehlerart, die sonst entsteht: Ein Abbruch hinterlässt **kein** Ergebnis, und wer nur auf die letzte Zeile sieht, hält „kein Fund" und „nicht gelaufen" für dasselbe — bei einer Prüfung, die vor jedem Commit greifen soll, ist das der schlechteste Ausgang. Am Rückgabewert hängt die Liste bewusst **nicht**: Sie sagt, dass die Prüfung unvollständig war, nicht dass etwas zu reparieren ist. Damit sie trotzdem nicht untergeht, verpflichtet die `SKILL.md` die Instanz, eine nicht-leere Liste dem Nutzer zu melden.
 
-`SKIP` in `md_table_artifacts.py` nennt die Pfadbestandteile, die nie angesehen werden. Derzeit sind das `/.git/` und der Ordner der abgelegten Arbeitsanweisungen dieses Repositories. **Das ist die eine projektbezogene Einstellung** — wer die Werkzeuge in ein anderes Projekt bringt, prüft die Liste zuerst.
+### Der Geltungsbereich: drei Grenzen
+
+**Versteckte Einträge bleiben außen vor** — jeder Pfad, dessen Segment mit einem Punkt beginnt, also `.git/`, `.claude/` und alles ihresgleichen. Gerechnet wird **relativ zum übergebenen Pfad**, und das ist keine Feinheit: Nur so bleibt ein gezielter Lauf **in** einen Punkt-Ordner möglich. Wer Markdown dort prüfen will — etwa die Dateien eines projekteigenen Skills unter `.claude/skills/` —, ruft den Prüfer zusätzlich mit diesem Ordner auf.
+
+**Nur reguläre Dateien werden gelesen.** Eine Bash-Sandbox maskiert Pfade, die sie nicht zeigen darf, indem sie ein Gerät darüber einhängt: Der Name sieht wie eine Markdown-Datei aus, der Eintrag ist ein Zeichengerät, unlesbar — und außerhalb der Sandbox überhaupt nicht vorhanden. **Erkannt wird das am Dateityp, nicht am Aussehen der Einhängung.** Das ist die tragende Entscheidung: Die Gestalt dieser Einhängungen ist nicht unsere, sie kann sich ändern; der Dateityp bleibt das Merkmal. Was diese Grenze nicht abfängt, fängt `unreadable`.
+
+**`SKIP` in `md_table_artifacts.py`** nennt die Ordner, die nach Namen ausgeschlossen sind — derzeit allein der Ordner der abgelegten Arbeitsanweisungen dieses Repositories. **Das ist die eine projektbezogene Einstellung**; wer die Werkzeuge in ein anderes Projekt bringt, prüft die Liste zuerst. Der frühere Eintrag `/.git/` ist entfallen, weil die Punktregel ihn erledigt.
 
 `SKIP` liegt im Kern und nicht im Korrektor, damit der Geltungsbereich nicht an zwei Stellen entschieden wird.
 

@@ -49,13 +49,19 @@ python3 "${CLAUDE_SKILL_DIR}/scan_md_tables.py" PATH | python3 "${CLAUDE_SKILL_D
 python3 "${CLAUDE_SKILL_DIR}/scan_md_tables.py" PATH
 ```
 
-The scanner descends from `PATH` into every subdirectory by itself — one call, not one per folder.
+The scanner descends from `PATH` into every subdirectory by itself — one call, not one per folder. Its descent has three limits:
 
-Its output holds two lists. **`files`** is the work list, and it alone determines the exit code: 1 while there is something to do, 0 when there is not. **`notes`** holds what is reported but deliberately never repaired, and is **not** outstanding work. Look the notes over and put to the user whatever looks wrong among them.
+- **Hidden entries stay out** — every path with a segment that starts with a dot. This is counted **relative to `PATH`**, so pointing the scanner **into** a dot folder on purpose does work, and is sometimes needed. Where Markdown that has to be checked lives in such a folder — `.claude/skills/`, for instance — call the scanner again with that folder as `PATH`; the run over the project root does not reach it.
+- **Regular files only.** A Bash sandbox masks the paths it must not expose by mounting a device over them: a name that looks like a Markdown file without being one. The scanner recognizes this by the **file type**, not by the shape of the mount — which is why it keeps working if those mounts are built differently in future.
+- **`SKIP`** in `md_table_artifacts.py` excludes folders by name. If that list does not fit this project, say so.
+
+Its output holds three lists. **`files`** is the work list, and it alone determines the exit code: 1 while there is something to do, 0 when there is not. **`notes`** holds what is reported but deliberately never repaired, and is **not** outstanding work. Look the notes over and put to the user whatever looks wrong among them.
+
+**`unreadable` must never be passed over when it is not empty: if something is in there, report it to the user.** Those files were skipped, not checked — the check was therefore incomplete, and the exit code does not show it, because that hangs on the work list alone. A run that aborts leaves no result at all; that is why it no longer aborts, and that is why reporting is a duty.
 
 **Step 3 must yield `"files": []` and exit code 0.** If it does not, the repair tool is broken: do not repeat the run, report it to the user.
 
-If `SKIP` in `md_table_artifacts.py` does not fit this project, say so. If the tools fail to recognize something as an artifact that is one, report it and do not change it yourself.
+If the tools fail to recognize something as an artifact that is one, report it and do not change it yourself.
 
 ## What you put on record
 
