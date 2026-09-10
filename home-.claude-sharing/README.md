@@ -35,6 +35,6 @@ Der Dienst startet danach bei jeder Anmeldung an der grafischen Sitzung von selb
 
 ## Weiterführendes
 
-- `implementation-doc.md` — vollständiges Konzept (Zusammenhänge, Vorgaben, Einheiten) samt Fragenkatalog
-- `work-plan.md` — nächste Schritte; `status.md` — was davon schon abgearbeitet ist
+- `implementation-doc.md` — die vollständige Beschreibung (Zusammenhänge, Vorgaben, Einheiten), im Anhang der Code-Review vom 13. August 2026 samt Bearbeitung
+- `work-plan.md` — der noch offene Schritt
 - `syncthing-synology-setup-guide.md` — Einrichtung des Vermittlungsknotens und der Clients
