@@ -1410,7 +1410,7 @@ def check_uninstall_guard(w: types.ModuleType, tmp_root: Path) -> None:
     check("inaktiv: Abmelden laeuft durch", code, 0)
     check("Unit entfernt", unit_file.exists(), False)
     check("und die Schlusszeile erscheint",
-          "Der Dienst ist abgemeldet" in output, True)
+          "The service is unregistered" in output, True)
 
     # 4. Nie eingerichtet: kein Abbruch, aber die Meldung wird nicht
     #    verschluckt (2.6).
@@ -1418,7 +1418,7 @@ def check_uninstall_guard(w: types.ModuleType, tmp_root: Path) -> None:
     code, output = run()
     check("nie eingerichtet: kein Abbruch", code, 0)
     check("aber die Meldung erscheint",
-          "Hinweis vom Abmelden" in output, True)
+          "Note from unregistering" in output, True)
 
 
 def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
@@ -1436,9 +1436,9 @@ def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
     print("Anmeldeprüfung (3.5):")
     source = INSTALL.read_text(encoding="utf-8").splitlines()
     start = next(i for i, line in enumerate(source)
-                 if line.startswith("# --- Anmeldepruefung: Anfang"))
+                 if line.startswith("# --- Login check: begin"))
     end = next(i for i, line in enumerate(source)
-               if line.startswith("# --- Anmeldepruefung: Ende"))
+               if line.startswith("# --- Login check: end"))
     check("die markierte Strecke ist auffindbar", start < end, True)
     region = "\n".join(source[start:end + 1])
 
@@ -1484,7 +1484,7 @@ def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
     # bestaetigte Anmeldung durchgehen, aber auch nicht abbrechen.
     code, output = run(angemeldet, 'echo teilausgabe; sleep 30')
     check("Zeitueberschreitung: kein Abbruch", code, 0)
-    check("aber sie wird gemeldet", "geantwortet" in output, True)
+    check("aber sie wird gemeldet", "did not answer" in output, True)
 
     # Gegenprobe zur Verengung: Der Prompt-Aufruf darf NICHTS mehr abbrechen,
     # auch wenn seine Antwort nach einem Anmeldeproblem aussieht.
@@ -1514,14 +1514,14 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
 
     def region(name: str) -> str:
         start = next(i for i, line in enumerate(source)
-                     if line.startswith(f"# --- {name}: Anfang"))
+                     if line.startswith(f"# --- {name}: begin"))
         end = next(i for i, line in enumerate(source)
-                   if line.startswith(f"# --- {name}: Ende"))
+                   if line.startswith(f"# --- {name}: end"))
         check(f"markierte Strecke {name} ist auffindbar", start < end, True)
         return "\n".join(source[start:end + 1])
 
-    ask_region = region("Frage")
-    list_region = region("Ausschlussliste")
+    ask_region = region("Question")
+    list_region = region("Exclusion list")
 
     def ask(default: str) -> tuple[int, str]:
         script = f'{ask_region}\nask_yes_no "Frage?" "{default}"\n'
@@ -1532,15 +1532,18 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
     # The new convention, and the one thing most easily got wrong: an empty
     # answer follows the default, and for the exclusion list that default is
     # YES -- leaving it diverging is the worse of the two answers (doku 2.8).
-    code, output = ask("j")
+    code, output = ask("y")
     check("leere Antwort folgt der Vorgabe ja", code, 0)
-    check("und die Vorgabe steht groß im Text", "[J/n]" in output, True)
+    check("und die Vorgabe steht groß im Text", "[Y/n]" in output, True)
     code, output = ask("n")
     check("leere Antwort folgt der Vorgabe nein", code, 1)
-    check("auch dort sichtbar", "[j/N]" in output, True)
-    # Same case statement an entered answer would run through.
-    check("ausgeschriebenes Ja zählt", ask("ja")[0], 0)
-    check("englisches Y zählt", ask("Y")[0], 0)
+    check("auch dort sichtbar", "[y/N]" in output, True)
+    # Same case statement an entered answer would run through. The German
+    # answers are pinned on purpose: the script asks in English, but a German
+    # package is installed by the same script, and reading "j" as a no would
+    # be the wrong answer to a clear intention.
+    check("ausgeschriebenes Yes zählt", ask("yes")[0], 0)
+    check("deutsches Ja zählt weiterhin", ask("ja")[0], 0)
     check("alles andere ist ein Nein", ask("quatsch")[0], 1)
 
     stage = tmp_root / "ausschluss"
@@ -1584,7 +1587,7 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
     check("fehlende Liste wird angeboten", "FRAGE[" in output, True)
     # Where nothing is excluded at all, leaving it as it is is the worse
     # of the two answers -- so the offer defaults to yes (doku 2.8).
-    check("und zwar mit Vorgabe ja", "FRAGE[j]:" in output, True)
+    check("und zwar mit Vorgabe ja", "FRAGE[y]:" in output, True)
     check("und bei Zustimmung übernommen",
           (ziel / ".stignore").read_text(encoding="utf-8"), massgeblich)
     check("mit Empfehlung zum Neueinlesen",
@@ -1600,14 +1603,15 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
 
     output = run_block(antwort=0, vorhanden=massgeblich)
     check("bei Gleichheit wird nicht gefragt", "FRAGE[" in output, False)
-    check("sondern die Gleichheit gemeldet", "überein" in output, True)
+    check("sondern die Gleichheit gemeldet",
+          "matches the authoritative version" in output, True)
 
     abweichend = "/telemetry\n/etwas-anderes\n"
     output = run_block(antwort=0, vorhanden=abweichend)
     check("Abweichung wird übernommen",
           (ziel / ".stignore").read_text(encoding="utf-8"), massgeblich)
     # The answer is about the differences, so they have to be readable first.
-    check("auch hier mit Vorgabe ja", "FRAGE[j]:" in output, True)
+    check("auch hier mit Vorgabe ja", "FRAGE[y]:" in output, True)
     check("und der Unterschied stand vor der Frage",
           output.index("/etwas-anderes") < output.index("FRAGE["), True)
 
