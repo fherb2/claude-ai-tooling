@@ -1,8 +1,8 @@
 # vscode-dev-container
 
-*Stand: 2026-09-07*
+*Stand: 2026-09-10*
 
-> English version: [README.en.md](README.en.md)
+*[English version](README.en.md)*
 
 **Ein Entwicklungscontainer für VS Code, der die Grenze zwischen Agent und Rechner von vornherein richtig zieht** — schmale Einhängungen statt ganzem Home, SSH-Agent statt Schlüsseldatei, Netzsperre auf dem Host. Er bringt einen C-Compiler, Python und Poetry mit und ist als Grundlage gedacht, auf der weiteres aufsetzt.
 
