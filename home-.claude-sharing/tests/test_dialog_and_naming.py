@@ -87,7 +87,15 @@ def load_daemon() -> types.ModuleType:
     Registering it in sys.modules is not optional: dataclasses resolves type
     annotations through the module entry and fails with an AttributeError
     without it.
+
+    The daemon imports its message catalogue from its own folder. Started as a
+    script -- the way the unit starts it -- Python puts that folder on sys.path
+    by itself; loaded by path it does not, so this is the harness's job
+    (doku 3.8).
     """
+    folder = str(DAEMON.parent)
+    if folder not in sys.path:
+        sys.path.insert(0, folder)
     spec = importlib.util.spec_from_file_location("claude_sync_watchd", DAEMON)
     module = importlib.util.module_from_spec(spec)
     sys.modules["claude_sync_watchd"] = module
