@@ -2,7 +2,7 @@
 
 **Angelegt am 13. August 2026.** Dieser Fall ist **bewusst zurückgestellt**: Er kam während des laufenden Doku-Reviews auf, und es wurde entschieden, den Review zuerst abzuschließen. An der Implementierungsdoku und an allen anderen Dateien wurde deshalb **nichts** geändert — dieses Dokument ist die vollständige Zwischenablage, damit der Faden in einer neuen Sitzung ohne den Gesprächskontext von heute wieder aufgenommen werden kann.
 
-Verweise auf die Implementierungsdoku stehen hier absichtlich als **Überschriftsnamen**, nicht als Kapitelnummern — die Nummern können sich im Review noch verschieben. Die F-Nummern des Fragenkatalogs sind dagegen stabil (dort wird nie umnummeriert).
+Verweise auf die Implementierungsdoku stehen hier absichtlich als **Überschriftsnamen**, nicht als Kapitelnummern — die Nummern können sich im Review noch verschieben. Die F-Nummern beziehen sich auf den Fragenkatalog der Implementierungsdoku (Anhang A). Dieser Anhang ist am 10. September 2026 entfallen, als die Implementierung abgeschlossen und alle Fragen beantwortet waren — F3 und F7 sind dort nicht mehr nachzulesen; ihr Gegenstand steht in den Kapiteln 1.3, 1.5 und 3.4.
 
 ---
 

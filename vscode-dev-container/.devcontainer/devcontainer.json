@@ -1,0 +1,56 @@
+// Copy this file and the Dockerfile into your project's .devcontainer/ folder.
+// README.md explains every entry and what has to be prepared on the host.
+{
+    "name": "vscode-dev-container",
+
+    // Building happens on the machine that opens the container, so the two
+    // arguments below carry that machine's user and home into the image.
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "USERNAME": "${localEnv:USER}",
+            "USER_HOME": "${localEnv:HOME}"
+        }
+    },
+    "remoteUser": "${localEnv:USER}",
+
+    // The project is mounted under the home directory, always as
+    // <home>/git/<folder name>, wherever it happens to sit on the host. That
+    // keeps the path Claude Code derives its session key from identical across
+    // machines. README.md, "Warum der Pfad so gewaehlt ist".
+    "workspaceMount": "source=${localWorkspaceFolder},target=${localEnv:HOME}/git/${localWorkspaceFolderBasename},type=bind",
+    "workspaceFolder": "${localEnv:HOME}/git/${localWorkspaceFolderBasename}",
+
+    "mounts": [
+        // Credentials, skills and session history. Written to, and synchronised
+        // on the host - not from inside the container.
+        "source=${localEnv:HOME}/.claude,target=${localEnv:HOME}/.claude,type=bind",
+        // Commit author only, hence read-only.
+        "source=${localEnv:HOME}/.gitconfig,target=${localEnv:HOME}/.gitconfig,type=bind,readonly",
+        // The agent socket instead of the key files: the container can sign,
+        // but cannot read a private key.
+        "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
+    ],
+
+    "containerEnv": {
+        // Keeps .claude.json inside the mounted directory, so the sign-in
+        // survives a rebuild.
+        "CLAUDE_CONFIG_DIR": "${localEnv:HOME}/.claude",
+        "SSH_AUTH_SOCK": "/ssh-agent"
+    },
+
+    "customizations": {
+        "vscode": {
+            // The extension brings its own copy of the CLI; nothing to install
+            // in the image for the chat panel.
+            "extensions": [
+                "anthropic.claude-code"
+            ]
+        }
+    }
+
+    // Uncomment when you need ping, tcpdump, arp-scan or an nmap SYN scan for
+    // network devices. Safe to grant: the boundary against the corporate
+    // network is a rule on the host, not a capability of the container.
+    // "runArgs": ["--cap-add=NET_RAW"]
+}

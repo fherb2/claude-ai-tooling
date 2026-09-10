@@ -88,6 +88,7 @@ git worktree add <worktree-dir>/<topic> <workbench>
 - No command that changes foreign worktrees, foreign branches or the main checkout.
 - **Command chains never rely on a lingering `cd`.** Every Git command addresses its target itself — `git -C <worktree>` for the workbench, `git -C <main-checkout>` for the squash. And no command runs with its working directory inside a worktree that is removed in the same go.
 - `push` of the workbench only after consent in the individual case.
+- **If the user asks for a push on a different branch** — the integration branch, say — **or the session itself proposes such a push**, ask **before** running it whether the open workbench should be backed up too. Whether it is still needed can't be judged reliably; so ask instead of guessing, with **"push it too" as the suggested default** unless the user says otherwise. This is the observable moment for an approaching machine switch or the end of a session — not its announcement.
 
 ### Changing central files (infra)
 

@@ -1,6 +1,8 @@
 # Pack Source for AI
 
-*Last updated: 2026-08-24*
+*Last updated: 2026-09-10*
+
+*[Deutsche Fassung](README.md)*
 
 A **shell script that bundles project source files into a single, structured text file** ready for upload to an AI agent's knowledge base.
 
