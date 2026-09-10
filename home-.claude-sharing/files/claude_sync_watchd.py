@@ -934,7 +934,7 @@ def find_conflicts(watch_dir: Path) -> tuple[list[Path], list[str]]:
     That second list is the whole point: "found nothing" and "could not look"
     used to be the same empty answer, and the second one is the worst outcome
     for a tool that exists only to escalate -- it reports calm for ever while
-    seeing nothing, and calm is the normal state (doku 3.1 step 1, 1.5, F7).
+    seeing nothing, and calm is the normal state (doku 3.1 step 1, 1.5).
     Two ways it happens: the watched directory is gone or unreadable (moved,
     a mount point away, permissions changed), and a subdirectory that
     ``os.walk`` silently skips because it cannot be entered.

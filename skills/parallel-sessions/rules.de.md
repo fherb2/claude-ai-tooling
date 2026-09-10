@@ -88,6 +88,7 @@ git worktree add <worktree-dir>/<topic> <workbench>
 - Kein Kommando, das fremde Worktrees, fremde Branches oder den Haupt-Checkout verändert.
 - **Kommandoketten verlassen sich nie auf ein fortwirkendes `cd`.** Jedes Git-Kommando adressiert sein Ziel selbst — `git -C <worktree>` für die Werkbank, `git -C <haupt-checkout>` für den Squash. Und kein Kommando läuft mit Arbeitsverzeichnis in einem Worktree, der im selben Zug entfernt wird.
 - `push` der Werkbank nur nach Zustimmung im Einzelfall.
+- **Fragt der Nutzer nach einem Push auf einem anderen Branch** — etwa dem Integrationsbranch — **oder schlägt die Sitzung selbst einen solchen Push vor**, wird **vor** dessen Ausführung gefragt, ob die offene Werkbank mitgesichert werden soll. Ob sie noch gebraucht wird, lässt sich nicht zuverlässig einschätzen; deshalb wird gefragt, nicht geraten, mit **„mitpushen" als vorgeschlagenem Standard**, sofern der Nutzer nicht widerspricht. Das ist der beobachtbare Moment für einen bevorstehenden Rechnerwechsel oder ein Sitzungsende — nicht dessen Ankündigung.
 
 ### Zentrale Dateien ändern (Infra)
 

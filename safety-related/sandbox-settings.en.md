@@ -1,6 +1,6 @@
 # Sandbox and tool settings: snippets with per-parameter notes
 
-*Last updated: 2026-09-01 · Statements verified against the Claude Code docs, a vendor reference configuration, the Trail of Bits threat model and four bug reports in the Claude Code repository. Sources at the end.*
+*Last updated: 2026-09-07 · Statements verified against the Claude Code docs, a vendor reference configuration, the Trail of Bits threat model and four bug reports in the Claude Code repository. Sources at the end.*
 
 **Scope:** Linux and macOS; on Windows only through WSL2 — the sandbox does not run natively there, and paths would be written differently (`//c/**/.env` instead of `//**/.env`).
 
@@ -60,12 +60,17 @@ The intended route, from the sandbox documentation. Covers files **and** environ
         { "name": "GITHUB_TOKEN", "mode": "deny" },
         { "name": "NPM_TOKEN", "mode": "deny" }
       ]
+    },
+    "filesystem": {
+      "allowRead": ["~/.ssh/known_hosts", "~/.ssh/config"]
     }
   }
 }
 ```
 
 Both lists need extending with your own cases — what belongs there is under "What you have to determine yourself" below.
+
+The `allowRead` line deliberately reopens two files inside the `~/.ssh` block: `known_hosts` and `config` are not secrets, they are what SSH host-key verification and git-over-SSH need. Without this exception, every SSH connection fails with "Host key verification failed" — even with a loaded agent, even when the private key itself is never read. Confirmed on 7 September 2026: exactly this failure, isolated through a direct SSH test call.
 
 ### A2 – prevent self-escalation *[NVIDIA]*
 
@@ -178,7 +183,9 @@ Per the docs this belongs in the project's `.claude/settings.json`, because `.` 
       "Bash(dangerouslyDisableSandbox:true)"
     ],
     "deny": [
-      "Read(~/.ssh/**)",
+      "Read(~/.ssh/id_*)",
+      "Read(~/.ssh/*.pem)",
+      "Read(~/.ssh/*.pub)",
       "Read(~/.aws/**)",
       "Read(~/.gnupg/**)",
       "Read(~/.netrc)",
@@ -195,6 +202,8 @@ Per the docs this belongs in the project's `.claude/settings.json`, because `.` 
   }
 }
 ```
+
+**Why this doesn't read `Read(~/.ssh/**)`:** at this layer, deny is absolute — unlike the sandbox, there is no `allow` that reopens a `deny` rule (see "Deny is absolute" further below). A block on the whole directory would also catch `known_hosts`, and every SSH connection would fail with "Host key verification failed". The rule has to be narrow from the start, rather than getting exceptions afterwards. The price: a key with an unconventional name — matching none of `id_*`, `*.pem`, `*.pub` — stays readable. That is not a gap you can close without blocking the whole directory again; it belongs in your own secrets inventory (see below).
 
 The `ask` rule is the single most effective entry: auto mode stays in force everywhere, and only the one event "leaving the sandbox" is necessarily put to you — enforced by the client, not by the model.
 

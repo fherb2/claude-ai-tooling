@@ -10,6 +10,37 @@ Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
+## 12 Worktree-Modus und Infra-Branch trennen
+
+**Unmittelbar nächster Schritt.** Ausgangspunkt ist eine Beobachtung des Entwicklers vom 7. September 2026: `.claude/git-worktree-model.json` vermischt zwei Dinge, die nichts miteinander zu tun haben — die **Branch-Topologie** (Integration, Release, Infra, und welche Dateien infra-verwaltet sind) und den **Arbeitsisolations-Modus** (ob eine Sitzung Worktree und Werkbank bekommt). Das ist nicht nur unsauber: Wer Worktrees abschalten will, indem er die Datei löscht, verliert damit die Infra-Disziplin mit — und wie fragil die ist, hat derselbe Tag gezeigt (Drift zwischen `dev` und `infra`, wodurch der vorgeschriebene Abgleich zur Rücksetzungsfalle wurde, behoben mit `14f9190`).
+
+Zu klären, **bevor** etwas geschrieben wird:
+
+1. **Prüfen, wie der Infra-Branch im Skill überhaupt definiert ist** — steht dort begründet, *warum* es ihn gibt, oder nur *wie* er benutzt wird? Verdacht des Entwicklers: Er ist beschrieben, aber nicht begründet.
+2. **Entscheiden, ob Infra überhaupt in `parallel-sessions` gehört.** Einschätzung des Entwicklers: nein — es ist Branch-Konfiguration, keine Frage gleichzeitiger Sitzungen. Dann bräuchte es einen eigenen Ort (eigener Skill, eigene Konfigurationsdatei, oder ein Abschnitt der Projekt-CLAUDE.md).
+
+Danach umzusetzen, mit diesen Festlegungen aus der Vorbesprechung:
+
+1. **Schalter mit drei Zuständen**, nicht zwei: `always` / `ask` / `off`. Was der Entwickler beschrieb („aus, aber bei Bedarf fragen") ist `ask`; ein echtes `off` ist für kleine Projekte nützlich, wo die Frage nie kommen soll.
+2. **Auslöser ist das erste schreibende Git-Kommando**, nicht „Sitzungsbeginn" — letzteres ist ein Zustand, den die Instanz nicht zuverlässig erkennt. Genau dieser Fehlertyp wurde am 7. September bei der Push-Regel schon einmal korrigiert (`ba9558c`).
+3. **Die Push-Regel mitverallgemeinern.** Sie hängt derzeit am Begriff „offene Werkbank"; ohne Worktrees gibt es keine, aber die Strandungsgefahr wechselt nur die Form — dann sind es unveröffentlichte Commits auf `dev` oder `infra`. Neue Fassung entsprechend: „unveröffentlichte Commits auf `<branch>` — mitpushen?"
+
+Betroffen sind `SKILL.de/en.md`, `rules.de/en.md`, `README.de/en.md`, die Konfigurationsdatei samt möglicher Umbenennung — und danach die Neuinstallation nach `~/.claude/skills/`.
+
+## 11 `vscode-dev-container`: Feldnachweise abschließen
+
+**Der erste Bau ist gelaufen** (5./7. September 2026, zwei Rechner): Image gebaut, Container gestartet, Claude-Erweiterung v2.1.263 lief, Pfad und Sitzungsschlüssel wie entworfen. Was dabei auffiel, steckt in der README des Bausteins samt Prüfliste mit Spalte „geprüft"; drei fehlende Pakete (`openssh-client`, `bubblewrap`, `socat`) sind im Dockerfile nachgetragen, die Ordnerstruktur auf `.devcontainer/` + `.claude/` umgestellt.
+
+Offen bleiben die drei Punkte, die Hardware oder eine Messung brauchen:
+
+1. **Die `DOCKER-USER`-Regel je Rechner festlegen** — mit den `ACCEPT`-Ausnahmen für die dort angeschlossenen Geräte (Kameras, Messtechnik). Ohne sie ist das Firmennetz aus dem Container erreichbar; das ist der Punkt, an dem der Baustein sein drittes Schutzziel einlöst oder nicht.
+2. **Die offene Frage zu `--network host` messen**: Ob `DOCKER-USER` dort tatsächlich nicht greift, ist aus der Docker-Netzarchitektur abgeleitet und nicht nachgemessen. Der Test ist ein Verbindungsversuch auf eine interne Adresse, einmal mit Bridge- und einmal mit Host-Netz.
+3. **Die zwei letzten Prüflistenzeilen abtasten**, die noch „offen" tragen: `git fetch` aus dem Container heraus und der Internet-Abruf.
+
+Erst danach ist die Baustellenmarke in den beiden Wurzel-READMEs von 🚧 auf ✅ zu ändern.
+
+**Nicht Teil dieses Schritts** und getrennt zu entscheiden: die beiden Befunde an der Konfiguration des Entwicklers (die A2-Schlüssel liegen in der Benutzer-`settings.json` unter `sandbox.credentials` statt unter `sandbox.filesystem` und bleiben dadurch wirkungslos; Block A2 in `safety-related/sandbox-settings.de.md` nennt `~/.claude/credentials.json`, die Datei heißt `.credentials.json`). Beide stehen im Anhang von `safety-related/vscode-topologies.de.md`.
+
 ## 3 Anweisungs-Inventar zuordnen
 
 Die Posten des Anweisungs-Inventars (T1–T27; liegt in einem temporären Arbeitsordner) werden einzeln zugeordnet. Der Ordner entfällt erst, wenn **alle** Posten in Skills eingepflegt sind — mit ihm dann auch `original/`. Solange auch nur einer offen ist, bleibt beides stehen. Claude reicht sie vorsortiert durch — gebündelt nach vorgeschlagenem Skill-Zuhause, je Posten mit Herkunft, Varianten und einem Geltungsbereichs-Vorschlag nach Kapitel 8.3 der `skill-dev-doc.md` (nur Coding / alle Arbeitsformen / andere) —, und der Entwickler legt je Posten die Zuordnung fest oder bestätigt sie. Maßstab der Verteilung ist das Arbeitsmodell in Kapitel 8.2. Die bestätigte Zuhause-Liste wird anschließend in der `skill-dev-doc.md` festgeschrieben; erst danach beginnt die Ausformulierung der einzelnen Skills.
