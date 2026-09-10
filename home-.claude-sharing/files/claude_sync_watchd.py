@@ -35,7 +35,8 @@ modify any file in the watched directory. It observes, reports and escalates.
 @Claude:
     This file is the daemon, not the conflict session. If you are reading it
     because a conflict session was started, the instructions you need are in
-    ``conflict-resolution.md`` -- that file, not this one, governs what you do.
+    ``conflict-resolution.<lang>.md`` -- that file, not this one, governs what
+    you do.
 
     If you are asked to change this script: the determinations it implements
     live in ``implementation-doc.md`` chapters 3.1 (behaviour), 3.2 (state
@@ -86,18 +87,32 @@ from messages import T
 TOOL_DIR = Path.home() / ".claude-sync-watch"
 STATE_FILE = TOOL_DIR / "zustand.json"
 LOCK_FILE = TOOL_DIR / ".lauf.lock"
-INSTRUCTION_FILE = TOOL_DIR / "conflict-resolution.md"
 TOOLS_DIR = TOOL_DIR / "tools"
 
 
 def set_tool_dir(directory: Path) -> None:
     """Point the daemon's own files at another directory (tests only)."""
-    global TOOL_DIR, STATE_FILE, LOCK_FILE, INSTRUCTION_FILE, TOOLS_DIR
+    global TOOL_DIR, STATE_FILE, LOCK_FILE, TOOLS_DIR
     TOOL_DIR = directory
     STATE_FILE = TOOL_DIR / "zustand.json"
     LOCK_FILE = TOOL_DIR / ".lauf.lock"
-    INSTRUCTION_FILE = TOOL_DIR / "conflict-resolution.md"
     TOOLS_DIR = TOOL_DIR / "tools"
+
+
+def instruction_file() -> Path:
+    """The working instruction, in the language the watcher speaks.
+
+    A function and not a constant beside the others: the language becomes
+    known only when main() has read the command line, and this module is
+    imported before that. The instruction decides which language the conflict
+    session speaks to the user, so its name carries the code (doku 3.3).
+
+    ``or messages.use()`` resolves the language for a harness that loads this
+    file without going through main(); without it the name would lose its code
+    and point at a file that cannot exist (doku 3.8).
+    """
+    code = messages.language() or messages.use()
+    return TOOL_DIR / f"conflict-resolution.{code}.md"
 
 DEFAULT_WATCH_DIR = Path.home() / ".claude"
 
@@ -1128,13 +1143,14 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
     # silently, and the next question came half an hour later. The installer
     # covers this at setup time only, and --tool-dir bypasses it entirely.
     TOOLS_DIR.mkdir(parents=True, exist_ok=True)
-    if not INSTRUCTION_FILE.is_file():
-        print(T("journal.no_instruction", path=INSTRUCTION_FILE),
+    instruction = instruction_file()
+    if not instruction.is_file():
+        print(T("journal.no_instruction", path=instruction),
               file=sys.stderr, flush=True)
         show_message(
             T("dialog.no_instruction.title"),
-            T("dialog.no_instruction.text", path=INSTRUCTION_FILE,
-              name=INSTRUCTION_FILE.name))
+            T("dialog.no_instruction.text", path=instruction,
+              name=instruction.name))
         return None
     # Argument order is load-bearing, not cosmetic: ``--add-dir`` is variadic
     # (``--add-dir <directories...>``), so it swallows every following argument
@@ -1146,7 +1162,7 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
         *terminal_cmd,
         claude_binary(),
         "--add-dir", str(TOOLS_DIR),
-        "--append-system-prompt-file", str(INSTRUCTION_FILE),
+        "--append-system-prompt-file", str(instruction),
         build_handover(pairs, watch_dir),
     ]
     if DRY_RUN:
