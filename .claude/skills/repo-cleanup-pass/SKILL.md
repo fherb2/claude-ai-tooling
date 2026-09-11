@@ -93,8 +93,9 @@ Eine Löschung im Release-Zweig ist Teil des Abgleichs, kein Sonderfall: Was in 
 ## Schritt 4 — Gegenprobe, und zwar zweifach
 
 ```bash
-# 1. Es darf nur noch das Ausgeschlossene übrig sein:
-git -c core.quotepath=false diff --name-only master dev | grep -v -E '^skills/[^A-Za-z0-9]|^\.research/'
+# 1. Es darf nur noch das Ausgeschlossene übrig sein -- alle DREI Klassen:
+git -c core.quotepath=false diff --name-only master dev \
+  | grep -v -E '^skills/[^A-Za-z0-9]|^\.research/|^\.claude/skills/'
 #    -> keine Ausgabe
 
 # 2. Jede übertragene Datei byteweise vergleichen:
@@ -104,6 +105,8 @@ xargs -0 -r -a "$LISTEN/take.z" -I{} sh -c \
 ```
 
 Die erste Probe fängt Vergessenes, die zweite einen misslungenen Übertrag. Beide gehören dazu; die erste allein sagt nur, dass ein Pfad existiert, nicht dass er stimmt.
+
+**Der Filter der ersten Probe muss alle Klassen führen, die oben ausgeschlossen sind.** Kommt eine hinzu und der Filter bleibt zurück, meldet die Probe genau die neu ausgeschlossenen Dateien als Vergessenes — am 11. September 2026 wären es die sieben Dateien dieses Skills gewesen, also ein Fehlalarm, der wie ein misslungener Abgleich aussieht. Wer eine Klasse ergänzt, ergänzt drei Stellen: die Liste oben, `DEFAULT_EXCLUDES` in `files/branch-diff.py` und diesen Filter.
 
 **`core.quotepath=false` ist in der ersten Probe nicht Kosmetik.** Ohne diese Angabe setzt Git Pfade mit Nicht-ASCII-Zeichen in Anführungszeichen — die Zeile beginnt dann mit `"` statt mit `skills/`, der Ausschlussfilter greift nicht, und die Probe meldet **alle** Baustellen-Skills als unerwartet. Beim ersten Lauf dieses Skills ist genau das passiert: 25 Fehlalarme, die wie ein misslungener Abgleich aussahen.
 
