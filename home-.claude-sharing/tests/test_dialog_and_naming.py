@@ -174,6 +174,27 @@ def check_dialog_answers(w: types.ModuleType) -> None:
     finally:
         w.subprocess.run = original
 
+    # The text is text, not markup. Without the flag zenity reads --text as
+    # Pango markup: measured, the parser rejects "a & b <c>", and these two
+    # dialogs are the only ones carrying foreign strings -- the conflicting
+    # file names and the command the user typed.
+    passed = {}
+
+    def spy(command, *args, **kwargs):
+        passed["command"] = command
+        return types.SimpleNamespace(returncode=1, stderr=b"")
+
+    for label, call in (("Frage", lambda: w.ask_question("T", "a & b <c>",
+                                                         "ja", "nein")),
+                        ("Meldung", lambda: w.show_message("T", "a & b <c>"))):
+        w.subprocess.run = spy
+        try:
+            call()
+        finally:
+            w.subprocess.run = original
+        check(f"{label} übergibt --no-markup",
+              "--no-markup" in passed.get("command", []), True)
+
 
 def check_timeout_unit(w: types.ModuleType) -> None:
     """The timeout must be a plain number of seconds, not a duration string.

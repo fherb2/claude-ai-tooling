@@ -407,7 +407,14 @@ def ask_question(title: str, text: str, ok_label: str, cancel_label: str,
     answer", handled like a deferral (doku 3.3).
     """
     _require_linux("Question dialog")
-    command = ["zenity", "--question", f"--title={title}", f"--text={text}",
+    # --no-markup, because this text carries the conflicting file names and
+    # zenity reads --text as Pango markup unless told otherwise. Measured: the
+    # parser rejects "a & b <c>" with "Entity did not end with a semicolon",
+    # and a project folder with an ampersand is not far-fetched. The flag has
+    # existed since zenity 3.x for question, info and error -- and for those
+    # three only, which is exactly where foreign strings end up (doku 3.3).
+    command = ["zenity", "--question", "--no-markup", f"--title={title}",
+               f"--text={text}",
                f"--ok-label={ok_label}", f"--cancel-label={cancel_label}"]
     if timeout_seconds is not None:
         command.append(f"--timeout={timeout_seconds}")
@@ -469,7 +476,11 @@ def show_message(title: str, text: str,
     as with every other dialog (doku 3.3).
     """
     _require_linux("Message dialog")
-    command = ["zenity", "--error", f"--title={title}", f"--text={text}"]
+    # --no-markup for the same reason as in ask_question: one of these texts
+    # quotes the command the user typed, and an ampersand in it would break
+    # the window rather than appear in it.
+    command = ["zenity", "--error", "--no-markup", f"--title={title}",
+               f"--text={text}"]
     if timeout_seconds is not None:
         command.append(f"--timeout={timeout_seconds}")
     try:
