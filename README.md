@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-09-10*
+*Last updated: 2026-09-11*
 
 *[Deutsche Fassung](README.de.md)*
 
@@ -46,7 +46,7 @@ Two files in the project root accompany the development of every building block:
 
 An always-on NAS node acts as the intermediary. The actual core is dealing with what Syncthing deliberately leaves unsolved: files changed at the same time are put aside as conflict copies, a watcher service discovers them, reports in and guides the user, together with Claude, through resolving them by content. Installation scripts, the service definition and a setup guide for the intermediary node are included; it ships as a package per language version under `downloads/`.
 
-**Status:** in operation on three of the developer's machines since 11 August 2026 — more in the [component's README](home-.claude-sharing/README.en.md).
+**Status:** in operation on four of the developer's machines since 11 August 2026 — more in the [component's README](home-.claude-sharing/README.en.md).
 
 ## skills
 
