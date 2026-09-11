@@ -197,8 +197,8 @@ fi
 
 # --- 2. Own files ---------------------------------------------------------
 
-MISSING_FILES_HINT="Every file of this project has to be in this folder. Please copy the
-folder 'files/' from the repository here in full."
+MISSING_FILES_HINT="Every file of this project has to be in this folder. Please unpack the
+claude-sync-watch package into your home folder again, in full."
 
 for file in claude_sync_watchd.py "$UNIT_NAME" messages.py .stignore; do
     [ -f "$SCRIPT_DIR/$file" ] || fail \

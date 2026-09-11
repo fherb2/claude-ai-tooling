@@ -10,7 +10,7 @@
 
 [Unit]
 Description=Claude sync conflict watcher
-Documentation=https://codebase.helmholtz.cloud/FWF/tools/claude-ai-tooling.git
+Documentation=https://github.com/fherb2/claude-ai-tooling/tree/master/home-.claude-sharing
 
 # The escalation shows graphical dialogs, so the service is bound to the
 # graphical session and stops with it. Without one there is no watcher;

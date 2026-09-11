@@ -82,10 +82,9 @@ TEXTS = {
     "dialog.no_instruction.title": "Claude-Sync: Konfliktlösung nicht möglich",
     "dialog.no_instruction.text": (
         "Die Arbeitsanweisung {path} fehlt. Ohne sie kann keine "
-        "Konfliktsitzung starten. Bitte den Inhalt des files/-Ordner aus der "
-        "Repo-Quelle von claude-sync-watch vollständig nach "
-        "~/.claude-sync-watch kopieren. Dort ist auch das fehlende File "
-        "'{name}' enthalten."
+        "Konfliktsitzung starten. Bitte das Paket von claude-sync-watch "
+        "erneut vollständig in das Benutzerverzeichnis entpacken; die "
+        "fehlende Datei '{name}' ist darin enthalten."
     ),
 
     "dialog.terminal_failed.title": "Claude-Sync: Terminal konnte nicht starten",

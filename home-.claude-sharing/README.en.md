@@ -1,6 +1,6 @@
 # Syncthing sync for `~/.claude`
 
-*Last updated: 2026-09-11*
+*Last updated: 2026-09-12*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.md)*
 
@@ -108,10 +108,8 @@ Steps 1 to 4 and 7 to 8 above apply unchanged. **Steps 5 and 6 do not apply:** t
 
 **Once an hour the watcher reports in** — briefly shown, not clickable. It is the sign of life of a service you otherwise cannot tell apart from one that has been stuck for days:
 
-    abgeglichen: 0.8 MB hoch, 0.3 MB herunter
-    kein Konflikt seit 74 Stunde(n)
-
-(“synced: 0.8 MB up, 0.3 MB down / no conflict for 74 hour(s)”.)
+    synced: 0.8 MB up, 0.3 MB down
+    no conflict for 74 hour(s)
 
 Four forms of this notification call for attention and therefore stay on screen longer: `3 conflict(s) for 9 hour(s) unresolved`, so a postponed resolution is not forgotten; `backlog: 7 file(s)` — something is stuck, which you would otherwise never learn about; `Sync paused for this folder — changes and conflict copies stay where they are`, because a pause you set yourself and forgot would otherwise stop the sync unnoticed; and `no connection to the sync for …`. Where a number would be, `counters reset` or `counting started afresh` means the reference value is simply missing — after a reconnection, such as a change of WLAN.
 

@@ -64,6 +64,13 @@ rule or the terminal launch: those need a screen and a human, and the
 manual probes next to this file cover them (doku 3.8).
 """
 
+# Like the daemon, and for the same reason: signature annotations are
+# evaluated at definition time otherwise, so "str | None" would raise
+# TypeError under Python 3.9 -- and 3.8 prescribes /usr/bin/python3, whatever
+# version a machine has there. The probe would then crash while loading
+# instead of reporting.
+from __future__ import annotations
+
 import ast
 import contextlib
 import datetime
