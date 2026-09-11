@@ -19,11 +19,11 @@ UNIT_NAME="claude-sync-watch.service"
 UNIT_TARGET_DIR="$HOME/.config/systemd/user"
 
 if ! command -v systemctl >/dev/null 2>&1; then
-    printf 'Abbruch: systemctl nicht gefunden.\n' >&2
+    printf 'Aborting: systemctl not found.\n' >&2
     exit 1
 fi
 
-printf 'Melde %s ab …\n' "$UNIT_NAME"
+printf 'Unregistering %s …\n' "$UNIT_NAME"
 
 # Return value and message are kept instead of discarded. The old
 # '|| true' with 2>/dev/null did cover the harmless cases -- never enabled,
@@ -49,14 +49,14 @@ case "$state" in
     inactive|failed|unknown)
         ;;
     *)
-        printf 'Abbruch: Der Dienst ist nicht nachweislich beendet.\n' >&2
-        printf 'Zustand laut systemctl: %s\n' "$state" >&2
+        printf 'Aborting: the service is not provably stopped.\n' >&2
+        printf 'State according to systemctl: %s\n' "$state" >&2
         if [ "$disable_failed" -eq 1 ]; then
-            printf 'Das Abmelden meldete: %s\n' "$disable_output" >&2
+            printf 'Disabling reported: %s\n' "$disable_output" >&2
         fi
-        printf '\nDie Unit bleibt absichtlich liegen: Ohne sie wäre ein noch\n' >&2
-        printf 'laufender Wächter schlechter zu beenden. Bitte nachsehen und\n' >&2
-        printf 'dieses Skript danach erneut aufrufen:\n' >&2
+        printf '\nThe unit is left in place on purpose: without it a watcher\n' >&2
+        printf 'that is still running would be harder to stop. Please look,\n' >&2
+        printf 'then call this script again:\n' >&2
         printf '    systemctl --user status %s\n' "$UNIT_NAME" >&2
         printf '    systemctl --user stop %s\n' "$UNIT_NAME" >&2
         exit 1
@@ -66,19 +66,19 @@ esac
 if [ "$disable_failed" -eq 1 ]; then
     # Harmless here -- the service is provably not running -- but not swallowed
     # either: a message thrown away is worse than one nobody needed (2.6).
-    printf 'Hinweis vom Abmelden: %s\n' "$disable_output"
+    printf 'Note from unregistering: %s\n' "$disable_output"
 fi
 
 if [ -f "$UNIT_TARGET_DIR/$UNIT_NAME" ]; then
     rm -f "$UNIT_TARGET_DIR/$UNIT_NAME"
-    printf 'Unit entfernt: %s\n' "$UNIT_TARGET_DIR/$UNIT_NAME"
+    printf 'Unit removed: %s\n' "$UNIT_TARGET_DIR/$UNIT_NAME"
 else
-    printf 'Keine installierte Unit gefunden — nichts zu entfernen.\n'
+    printf 'No installed unit found — nothing to remove.\n'
 fi
 
 systemctl --user daemon-reload
 
-printf '\nDer Dienst ist abgemeldet.\n'
-printf 'Ordner, Zustandsdatei und Arbeitsanweisung bleiben unangetastet:\n'
+printf '\nThe service is unregistered.\n'
+printf 'Folder, state file and working instruction stay untouched:\n'
 printf '    %s\n' "$HOME/.claude-sync-watch"
-printf 'Wer alles loswerden will, löscht diesen Ordner von Hand.\n'
+printf 'To get rid of everything, delete this folder by hand.\n'

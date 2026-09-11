@@ -1,6 +1,6 @@
 # Syncthing sync for `~/.claude`
 
-*Last updated: 2026-09-10*
+*Last updated: 2026-09-11*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.md)*
 
@@ -8,7 +8,7 @@
 
 The sync has been running since 11 August 2026, by now on three machines; the watcher runs as a service on all three and has handled real conflicts. The implementation is complete; the only open item is a counterpart for Windows (`work-plan.md`).
 
-A note for English readers: this tool talks to you in **German**. Its dialogs, notifications and journal lines are German by deliberate decision, because they name the same things as the German documentation and two languages for one term cost a translation in your head on every diagnosis. The German strings below are quoted verbatim, with a translation where it matters.
+A note on language: the package you install decides it. The English package carries an English message catalogue and an English working instruction, so dialogs, notifications, journal lines and the conflict session itself speak English; the German package speaks German. There is nothing to configure. The two setup scripts are English in both packages — setting up runs once and is the first contact with the tool. The strings quoted below are the English ones, verbatim.
 
 ## Purpose
 
@@ -76,15 +76,15 @@ The script **installs nothing silently**: if a package is missing it names the c
 **The normal case is a machine that already has its own, grown `~/.claude`** — holding the chats of its local projects and those from Claude Desktop. Those contents must not be overwritten, and that is exactly why the path below looks the way it does and not like an ordinary "synchronise a folder": the initial sync **unites** two grown sets of files, and the merge step that comes with it is part of the plan.
 
 1. **Back up what is there.** `cp -a ~/.claude ~/.claude.before-sync` — the only fallback line of this procedure. It is released only at the end.
-2. **Unpack the tool package.** Download `downloads/claude-sync-watch_en_local.zip` from this folder, then `unzip claude-sync-watch_en_local.zip -d ~`. That creates `~/.claude-sync-watch/` with every file needed. This location is **mandatory**, not a recommendation: the service definition refers to it verbatim, and the installation script refuses the service at any other location. The folder is hidden; check with `ls -d ~/.claude-sync-watch`. The service is **not** set up yet at this point.
+2. **Unpack the tool package.** Download `downloads/claude-sync-watch_en_local.zip` from this folder, then `unzip claude-sync-watch_en_local.zip -d ~`. That creates `~/.claude-sync-watch/` with every file needed — including the English catalogue and the English working instruction, which is what makes the tool speak English. This location is **mandatory**, not a recommendation: the service definition refers to it verbatim, and the installation script refuses the service at any other location. The folder is hidden; check with `ls -d ~/.claude-sync-watch`. The service is **not** set up yet at this point.
 3. **Create the ignore list — before sharing.** `cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore`. Why beforehand: Syncthing does not synchronise this file, it has to be present on every machine separately — and if it is missing at the first sync, the credentials set off travelling. What Syncthing later shows in the *Ignore Patterns* tab is exactly this file; before sharing, that tab does not exist yet.
 4. **Share the folder in Syncthing.** Four steps, details in section 7 of the setup guide: **Add Folder**; enter the same **Folder ID** as on the other devices — character for character, otherwise it counts as a different folder; set "Folder Path" to `~/.claude`; tick the node in the **Sharing** tab; save. At the node, a prompt appears asking whether to accept the folder. All devices stay on **Send & Receive**.
 5. **Wait for the initial sync.** It is done when both sides show "Up to Date". What happens meanwhile: files present on one side only get distributed; files present on both sides with differing content produce conflict copies carrying `.sync-conflict-` in the name. How many there are depends on how far the two sets have diverged — **this is the planned merge step, not a fault.**
 6. **Resolve the conflict copies, started by hand.** The watcher is not running yet, and that is deliberate: it should start out on a conflict-free state, and during an initial sync still in progress further copies would keep arriving. So do it once yourself:
 
         cd ~/.claude
-        claude --append-system-prompt-file ~/.claude-sync-watch/conflict-resolution.md \
-               "Der zu durchsuchende Ordner ist ~/.claude. Löse die dort liegenden Konfliktkopien auf."
+        claude --append-system-prompt-file ~/.claude-sync-watch/conflict-resolution.en.md \
+               "The folder to search is ~/.claude. Please resolve the conflict copies lying there."
 
    The working directory carries weight, it is not decoration: Claude Code takes it from the calling process. The working instruction passed along is the same one the watcher uses later — without it, the session pulls in the project methodology from `~/.claude/CLAUDE.md`, which does not apply here and leads it astray. The session goes through the pairs one by one with you and writes or deletes nothing without your consent. Check for yourself afterwards: `find ~/.claude -name '*.sync-conflict-*'` must come back empty.
 7. **Set up the service.** Run `~/.claude-sync-watch/install_service.sh` — from any working directory, the script finds its own folder. It checks the prerequisites above, compares `~/.claude/.stignore` with the authoritative version in the tool folder and **offers to take it over** if they differ; here the default is **yes**. If something was actually copied, it recommends having Syncthing re-read the folder once through its web interface (`http://127.0.0.1:8384`). After that the watcher starts by itself with every login to the graphical session and ends with it. Follow along with `journalctl --user -u claude-sync-watch.service -f`.
@@ -113,11 +113,11 @@ Steps 1 to 4 and 7 to 8 above apply unchanged. **Steps 5 and 6 do not apply:** t
 
 (“synced: 0.8 MB up, 0.3 MB down / no conflict for 74 hour(s)”.)
 
-Four forms of this notification call for attention and therefore stay on screen longer: `3 Konflikt(e) seit 9 Stunde(n) ungelöst` — three conflicts unresolved for nine hours, so a postponed resolution is not forgotten; `Rückstand: 7 Datei(en)` — a backlog of seven files, meaning something is stuck, which you would otherwise never learn about; `Abgleich für diesen Ordner angehalten — Änderungen und Konfliktkopien bleiben liegen` — the sync for this folder is paused, so changes and conflict copies stay where they are; and `keine Verbindung zum Abgleich seit …`, no connection since. Where a number would be, `Zähler neu gesetzt` or `Zählung neu begonnen` means the reference value is simply missing — after a reconnection, such as a change of WLAN.
+Four forms of this notification call for attention and therefore stay on screen longer: `3 conflict(s) for 9 hour(s) unresolved`, so a postponed resolution is not forgotten; `backlog: 7 file(s)` — something is stuck, which you would otherwise never learn about; `Sync paused for this folder — changes and conflict copies stay where they are`, because a pause you set yourself and forgot would otherwise stop the sync unnoticed; and `no connection to the sync for …`. Where a number would be, `counters reset` or `counting started afresh` means the reference value is simply missing — after a reconnection, such as a change of WLAN.
 
 **If the hourly notification stops appearing altogether, that is a finding in itself** and worth looking up in the journal.
 
-**On a conflict**, a dialog asks whether to resolve it now („Jetzt lösen" / „Später" — resolve now / later). On consent, a terminal opens with a Claude Code session that goes through all pending conflict pairs **one by one with the user**: it compares original and copy, explains the difference and obtains the decision — keep the original, take over the copy, or merge. **Nothing** is written or deleted without explicit consent for the specific file; at the end the session reports what it did.
+**On a conflict**, a dialog asks whether to resolve it now (“Resolve now” / “Later”). On consent, a terminal opens with a Claude Code session that goes through all pending conflict pairs **one by one with the user**: it compares original and copy, explains the difference and obtains the decision — keep the original, take over the copy, or merge. **Nothing** is written or deleted without explicit consent for the specific file; at the end the session reports what it did.
 
 Two things about that:
 

@@ -11,7 +11,13 @@ Usage:
 Prints one line per case and exits with 1 on the first deviation, so it can
 also be used as a gate before a commit. Needs no display, no zenity, no
 Syncthing and no network: zenity and the REST interface are replaced by stubs,
-and the names are fixed strings. Runs in well under a second.
+and the names are fixed strings. Runs in about three seconds.
+
+Every group runs once per installed language (see run_groups), which is why it
+is seconds and not a fraction of one. That is the point: since the wordings
+live in a catalogue, no check may depend on a German literal any more, and a
+group that was overlooked while converting is exactly what the second language
+finds.
 
 The interpreter matters: use /usr/bin/python3, the one the service starts. A
 virtualenv in the shell's PATH is a different interpreter and would check
@@ -40,7 +46,14 @@ WHY THIS EXISTS -- every check guards against a specific, already-made error:
    existed. The doku had claimed the opposite, two paragraphs above its own
    refutation (doku 3.1, step 1).
 
-4. The notice. Its display time now depends on what it says, and the wording
+4. The message catalogue. A message that exists in one language and not in
+   the other would fail at the moment it is needed, and on an error path that
+   can be months later. check_catalogues therefore compares the catalogues
+   against each other and both against the keys the watcher actually asks for
+   -- collected from its syntax tree, so a message on a path nothing here
+   exercises is covered as well (doku 1.8).
+
+5. The notice. Its display time now depends on what it says, and the wording
    must not claim a span it cannot know. Pinned here: the unit thresholds,
    which cases count as "asking for attention", and the one case where the
    notice is not decoration -- an open conflict is reported even when the REST
@@ -51,11 +64,13 @@ rule or the terminal launch: those need a screen and a human, and the
 manual probes next to this file cover them (doku 3.8).
 """
 
+import ast
 import contextlib
 import datetime
 import importlib.util
 import io
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -67,6 +82,14 @@ DAEMON = Path(__file__).resolve().parent.parent / "files" / "claude_sync_watchd.
 UNIT = Path(__file__).resolve().parent.parent / "files" / "claude-sync-watch.service"
 UNINSTALL = Path(__file__).resolve().parent.parent / "files" / "uninstall_service.sh"
 INSTALL = Path(__file__).resolve().parent.parent / "files" / "install_service.sh"
+
+# The daemon's folder on the path before its message module is imported here.
+# Started as a script -- the way the unit starts it -- Python puts that folder
+# on sys.path by itself; loaded by path, as below, it does not (doku 3.8).
+sys.path.insert(0, str(DAEMON.parent))
+
+import messages                                              # noqa: E402
+from messages import T                                       # noqa: E402
 
 failures = 0
 
@@ -81,12 +104,27 @@ def check(label: str, got: object, expected: object) -> None:
           + ("" if ok else f"   erwartet: {expected!r}"))
 
 
+def segment(key: str, index: int = 0) -> str:
+    """One literal piece of a message, between two of its placeholders.
+
+    Several checks ask whether a line IS a particular message without knowing
+    the numbers in it, or whether a number appears in the message that gives it
+    its meaning. Both questions need the wording, not the filled-in text --
+    taken from the catalogue so they survive a translation. Index 0 is the
+    piece before the first placeholder.
+    """
+    return re.split(r"\{\w+\}", messages.texts()[key])[index]
+
+
 def load_daemon() -> types.ModuleType:
     """Import the daemon by path, without installing it anywhere.
 
     Registering it in sys.modules is not optional: dataclasses resolves type
     annotations through the module entry and fails with an AttributeError
     without it.
+
+    The folder of the daemon is already on sys.path -- put there at the top of
+    this file, because its message module is imported there as well (doku 3.8).
     """
     spec = importlib.util.spec_from_file_location("claude_sync_watchd", DAEMON)
     module = importlib.util.module_from_spec(spec)
@@ -472,11 +510,14 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         stub()
         text, seconds = w.build_notice(state(), 0, folder)
         check("Normalfall kurz", seconds, w.NOTICE_SECONDS_QUIET)
-        check("Normalfall nennt die Frist", "kein Konflikt seit" in text, True)
+        check("Normalfall nennt die Frist",
+              segment("notify.quiet_since") in text, True)
 
         text, seconds = w.build_notice(state(seen=None), 0, folder)
         check("ohne Bezugspunkt keine Frist",
-              "Zählung neu begonnen" in text and "seit" not in text, True)
+              T("notify.count_restarted") in text
+              and segment("notify.quiet_since") not in text
+              and segment("notify.since_hours") not in text, True)
 
         # The first check ever to look at the byte figures themselves. Until now
         # the stub returned constant totals, so the delta was always zero and
@@ -484,10 +525,10 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         stub(totals=(2200, 1100))
         text, seconds = w.build_notice(state(), 0, folder)
         check("Bytes erscheinen bei gültigem Bezug",
-              f"{w._human_bytes(1100)} hoch" in text
-              and f"{w._human_bytes(2200)} herunter" in text, True)
+              T("notify.synced", up=w._human_bytes(1100),
+                down=w._human_bytes(2200)) in text, True)
         check("gültiger Bezug ohne Ersatzsatz",
-              "Zähler neu gesetzt" in text, False)
+              T("notify.counter_reset") in text, False)
 
         # Every reconnect restarts Syncthing's counters, so a delta across it
         # would be meaningless. The notice says that instead of showing zeroes,
@@ -495,52 +536,55 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         stub(started="t2", totals=(2200, 1100))
         text, seconds = w.build_notice(state(), 0, folder)
         check("nach Neuverbindung ein Satz statt Nullen",
-              "Zähler neu gesetzt" in text and "0 B" not in text, True)
+              T("notify.counter_reset") in text and "0 B" not in text, True)
         check("der Satz darf kurz stehen", seconds, w.NOTICE_SECONDS_QUIET)
 
         # First pass ever: no reference point at all. Same truth, same wording.
         stub(totals=(2200, 1100))
         text, _ = w.build_notice(state(baseline={}), 0, folder)
         check("frische Installation, derselbe Satz",
-              "Zähler neu gesetzt" in text, True)
+              T("notify.counter_reset") in text, True)
 
         # The backlog is a stock figure, not a delta -- untouched by a reconnect,
         # and it keeps its longer display time.
         stub(started="t2", need=3)
         text, seconds = w.build_notice(state(), 0, folder)
         check("Rückstand steht neben dem Satz",
-              "Zähler neu gesetzt" in text
-              and "Rückstand: 3 Datei(en)" in text, True)
+              T("notify.counter_reset") in text
+              and T("notify.backlog", count=3) in text, True)
         check("Rückstand verlängert auch hier", seconds,
               w.NOTICE_SECONDS_ATTENTION)
 
         stub(need=7)
         text, seconds = w.build_notice(state(), 0, folder)
         check("Rückstand verlängert", seconds, w.NOTICE_SECONDS_ATTENTION)
-        check("Rückstand wird genannt", "Rückstand: 7 Datei(en)" in text, True)
+        check("Rückstand wird genannt",
+              T("notify.backlog", count=7) in text, True)
 
         stub(connected=False)
         text, seconds = w.build_notice(state(), 0, folder)
         check("keine Verbindung verlängert", seconds,
               w.NOTICE_SECONDS_ATTENTION)
         check("keine Verbindung wird genannt",
-              text.startswith("keine Verbindung zum Abgleich"), True)
+              text.startswith(segment("notify.no_connection")), True)
 
         stub()
         text, seconds = w.build_notice(state(), 3, folder)
         check("Konflikte verlängern", seconds, w.NOTICE_SECONDS_ATTENTION)
-        check("Konfliktzahl wird genannt", "3 Konflikt(e)" in text, True)
-        check("ohne Pause kein Zusatz", "angehalten" in text, False)
+        check("Konfliktzahl wird genannt",
+              "3" + segment("notify.conflicts_open", 1) in text, True)
+        check("ohne Pause kein Zusatz",
+              T("notify.paused_short") in text, False)
 
         # A hand-set pause stops the sync without anything looking broken --
         # the very case the notice exists for (doku 1.8).
         stub(paused=True)
         text, seconds = w.build_notice(state(), 0, folder)
         check("Pause verlängert", seconds, w.NOTICE_SECONDS_ATTENTION)
-        check("Pause wird genannt", text.startswith("Abgleich für diesen "
-                                                    "Ordner angehalten"), True)
+        check("Pause wird genannt",
+              text.startswith(T("notify.paused_sentence")), True)
         check("Pausenform ohne Rückstand nennt keinen",
-              "Rückstand" in text, False)
+              segment("notify.backlog") in text, False)
 
         # A pause does not make the backlog less relevant, and a backlog DURING
         # a pause is the expected case (doku 1.8). Without conflicts the pause
@@ -548,26 +592,31 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         stub(need=5, paused=True)
         text, _ = w.build_notice(state(), 0, folder)
         check("Rückstand in der Pausenform",
-              text.startswith("Abgleich für diesen Ordner angehalten")
-              and text.endswith(w.CLAUSE_BREAK + "Rückstand: 5 Datei(en)"),
+              text.startswith(T("notify.paused_sentence"))
+              and text.endswith(w.CLAUSE_BREAK
+                                + T("notify.backlog", count=5)),
               True)
 
         # With conflicts open, pause and backlog are named alongside, not
         # instead: both change what the user has to do (doku 1.8).
         text, seconds = w.build_notice(state(), 2, folder)
         check("Pause neben Konflikten",
-              "2 Konflikt(e)" in text and "Abgleich angehalten" in text, True)
+              "2" + segment("notify.conflicts_open", 1) in text
+              and T("notify.paused_short") in text, True)
 
         stub(need=4)
         text, _ = w.build_notice(state(), 2, folder)
         check("Rückstand neben Konflikten",
-              "2 Konflikt(e)" in text and "Rückstand: 4 Datei(en)" in text, True)
+              "2" + segment("notify.conflicts_open", 1) in text
+              and T("notify.backlog", count=4) in text, True)
 
         stub(need=4, paused=True)
         text, _ = w.build_notice(state(), 2, folder)
         check("Pause und Rückstand zugleich",
-              all(chunk in text for chunk in ("2 Konflikt(e)", "angehalten",
-                                            "Rückstand: 4 Datei(en)")), True)
+              all(chunk in text for chunk
+                  in ("2" + segment("notify.conflicts_open", 1),
+                      T("notify.paused_short"),
+                      T("notify.backlog", count=4))), True)
 
         # Same wording in all three notices -- one source, no drift (doku 2.4).
         stub(need=4)
@@ -575,37 +624,43 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         conflict_text, _ = w.build_notice(state(), 2, folder)
         stub(need=4, paused=True)
         paused_text, _ = w.build_notice(state(), 0, folder)
-        clause_text = w.CLAUSE_BREAK + "Rückstand: 4 Datei(en)"
+        clause_text = w.CLAUSE_BREAK + T("notify.backlog", count=4)
         check("Rückstands-Wortlaut in drei Formen identisch",
               all(form.endswith(clause_text)
                   for form in (quiet_text, conflict_text, paused_text)), True)
 
         # Two deliberate forms, not one: an appended half-sentence where a
         # conflict already carries the message, a full sentence where the pause
-        # IS the message (doku 3.1, point 4).
+        # IS the message (doku 3.1, point 4). Since Etappe 3 of the
+        # multilingual conversion they are two catalogue entries instead of two
+        # constants, and the separator is NOT part of either: it is a layout
+        # decision and stays in the watcher (doku 1.8).
         check("zwei Pausenfassungen, nicht eine",
-              w.PAUSE_CLAUSE_SHORT != w.PAUSE_SENTENCE
-              and w.PAUSE_CLAUSE_SHORT.startswith(w.CLAUSE_BREAK)
-              and not w.PAUSE_SENTENCE.startswith(w.CLAUSE_BREAK), True)
+              T("notify.paused_short") != T("notify.paused_sentence")
+              and not T("notify.paused_short").startswith(w.CLAUSE_BREAK)
+              and not T("notify.paused_sentence").startswith(w.CLAUSE_BREAK),
+              True)
 
-        # Both notices draw from the constants instead of carrying their own
-        # literal: swapping the constants must swap the notices. Comparing the
-        # text against the constant would not show that -- a branch with its own
-        # copy of the same words would pass just as well.
-        original_short = w.PAUSE_CLAUSE_SHORT
-        original_sentence = w.PAUSE_SENTENCE
-        w.PAUSE_CLAUSE_SHORT = w.CLAUSE_BREAK + "KURZ"
-        w.PAUSE_SENTENCE = "LANG"
+        # Both notices draw from the catalogue instead of carrying their own
+        # literal: replacing the entry must change the notice. Comparing the
+        # text against the entry would not show that -- a branch with its own
+        # copy of the same words would pass just as well. The live dictionary
+        # is what messages.texts() hands out, which is why this works at all.
+        catalogue = messages.texts()
+        original_short = catalogue["notify.paused_short"]
+        original_sentence = catalogue["notify.paused_sentence"]
+        catalogue["notify.paused_short"] = "KURZ"
+        catalogue["notify.paused_sentence"] = "LANG"
         try:
             stub(paused=True)
             marked_quiet, _ = w.build_notice(state(), 0, folder)
             marked_conflict, _ = w.build_notice(state(), 2, folder)
         finally:
-            w.PAUSE_CLAUSE_SHORT = original_short
-            w.PAUSE_SENTENCE = original_sentence
-        check("lange Pausenfassung kommt aus der Konstante",
+            catalogue["notify.paused_short"] = original_short
+            catalogue["notify.paused_sentence"] = original_sentence
+        check("lange Pausenfassung kommt aus dem Katalog",
               marked_quiet.startswith("LANG"), True)
-        check("kurze Pausenfassung kommt aus der Konstante",
+        check("kurze Pausenfassung kommt aus dem Katalog",
               marked_conflict.endswith(w.CLAUSE_BREAK + "KURZ"), True)
 
         # The separator itself, pinned here and nowhere else. Every check above
@@ -619,8 +674,9 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         text, _ = w.build_notice(state(), 0, folder)
         lines = text.split("\n")
         check("Ruheform bricht vor jeder Klausel um",
-              lines[0].startswith("abgeglichen:")
-              and any(line.startswith("Rückstand:") for line in lines[1:])
+              lines[0].startswith(segment("notify.synced"))
+              and any(line.startswith(segment("notify.backlog"))
+                      for line in lines[1:])
               and ";" not in text, True)
 
         # A paused DEVICE is a different case and needs no own wording: it
@@ -629,7 +685,7 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
         stub(paused=False, connected=False)
         text, _ = w.build_notice(state(), 0, folder)
         check("angehaltenes Gerät heißt: keine Verbindung",
-              text.startswith("keine Verbindung"), True)
+              text.startswith(segment("notify.no_connection")), True)
 
         # The one case where the notice is not decoration: without the
         # interface there are no figures, but an open conflict must still be
@@ -639,7 +695,9 @@ def check_notice(w: types.ModuleType, tmp_root: Path) -> None:
               w.build_notice(state(), 0, folder), None)
         notice = w.build_notice(state(), 2, folder)
         check("ohne REST trotzdem Konfliktmeldung",
-              notice is not None and "2 Konflikt(e)" in notice[0], True)
+              notice is not None
+              and "2" + segment("notify.conflicts_open", 1) in notice[0],
+              True)
     finally:
         w.read_api_key, w.rest_get = original_key, original_get
     folder.rmdir()
@@ -707,15 +765,18 @@ def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
     w.subprocess.run = (lambda *a, **k: types.SimpleNamespace(
         returncode=1, stdout=b"", stderr=b"kein Benachrichtigungsdienst"))
     try:
-        journal_text = capture(w.notify, "Claude-Sync", "abgeglichen: 1 kB", 5)
+        # The body is a marker and not a real notice: the check below asks
+        # whether the CONTENT stays out of the journal, and a marker answers
+        # that in any language.
+        journal_text = capture(w.notify, "Claude-Sync", "MELDUNGSINHALT", 5)
     finally:
         w.subprocess.run = original
     check("notify-send: Rückgabewert wird gemeldet",
-          "Rückgabewert 1" in journal_text, True)
+          segment("journal.notify_failed") + "1" in journal_text, True)
     check("notify-send: Fehlertext wird gemeldet",
           "Benachrichtigungsdienst" in journal_text, True)
     check("notify-send: Meldungstext bleibt draußen",
-          "abgeglichen" in journal_text, False)
+          "MELDUNGSINHALT" in journal_text, False)
 
     # --- maybe_notify: report the programming error AND stamp the time -----
     original_build = w.build_notice
@@ -730,7 +791,7 @@ def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
     finally:
         w.build_notice = original_build
     check("Ausnahme in der Meldung wird gemeldet",
-          "Betriebsmeldung fehlgeschlagen" in journal_text, True)
+          T("journal.notice_failed") in journal_text, True)
     check("mit Rückverfolgung", "KeyError" in journal_text, True)
     # Without the stamp the notice would stay due and the line would arrive
     # at the pace of file events -- the very flood 2.6 rules out.
@@ -986,12 +1047,15 @@ def check_episode_clock(w: types.ModuleType, tmp_root: Path) -> None:
         text, _ = w.build_notice(
             w.WatchState(conflict_since=long_open, last_conflict_seen=just_seen),
             3, tmp_root)
-        check("Frist kommt aus dem Episodenbeginn", "seit 9 Stunde(n)" in text, True)
+        check("Frist kommt aus dem Episodenbeginn",
+          T("notify.since_hours", hours=9) in text, True)
         # Der eigentliche Nachweis: die frische Sichtung darf sie nicht drücken.
-        check("frische Sichtung ändert sie nicht", "0 Stunde(n)" in text, False)
+        check("frische Sichtung ändert sie nicht",
+          T("notify.since_hours", hours=0) in text, False)
         text, _ = w.build_notice(
             w.WatchState(last_conflict_seen=just_seen), 3, tmp_root)
-        check("ohne Episodenbeginn keine Frist", "seit" in text, False)
+        check("ohne Episodenbeginn keine Frist",
+          segment("notify.since_hours") in text, False)
     finally:
         w.read_api_key = original_key
     # Die Gegenrichtung: Die Ruheform zählt weiter ab der Sichtung und darf den
@@ -1008,7 +1072,8 @@ def check_episode_clock(w: types.ModuleType, tmp_root: Path) -> None:
         text, _ = w.build_notice(
             w.WatchState(last_conflict_seen=long_open,
                          conflict_since=just_seen), 0, tmp_root)
-        check("Ruheform zählt ab der Sichtung", "seit 9 Stunde(n)" in text, True)
+        check("Ruheform zählt ab der Sichtung",
+          T("notify.quiet_since", hours=9) in text, True)
     finally:
         w.read_api_key, w.rest_get = original_key, original_get
 
@@ -1080,7 +1145,7 @@ def check_dry_run(w: types.ModuleType, tmp_root: Path) -> None:
         check("Trockenlauf lässt die Zustandsdatei unverändert",
               w.STATE_FILE.read_bytes() == vorher, True)
         check("und sagt es in der Ausgabe",
-              "Zustand nicht geschrieben" in journal, True)
+              T("dryrun.state_unwritten") in journal, True)
         w.DRY_RUN = False
 
         # Gegenprobe: Der reguläre Durchgang schreibt sehr wohl.
@@ -1222,7 +1287,7 @@ def check_launch_failure(w: types.ModuleType, tmp_root: Path) -> None:
                           original=tmp_root / "a.txt", device="DEV")
     try:
         w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
-        w.INSTRUCTION_FILE.write_text("egal", encoding="utf-8")
+        w.instruction_file().write_text("egal", encoding="utf-8")
 
         def refusing(*args, **kwargs):
             raise OSError(2, "No such file or directory")
@@ -1234,7 +1299,8 @@ def check_launch_failure(w: types.ModuleType, tmp_root: Path) -> None:
             pid = w.launch_session(["gibtsnicht", "-e"], [pair], tmp_root)
         check("kein Fehler nach oben, keine PID", pid, None)
         check("Journalzeile geschrieben",
-              "Terminalstart fehlgeschlagen" in buffer.getvalue(), True)
+              segment("journal.terminal_launch_failed") in buffer.getvalue(),
+              True)
         check("und der Nutzer erfaehrt es", len(gemeldet), 1)
     finally:
         w.subprocess.Popen = original_popen
@@ -1267,7 +1333,7 @@ def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
                           original=watch_dir / "a.txt", device="DEV")
     try:
         w.TOOL_DIR.mkdir(parents=True, exist_ok=True)
-        w.INSTRUCTION_FILE.write_text("egal", encoding="utf-8")
+        w.instruction_file().write_text("egal", encoding="utf-8")
         watch_dir.mkdir(parents=True, exist_ok=True)
 
         def aufzeichnen(argv, cwd):
@@ -1295,7 +1361,7 @@ def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
         # start (doku 3.3).
         check("Arbeitsanweisung folgt unmittelbar auf ihre Option",
               argv[argv.index("--append-system-prompt-file") + 1],
-              str(w.INSTRUCTION_FILE))
+              str(w.instruction_file()))
         check("Übergabetext ist das letzte Argument",
               argv[-1], w.build_handover([pair], watch_dir))
         check("Arbeitsverzeichnis ist der überwachte Ordner",
@@ -1330,15 +1396,19 @@ def check_pass_guard(w: types.ModuleType, tmp_root: Path) -> None:
     finally:
         w.run_pass = original_run
 
+    # Since the conversion to the catalogue the anlass is a key, not a
+    # literal, so the source is searched for the keys. That is the stronger
+    # check anyway: a key that no catalogue carries fails in check_catalogues.
     source = DAEMON.read_text(encoding="utf-8")
-    gesichert = [reason for reason in
-                 ("Ereignis: angelegt", "Ereignis: verschoben",
-                  "Ereignis: gel\u00f6scht", "Startlauf", "Sicherheitslauf")
-                 if f'guarded_pass(watch_dir, "{reason}")' in source]
+    gesichert = [key for key in
+                 ("journal.reason.created", "journal.reason.moved",
+                  "journal.reason.deleted", "journal.reason.startup",
+                  "journal.reason.safety")
+                 if f'guarded_pass(watch_dir, T("{key}"))' in source]
     check("alle fuenf Stellen des Dauerbetriebs sind gesichert",
           len(gesichert), 5)
     check("der Einzellauf bleibt ungesichert",
-          'run_pass(watch_dir, "Einzellauf")' in source, True)
+          'run_pass(watch_dir, T("journal.reason.single"))' in source, True)
 
 
 def check_uninstall_guard(w: types.ModuleType, tmp_root: Path) -> None:
@@ -1402,7 +1472,7 @@ def check_uninstall_guard(w: types.ModuleType, tmp_root: Path) -> None:
     check("inaktiv: Abmelden laeuft durch", code, 0)
     check("Unit entfernt", unit_file.exists(), False)
     check("und die Schlusszeile erscheint",
-          "Der Dienst ist abgemeldet" in output, True)
+          "The service is unregistered" in output, True)
 
     # 4. Nie eingerichtet: kein Abbruch, aber die Meldung wird nicht
     #    verschluckt (2.6).
@@ -1410,7 +1480,7 @@ def check_uninstall_guard(w: types.ModuleType, tmp_root: Path) -> None:
     code, output = run()
     check("nie eingerichtet: kein Abbruch", code, 0)
     check("aber die Meldung erscheint",
-          "Hinweis vom Abmelden" in output, True)
+          "Note from unregistering" in output, True)
 
 
 def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
@@ -1428,9 +1498,9 @@ def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
     print("Anmeldeprüfung (3.5):")
     source = INSTALL.read_text(encoding="utf-8").splitlines()
     start = next(i for i, line in enumerate(source)
-                 if line.startswith("# --- Anmeldepruefung: Anfang"))
+                 if line.startswith("# --- Login check: begin"))
     end = next(i for i, line in enumerate(source)
-               if line.startswith("# --- Anmeldepruefung: Ende"))
+               if line.startswith("# --- Login check: end"))
     check("die markierte Strecke ist auffindbar", start < end, True)
     region = "\n".join(source[start:end + 1])
 
@@ -1476,7 +1546,7 @@ def check_login_check(w: types.ModuleType, tmp_root: Path) -> None:
     # bestaetigte Anmeldung durchgehen, aber auch nicht abbrechen.
     code, output = run(angemeldet, 'echo teilausgabe; sleep 30')
     check("Zeitueberschreitung: kein Abbruch", code, 0)
-    check("aber sie wird gemeldet", "geantwortet" in output, True)
+    check("aber sie wird gemeldet", "did not answer" in output, True)
 
     # Gegenprobe zur Verengung: Der Prompt-Aufruf darf NICHTS mehr abbrechen,
     # auch wenn seine Antwort nach einem Anmeldeproblem aussieht.
@@ -1506,14 +1576,14 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
 
     def region(name: str) -> str:
         start = next(i for i, line in enumerate(source)
-                     if line.startswith(f"# --- {name}: Anfang"))
+                     if line.startswith(f"# --- {name}: begin"))
         end = next(i for i, line in enumerate(source)
-                   if line.startswith(f"# --- {name}: Ende"))
+                   if line.startswith(f"# --- {name}: end"))
         check(f"markierte Strecke {name} ist auffindbar", start < end, True)
         return "\n".join(source[start:end + 1])
 
-    ask_region = region("Frage")
-    list_region = region("Ausschlussliste")
+    ask_region = region("Question")
+    list_region = region("Exclusion list")
 
     def ask(default: str) -> tuple[int, str]:
         script = f'{ask_region}\nask_yes_no "Frage?" "{default}"\n'
@@ -1524,15 +1594,18 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
     # The new convention, and the one thing most easily got wrong: an empty
     # answer follows the default, and for the exclusion list that default is
     # YES -- leaving it diverging is the worse of the two answers (doku 2.8).
-    code, output = ask("j")
+    code, output = ask("y")
     check("leere Antwort folgt der Vorgabe ja", code, 0)
-    check("und die Vorgabe steht groß im Text", "[J/n]" in output, True)
+    check("und die Vorgabe steht groß im Text", "[Y/n]" in output, True)
     code, output = ask("n")
     check("leere Antwort folgt der Vorgabe nein", code, 1)
-    check("auch dort sichtbar", "[j/N]" in output, True)
-    # Same case statement an entered answer would run through.
-    check("ausgeschriebenes Ja zählt", ask("ja")[0], 0)
-    check("englisches Y zählt", ask("Y")[0], 0)
+    check("auch dort sichtbar", "[y/N]" in output, True)
+    # Same case statement an entered answer would run through. The German
+    # answers are pinned on purpose: the script asks in English, but a German
+    # package is installed by the same script, and reading "j" as a no would
+    # be the wrong answer to a clear intention.
+    check("ausgeschriebenes Yes zählt", ask("yes")[0], 0)
+    check("deutsches Ja zählt weiterhin", ask("ja")[0], 0)
     check("alles andere ist ein Nein", ask("quatsch")[0], 1)
 
     stage = tmp_root / "ausschluss"
@@ -1576,7 +1649,7 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
     check("fehlende Liste wird angeboten", "FRAGE[" in output, True)
     # Where nothing is excluded at all, leaving it as it is is the worse
     # of the two answers -- so the offer defaults to yes (doku 2.8).
-    check("und zwar mit Vorgabe ja", "FRAGE[j]:" in output, True)
+    check("und zwar mit Vorgabe ja", "FRAGE[y]:" in output, True)
     check("und bei Zustimmung übernommen",
           (ziel / ".stignore").read_text(encoding="utf-8"), massgeblich)
     check("mit Empfehlung zum Neueinlesen",
@@ -1592,14 +1665,15 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
 
     output = run_block(antwort=0, vorhanden=massgeblich)
     check("bei Gleichheit wird nicht gefragt", "FRAGE[" in output, False)
-    check("sondern die Gleichheit gemeldet", "überein" in output, True)
+    check("sondern die Gleichheit gemeldet",
+          "matches the authoritative version" in output, True)
 
     abweichend = "/telemetry\n/etwas-anderes\n"
     output = run_block(antwort=0, vorhanden=abweichend)
     check("Abweichung wird übernommen",
           (ziel / ".stignore").read_text(encoding="utf-8"), massgeblich)
     # The answer is about the differences, so they have to be readable first.
-    check("auch hier mit Vorgabe ja", "FRAGE[j]:" in output, True)
+    check("auch hier mit Vorgabe ja", "FRAGE[y]:" in output, True)
     check("und der Unterschied stand vor der Frage",
           output.index("/etwas-anderes") < output.index("FRAGE["), True)
 
@@ -1653,7 +1727,8 @@ def check_clock(w: types.ModuleType, tmp_root: Path) -> None:
         text, _ = w.build_notice(
             w.WatchState(conflict_since=zukunft), 2, tmp_root)
         check("und auch nicht in der Meldung",
-              "seit 0 Stunde(n)" in text and "-" not in text.split("seit")[1],
+              T("notify.since_hours", hours=0) in text
+              and "-" not in text.split(segment("notify.since_hours"))[1],
               True)
     finally:
         w.read_api_key, w.rest_get = original_key, original_get
@@ -1681,9 +1756,14 @@ def check_clock(w: types.ModuleType, tmp_root: Path) -> None:
             taken = w.acquire_lock()
         if taken:
             w.release_lock()
+        # The age is read out of the journal line between the two pieces of
+        # its own message, so the cut survives a translation.
+        before = segment("journal.lock_stale", 1)
+        after = segment("journal.lock_stale", 2)
+        written = buffer.getvalue()
         check("Sperre aus der Zukunft: kein negatives Alter im Journal",
-              "-" in buffer.getvalue().split("Alter")[1].split("s)")[0]
-              if "Alter" in buffer.getvalue() else False, False)
+              "-" in written.split(before)[1].split(after)[0]
+              if before in written else False, False)
     finally:
         w.LOCK_FILE.unlink(missing_ok=True)
         w.set_tool_dir(original_dir)
@@ -1821,15 +1901,144 @@ def check_missing_notify_send(w: types.ModuleType) -> None:
             w._notify_missing_reported = False
         return captured.getvalue()
 
-    written = run_notices("abgeglichen: 1.1 kB hoch", "abgeglichen: 2.2 kB hoch")
-    check("Meldungsinhalt bleibt draußen", "abgeglichen" in written, False)
+    # Markers instead of real notices: the question is whether the CONTENT
+    # stays out of the journal, and a marker answers it in any language.
+    written = run_notices("INHALT-EINS", "INHALT-ZWEI")
+    check("Meldungsinhalt bleibt draußen",
+          "INHALT-EINS" in written or "INHALT-ZWEI" in written, False)
     check("Störung genau einmal je Lauf", written.count("notify-send"), 1)
     check("nennt das nachzuinstallierende Paket",
           "libnotify-bin" in written, True)
     # Once per run, not once for ever: a package removed later must show up
     # again. That is why the marker is a module variable and not a state field.
     check("nach Neustart wieder gemeldet",
-          run_notices("abgeglichen: 3.3 kB hoch").count("notify-send"), 1)
+          run_notices("INHALT-DREI").count("notify-send"), 1)
+
+
+# The groups, as lists rather than as a sequence of calls: every one of them
+# runs once per language (see run_groups), and a second list of call sites
+# would drift from the first.
+PLAIN_GROUPS = (
+    check_dialog_answers,
+    check_timeout_unit,
+    check_terminal_dialogs,
+    check_dialog_timing,
+    check_naming,
+    check_session_detection,
+    check_missing_notify_send,
+)
+
+TMP_GROUPS = (
+    check_lock,
+    check_swallowed_errors,
+    check_episode_clock,
+    check_terminal_duplicates,
+    check_precondition_exit,
+    check_free_text_terminal,
+    check_launch_failure,
+    check_launch_argv,
+    check_pass_guard,
+    check_uninstall_guard,
+    check_login_check,
+    check_stignore_offer,
+    check_clock,
+    check_dry_run,
+    check_folder_check,
+    check_deferral_stamp,
+    check_transfer_temporaries,
+    check_notice,
+)
+
+
+def run_groups(w: types.ModuleType, language: str) -> None:
+    """Every group once, in *language*.
+
+    Running the whole set per language and not only the message-dependent part
+    of it is deliberate: the point of the catalogue is that nothing in the
+    watcher carries its own wording any more, and a group that was overlooked
+    while converting is exactly what a second language finds.
+
+    The language is set freshly before EVERY group, not once at the start:
+    several groups call w.main(), and main() resolves the language from its own
+    command line, falling back to German without --lang (doku 3.1). Without
+    this the groups behind such a call would run in German, and a run in
+    another language would prove nothing -- measured while converting the
+    launch checks.
+
+    Its own scratch directory per language, because a group may leave a state
+    file behind and the second run must not meet the first one's leavings.
+    """
+    for group in PLAIN_GROUPS:
+        messages.use(language)
+        group(w)
+    with tempfile.TemporaryDirectory(
+            prefix=f"claude-sync-probe-{language}-") as tmp:
+        for group in TMP_GROUPS:
+            messages.use(language)
+            group(w, Path(tmp))
+
+
+def check_catalogues() -> None:
+    """Every language carries the same messages, and the watcher asks for none
+    that is missing (doku 1.8, 3.8).
+
+    This is the group that turns "half translated" into a failing case instead
+    of a surprise in operation: an entry added to one catalogue and forgotten
+    in the other, a placeholder renamed on one side only, a key used in the
+    watcher that no catalogue has. It runs once and not per language, because
+    its subject is the relation BETWEEN the catalogues.
+
+    The keys in use are collected from the syntax tree of the watcher, not by
+    running it and not by a text search: a message on an error path would
+    otherwise never be looked at, and a call written differently would slip
+    past a grep. A computed key could not be checked at all, so its absence is
+    a case of its own.
+    """
+    print("Meldungskataloge (1.8):")
+    codes = sorted(messages.available())
+    check("beide Sprachen liegen bereit", codes, ["de", "en"])
+
+    catalogues: dict[str, dict[str, str]] = {}
+    for code in codes:
+        messages.use(code)
+        catalogues[code] = dict(messages.texts())
+
+    reference = codes[0]
+    for code in codes[1:]:
+        check(f"{code}: derselbe Schlüsselsatz wie {reference}",
+              sorted(set(catalogues[reference]) ^ set(catalogues[code])), [])
+
+    # The placeholders are part of the message: one renamed on a single side
+    # raises a KeyError at exactly the moment that message is needed.
+    def fields(text: str) -> frozenset:
+        return frozenset(re.findall(r"\{(\w+)", text))
+
+    differing = sorted(
+        key for key in catalogues[reference]
+        if len({fields(catalogues[code][key]) for code in codes
+                if key in catalogues[code]}) > 1)
+    check("gleiche Platzhalter je Schlüssel", differing, [])
+
+    tree = ast.parse(DAEMON.read_text(encoding="utf-8"))
+    used: set[str] = set()
+    computed: list[int] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) \
+                and node.func.id == "T":
+            if node.args and isinstance(node.args[0], ast.Constant):
+                used.add(node.args[0].value)
+            else:
+                computed.append(node.lineno)
+    check("kein berechneter Schlüssel im Wächter", computed, [])
+    check("der Wächter greift überhaupt auf den Katalog zu", len(used) > 0,
+          True)
+    for code in codes:
+        check(f"{code}: kein benutzter Schlüssel fehlt",
+              sorted(used - set(catalogues[code])), [])
+        # Holds today and is worth keeping: an entry nobody asks for is dead
+        # weight that still has to be translated.
+        check(f"{code}: kein Eintrag ohne Verwendung",
+              sorted(set(catalogues[code]) - used), [])
 
 
 def main() -> int:
@@ -1837,32 +2046,10 @@ def main() -> int:
         print(f"Nicht gefunden: {DAEMON}", file=sys.stderr)
         return 2
     w = load_daemon()
-    check_dialog_answers(w)
-    check_timeout_unit(w)
-    check_terminal_dialogs(w)
-    check_dialog_timing(w)
-    check_naming(w)
-    check_session_detection(w)
-    check_missing_notify_send(w)
-    with tempfile.TemporaryDirectory(prefix="claude-sync-probe-") as tmp:
-        check_lock(w, Path(tmp))
-        check_swallowed_errors(w, Path(tmp))
-        check_episode_clock(w, Path(tmp))
-        check_terminal_duplicates(w, Path(tmp))
-        check_precondition_exit(w, Path(tmp))
-        check_free_text_terminal(w, Path(tmp))
-        check_launch_failure(w, Path(tmp))
-        check_launch_argv(w, Path(tmp))
-        check_pass_guard(w, Path(tmp))
-        check_uninstall_guard(w, Path(tmp))
-        check_login_check(w, Path(tmp))
-        check_stignore_offer(w, Path(tmp))
-        check_clock(w, Path(tmp))
-        check_dry_run(w, Path(tmp))
-        check_folder_check(w, Path(tmp))
-        check_deferral_stamp(w, Path(tmp))
-        check_transfer_temporaries(w, Path(tmp))
-        check_notice(w, Path(tmp))
+    check_catalogues()
+    for language in sorted(messages.available()):
+        print(f"\nSprache {language}:")
+        run_groups(w, language)
     print()
     if failures:
         print(f"{failures} Abweichung(en).")

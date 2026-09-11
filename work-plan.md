@@ -10,12 +10,6 @@ Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
-## 13 `correct-zaaack-md-editor-mistakes`: die neue Fassung installieren
-
-**Code, Texte und Pakete sind am 10. September 2026 fertig** — offen ist allein der Schritt, den nur der Entwickler tun kann: das Paket `downloads/correct-zaaack-md-editor-mistakes_de_local.zip` nach `~/.claude/skills/` entpacken. Bis dahin läuft die **alte** installierte Fassung, die an den Attrappen der Bash-Sandbox abbricht; die Änderung im Repo wirkt dort nicht von sich aus.
-
-Zur Erinnerung, was die neue Fassung leistet: Sie überspringt versteckte Einträge und nicht-reguläre Dateien und meldet unlesbare in einer dritten Liste `unreadable`, statt den Lauf zu beenden. Erkannt wird eine Sandbox-Attrappe am **Dateityp**, nicht an ihrer Gestalt.
-
 ## 12 Worktree-Modus und Infra-Branch trennen
 
 **Unmittelbar nächster Schritt.** Ausgangspunkt ist eine Beobachtung des Entwicklers vom 7. September 2026: `.claude/git-worktree-model.json` vermischt zwei Dinge, die nichts miteinander zu tun haben — die **Branch-Topologie** (Integration, Release, Infra, und welche Dateien infra-verwaltet sind) und den **Arbeitsisolations-Modus** (ob eine Sitzung Worktree und Werkbank bekommt). Das ist nicht nur unsauber: Wer Worktrees abschalten will, indem er die Datei löscht, verliert damit die Infra-Disziplin mit — und wie fragil die ist, hat derselbe Tag gezeigt (Drift zwischen `dev` und `infra`, wodurch der vorgeschriebene Abgleich zur Rücksetzungsfalle wurde, behoben mit `14f9190`).
@@ -43,7 +37,7 @@ Offen bleiben die drei Punkte, die Hardware oder eine Messung brauchen:
 2. **Die offene Frage zu `--network host` messen**: Ob `DOCKER-USER` dort tatsächlich nicht greift, ist aus der Docker-Netzarchitektur abgeleitet und nicht nachgemessen. Der Test ist ein Verbindungsversuch auf eine interne Adresse, einmal mit Bridge- und einmal mit Host-Netz.
 3. **Die zwei letzten Prüflistenzeilen abtasten**, die noch „offen" tragen: `git fetch` aus dem Container heraus und der Internet-Abruf.
 
-Erst danach ist die Baustellenmarke in den beiden Wurzel-READMEs von 🚧 auf ✅ zu ändern.
+**Die Baustellenmarke ist unabhängig davon schon gefallen:** Die beiden Wurzel-READMEs tragen seit dem 10. September 2026 ✅ statt 🚧 — Entscheidung des Entwicklers, gestützt auf den gelungenen Feldbau („einmal erfolgreich gelaufen, kann also verwendet werden"). Dieser Schritt hängt damit nicht mehr an der Marke, sondern nur noch an den drei Punkten oben; erledigt sind sie erst, wenn die Prüfliste in der README des Bausteins keine Zeile „offen" mehr trägt.
 
 **Nicht Teil dieses Schritts** und getrennt zu entscheiden: die beiden Befunde an der Konfiguration des Entwicklers (die A2-Schlüssel liegen in der Benutzer-`settings.json` unter `sandbox.credentials` statt unter `sandbox.filesystem` und bleiben dadurch wirkungslos; Block A2 in `safety-related/sandbox-settings.de.md` nennt `~/.claude/credentials.json`, die Datei heißt `.credentials.json`). Beide stehen im Anhang von `safety-related/vscode-topologies.de.md`.
 

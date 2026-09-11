@@ -52,7 +52,7 @@ LOGIN_PROBE_TIMEOUT=120
 SYNCTHING_GUI="http://127.0.0.1:8384"
 
 fail() {
-    printf 'Abbruch: %s\n' "$1" >&2
+    printf 'Aborting: %s\n' "$1" >&2
     if [ $# -gt 1 ]; then
         printf '\n%s\n' "$2" >&2
     fi
@@ -70,12 +70,27 @@ warn() {
     sleep "$WARN_PAUSE_SECONDS"
 }
 
-# --- Frage: Anfang (doku 3.5) -----------------------------------------------
+# True when at least one file matches the pattern. Needed because the working
+# instruction and the message catalogue carry a language code in their name and
+# a package holds exactly one of each (doku 2.7): there is no fixed name to
+# test for. Without nullglob an unmatched pattern stays literal, and the -f
+# test then fails as it should.
+one_of() {
+    local pattern="$1" candidate
+    for candidate in $pattern; do
+        if [ -f "$candidate" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# --- Question: begin (doku 3.5) ---------------------------------------------
 # Cut out and run by the test script as it stands. Do not restructure without
 # looking there.
 #
 # Ask a yes/no question and answer through the exit status. Arguments: the
-# question, then the default -- "j" or "n" -- which an empty answer selects and
+# question, then the default -- "y" or "n" -- which an empty answer selects and
 # which the prompt shows in capitals.
 #
 # One reader for both questions: the packages default to NO, because installing
@@ -96,19 +111,23 @@ warn() {
 # user could act on.
 ask_yes_no() {
     local question="$1" default="$2" answer=""
-    if [ "$default" = "j" ]; then
-        printf '%s [J/n] ' "$question" >&2
+    if [ "$default" = "y" ]; then
+        printf '%s [Y/n] ' "$question" >&2
     else
-        printf '%s [j/N] ' "$question" >&2
+        printf '%s [y/N] ' "$question" >&2
     fi
     read -r answer 2>/dev/null < /dev/tty || answer=""
     [ -n "$answer" ] || answer="$default"
+    # The German answers stay accepted although the script asks in English: a
+    # German package is installed by the same script, and "j" is what that
+    # user reaches for. Accepting one keystroke more costs nothing; reading it
+    # as a no would be the wrong answer to a clear intention.
     case "$answer" in
-        j|J|ja|Ja|JA|y|Y|yes|Yes) return 0 ;;
+        y|Y|yes|Yes|j|J|ja|Ja|JA) return 0 ;;
     esac
     return 1
 }
-# --- Frage: Ende ------------------------------------------------------------
+# --- Question: end ----------------------------------------------------------
 
 # Offer to install a missing package instead of only naming the command.
 # Arguments: package, what doing without costs, the abort text -- empty makes
@@ -123,28 +142,28 @@ ensure_package() {
     if "$@" >/dev/null 2>&1; then
         return 0
     fi
-    printf '\n%s fehlt — %s\n' "$package" "$consequence" >&2
-    printf 'Jetzt nachinstallieren? Das Skript ruft dazu\n' >&2
+    printf '\n%s is missing — %s\n' "$package" "$consequence" >&2
+    printf 'Install it now? The script would run\n' >&2
     printf '    sudo apt install %s\n' "$package" >&2
-    if ask_yes_no "auf; das System fragt dabei nach dem Passwort." "n"; then
+    if ask_yes_no "and the system will ask for your password." "n"; then
         local apt_log=""
-        printf 'Installiere %s …\n' "$package"
+        printf 'Installing %s …\n' "$package"
         # apt's output is captured and shown only on failure: this whole
         # change exists because the run was too talkative to be read. The
         # "unstable CLI interface" notice apt emits without a tty lands in
         # the same capture and stays invisible unless something breaks.
         if apt_log="$(sudo apt install -y "$package" 2>&1)" \
                 && "$@" >/dev/null 2>&1; then
-            printf '%s ist installiert.\n\n' "$package"
+            printf '%s is installed.\n\n' "$package"
             return 0
         fi
-        printf 'Die Installation von %s ist fehlgeschlagen:\n' "$package" >&2
+        printf 'Installing %s failed:\n' "$package" >&2
         printf '%s\n' "$apt_log" >&2
     fi
     if [ -n "$abort_text" ]; then
-        fail "$package fehlt — $consequence" "$abort_text"
+        fail "$package is missing — $consequence" "$abort_text"
     fi
-    warn "Weiter ohne $package."
+    warn "Carrying on without $package."
 }
 
 # --- 0. Terminal ----------------------------------------------------------
@@ -154,23 +173,23 @@ ensure_package() {
 # test would always succeed (measured). A failing redirection inside an `if`
 # condition is exempt from `set -e`, so this cannot abort the script by itself.
 if ! ( : < /dev/tty ) 2>/dev/null; then
-    fail "Kein Terminal — dieses Skript fragt nach und braucht eine Antwort." \
-"Eine Einrichtung ohne Rückmeldung an den Nutzer wird bewusst nicht
-unterstützt: Sie könnten weder eine Rückfrage beantworten noch sehen, was
-dabei geschieht. Bitte das Skript in einem Terminal starten."
+    fail "No terminal — this script asks questions and needs an answer." \
+"An installation without feedback to the user is deliberately not
+supported: you could neither answer a question nor see what is happening.
+Please start this script in a terminal."
 fi
 
 # --- 1. Location ----------------------------------------------------------
 # Checked first: everything below assumes the prescribed path.
 
 if [ "$SCRIPT_DIR" != "$REQUIRED_DIR" ]; then
-    fail "Dieser Ordner liegt an der falschen Stelle." \
-"Gefunden:  $SCRIPT_DIR
-Erwartet:  $REQUIRED_DIR
+    fail "This folder is in the wrong place." \
+"Found:     $SCRIPT_DIR
+Expected:  $REQUIRED_DIR
 
-Der Ort ist Vorschrift, keine Empfehlung: Die Dienstdefinition verweist
-fest auf ~/.claude-sync-watch. Bitte den gesamten Ordner dorthin
-verschieben und dieses Skript erneut starten:
+The location is prescribed, not suggested: the service definition points
+at ~/.claude-sync-watch and nowhere else. Please move the whole folder
+there and start this script again:
 
     mv \"$SCRIPT_DIR\" \"$REQUIRED_DIR\"
     \"$REQUIRED_DIR/install_service.sh\""
@@ -178,11 +197,19 @@ fi
 
 # --- 2. Own files ---------------------------------------------------------
 
-for file in claude_sync_watchd.py "$UNIT_NAME" conflict-resolution.md .stignore; do
+MISSING_FILES_HINT="Every file of this project has to be in this folder. Please copy the
+folder 'files/' from the repository here in full."
+
+for file in claude_sync_watchd.py "$UNIT_NAME" messages.py .stignore; do
     [ -f "$SCRIPT_DIR/$file" ] || fail \
-        "Die Datei '$file' fehlt in $SCRIPT_DIR." \
-"Alle Dateien des Vorhabens müssen in diesem Ordner liegen. Bitte den
-Ordner 'files/' aus dem Repo vollständig hierher kopieren."
+        "The file '$file' is missing from $SCRIPT_DIR." \
+        "$MISSING_FILES_HINT"
+done
+
+for pattern in "conflict-resolution.*.md" "messages_*.py"; do
+    one_of "$SCRIPT_DIR/$pattern" || fail \
+        "No file matching '$pattern' in $SCRIPT_DIR." \
+        "$MISSING_FILES_HINT"
 done
 
 [ -d "$SCRIPT_DIR/tools" ] || mkdir -p "$SCRIPT_DIR/tools"
@@ -192,26 +219,25 @@ done
 # named here rather than removed: deleting on someone's machine is the user's
 # call (doku 3.5), and the folder may hold scripts nobody else knows about.
 if [ -d "$SCRIPT_DIR/werkzeuge" ]; then
-    warn "Hinweis: $SCRIPT_DIR/werkzeuge/ ist der frühere Name des
-Ordners 'tools' und wird nicht mehr verwendet. Er bleibt liegen, bis Du
-ihn entfernst — nachsehen, ob etwas darin steht, und dann:
+    warn "Note: $SCRIPT_DIR/werkzeuge/ is the former name of the folder
+'tools' and is no longer used. It stays where it is until you remove it —
+look whether anything is in there, then:
     rm -r $SCRIPT_DIR/werkzeuge"
 fi
 
 # --- 3. Prerequisites -----------------------------------------------------
 
 [ -x "$CLAUDE_BIN" ] || fail \
-    "$CLAUDE_BIN ist nicht vorhanden oder nicht ausführbar." \
-"Ohne Claude Code kann keine Konfliktsitzung starten. Bitte Claude Code
-installieren und sicherstellen, dass es unter $CLAUDE_BIN erreichbar
-ist."
+    "$CLAUDE_BIN does not exist or is not executable." \
+"Without Claude Code no conflict session can start. Please install Claude
+Code and make sure it can be reached at $CLAUDE_BIN."
 
 # Present is not enough: the conflict session is worthless if the terminal
 # installation is not logged in. Without this check the service installs
 # itself, dutifully shows dialogs and opens terminals in which nothing
 # useful happens -- a silent failure.
 #
-# --- Anmeldepruefung: Anfang (doku 3.5) -------------------------------------
+# --- Login check: begin (doku 3.5) ------------------------------------------
 # Everything between these markers is run by the test script as it stands, with
 # fail/warn and CLAUDE_BIN supplied. Do not restructure without looking there.
 #
@@ -220,35 +246,36 @@ ist."
 # unknown subcommand exits 1 as well (measured), so an older Claude Code would
 # look exactly like a missing login. Decided on the CONTENT, with the spaces
 # removed so a change of formatting cannot break it.
-printf 'Prüfe die Anmeldung von Claude Code …\n'
+printf 'Checking whether Claude Code is logged in …\n'
 auth_report="$("$CLAUDE_BIN" auth status 2>&1 || true)"
 auth_flat="$(printf '%s' "$auth_report" | tr -d ' \t\n\r')"
 
 case "$auth_flat" in
     *'"loggedIn":true'*)
-        printf 'Angemeldet.\n'
+        printf 'Logged in.\n'
         ;;
     *'"loggedIn":false'*)
-        fail "Claude Code ist in dieser Terminal-Umgebung nicht angemeldet." \
-"Die Konfliktsitzung koennte nichts tun. Bitte einmal von Hand anmelden:
+        fail "Claude Code is not logged in for this terminal environment." \
+"The conflict session would be unable to do anything. Please log in once by
+hand:
 
     claude
 
-Dort das Erst-Start-Gespraech durchlaufen (Theme waehlen; 'auto' passt sich
-dem Terminal an) und '/login' ausfuehren. Danach dieses Skript erneut starten."
+Walk through the first-start conversation there (pick a theme; 'auto'
+adapts to the terminal) and run '/login'. Then start this script again."
         ;;
     *)
         # Not an abort: an older Claude Code without this subcommand is no
         # evidence of a missing login, and the same principle already governs
         # the hanging line below (doku 3.5). The answer is shown rather than
         # silently classified.
-        warn "Hinweis: Die Anmeldung liess sich nicht feststellen.
-Antwort von '$CLAUDE_BIN auth status':
+        warn "Note: the login state could not be determined.
+Answer of '$CLAUDE_BIN auth status':
 
 $auth_report
 
-Der Dienst wird eingerichtet. Bitte einmal von Hand 'claude' starten und
-sicherstellen, dass es ohne Anmeldefrage antwortet."
+The service is being installed. Please start 'claude' by hand once and make
+sure it answers without asking you to log in."
         ;;
 esac
 
@@ -260,7 +287,7 @@ esac
 # The call costs a fraction of a cent in tokens and one network access.
 # NOT with --bare: that reports an existing login as missing (observed,
 # doku 3.8).
-printf 'Prüfe, ob Claude Code antwortet (ein kurzer Aufruf) …\n'
+printf 'Checking whether Claude Code answers (one short call) …\n'
 if login_probe="$(timeout "$LOGIN_PROBE_TIMEOUT" "$CLAUDE_BIN" -p "ok" 2>&1)"; then
     probe_status=0
 else
@@ -271,25 +298,25 @@ fi
 # already produced output -- which is why the old '|| true' let a hanging line
 # pass for a confirmed login (doku 3.5).
 if [ "$probe_status" -eq 124 ]; then
-    warn "Hinweis: Claude Code hat binnen $LOGIN_PROBE_TIMEOUT Sekunden nicht
-geantwortet. Der Dienst wird trotzdem eingerichtet; eine haengende Leitung
-ist kein Beweis fuer eine fehlende Anmeldung. Bitte einmal von Hand pruefen."
+    warn "Note: Claude Code did not answer within $LOGIN_PROBE_TIMEOUT
+seconds. The service is being installed all the same; a hanging line is no
+evidence of a missing login. Please check once by hand."
 else
     case "$login_probe" in
         *"Not logged in"*|*"run /login"*)
-            warn "Hinweis: Die Antwort sieht nach einem Anmeldeproblem aus,
-obwohl die Anmeldung bestaetigt wurde. Antwort im Wortlaut:
+            warn "Note: the answer looks like a login problem although the
+login was confirmed. The answer verbatim:
 
 $login_probe"
             ;;
         "")
-            warn 'Hinweis: Die Antwort war leer.
-Der Dienst wird trotzdem eingerichtet; bitte einmal von Hand
-"claude" starten und sicherstellen, dass es antwortet.'
+            warn 'Note: the answer was empty.
+The service is being installed all the same; please start
+"claude" by hand once and make sure it answers.'
             ;;
     esac
 fi
-# --- Anmeldepruefung: Ende --------------------------------------------------
+# --- Login check: end -------------------------------------------------------
 
 # Checked is exactly the interpreter the unit starts -- NOT the "python3" of
 # this shell. On a machine whose shell carries a virtualenv in PATH those are
@@ -299,28 +326,29 @@ fi
 SERVICE_PYTHON=/usr/bin/python3
 
 [ -x "$SERVICE_PYTHON" ] || fail \
-    "$SERVICE_PYTHON ist nicht vorhanden oder nicht ausführbar." \
-"Der Dienst startet genau diesen Interpreter. Bitte Python 3 über die
-Distribution installieren, zum Beispiel:
+    "$SERVICE_PYTHON does not exist or is not executable." \
+"The service starts exactly this interpreter. Please install Python 3
+through the distribution, for example:
 
     sudo apt install python3"
 
-printf 'Prüfe die Beobachtungsbibliothek in %s …\n' "$SERVICE_PYTHON"
+printf 'Checking the watch library in %s …\n' "$SERVICE_PYTHON"
 ensure_package python3-watchdog \
-    "der Wächter kann ohne sie keine Dateiänderung bemerken" \
-"Ein 'pip install' in einer Virtualenv hilft hier nicht: Der Dienst startet
-$SERVICE_PYTHON, nicht das python3 dieser Shell. Bitte das Distributionspaket
-installieren:
+    "without it the watcher cannot notice any file change" \
+"A 'pip install' in a virtualenv does not help here: the service starts
+$SERVICE_PYTHON, not the python3 of this shell. Please install the
+distribution package:
 
     sudo apt install python3-watchdog
 
-Danach dieses Skript erneut starten." \
+Then start this script again." \
     "$SERVICE_PYTHON" -c 'import watchdog'
 
 ensure_package zenity \
-    "ohne es kann kein Dialog erscheinen" \
-"Der Wächter eskaliert ausschließlich über Zenity-Dialoge (Doku 2.9); ohne sie
-bliebe ein Konflikt unbemerkt liegen. Bitte über die Distribution installieren:
+    "without it no dialog can appear" \
+"The watcher escalates through Zenity dialogs and nothing else (doku 2.9);
+without them a conflict would lie there unnoticed. Please install it through
+the distribution:
 
     sudo apt install zenity" \
     command -v zenity
@@ -330,18 +358,18 @@ bliebe ein Konflikt unbemerkt liegen. Bitte über die Distribution installieren:
 # noticed all the same -- this very gap went unnoticed on one machine for two
 # days, because nothing checked for it here (doku 3.8).
 ensure_package libnotify-bin \
-    "ohne dieses Paket fehlt notify-send, und die stündliche Betriebsmeldung kann nicht am Bildschirm erscheinen. Der Wächter meldet das einmal je Lauf im Journal, aber erst beim ersten fälligen Durchgang, spätestens nach einer Stunde. Konflikterkennung und Eskalation sind unberührt" \
+    "without this package notify-send is missing, and the hourly notice cannot appear on screen. The watcher reports that once per run in the journal, but only at the first pass that is due, within the hour at the latest. Conflict detection and escalation are unaffected" \
     "" \
     command -v notify-send
 
 command -v systemctl >/dev/null 2>&1 || fail \
-    "'systemctl' nicht gefunden — dieses Skript richtet einen systemd-Benutzerdienst ein." \
-"Auf Systemen ohne systemd ist der Dienst von Hand einzurichten; die
-Vorlage steht in $UNIT_NAME."
+    "'systemctl' not found — this script installs a systemd user service." \
+"On a system without systemd the service has to be set up by hand; the
+template is $UNIT_NAME."
 
 [ -d "$WATCH_DIR" ] || fail \
-    "Der zu überwachende Ordner $WATCH_DIR existiert nicht." \
-"Erwartet wird das von Syncthing abgeglichene ~/.claude."
+    "The directory to watch, $WATCH_DIR, does not exist." \
+"Expected is ~/.claude, the directory Syncthing synchronises."
 
 # The directory being there says nothing about it being synchronised, and 3.5
 # used to promise the second while checking the first -- exactly the silent
@@ -354,22 +382,28 @@ Vorlage steht in $UNIT_NAME."
 # that the script may conclude nothing; case 1 means the watcher would run
 # flawlessly and find nothing for ever, which the user has to learn -- but a
 # watcher without a synced folder is useless, not harmful.
-printf 'Prüfe, ob %s von Syncthing abgeglichen wird …\n' "$WATCH_DIR"
+#
+# The line the watcher answers with is in the WATCHER's language, not this
+# script's: setup speaks English by exception, the tool speaks the language of
+# the catalogue installed with it (doku 2.5). In a German package this is
+# therefore the one German line in an English run, and translating it here
+# would mean a second wording to keep in step.
+printf 'Checking whether Syncthing synchronises %s …\n' "$WATCH_DIR"
 folder_check="$("$SERVICE_PYTHON" "$SCRIPT_DIR/claude_sync_watchd.py" \
     --check-folder --watch-dir "$WATCH_DIR" 2>&1)" && folder_state=0 \
     || folder_state=$?
 case "$folder_state" in
     0) printf '%s\n' "$folder_check" ;;
-    1) warn "WARNUNG: $folder_check
-Der Wächter wird eingerichtet und läuft, findet aber nie einen Konflikt,
-weil dieser Ordner nicht am Abgleich teilnimmt. Bitte ihn in Syncthing
-teilen — die Anleitung steht in der Konfigurationsanleitung." ;;
-    *) warn "Hinweis: $folder_check
-Ob der Ordner abgeglichen wird, ist damit offen. Der Dienst wird
-eingerichtet; bitte in Syncthings Oberfläche nachsehen." ;;
+    1) warn "WARNING: $folder_check
+The watcher is being installed and will run, but it will never find a
+conflict, because this folder does not take part in the synchronisation.
+Please share it in Syncthing — the README says how." ;;
+    *) warn "Note: $folder_check
+Whether the folder is synchronised is therefore open. The service is being
+installed; please look in Syncthing's interface." ;;
 esac
 
-# --- Ausschlussliste: Anfang (doku 3.5) -------------------------------------
+# --- Exclusion list: begin (doku 3.5) ---------------------------------------
 # Everything between these markers is run by the test script as it stands, with
 # warn, ask_yes_no, the two paths and the GUI address supplied. Do not
 # restructure without looking there.
@@ -390,32 +424,32 @@ if [ ! -f "$WATCH_DIR/.stignore" ]; then
     # The weaker case gets the same default as the other one on purpose: here
     # NOTHING is excluded, not even the credentials, so leaving it as it is is
     # the worse of the two answers.
-    printf '\nWARNUNG: %s/.stignore fehlt — nichts ist ausgeschlossen,\n' \
+    printf '\nWARNING: %s/.stignore is missing — nothing is excluded,\n' \
         "$WATCH_DIR" >&2
-    printf 'auch nicht die Zugangsdaten.\n' >&2
-    if ask_yes_no "Die maßgebliche Fassung jetzt übernehmen?" "j"; then
+    printf 'not even the credentials.\n' >&2
+    if ask_yes_no "Take the authoritative version now?" "y"; then
         cp "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"
         stignore_copied=1
     else
-        warn "Weiter ohne Ausschlussliste. Übernehmen mit:
+        warn "Carrying on without an exclusion list. Take it with:
     cp $SCRIPT_DIR/.stignore $WATCH_DIR/.stignore"
     fi
 elif cmp -s "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"; then
-    printf 'Ausschlussliste stimmt mit der maßgeblichen Fassung überein.\n'
+    printf 'The exclusion list matches the authoritative version.\n'
 else
     # The differences are listed in full BEFORE the question: the answer is
     # about them, and an offer to overwrite something unseen would be no offer.
     stignore_diff="$(diff -u "$WATCH_DIR/.stignore" "$SCRIPT_DIR/.stignore" || true)"
-    printf '\nWARNUNG: %s/.stignore weicht von der Fassung in diesem\n' \
+    printf '\nWARNING: %s/.stignore differs from the version in this\n' \
         "$WATCH_DIR" >&2
-    printf 'Ordner ab. Die Datei wandert nicht mit dem Abgleich, Abweichungen\n' >&2
-    printf 'zwischen den Rechnern fallen also nie von selbst auf. Unterschiede:\n\n' >&2
+    printf 'folder. The file does not travel with the synchronisation, so\n' >&2
+    printf 'differences between machines never surface by themselves. Diff:\n\n' >&2
     printf '%s\n\n' "$stignore_diff" >&2
-    if ask_yes_no "Maßgeblich ist die Fassung hier. Jetzt übernehmen?" "j"; then
+    if ask_yes_no "The version here is authoritative. Take it now?" "y"; then
         cp "$SCRIPT_DIR/.stignore" "$WATCH_DIR/.stignore"
         stignore_copied=1
     else
-        warn "Die Abweichung bleibt bestehen. Übernehmen mit:
+        warn "The difference stays as it is. Take the version here with:
     cp $SCRIPT_DIR/.stignore $WATCH_DIR/.stignore"
     fi
 fi
@@ -426,23 +460,23 @@ fi
 # 2026). The recommendation is therefore the only defensible statement, and it
 # is a warn() so that it survives the blocks that follow (doku 3.5).
 if [ "$stignore_copied" -eq 1 ]; then
-    printf 'Ausschlussliste übernommen.\n'
-    warn "Bitte den Ordner in Syncthing einmal neu einlesen lassen:
+    printf 'Exclusion list taken over.\n'
+    warn "Please have Syncthing re-read the folder once:
     $SYNCTHING_GUI
-Ob eine geänderte .stignore von selbst wirksam wird, sagt Syncthings
-Dokumentation an keiner Stelle — deshalb die Empfehlung."
+Whether a changed .stignore takes effect by itself is stated nowhere in
+Syncthing's documentation — hence the recommendation."
 fi
-# --- Ausschlussliste: Ende --------------------------------------------------
+# --- Exclusion list: end ----------------------------------------------------
 
 if command -v pgrep >/dev/null 2>&1 && ! pgrep -x syncthing >/dev/null 2>&1; then
-    warn 'Hinweis: Syncthing scheint gerade nicht zu laufen.
-Der Dienst wird trotzdem eingerichtet; ohne laufendes Syncthing
-entstehen aber keine Konfliktkopien und die Betriebsmeldung entfällt.'
+    warn 'Note: Syncthing does not seem to be running right now.
+The service is being installed all the same; without a running Syncthing
+no conflict copies arise and the hourly notice stays away.'
 fi
 
 # --- 4. Install -----------------------------------------------------------
 
-printf 'Richte %s ein …\n' "$UNIT_NAME"
+printf 'Installing %s …\n' "$UNIT_NAME"
 
 mkdir -p "$UNIT_TARGET_DIR"
 cp "$SCRIPT_DIR/$UNIT_NAME" "$UNIT_TARGET_DIR/$UNIT_NAME"
@@ -460,10 +494,10 @@ systemctl --user enable "$UNIT_NAME"
 # detached process, the run lock is transient, and its pid is in the state file.
 systemctl --user restart "$UNIT_NAME"
 
-printf '\nFertig, Dienst neu gestartet. Status:\n\n'
+printf '\nDone, service restarted. Status:\n\n'
 systemctl --user --no-pager status "$UNIT_NAME" || true
 
-printf '\nLaufende Ausgabe mitlesen:\n'
+printf '\nFollow the running output with:\n'
 printf '    journalctl --user -u %s -f\n' "$UNIT_NAME"
-printf 'Wieder abmelden:\n'
+printf 'Unregister again with:\n'
 printf '    %s/uninstall_service.sh\n' "$SCRIPT_DIR"
