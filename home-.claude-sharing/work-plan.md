@@ -2,27 +2,9 @@
 
 Reine Abfolge der Arbeitsschritte, keine Inhalte. Details stehen in `implementation-doc.md`.
 
-Der Mechanismus ist fertig und im Betrieb. Offen sind zwei Ausbauschritte — die Mehrsprachigkeit von Anzeige und Arbeitsanweisung und die Portierung nach Windows — dazu eine Nachtragung, sobald der vierte Rechner läuft. Nummern erledigter Schritte werden nicht neu vergeben; die Lücken davor sind gewollt.
+Der Mechanismus ist fertig und im Betrieb, in Deutsch und Englisch. Offen ist ein Ausbauschritt — die Portierung nach Windows —, dazu eine Nachtragung, sobald der vierte Rechner läuft. Nummern erledigter Schritte werden nicht neu vergeben; die Lücken davor sind gewollt.
 
 ## Schritte
-
-13. **Mehrsprachigkeit: Anzeige und Anweisung in Deutsch und Englisch.**
-
-    **Das Ziel ist nicht „das Werkzeug kann auch Englisch", sondern dass die mitgegebene Arbeitsanweisung die Claude-Instanz nicht in eine Sprache zwingt, die der Nutzer nicht spricht.** Heute ist `conflict-resolution.md` durchgehend deutsche Prosa; die Konfliktsitzung fragt deshalb auf Deutsch, auch einen englischsprachigen Nutzer. Alles Übrige folgt daraus.
-
-    **Entschieden (Entwickler, 10. September 2026):**
-
-    - **Sprachfassungen tragen ihr Kürzel im Dateinamen — und behalten es im Archiv.** `conflict-resolution.de.md` / `.en.md`; für die Kataloge `messages_de.py` / `messages_en.py` mit **Unterstrich**, weil ein Punkt im Python-Modulnamen ein Paketpfad wäre und die Datei damit nicht importierbar. Keine Umbenennung beim Packen: `skill-dev-doc.md` 5.3 bleibt unberührt, Repo und Paket sind namensgleich, und der Wächter bleibt aus dem Repo heraus prüfbar (daran hängen die Prüffälle in 3.8).
-    - **Ein Paket enthält genau einen Katalog und genau eine Arbeitsanweisung.** Der Wächter bestimmt seine Sprache daran, **welche Fassung vorliegt** — keine Einstellung, keine Umgebungserkennung. Grund, gemessen: Die Unit setzt keine Spracheinstellung, und ein Benutzerdienst startet mit karger Umgebung; `LANG` kann fehlen. Liegen beide vor — der Entwicklungszustand im Repo —, entscheidet der Schalter `--lang de|en` aus der Schalterfamilie in 3.1; fehlt auch der, gilt Deutsch, weil das Werkzeug ursprünglich lokal und deutsch gedacht war. `zustand.json` bleibt Merker und nimmt keine Konfiguration auf (3.2).
-    - **Katalogform: ein Python-Modul je Sprache mit einem Wörterbuch.** Kein CSV und kein `gettext`. Gegen `gettext` steht der Kompilierschritt in einem Werkzeug, das als reiner Dateisatz ausgeliefert wird; gegen CSV und JSON steht, dass sie **keine Kommentare** kennen — die Wortlaute, die 1.8 zur Festlegung erklärt, verlieren dort die Begründung, die heute unmittelbar bei ihnen steht. Der Zugriff im Code erfolgt über sprechende Schlüssel, nicht über Sprachfetzen. Mehrzahl weiterhin über die Klammerform („Stunde(n)", „hour(s)") statt über eine Pluralmaschine.
-    - **Die Journalzeilen folgen der Anzeigesprache**, aus demselben Katalog wie die Dialoge.
-    - **`install_service.sh` und `uninstall_service.sh` sprechen künftig englisch**, einsprachig. Das ist eine **Ausnahme von 2.5** und dort als solche mit Grund einzutragen: Die Einrichtung ist der erste Kontakt, läuft einmal und richtet sich an jemanden, der das Werkzeug noch nicht kennt.
-
-    **Zu ändern, nach adressierbaren Einheiten:** neues Modul `messages_de.py`/`messages_en.py` samt Auflösungsfunktion hinter **einer** Stelle (2.4); im Wächter jede Ausgabestelle auf Schlüsselzugriff; `conflict-resolution.md` in zwei Sprachfassungen; der Pfad der Arbeitsanweisung im Sitzungsaufruf wird sprachabhängig (3.3, dazu die neun Aufruf-Prüffälle in 3.8); die Pflichtdateien-Prüfung in `install_service.sh` akzeptiert die Sprachvariante; beide Shell-Skripte auf Englisch. **Doku:** 1.8 (Wortlaute je Sprache), 2.5 (Sprachregel und die Ausnahme), 2.7 (Ablageorte), 3.1 (`--lang`), 3.3, 3.4, 3.5, 3.8; README und README.en (Paketname, Handstart der Sitzung). **Prüfskript:** Meldungsprüfungen gegen den Katalog statt gegen Literale, dazu je Sprache eine Vollständigkeitsprobe — gleicher Schlüsselsatz, und jeder im Code benutzte Schlüssel vorhanden. Damit ist „halb übersetzt" ein fallender Prüffall.
-
-    **Reihenfolge:** Katalog mit beiden Sprachen → Ausgabestellen im Wächter → Arbeitsanweisung teilen → Skripte auf Englisch → Prüfskript → Doku → Pakete neu packen. Je Etappe ein Checkpoint-Commit.
-
-    **Zur englischen Fassung:** Übersetzt werden die **Festlegungen**, nicht die Wörter. Wo 1.8 zwei Wortlaute unterscheidet — die kurze und die lange Pausenfassung —, muss die englische Fassung diese Unterscheidung tragen, nicht bloß denselben Satz zweimal.
 
 14. **Den vierten Rechner nachtragen — und was der erste Vollzug der neuen Anleitung gezeigt hat.**
 
@@ -32,5 +14,9 @@ Der Mechanismus ist fertig und im Betrieb. Offen sind zwei Ausbauschritte — di
 
     - **Die Rechnerzahl** steht an vier Stellen auf „drei": `README.md` und `README.en.md` dieses Ordners („inzwischen auf drei Rechnern; auf allen drei läuft der Wächter als Dienst") sowie die Standzeile in den beiden Wurzel-READMEs („Im Betrieb auf drei Rechnern beim Entwickler seit dem 11. August 2026"). Erst ändern, wenn der Dienst dort wirklich läuft — eine Zahl in einer Statuszeile, die niemand belegen kann, ist schlechter als eine veraltete.
     - **Was die Anleitung offengelassen hat.** Hat der Erstabgleich Konfliktkopien erzeugt, und ließen sie sich mit dem beschriebenen Handstart auflösen? Hat eine Voraussetzung gefehlt, die die Tabelle nicht nennt? War ein Schritt in der falschen Reihenfolge? Jeder solche Fund gehört in die README und in 3.6 — nicht ins Gedächtnis. Eine Anleitung, die einmal gegen die Wirklichkeit gelaufen ist, ist mehr wert als jede Prüfung am Schreibtisch.
+
+15. **Ein Packwerkzeug für dieses Vorhaben — zu entscheiden, nicht beschlossen.**
+
+    2.7 verlangt: Wer in `files/` etwas ändert, packt im selben Arbeitsgang neu, und geprüft wird das über Prüfsummen. Ein Werkzeug dafür gibt es hier nicht — die Skills haben eines (`skill-dev-doc.md`, Anhang A.1), dieses Vorhaben nicht. Bei der Mehrsprachigkeit hat sich das gezeigt: Der Dateisatz je Paket ist jetzt eine Regel mit Ausnahmen (ein Katalog, eine Anweisung, README umbenannt, `tools/` und `zustand.json` draußen), und die von Hand einzuhalten ist genau die Sorte Arbeit, die beim dritten Mal schiefgeht. Am 11. September 2026 ist das mit einem Einmal-Skript im Sitzungsordner erledigt worden, samt Prüfung jeder Datei gegen ihre Quelle und je Sprache drei Gegenproben gegen die Pflichtdateien-Strecke des Installskripts. **Zu entscheiden:** ob dieses Skript als `files/pack_packages.sh` (oder unter `tools/`) ins Repo kommt. Dafür spricht, dass die Regel sonst nur in Prosa steht; dagegen, dass es ein weiteres Artefakt ist, das gepflegt werden muss.
 
 6. **Windows-Pendant** entwickeln (Kap. 3.7). Die Zuordnung der plattformabhängigen Bausteine für die Kapselstelle ist dort bereits festgehalten, ebenso die Grenze: Gekapselt sind Dialoge, Terminalstart, Prozessprüfung, der Ablageort der Syncthing-Konfiguration und der Start des Dauerdienstes — alles andere ist plattformneutral (2.4).
