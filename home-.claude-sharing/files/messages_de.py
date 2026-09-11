@@ -202,6 +202,12 @@ TEXTS = {
         "sudo apt install libnotify-bin. Konflikterkennung und Eskalation "
         "sind unberührt."
     ),
+    "error.watch_setup_failed": (
+        "Die Verzeichnisbeobachtung lässt sich nicht einrichten: {detail}\n"
+        "Häufigste Ursache ist das inotify-Kontingent "
+        "(fs.inotify.max_user_watches); die rekursive Beobachtung belegt je "
+        "Verzeichnis unterhalb des beobachteten Ordners einen Eintrag."
+    ),
     "error.watchdog_missing": (
         "Die Python-Beobachtungsbibliothek 'watchdog' fehlt.\n"
         "Bitte über die Distribution installieren (zum Beispiel: "

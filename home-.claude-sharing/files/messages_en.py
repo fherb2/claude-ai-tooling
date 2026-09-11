@@ -180,6 +180,12 @@ TEXTS = {
         "screen. Please install 'libnotify-bin': sudo apt install "
         "libnotify-bin. Conflict detection and escalation are unaffected."
     ),
+    "error.watch_setup_failed": (
+        "The directory watch cannot be set up: {detail}\n"
+        "The usual cause is the inotify quota "
+        "(fs.inotify.max_user_watches); the recursive watch takes one entry "
+        "per directory below the watched folder."
+    ),
     "error.watchdog_missing": (
         "The Python watch library 'watchdog' is missing.\n"
         "Please install it through the distribution (for example: "
