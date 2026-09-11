@@ -797,6 +797,27 @@ def check_swallowed_errors(w: types.ModuleType, tmp_root: Path) -> None:
     # at the pace of file events -- the very flood 2.6 rules out.
     check("und trotzdem gestempelt", probe_state.notice_last_shown is not None, True)
 
+    # --- notify-send that is there but cannot run --------------------------
+    # notify() swallows a MISSING notify-send; wrong permissions or a damaged
+    # file raise something else, and that used to leave run_pass before
+    # save_state: stamp lost, notice due for ever, traceback at the pace of
+    # file events. The call sits inside the guard for that reason.
+    def verweigert(*args, **kwargs):
+        raise PermissionError("notify-send")
+
+    broken_state = w.WatchState()
+    w.build_notice = lambda *a, **k: ("Text", 5)
+    w.subprocess.run = verweigert
+    try:
+        journal_text = capture(w.maybe_notify, broken_state, 1, tmp_root)
+    finally:
+        w.build_notice = original_build
+        w.subprocess.run = original
+    check("unausfuehrbares notify-send bricht nicht ab",
+          T("journal.notice_failed") in journal_text, True)
+    check("und bleibt gestempelt",
+          broken_state.notice_last_shown is not None, True)
+
     silent_state = w.WatchState()
     w.build_notice = lambda *a, **k: None
     try:
@@ -950,16 +971,28 @@ def check_lock(w: types.ModuleType, tmp_root: Path) -> None:
     stranger = subprocess.Popen(["/bin/sleep", "30"])
     ancient = (datetime.datetime.now() - datetime.timedelta(days=1)).timestamp()
     try:
-        # A living holder keeps the lock however old the file is. The holder is
-        # deliberately somebody else's pid: with our own, the release below
-        # could not tell "mine" from "foreign" apart at all.
+        # A living holder keeps the lock however old the file is -- provided it
+        # CAN be the holder, which means the lock was written after that
+        # process started. The holder is deliberately somebody else's pid: with
+        # our own, the release below could not tell "mine" from "foreign" apart
+        # at all.
         w.LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
-        w.LOCK_FILE.write_text(f"pid {stranger.pid} 2000-01-01T00:00:00\n",
+        w.LOCK_FILE.write_text(f"pid {stranger.pid} {w._now()}\n",
                                encoding="utf-8")
         os.utime(w.LOCK_FILE, (ancient, ancient))
         check("lebender Halter behält sie", w.acquire_lock(), False)
         check("fremde Sperre bleibt liegen",
               (w.release_lock(), w.LOCK_FILE.exists())[1], True)
+
+        # The reboot case, and the reason the moment is read at all: the number
+        # is alive, but that process started long after the lock was written,
+        # so it cannot have written it. Judged by existence alone the lock
+        # belonged to a stranger for good -- and the watcher stopped for good
+        # with it, because the age limit only speaks for an unreadable pid.
+        w.LOCK_FILE.write_text(f"pid {stranger.pid} 2000-01-01T00:00:00\n",
+                               encoding="utf-8")
+        check("lebender Namensvetter gibt sie frei", w.acquire_lock(), True)
+        w.LOCK_FILE.unlink(missing_ok=True)
 
         # A dead holder leaves a leftover, and that may go.
         w.LOCK_FILE.write_text(f"pid {_dead_pid()} 2000-01-01T00:00:00\n",
