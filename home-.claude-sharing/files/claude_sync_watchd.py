@@ -35,7 +35,8 @@ modify any file in the watched directory. It observes, reports and escalates.
 @Claude:
     This file is the daemon, not the conflict session. If you are reading it
     because a conflict session was started, the instructions you need are in
-    ``conflict-resolution.md`` -- that file, not this one, governs what you do.
+    ``conflict-resolution.<lang>.md`` -- that file, not this one, governs what
+    you do.
 
     If you are asked to change this script: the determinations it implements
     live in ``implementation-doc.md`` chapters 3.1 (behaviour), 3.2 (state
@@ -67,6 +68,13 @@ import traceback
 from pathlib import Path
 from typing import Any, Optional
 
+# The only import from this daemon's own folder. Python puts the script's
+# directory on sys.path when it is started as a script, which is how the unit
+# starts it; a harness that loads this file by path has to put the folder there
+# itself (doku 3.8).
+import messages
+from messages import T
+
 # ---------------------------------------------------------------------------
 # Configuration (doku 2.7: everything this project brings lives in one folder)
 # ---------------------------------------------------------------------------
@@ -79,18 +87,32 @@ from typing import Any, Optional
 TOOL_DIR = Path.home() / ".claude-sync-watch"
 STATE_FILE = TOOL_DIR / "zustand.json"
 LOCK_FILE = TOOL_DIR / ".lauf.lock"
-INSTRUCTION_FILE = TOOL_DIR / "conflict-resolution.md"
 TOOLS_DIR = TOOL_DIR / "tools"
 
 
 def set_tool_dir(directory: Path) -> None:
     """Point the daemon's own files at another directory (tests only)."""
-    global TOOL_DIR, STATE_FILE, LOCK_FILE, INSTRUCTION_FILE, TOOLS_DIR
+    global TOOL_DIR, STATE_FILE, LOCK_FILE, TOOLS_DIR
     TOOL_DIR = directory
     STATE_FILE = TOOL_DIR / "zustand.json"
     LOCK_FILE = TOOL_DIR / ".lauf.lock"
-    INSTRUCTION_FILE = TOOL_DIR / "conflict-resolution.md"
     TOOLS_DIR = TOOL_DIR / "tools"
+
+
+def instruction_file() -> Path:
+    """The working instruction, in the language the watcher speaks.
+
+    A function and not a constant beside the others: the language becomes
+    known only when main() has read the command line, and this module is
+    imported before that. The instruction decides which language the conflict
+    session speaks to the user, so its name carries the code (doku 3.3).
+
+    ``or messages.use()`` resolves the language for a harness that loads this
+    file without going through main(); without it the name would lose its code
+    and point at a file that cannot exist (doku 3.8).
+    """
+    code = messages.language() or messages.use()
+    return TOOL_DIR / f"conflict-resolution.{code}.md"
 
 DEFAULT_WATCH_DIR = Path.home() / ".claude"
 
@@ -173,17 +195,13 @@ NOTICE_SECONDS_ATTENTION = 12
 # specification defines neither.
 CLAUSE_BREAK = "\n"
 
-# The pause wording, in one place because it appears in two notices (doku 3.1,
-# point 4). Two deliberate forms, and they are laid out side by side so that
-# changing one and forgetting the other shows up in the diff: an appended
-# half-sentence where a conflict already carries the message, and a full
-# sentence where the pause IS the message. Constants, not a function like
-# `_backlog_clause`: that one carries a decision (empty at zero), the pause
-# carries none -- the branch has already tested it. Function where something is
-# decided, constant where there is only text.
-PAUSE_CLAUSE_SHORT = CLAUSE_BREAK + "Abgleich angehalten"
-PAUSE_SENTENCE = ("Abgleich für diesen Ordner angehalten — Änderungen und "
-                  "Konfliktkopien bleiben liegen")
+# The pause has two deliberate wordings -- an appended half-sentence where a
+# conflict already carries the message, and a full sentence where the pause IS
+# the message. They live side by side in the message catalogue as
+# `notify.paused_short` and `notify.paused_sentence`, so that changing one and
+# forgetting the other still shows up in a diff (doku 1.8, 3.1 point 4). The
+# clause break is prepended here and is not part of the text: it is a layout
+# decision, not a language one.
 SAFETY_SCAN_INTERVAL = datetime.timedelta(minutes=15)
 
 # Fallback only, for a lock whose holder cannot be read. The holder's pid
@@ -225,10 +243,7 @@ def _is_windows() -> bool:
 def _require_linux(what: str) -> None:
     """Refuse a platform-specific action rather than guessing at it."""
     if _is_windows():
-        raise NotImplementedError(
-            f"{what} is not implemented for Windows yet "
-            "(implementation-doc.md, 3.7)."
-        )
+        raise NotImplementedError(T("error.platform_unsupported", what=what))
 
 
 # Reported once per service run, not once per notice. The marker's purpose is
@@ -308,7 +323,7 @@ def notify(summary: str, body: str,
     """
     global _notify_missing_reported
     if DRY_RUN:
-        print(f"[dry-run] Meldung ({seconds}s): {summary} -- {body}")
+        print(T("dryrun.notify", seconds=seconds, summary=summary, body=body))
         return
     _require_linux("Desktop notification")
     try:
@@ -324,8 +339,8 @@ def notify(summary: str, body: str,
             # chatter 2.6 rules out, and in the journal it would quietly become
             # a third channel where 2.6 promises exactly two.
             detail = (result.stderr or b"").decode("utf-8", "replace").strip()
-            print(f"'notify-send' endete mit Rückgabewert "
-                  f"{result.returncode}: {detail or 'ohne Meldung'}",
+            print(T("journal.notify_failed", code=result.returncode,
+                    detail=detail or T("journal.notify_no_detail")),
                   file=sys.stderr, flush=True)
     except FileNotFoundError:
         # A missing notify-send must not break conflict detection (doku 1.8).
@@ -334,11 +349,7 @@ def notify(summary: str, body: str,
         # channel where 2.6 promises exactly two. Reported once per run instead.
         if not _notify_missing_reported:
             _notify_missing_reported = True
-            print("'notify-send' fehlt — die stündliche Betriebsmeldung kann "
-                  "nicht am Bildschirm erscheinen. Bitte 'libnotify-bin' "
-                  "installieren: sudo apt install libnotify-bin. "
-                  "Konflikterkennung und Eskalation sind unberührt.",
-                  file=sys.stderr, flush=True)
+            print(T("error.notify_missing"), file=sys.stderr, flush=True)
 
 
 class Answer(enum.Enum):
@@ -381,8 +392,7 @@ def ask_question(title: str, text: str, ok_label: str, cancel_label: str,
     try:
         result = subprocess.run(command, capture_output=True, check=False)
     except FileNotFoundError:
-        print("Dialog nicht möglich: 'zenity' ist nicht installiert.",
-              file=sys.stderr, flush=True)
+        print(T("error.zenity_question"), file=sys.stderr, flush=True)
         return Answer.FAILED
     return zenity_outcome(result)
 
@@ -407,8 +417,8 @@ def zenity_outcome(result: subprocess.CompletedProcess,
     if detail:
         # Unconditionally, whatever the classification below decides: a case
         # this misjudges is then at least visible instead of silent (doku 3.3).
-        print(f"zenity meldete (Rückgabewert {result.returncode}): {detail}",
-              file=sys.stderr, flush=True)
+        print(T("journal.zenity_reported", code=result.returncode,
+                detail=detail), file=sys.stderr, flush=True)
 
     if result.returncode == 0:
         return Answer.YES
@@ -416,14 +426,13 @@ def zenity_outcome(result: subprocess.CompletedProcess,
         # Closed itself unanswered: nobody is sitting there. Treated like a
         # deferral, not like a defect -- the regular waiting time applies.
         if expects_answer:
-            print("Dialog lief ohne Antwort ab.", file=sys.stderr, flush=True)
+            print(T("journal.dialog_timeout"), file=sys.stderr, flush=True)
         return Answer.NO
 
     lowered = detail.lower()
     if (result.returncode != 1
             or any(marker in lowered for marker in DISPLAY_FAILURE_MARKERS)):
-        print("Dialog konnte nicht gezeigt werden -- das gilt nicht als "
-              "vertagt.", file=sys.stderr, flush=True)
+        print(T("journal.dialog_failed"), file=sys.stderr, flush=True)
         return Answer.FAILED
     return Answer.NO
 
@@ -444,8 +453,7 @@ def show_message(title: str, text: str,
     try:
         result = subprocess.run(command, capture_output=True, check=False)
     except FileNotFoundError:
-        print("Meldung nicht möglich: 'zenity' ist nicht installiert.",
-              file=sys.stderr, flush=True)
+        print(T("error.zenity_message"), file=sys.stderr, flush=True)
         return
     zenity_outcome(result, expects_answer=False)
 
@@ -477,8 +485,7 @@ def pick_from_list(title: str, text: str, column: str, options: list[str],
         result = subprocess.run(command, capture_output=True, text=True,
                                 check=False)
     except FileNotFoundError:
-        print("Auswahl nicht möglich: 'zenity' ist nicht installiert.",
-              file=sys.stderr, flush=True)
+        print(T("error.zenity_pick"), file=sys.stderr, flush=True)
         return Answer.FAILED, None
     outcome = zenity_outcome(result)
     if outcome is not Answer.YES:
@@ -503,8 +510,7 @@ def ask_text(title: str, text: str,
         result = subprocess.run(command, capture_output=True, text=True,
                                 check=False)
     except FileNotFoundError:
-        print("Eingabe nicht möglich: 'zenity' ist nicht installiert.",
-              file=sys.stderr, flush=True)
+        print(T("error.zenity_entry"), file=sys.stderr, flush=True)
         return Answer.FAILED, None
     outcome = zenity_outcome(result)
     if outcome is not Answer.YES:
@@ -562,8 +568,8 @@ def spawn_detached(argv: list[str], cwd: Path) -> Optional[int]:
         # the way up, killing the pass and with it the observer thread. Reported
         # and turned into "no pid" instead: the caller then leaves the episode
         # open, and it reports itself again later (doku 3.3, 2.6).
-        print(f"Terminalstart fehlgeschlagen ({argv[0]!r}): {error}",
-              file=sys.stderr, flush=True)
+        print(T("journal.terminal_launch_failed", command=repr(argv[0]),
+                error=error), file=sys.stderr, flush=True)
         return None
     _session_process = process
     return process.pid
@@ -857,10 +863,11 @@ def acquire_lock() -> bool:
             if holder is None and age < LOCK_STALE_AFTER:
                 return False
             if attempt == 1:
-                whose = (f"von PID {holder}" if holder is not None
-                         else "ohne lesbare PID")
-                print(f"Laufsperre {whose} war ein Überrest (Alter "
-                      f"{int(age.total_seconds())} s) und wurde entfernt.",
+                whose = (T("journal.lock_holder_pid", pid=holder)
+                         if holder is not None
+                         else T("journal.lock_holder_unknown"))
+                print(T("journal.lock_stale", whose=whose,
+                        seconds=int(age.total_seconds())),
                       file=sys.stderr, flush=True)
                 LOCK_FILE.unlink(missing_ok=True)
                 continue
@@ -899,8 +906,8 @@ def release_lock() -> None:
     """
     holder = lock_holder()
     if holder is not None and holder != os.getpid():
-        print(f"Laufsperre gehört PID {holder}, nicht diesem Durchgang — "
-              "nicht entfernt.", file=sys.stderr, flush=True)
+        print(T("journal.lock_foreign", pid=holder),
+              file=sys.stderr, flush=True)
         return
     LOCK_FILE.unlink(missing_ok=True)
 
@@ -923,7 +930,8 @@ class ConflictPair:
         Names the device id, never a direction: "from" would claim an origin
         the name cannot carry (doku 3.1, step 2).
         """
-        marked = f" (Gerätekennung {self.device})" if self.device else ""
+        marked = (T("conflict.device_marker", device=self.device)
+                  if self.device else "")
         return f"{self.original.name}{marked}"
 
 
@@ -948,7 +956,7 @@ def find_conflicts(watch_dir: Path) -> tuple[list[Path], list[str]]:
     found: list[Path] = []
     problems: list[str] = []
     if not watch_dir.is_dir():
-        return found, [f"{watch_dir}: nicht vorhanden oder kein Verzeichnis"]
+        return found, [T("journal.watch_dir_unusable", dir=watch_dir)]
 
     def note(error: OSError) -> None:
         problems.append(f"{error.filename}: {error.strerror}")
@@ -1072,18 +1080,18 @@ def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
         chosen = [found[0][0], found[0][1]]
     elif len(found) > 1:
         outcome, selected = pick_from_list(
-            "Claude-Sync: Terminal wählen",
-            "Mehrere Terminal-Emulatoren gefunden. Welcher soll für die "
-            "Konfliktsitzung verwendet werden?",
-            "Terminal", [binary for binary, _ in found],
+            T("dialog.terminal_pick.title"),
+            T("dialog.terminal_pick.text"),
+            T("dialog.terminal_pick.column"),
+            [binary for binary, _ in found],
             DIALOG_TIMEOUT_SECONDS)
         if selected is None:
             return outcome, None
         chosen = [selected, dict(found).get(selected, terminal_run_flags()[0])]
     else:
         outcome, entered = ask_text(
-            "Claude-Sync: Terminal-Emulator",
-            "Kein bekannter Terminal-Emulator gefunden. Bitte Befehl angeben:",
+            T("dialog.terminal_entry.title"),
+            T("dialog.terminal_entry.text"),
             DIALOG_TIMEOUT_SECONDS)
         if entered is None:
             return outcome, None
@@ -1093,13 +1101,11 @@ def detect_terminal(state: WatchState) -> tuple[Answer, Optional[list[str]]]:
             # where the exception used to kill the whole pass. Reported here,
             # and the answer NO lands in the retry question escalate already
             # asks -- one loop, not a second one (doku 3.3).
-            print(f"Eingegebener Terminal-Befehl nicht verwendbar: {entered!r}",
+            print(T("journal.terminal_entry_unusable", entered=repr(entered)),
                   file=sys.stderr, flush=True)
             show_message(
-                "Claude-Sync: Terminal-Befehl unbrauchbar",
-                f"Der eingegebene Befehl „{entered}“ lässt sich nicht "
-                "verwenden — das erste Wort muss ein vorhandenes Programm "
-                "sein. Beispiele: „konsole“ oder „urxvt -hold“.")
+                T("dialog.terminal_unusable.title"),
+                T("dialog.terminal_unusable.text", entered=entered))
             return Answer.NO, None
         chosen = candidate
 
@@ -1118,14 +1124,7 @@ def build_handover(pairs: list[ConflictPair], watch_dir: Path) -> str:
     this list orients it rather than binding it.
     """
     lines = [f"  - {pair.describe()}" for pair in pairs]
-    return (
-        f"Syncthing hat Konfliktkopien angelegt, im Ordner {watch_dir} — "
-        "genau dort und nirgends sonst ist zu suchen.\n"
-        "Betroffene Originale:\n"
-        + "\n".join(lines)
-        + "\n\nBitte suche selbst nach *.sync-conflict-* und arbeite nach der "
-          "Arbeitsanweisung, die dir als System-Prompt mitgegeben wurde."
-    )
+    return T("handover.text", dir=watch_dir, listing="\n".join(lines))
 
 
 def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
@@ -1144,16 +1143,14 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
     # silently, and the next question came half an hour later. The installer
     # covers this at setup time only, and --tool-dir bypasses it entirely.
     TOOLS_DIR.mkdir(parents=True, exist_ok=True)
-    if not INSTRUCTION_FILE.is_file():
-        print(f"Arbeitsanweisung fehlt: {INSTRUCTION_FILE} — keine Sitzung "
-              "gestartet.", file=sys.stderr, flush=True)
+    instruction = instruction_file()
+    if not instruction.is_file():
+        print(T("journal.no_instruction", path=instruction),
+              file=sys.stderr, flush=True)
         show_message(
-            "Claude-Sync: Konfliktlösung nicht möglich",
-            f"Die Arbeitsanweisung {INSTRUCTION_FILE} fehlt. Ohne sie kann "
-            "keine Konfliktsitzung starten. Bitte den Inhalt des "
-            "files/-Ordner aus der Repo-Quelle von claude-sync-watch "
-            "vollständig nach ~/.claude-sync-watch kopieren. Dort ist auch "
-            "das fehlende File 'conflict-resolution.md' enthalten.")
+            T("dialog.no_instruction.title"),
+            T("dialog.no_instruction.text", path=instruction,
+              name=instruction.name))
         return None
     # Argument order is load-bearing, not cosmetic: ``--add-dir`` is variadic
     # (``--add-dir <directories...>``), so it swallows every following argument
@@ -1165,22 +1162,20 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
         *terminal_cmd,
         claude_binary(),
         "--add-dir", str(TOOLS_DIR),
-        "--append-system-prompt-file", str(INSTRUCTION_FILE),
+        "--append-system-prompt-file", str(instruction),
         build_handover(pairs, watch_dir),
     ]
     if DRY_RUN:
-        print("[dry-run] würde starten:", " ".join(repr(a) for a in argv))
+        print(T("dryrun.would_start"), " ".join(repr(a) for a in argv))
         return None
     pid = spawn_detached(argv, cwd=watch_dir)
     if pid is None:
         # Same treatment as a missing instruction file: tell the user, record
         # no pid, let the episode report itself again (doku 3.3).
         show_message(
-            "Claude-Sync: Terminal konnte nicht starten",
-            f"Der Terminalbefehl „{' '.join(terminal_cmd)}“ ließ sich nicht "
-            "ausführen. Die Konfliktkopien bleiben liegen; der Wächter meldet "
-            "sich wieder. Einzelheiten stehen im Journal: "
-            "journalctl --user -u claude-sync-watch")
+            T("dialog.terminal_failed.title"),
+            T("dialog.terminal_failed.text",
+              command=" ".join(terminal_cmd)))
     return pid
 
 
@@ -1225,15 +1220,9 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
     # label the names read as the copies' names, which they are not -- they
     # carry neither the date nor the device suffix (doku 1.8, 3.3).
     listing = "\n".join(f"  {pair.describe()}" for pair in pairs)
-    text = (
-        f"Syncthing hat {len(pairs)} Konfliktkopie(n) angelegt.\n\n"
-        f"Betroffene Originale:\n{listing}\n\n"
-        "Zur Bearbeitung öffnet sich eine Claude-Code-Sitzung in einem "
-        "Terminal. Gegebenenfalls ist dafür ein Terminal-Programm auszuwählen.\n\n"
-        "Jetzt lösen?"
-    )
+    text = T("dialog.conflict.text", count=len(pairs), listing=listing)
     if DRY_RUN:
-        print(f"[dry-run] würde nach {len(pairs)} Konflikt(en) fragen:\n{listing}")
+        print(T("dryrun.would_ask", count=len(pairs), listing=listing))
         return
 
     # Saved before the dialog opens, not with the rest of the pass at the end:
@@ -1243,8 +1232,9 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
     # (doku 3.2, 3.3).
     state.dialog_last_shown = _now()
     save_state(state)
-    answer = ask_question("Claude-Sync: Konflikt", text, "Jetzt lösen",
-                          "Später", DIALOG_TIMEOUT_SECONDS)
+    answer = ask_question(T("dialog.conflict.title"), text,
+                          T("dialog.conflict.ok"), T("dialog.conflict.later"),
+                          DIALOG_TIMEOUT_SECONDS)
     if answer is Answer.FAILED:
         # Nothing was shown, so nothing was deferred: the stamp above stands,
         # and the short retry interval runs from the ATTEMPT (doku 3.3).
@@ -1268,10 +1258,11 @@ def escalate(pairs: list[ConflictPair], state: WatchState,
             state.dialog_failed = True
             return
         retry = ask_question(
-            "Claude-Sync: Terminal nötig",
-            "Zur Bearbeitung des Konflikts wird ein Terminal für die "
-            "Claude-Sitzung benötigt. Auswahl erneut versuchen?",
-            "Erneut versuchen", "Abbrechen", DIALOG_TIMEOUT_SECONDS)
+            T("dialog.terminal_retry.title"),
+            T("dialog.terminal_retry.text"),
+            T("dialog.terminal_retry.ok"),
+            T("dialog.terminal_retry.cancel"),
+            DIALOG_TIMEOUT_SECONDS)
         if retry is Answer.FAILED:
             state.dialog_failed = True
             return
@@ -1342,7 +1333,7 @@ def _backlog_clause(count: int) -> str:
     turns down on purpose. Named here because the pause sentence speaks of both
     directions while this number can only vouch for one (doku 1.8).
     """
-    return f"{CLAUSE_BREAK}Rückstand: {count} Datei(en)" if count else ""
+    return (CLAUSE_BREAK + T("notify.backlog", count=count)) if count else ""
 
 
 def build_notice(state: WatchState, open_conflicts: int,
@@ -1368,17 +1359,18 @@ def build_notice(state: WatchState, open_conflicts: int,
         # older state file must not be made to claim zero.
         since = ""
         if state.conflict_since:
-            hours = _hours_since(state.conflict_since)
-            since = f" seit {hours} Stunde(n)"
+            since = T("notify.since_hours",
+                      hours=_hours_since(state.conflict_since))
         # Both a pause and a backlog change what the user has to do, so both
         # are named alongside the conflict instead of waiting for a quiet hour
         # that may not come while conflicts are open (doku 1.8).
         extra = ""
         if figures and figures["paused"]:
-            extra += PAUSE_CLAUSE_SHORT
+            extra += CLAUSE_BREAK + T("notify.paused_short")
         if figures:
             extra += _backlog_clause(figures["backlog"])
-        return (f"{open_conflicts} Konflikt(e){since} ungelöst{extra}",
+        return (T("notify.conflicts_open", count=open_conflicts,
+                  since=since, extra=extra),
                 NOTICE_SECONDS_ATTENTION)
 
     if figures is None:
@@ -1390,15 +1382,16 @@ def build_notice(state: WatchState, open_conflicts: int,
         # The backlog comes along, as it does next to a conflict: a pause does
         # not make the number less relevant, and a backlog DURING a pause is
         # the expected case (doku 1.8).
-        return (PAUSE_SENTENCE + _backlog_clause(figures["backlog"]),
+        return (T("notify.paused_sentence")
+                + _backlog_clause(figures["backlog"]),
                 NOTICE_SECONDS_ATTENTION)
 
     if not figures["connected"]:
         since = ""
         if state.last_connected:
-            hours = _hours_since(state.last_connected)
-            since = f" seit {hours} Stunde(n)"
-        return (f"keine Verbindung zum Abgleich{since}",
+            since = T("notify.since_hours",
+                      hours=_hours_since(state.last_connected))
+        return (T("notify.no_connection", since=since),
                 NOTICE_SECONDS_ATTENTION)
 
     # Without a reference point, naming a span would be a lie. One sentence
@@ -1406,14 +1399,14 @@ def build_notice(state: WatchState, open_conflicts: int,
     # fresh installation that has never seen a conflict. From the outside the
     # two are indistinguishable, and it is true of both.
     if state.last_conflict_seen:
-        hours = _hours_since(state.last_conflict_seen)
-        quiet = f"{CLAUSE_BREAK}kein Konflikt seit {hours} Stunde(n)"
+        quiet = CLAUSE_BREAK + T("notify.quiet_since",
+                                 hours=_hours_since(state.last_conflict_seen))
     else:
-        quiet = CLAUSE_BREAK + "Zählung neu begonnen"
+        quiet = CLAUSE_BREAK + T("notify.count_restarted")
 
     if figures["comparable"]:
-        text = (f"abgeglichen: {_human_bytes(figures['outgoing'])} hoch, "
-                f"{_human_bytes(figures['incoming'])} herunter{quiet}")
+        text = T("notify.synced", up=_human_bytes(figures["outgoing"]),
+                 down=_human_bytes(figures["incoming"])) + quiet
     else:
         # A sentence instead of zeroes. "0 B hoch, 0 B herunter" would stand for
         # three different situations at once -- a quiet hour, a lost reference
@@ -1421,8 +1414,7 @@ def build_notice(state: WatchState, open_conflicts: int,
         # this notice exists for (doku 1.8). The wording holds for both ways of
         # losing the reference: a reconnect and a first pass. The prefix stays
         # on purpose; it is what makes the hourly notice recognisable.
-        text = ("abgeglichen: Zähler neu gesetzt — Bytes erst in der nächsten "
-                f"Meldung{quiet}")
+        text = T("notify.counter_reset") + quiet
     if figures["backlog"]:
         return (text + _backlog_clause(figures["backlog"]),
                 NOTICE_SECONDS_ATTENTION)
@@ -1562,8 +1554,8 @@ def maybe_notify(state: WatchState, open_conflicts: int,
         # defect. Caught before the branch below on purpose: reported as a
         # programming error with a traceback it would be a lie -- and an
         # hourly one -- at the very place this pass made truthful.
-        print(f"Betriebsmeldung auf dieser Plattform nicht bedient "
-              f"({unsupported}); siehe 3.7.", file=sys.stderr, flush=True)
+        print(T("journal.notice_unsupported", detail=unsupported),
+              file=sys.stderr, flush=True)
         return
     except Exception:
         # Everything the suppliers handle themselves -- unreachable interface,
@@ -1571,13 +1563,13 @@ def maybe_notify(state: WatchState, open_conflicts: int,
         # point 3). What arrives here is a programming error, and 2.6 has no
         # exception for those. With the traceback, because a report nobody can
         # locate is not a report.
-        print("Betriebsmeldung fehlgeschlagen:\n"
+        print(T("journal.notice_failed") + "\n"
               + traceback.format_exc().rstrip(), file=sys.stderr, flush=True)
         return
     if notice is None:
         return
     text, seconds = notice
-    notify("Claude-Sync", text, seconds)
+    notify(T("notify.summary"), text, seconds)
 
 
 # ---------------------------------------------------------------------------
@@ -1596,10 +1588,10 @@ def run_pass(watch_dir: Path, reason: str) -> int:
 
         # Reported on the CHANGE, in both directions -- see the state field.
         if problems and not state.scan_incomplete:
-            print(f"Suchlauf unvollständig, {len(problems)} Stelle(n) nicht "
-                  f"lesbar: {problems[0]}", file=sys.stderr, flush=True)
+            print(T("journal.scan_incomplete", count=len(problems),
+                    first=problems[0]), file=sys.stderr, flush=True)
         elif not problems and state.scan_incomplete:
-            print("Suchlauf wieder vollständig.", file=sys.stderr, flush=True)
+            print(T("journal.scan_complete"), file=sys.stderr, flush=True)
         state.scan_incomplete = bool(problems)
 
         if not state.session_running():
@@ -1648,7 +1640,7 @@ def run_pass(watch_dir: Path, reason: str) -> int:
         # service's state -- it would take away its next notice and shift the
         # episode -- while 3.8 worked around that by hand (doku 3.1, 3.2).
         if DRY_RUN:
-            print("[dry-run] Zustand nicht geschrieben.", flush=True)
+            print(T("dryrun.state_unwritten"), flush=True)
         else:
             save_state(state)
         # One line per pass that found something -- as a service this is the
@@ -1656,8 +1648,8 @@ def run_pass(watch_dir: Path, reason: str) -> int:
         # deliberate: the safety scan runs every 15 minutes and would otherwise
         # fill the journal with "nothing".
         if pairs or DRY_RUN:
-            print(f"[{reason}] {len(pairs)} Konflikt(e) in {watch_dir}",
-                  flush=True)
+            print(T("journal.pass_conflicts", reason=reason,
+                    count=len(pairs), dir=watch_dir), flush=True)
         return len(pairs)
     finally:
         release_lock()
@@ -1685,8 +1677,8 @@ def guarded_pass(watch_dir: Path, reason: str) -> None:
     try:
         run_pass(watch_dir, reason)
     except Exception:
-        print(f"Durchgang '{reason}' mit einem Fehler abgebrochen; "
-              "der Waechter laeuft weiter:", file=sys.stderr, flush=True)
+        print(T("journal.pass_failed", reason=reason),
+              file=sys.stderr, flush=True)
         traceback.print_exc()
         sys.stderr.flush()
 
@@ -1705,10 +1697,7 @@ def watch_forever(watch_dir: Path) -> int:
         from watchdog.events import FileSystemEventHandler
         from watchdog.observers import Observer
     except ImportError:
-        print("Die Python-Beobachtungsbibliothek 'watchdog' fehlt.\n"
-              "Bitte über die Distribution installieren (zum Beispiel: "
-              "sudo apt install python3-watchdog) und den Dienst erneut "
-              "starten.", file=sys.stderr)
+        print(T("error.watchdog_missing"), file=sys.stderr)
         # Not exit 1: a missing library is structural. With RestartSec=30 the
         # start-rate limit never triggers (five starts in ten seconds is the
         # default), so exit 1 looped every thirty seconds forever and the unit
@@ -1731,11 +1720,11 @@ def watch_forever(watch_dir: Path) -> int:
 
         def on_created(self, event: Any) -> None:
             if self._relevant(event):
-                guarded_pass(watch_dir, "Ereignis: angelegt")
+                guarded_pass(watch_dir, T("journal.reason.created"))
 
         def on_moved(self, event: Any) -> None:
             if self._relevant(event):
-                guarded_pass(watch_dir, "Ereignis: verschoben")
+                guarded_pass(watch_dir, T("journal.reason.moved"))
 
         def on_deleted(self, event: Any) -> None:
             # A copy that disappears ends the episode. Without this the state
@@ -1744,9 +1733,9 @@ def watch_forever(watch_dir: Path) -> int:
             # copy vanishing because it was resolved elsewhere is the normal
             # case, not an edge one (doku 3.1, step 1).
             if self._relevant(event):
-                guarded_pass(watch_dir, "Ereignis: gelöscht")
+                guarded_pass(watch_dir, T("journal.reason.deleted"))
 
-    guarded_pass(watch_dir, "Startlauf")
+    guarded_pass(watch_dir, T("journal.reason.startup"))
 
     observer = Observer()
     observer.schedule(ConflictHandler(), str(watch_dir), recursive=True)
@@ -1761,7 +1750,7 @@ def watch_forever(watch_dir: Path) -> int:
         while True:
             time.sleep(30)
             if time.monotonic() - last_safety >= SAFETY_SCAN_INTERVAL.total_seconds():
-                guarded_pass(watch_dir, "Sicherheitslauf")
+                guarded_pass(watch_dir, T("journal.reason.safety"))
                 last_safety = time.monotonic()
     except KeyboardInterrupt:
         pass
@@ -1802,20 +1791,17 @@ def check_folder(watch_dir: Path) -> int:
     """
     api_key = read_api_key()
     if not api_key:
-        print("Freigabe nicht prüfbar: Syncthings API-Schlüssel ist nicht "
-              "lesbar.", file=sys.stderr)
+        print(T("check.no_api_key"), file=sys.stderr)
         return 2
     folder = folder_config_for(watch_dir, api_key)
     if folder is None:
         if rest_get("/rest/system/config", api_key) is None:
-            print("Freigabe nicht prüfbar: Syncthings Schnittstelle antwortet "
-                  "nicht.", file=sys.stderr)
+            print(T("check.no_answer"), file=sys.stderr)
             return 2
-        print(f"Syncthing kennt keine Freigabe für {watch_dir} — der Ordner "
-              "wird nicht abgeglichen.", file=sys.stderr)
+        print(T("check.no_folder", dir=watch_dir), file=sys.stderr)
         return 1
-    paused = " (angehalten)" if folder.get("paused") else ""
-    print(f"Freigabe gefunden: {folder.get('id')}{paused}.")
+    paused = T("check.paused_suffix") if folder.get("paused") else ""
+    print(T("check.found", id=folder.get("id"), paused=paused))
     return 0
 
 
@@ -1836,7 +1822,18 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--check-folder", action="store_true",
                         help="report whether Syncthing has the watched "
                              "directory as a folder, then exit")
+    # No choices= here on purpose: which languages exist is a property of the
+    # installation, and a package that carries one catalogue speaks that one
+    # whatever the switch says (messages.use). Rejecting the switch would
+    # promise a choice the installation does not have.
+    parser.add_argument("--lang", default="", metavar="CODE",
+                        help="message language (de, en); only where several "
+                             "catalogues are installed, default de")
     args = parser.parse_args(argv)
+
+    # Resolved once, before the first message: a missing catalogue then fails
+    # at startup instead of in the middle of a pass (doku 3.1).
+    messages.use(args.lang)
 
     DRY_RUN = args.dry_run
     if args.tool_dir:
@@ -1849,14 +1846,13 @@ def main(argv: Optional[list[str]] = None) -> int:
         return check_folder(watch_dir)
 
     if not watch_dir.is_dir():
-        print(f"Überwachungsordner existiert nicht: {watch_dir}", file=sys.stderr)
+        print(T("journal.watch_dir_missing", dir=watch_dir), file=sys.stderr)
         return 1
 
     if args.once:
-        count = run_pass(watch_dir, "Einzellauf")
+        count = run_pass(watch_dir, T("journal.reason.single"))
         if count < 0:
-            print("Ein anderer Durchgang läuft gerade; nichts getan.",
-                  file=sys.stderr)
+            print(T("journal.pass_busy"), file=sys.stderr)
             return 1
         return 0
 

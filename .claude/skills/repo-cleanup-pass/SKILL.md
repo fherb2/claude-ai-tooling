@@ -71,13 +71,17 @@ Das Skript gibt vier Listen aus: zu übernehmen, im Release-Zweig zu löschen, b
 ```bash
 LISTEN=<Pfad aus Schritt 2>
 git checkout master
-xargs -0 -a "$LISTEN/take.z" git checkout dev --
-xargs -0 -a "$LISTEN/dele.z" git rm -q --
+xargs -0 -r -a "$LISTEN/take.z" git checkout dev --
+xargs -0 -r -a "$LISTEN/dele.z" git rm -q --
 git diff --cached --stat        # ansehen, dann committen
 git commit
 ```
 
 Eine Löschung im Release-Zweig ist Teil des Abgleichs, kein Sonderfall: Was in `dev` bewusst entfallen ist, hat dort ebenfalls nichts mehr zu suchen. Sie wird aber **benannt**, nicht nebenbei ausgeführt.
+
+**`-r` ist kein Beiwerk:** Ohne es ruft `xargs` den Befehl auch bei leerer Liste einmal ohne Argumente auf, und `git rm --` ohne Pfad bricht mit `fatal: No pathspec given` ab. Eine leere Löschliste ist der Regelfall, nicht die Ausnahme.
+
+**Eine Umbenennung ist im Abgleich zwei Vorgänge**, kein eigener dritter. `branch-diff.py` erhebt den Vergleich deshalb mit `--no-renames`: Der alte Name steht dann in der Löschliste, der neue in der Übernahmeliste. Wer die Listen mit einer unabhängigen Messung vergleicht, muss das wissen — `git diff --name-only` mit Umbenennungserkennung nennt **nur** den neuen Namen, zählt also einen Pfad weniger. Beide Zahlen sind richtig; sie beantworten verschiedene Fragen.
 
 **Bekannte Bedingung: `.claude/skills/` ist unter aktiver Sandbox nur lesbar.** Enthält die Übertragungsliste Dateien von dort — etwa diesen Skill selbst —, bricht `git checkout` sie mit „Das Dateisystem ist nur lesbar" ab. Der Index bekommt den richtigen Inhalt trotzdem; nur der Arbeitsbaum lässt sich nicht schreiben. Zwei Wege:
 
@@ -92,7 +96,7 @@ git -c core.quotepath=false diff --name-only master dev | grep -v -E '^skills/[^
 #    -> keine Ausgabe
 
 # 2. Jede übertragene Datei byteweise vergleichen:
-xargs -0 -a "$LISTEN/take.z" -I{} sh -c \
+xargs -0 -r -a "$LISTEN/take.z" -I{} sh -c \
   'a=$(git show dev:"{}" | sha256sum); b=$(git show master:"{}" | sha256sum); [ "$a" = "$b" ] || echo "ABWEICHUNG: {}"'
 #    -> keine Ausgabe
 ```

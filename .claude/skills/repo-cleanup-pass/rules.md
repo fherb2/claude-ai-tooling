@@ -96,7 +96,7 @@ Das Skript baut das Archiv aus **seinem eigenen Inhalt** neu und tauscht allein 
 
 **Die Zeitstempel gehören zur Prüfung.** Vergleicht man `unzip -l` vor und nach dem Packen, darf sich genau die Zeile der ausgetauschten Datei bewegt haben.
 
-**Der Aktualitätsprüfer aus `skill-dev-doc.md` A.3 gilt nur für Skills.** Er vergleicht den Inhalt jedes Archiveintrags gegen die Dateien im **Wurzelordner** des Bereichs — bei einem Skill liegen sie genau dort. `home-.claude-sharing` hält seine Werkzeuge dagegen in `files/`, und dann meldet der Prüfer jedes Paket als veraltet, obwohl keines es ist. Für diesen Bereich also gegen `files/` **plus** die beiden READMEs prüfen. Ein „VERALTET" ohne konkrete Abweichung in der Datei ist zuerst ein Verdacht auf diesen Fehlgriff, nicht auf ein altes Paket.
+**Der Aktualitätsprüfer aus `skill-dev-doc.md` A.3 gilt nur für Skills.** Er vergleicht den Inhalt jedes Archiveintrags gegen die Dateien im **Wurzelordner** des Bereichs — bei einem Skill liegen sie genau dort. `home-.claude-sharing` hält seine Werkzeuge dagegen in `files/`, und dann meldet der Prüfer jedes Paket als veraltet, obwohl keines es ist. Für diesen Bereich beantwortet das die Frage ohnehin nicht mehr von Hand: `home-.claude-sharing/scripts/pack_packages.sh` laufen lassen und danach `git status` ansehen. Das Werkzeug baut beide Archive neu und prüft sie gegen `files/` und die beiden READMEs; **bei unverändertem Bestand sind die Archive byte-identisch** (gemessen am 11. September 2026), ein geändertes Zip im Arbeitsbaum ist also der Nachweis, dass das Paket veraltet war — und gleichzeitig schon die Behebung. Ein „VERALTET" ohne konkrete Abweichung in der Datei ist zuerst ein Verdacht auf diesen Fehlgriff, nicht auf ein altes Paket.
 
 ---
 
