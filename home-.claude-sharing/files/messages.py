@@ -76,6 +76,21 @@ def language() -> str:
     return _language
 
 
+def texts() -> dict[str, str]:
+    """The loaded catalogue itself, unformatted.
+
+    Two callers need the wording without filling it in, both in the check
+    script (doku 3.8): one asks whether a line begins with a message whose
+    numbers it does not know, the other replaces single entries with markers to
+    prove that a notice really takes its text from here instead of carrying its
+    own copy of the same words. Returning the live dictionary rather than a copy
+    is what makes the second possible.
+    """
+    if not _texts:
+        use()
+    return _texts
+
+
 def T(key: str, **fields) -> str:
     """The text for *key*, with its named placeholders filled in.
 
