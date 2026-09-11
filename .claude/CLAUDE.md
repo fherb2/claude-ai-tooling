@@ -87,6 +87,16 @@ einer installierten Kopie nicht anzusehen, ob sie dem Stand des Repos
 entspricht; das Datum ist hier die Versionsangabe (Festlegung des
 Entwicklers vom 24. August 2026).
 
+# Querverweise zwischen den Sprachfassungen
+
+Wie die beiden Sprachfassungen einer README oben aufeinander verweisen, ist
+festgeschrieben in `skill-dev-doc.md`, Kapitel 5.1: Form, Zweigangabe
+(`blob/master`, nicht `HEAD`) und Begründung je Festlegung. **Das gilt als
+Anweisung, nicht als Beschreibung** — wer eine README anlegt oder ihren
+Verweis anfasst, richtet sich danach. Hier steht sie absichtlich nicht ein
+zweites Mal; hier steht nur, dass sie gilt und wo sie zu finden ist
+(Festlegung des Entwicklers vom 11. September 2026).
+
 ## Arbeitsmodell: Git-Worktrees
 
 Dieses Repo arbeitet nach dem Worktree-Modell: Jede Claude-Sitzung
