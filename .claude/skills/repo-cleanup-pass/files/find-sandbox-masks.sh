@@ -13,7 +13,22 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
-found=$(find . -path ./.git -prune -o \( -type c -o -type b \) -print 2>/dev/null | LC_ALL=C sort)
+# The type is asked PER PATH and never taken from the directory listing. A mask
+# is a mount, and the d_type that readdir hands out still describes the regular
+# file underneath it -- GNU find uses exactly that d_type to avoid a stat call,
+# so `find . -type c` misses every mask, while `find .bashrc -type c` on the
+# same name in the same process finds it. Measured on 11 September 2026: the
+# one-liner this loop replaces reported "no masks" while 20 of them lay in the
+# working tree. `test -c` calls stat(2) on the path and is therefore reliable.
+masks=()
+while IFS= read -r -d '' path; do
+    path=${path#./}
+    if [ -c "$path" ] || [ -b "$path" ]; then
+        masks+=("$path")
+    fi
+done < <(find . -path ./.git -prune -o -print0 2>/dev/null)
+
+found=$(printf '%s\n' ${masks+"${masks[@]}"} | grep . | LC_ALL=C sort || true)
 
 if [ -z "$found" ]; then
     echo 'Keine Attrappen im Arbeitsbaum. Entweder laeuft keine Sandbox, oder sie maskiert hier nichts.'
