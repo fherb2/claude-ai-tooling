@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-09-10*
+*Stand: 2026-09-11*
 
 *[English version](README.md)*
 
@@ -46,7 +46,7 @@ Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[
 
 Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche Kern ist der Umgang mit dem, was Syncthing bewusst nicht löst: Gleichzeitig geänderte Dateien werden als Konfliktkopien abgelegt, ein Wächter-Dienst entdeckt sie, meldet sich und führt den Nutzer gemeinsam mit Claude durch die inhaltliche Auflösung. Installationsskripte, Dienstdefinition und eine Einrichtungsanleitung für den Vermittlungsknoten liegen bei; ausgeliefert wird es als Paket je Sprachfassung unter `downloads/`.
 
-**Stand:** Im Betrieb auf drei Rechnern beim Entwickler seit dem 11. August 2026 — Näheres in der [README des Bausteins](home-.claude-sharing/README.md).
+**Stand:** Im Betrieb auf vier Rechnern beim Entwickler seit dem 11. August 2026 — Näheres in der [README des Bausteins](home-.claude-sharing/README.md).
 
 ## skills
 

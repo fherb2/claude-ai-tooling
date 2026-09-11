@@ -6,7 +6,7 @@
 
 **Keeps the working state of Claude Code and Claude Desktop — configuration, session transcripts, project memory — automatically in sync across several machines, so the same context is available everywhere. And it reports the exceptional case a synchronisation cannot resolve by itself: the file that was changed on both sides.**
 
-The sync has been running since 11 August 2026, by now on three machines; the watcher runs as a service on all three and has handled real conflicts. The implementation is complete; the only open item is a counterpart for Windows (`work-plan.md`).
+The sync has been running since 11 August 2026, by now on four machines; the watcher runs as a service on all four and has handled real conflicts. The implementation is complete; the only open item is a counterpart for Windows (`work-plan.md`).
 
 A note on language: the package you install decides it. The English package carries an English message catalogue and an English working instruction, so dialogs, notifications, journal lines and the conflict session itself speak English; the German package speaks German. There is nothing to configure. The two setup scripts are English in both packages — setting up runs once and is the first contact with the tool. The strings quoted below are the English ones, verbatim.
 
