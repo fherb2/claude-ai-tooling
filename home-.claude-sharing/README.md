@@ -1,6 +1,6 @@
 # Syncthing-Sync für `~/.claude`
 
-*Stand: 2026-09-10*
+*Stand: 2026-09-11*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.en.md)*
 
@@ -74,14 +74,14 @@ Das Skript **installiert nichts stillschweigend**: Fehlt ein Paket, nennt es die
 **Der Normalfall ist ein Rechner, der schon ein eigenes, gewachsenes `~/.claude` hat** — darin stecken die Chats seiner lokalen Projekte und die aus Claude Desktop. Dieser Bestand darf nicht überschrieben werden, und genau deshalb sieht der Weg unten so aus und nicht wie ein gewöhnliches „Ordner synchronisieren": Der Erstabgleich **vereinigt** zwei gewachsene Bestände, und der Zusammenführungsschritt dabei ist eingeplant.
 
 1. **Bestand sichern.** `cp -a ~/.claude ~/.claude.vor-sync` — die einzige Rückfalllinie dieses Vorgangs. Sie wird erst am Ende aufgelöst.
-2. **Werkzeugpaket entpacken.** `downloads/claude-sync-watch_de_local.zip` aus diesem Ordner herunterladen, dann `unzip claude-sync-watch_de_local.zip -d ~`. Das legt `~/.claude-sync-watch/` mit allen benötigten Dateien an. Dieser Ort ist **Vorschrift**, keine Empfehlung: Die Dienstdefinition verweist fest darauf, und das Installationsskript verweigert den Dienst an jedem anderen Ort. Der Ordner ist versteckt; Kontrolle mit `ls -d ~/.claude-sync-watch`. Der Dienst wird hier noch **nicht** eingerichtet.
+2. **Werkzeugpaket entpacken.** `downloads/claude-sync-watch_de_local.zip` aus diesem Ordner herunterladen, dann `unzip claude-sync-watch_de_local.zip -d ~`. Das legt `~/.claude-sync-watch/` mit allen benötigten Dateien an. **Das Paket bestimmt die Sprache:** Dieses hier bringt den deutschen Meldungskatalog und die deutsche Arbeitsanweisung mit, das englische (`claude-sync-watch_en_local.zip`) die englischen. Einzustellen ist dazu nichts. Dieser Ort ist **Vorschrift**, keine Empfehlung: Die Dienstdefinition verweist fest darauf, und das Installationsskript verweigert den Dienst an jedem anderen Ort. Der Ordner ist versteckt; Kontrolle mit `ls -d ~/.claude-sync-watch`. Der Dienst wird hier noch **nicht** eingerichtet.
 3. **Ausschlussliste anlegen — vor dem Teilen.** `cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore`. Warum vorher: Syncthing synchronisiert diese Datei nicht, sie muss auf jedem Rechner einzeln vorhanden sein — und fehlt sie beim ersten Abgleich, wandern die Zugangsdaten los. Was Syncthing später im Reiter *Ignore Patterns* anzeigt, ist genau diese Datei; vor dem Teilen gibt es den Reiter noch nicht.
 4. **Den Ordner in Syncthing teilen.** Vier Handgriffe, Einzelheiten in Abschnitt 7 des Setup-Guides: **Add Folder**; als **Folder ID** dieselbe Kennung wie auf den übrigen Geräten eintragen — zeichengleich, sonst gilt der Ordner als ein anderer; als „Folder Path" `~/.claude`; im Reiter **Sharing** den Knoten anhaken; speichern. Am Knoten erscheint die Rückfrage, ob der Ordner angenommen werden soll. Alle Geräte bleiben auf **Send & Receive**.
 5. **Erstabgleich abwarten.** Fertig, wenn die Oberfläche auf beiden Seiten „Up to Date" zeigt. Was dabei geschieht: Einseitig vorhandene Dateien werden verteilt; beidseitig vorhandene, inhaltlich verschiedene erzeugen Konfliktkopien mit `.sync-conflict-` im Namen. Wie viele es werden, hängt an der Divergenz der Bestände — **das ist der geplante Zusammenführungsschritt, kein Fehler.**
 6. **Konfliktkopien auflösen, von Hand gestartet.** Der Wächter läuft noch nicht, und das ist Absicht: Er soll auf einem konfliktfreien Stand anfangen, und während eines laufenden Erstabgleichs kämen fortlaufend neue Kopien dazwischen. Deshalb hier einmal selbst:
 
         cd ~/.claude
-        claude --append-system-prompt-file ~/.claude-sync-watch/conflict-resolution.md \
+        claude --append-system-prompt-file ~/.claude-sync-watch/conflict-resolution.de.md \
                "Der zu durchsuchende Ordner ist ~/.claude. Löse die dort liegenden Konfliktkopien auf."
 
    Das Arbeitsverzeichnis ist tragend, nicht Zierde: Claude Code übernimmt es vom aufrufenden Prozess. Die mitgegebene Arbeitsanweisung ist dieselbe, die der Wächter später verwendet — ohne sie zieht die Sitzung die Projektmethodik aus `~/.claude/CLAUDE.md` heran, die hier nicht gilt und in die Irre führt. Die Sitzung geht Paar für Paar mit Dir durch und schreibt oder löscht nichts ohne Deine Zustimmung. Zum Schluss selbst nachsehen: `find ~/.claude -name '*.sync-conflict-*'` muss leer bleiben.
