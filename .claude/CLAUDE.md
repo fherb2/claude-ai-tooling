@@ -105,6 +105,25 @@ Worktree; die Vereinbarungen stehen in `.claude/git-worktree-model.json`.
 Verfahren und Regeln: Skill `parallel-sessions` (Quelle:
 `skills/parallel-sessions/`).
 
+## Projekt-Skills gehören dem Entwicklungszweig
+
+Was unter `.claude/skills/` liegt, ist Arbeitsgerät für die Entwicklung
+dieses Repositories und **bleibt in `dev`**. In `master` hat es nichts zu
+suchen: Ein Werkzeug, das den Release-Zweig herstellt, ist nicht Teil des
+Releases. In `infra` ebenso nicht — dort liegen ausschließlich die fünf
+zentralen Dateien aus `infra_files`.
+
+Das ist keine Ordnungsfrage, sondern eine Aussage darüber, was der
+Release-Zweig ist: der veröffentlichte Stand des Repositories, nicht die
+Werkstatt, in der er entsteht. Der Abgleich nach `master` führt diese
+Klasse deshalb neben den Baustellen-Skills und `.research/` als bewusst
+ausgeschlossen (Skill `repo-cleanup-pass`, Abschnitt „Was im Release-Zweig
+fehlen soll"; das Muster steht in dessen `files/branch-diff.py` und hängt
+am Präfix, nicht am Namen eines einzelnen Skills). Die **Quellen** der
+weitergegebenen Skills unter `skills/` sind davon unberührt — die gehören
+in den Release, sie sind das Produkt (Festlegung des Entwicklers vom
+11. September 2026).
+
 ## Jedes Vorhaben ist eigenständig aufgebaut
 
 Die Vorhaben dieses Repos unterscheiden sich in Doku-Aufbau, Benennung und
