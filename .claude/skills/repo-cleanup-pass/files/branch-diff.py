@@ -66,7 +66,17 @@ def main() -> int:
     excl = [re.compile(p) for p in DEFAULT_EXCLUDES + args.exclude]
     infra = [re.compile(p) for p in infra_patterns(root)]
 
-    raw = run("git", "diff", "--name-status", "-z", args.dst, args.src)
+    # --no-renames is load-bearing, not a preference: with rename detection a
+    # renamed file arrives as ONE record of THREE fields (R100, old, new),
+    # while every other record has two. The loop below pairs them two by two,
+    # so a single rename shifts everything behind it by one field -- status
+    # letters end up in the path slot and the old name lands in the take list
+    # instead of the delete list. Measured on 11 September 2026: one R100 in
+    # the comparison, 24 bogus entries behind it. Without rename detection git
+    # reports the same change as "D old" plus "A new", which is exactly the
+    # pair of lists this script keeps.
+    raw = run("git", "diff", "--name-status", "--no-renames", "-z",
+              args.dst, args.src)
     fields = raw.split("\0")
     take: list[str] = []
     dele: list[str] = []
