@@ -14,7 +14,7 @@ Dieser Durchgang hat zwei Tiefen, und die Wahl trifft der Nutzer.
 > Soll der Durchgang nur die Dateien abgleichen, die in `dev` neu oder verändert sind — oder vorher eine Tiefenprüfung über die Inhalte der Bereiche laufen, insbesondere über die READMEs, die Sprachfassungen und die Zip-Pakete?
 
 - **Nur Datei-Abgleich:** Alles, was zu tun ist, steht unten in diesem Dokument. **Lade `rules.md` nicht** — sie enthält nichts, was für diesen Fall gebraucht wird, und kostet nur Kontext.
-- **Mit Tiefenprüfung:** Lies `rules.md` im Ordner dieses Skills vollständig und arbeite sie ab. **Die Reihenfolge ist festgelegt: erst die Tiefenprüfung samt der Korrekturen, die aus ihr erwachsen — der Datei-Abgleich unten kommt zuletzt.** Andernfalls überträgst du einen Stand, den du gleich danach korrigierst, und der Release-Zweig trägt zwei Commits, wo einer gereicht hätte.
+- **Mit Tiefenprüfung:** Lies `rules.md` im Ordner dieses Skills vollständig und arbeite sie ab. **Erst die Tiefenprüfung samt der Korrekturen, die aus ihr erwachsen — der Datei-Abgleich unten kommt zuletzt** (der allgemeine Fall davon steht im nächsten Abschnitt).
 
 ## Was in jedem Fall gilt
 
@@ -23,6 +23,7 @@ Dieser Durchgang hat zwei Tiefen, und die Wahl trifft der Nutzer.
 - **Ein Checkpoint-Commit je Etappe**, nicht einer am Ende. Was auffällt, fällt oft erst zwei Etappen später auf.
 - **Mit ausdrücklichen Pfaden committen, nie mit `git add -A`.** Läuft die Bash-Sandbox, hängt sie Attrappen in den Arbeitsbaum, die wie unversionierte Dateien aussehen und nicht lesbar sind; `files/find-sandbox-masks.sh` listet sie. Aus demselben Grund ist ein rekursives Prüfwerkzeug, das mit „Permission denied" abbricht, nicht zwangsläufig kaputt.
 - **Vor jedem Commit, der Markdown einschließt**, die Tabellenprüfung des Skills `correct-zaaack-md-editor-mistakes` laufen lassen.
+- **Der Datei-Abgleich ist der letzte Schritt einer Arbeitssitzung**, nicht einer von mehreren. Steht noch etwas offen, das den Entwicklungszweig ändert — eine Korrektur aus der Tiefenprüfung, ein offener Punkt aus dem Gespräch —, wird erst das erledigt. Sonst trägt der Release-Zweig zwei Commits, wo einer gereicht hätte. **Am 11. September 2026 genau so passiert:** Der Abgleich lief, danach wurden drei offene Punkte abgearbeitet, und sechs Dateien mussten hinterher nachgezogen werden. Gefunden hat das die zweifache Gegenprobe aus Schritt 4 — die ist deshalb keine Formalität.
 - **Nicht pushen.** Der Push ist Sache des Nutzers, auch am Ende eines gelungenen Durchgangs.
 
 ---
@@ -39,8 +40,9 @@ Zwei Klassen, und sie sind keine Nachlässigkeit:
 
 1. **Skills mit Baustellenschild im Ordnernamen** (`skills/🚧_…`, `skills/🚷_…`). Sie sind unfertig und bleiben es dort, wo sie stehen.
 2. **Der Ordner `.research/`.** Untersuchungsmaterial, das den Release-Zweig nicht erreicht.
+3. **Die Projekt-Skills unter `.claude/skills/`** — und damit dieser Skill selbst. Sie sind Arbeitsgerät des Entwicklungszweigs: Ein Werkzeug, das den Release-Zweig herstellt, hat in ihm nichts zu suchen. In `infra` ebenso nicht, dort liegen nur die fünf zentralen Dateien (Festlegung des Entwicklers vom 11. September 2026; Anweisung in der Projekt-CLAUDE.md).
 
-`files/branch-diff.py` kennt beide Klassen als Vorgabe. Erkannt werden sie nicht an einer Namensliste, sondern daran, dass der Ordnername unter `skills/` nicht mit einem alphanumerischen Zeichen beginnt — ein künftiges Schild fällt damit von selbst darunter.
+`files/branch-diff.py` kennt alle drei Klassen als Vorgabe. Die Baustellen werden nicht an einer Namensliste erkannt, sondern daran, dass der Ordnername unter `skills/` nicht mit einem alphanumerischen Zeichen beginnt — ein künftiges Schild fällt damit von selbst darunter. Die dritte Klasse hängt am Präfix `.claude/skills/` und nicht am Namen dieses Skills, damit ein künftiger zweiter Projekt-Skill ebenso von selbst darunterfällt.
 
 ## Schritt 1 — Infra verteilen, auf beide Zweige
 

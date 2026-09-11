@@ -28,9 +28,15 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Skill folders whose name does not start with an alphanumeric character carry a
-# construction sign and are deliberately absent from the release branch.
-DEFAULT_EXCLUDES = [r"^skills/(?![A-Za-z0-9])", r"^\.research/"]
+# Three classes are deliberately absent from the release branch: skill folders
+# whose name does not start with an alphanumeric character (they carry a
+# construction sign), the research material, and the project's own skills under
+# .claude/skills/ -- those are working equipment of the development branch, this
+# skill included, and a tool that produces the release branch has no business
+# inside it. The third pattern hangs on the prefix and not on a folder name, so
+# a second project skill is covered without anyone having to remember it.
+DEFAULT_EXCLUDES = [r"^skills/(?![A-Za-z0-9])", r"^\.research/",
+                    r"^\.claude/skills/"]
 
 
 def run(*args: str) -> str:
