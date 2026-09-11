@@ -638,7 +638,10 @@ def _boot_time() -> Optional[datetime.datetime]:
     try:
         for line in Path("/proc/stat").read_text(encoding="utf-8").splitlines():
             if line.startswith("btime "):
-                return datetime.datetime.fromtimestamp(int(line.split()[1]))
+                # With its zone: session_running subtracts this time from a
+                # state stamp, and those carry one (doku 3.2).
+                return datetime.datetime.fromtimestamp(
+                    int(line.split()[1])).astimezone()
     except (OSError, ValueError, IndexError):
         return None
     return None
@@ -748,9 +751,8 @@ class WatchState:
         started = process_running_since(self.session_pid)
         if started is None:
             return False
-        try:
-            recorded = datetime.datetime.fromisoformat(self.session_started)
-        except (ValueError, TypeError):
+        recorded = _moment(self.session_started)
+        if recorded is None:
             return False
         return abs(started - recorded) <= PID_START_TOLERANCE
 
@@ -769,6 +771,23 @@ def _now() -> str:
     return datetime.datetime.now().astimezone().isoformat()
 
 
+def _moment(timestamp: str) -> Optional[datetime.datetime]:
+    """An ISO 8601 stamp as a moment WITH a zone, or None if unreadable.
+
+    One place for reading a stamp, because a naive one must never reach a
+    subtraction: naive minus aware raises TypeError (doku 3.2). Without an
+    offset the stamp is read as local time; what that costs and what it
+    saves is spelled out at the two callers, _age and session_running.
+    """
+    try:
+        moment = datetime.datetime.fromisoformat(timestamp)
+    except (ValueError, TypeError):
+        return None
+    if moment.tzinfo is None:
+        moment = moment.astimezone()
+    return moment
+
+
 def _age(timestamp: str) -> datetime.timedelta:
     """How long ago an ISO 8601 timestamp was. Unparsable counts as ancient.
 
@@ -780,12 +799,9 @@ def _age(timestamp: str) -> datetime.timedelta:
     and summer correctly by date. Its one residual: a naive stamp from the
     SECOND pass through an ambiguous hour is read an hour off, once.
     """
-    try:
-        moment = datetime.datetime.fromisoformat(timestamp)
-    except (ValueError, TypeError):
+    moment = _moment(timestamp)
+    if moment is None:
         return datetime.timedelta.max
-    if moment.tzinfo is None:
-        moment = moment.astimezone()
     return datetime.datetime.now().astimezone() - moment
 
 

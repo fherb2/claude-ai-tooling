@@ -994,7 +994,10 @@ def check_session_detection(w: types.ModuleType) -> None:
     cover (doku 3.1, step 3).
     """
     print("Sitzungserkennung:")
-    now = datetime.datetime.now()
+    # With their zone, because that is the only form the daemon ever writes:
+    # session_started comes from _now(). Naive stamps let this group compute
+    # naive against naive and miss the operating case entirely (3.2).
+    now = datetime.datetime.now().astimezone()
     long_ago = (now - datetime.timedelta(hours=3)).isoformat()
     recent = (now - datetime.timedelta(minutes=5)).isoformat()
 
@@ -1014,14 +1017,29 @@ def check_session_detection(w: types.ModuleType) -> None:
     check("nach der Ruhezeit, fremder Prozess: beendet",
           w.WatchState(session_pid=os.getpid(),
                        session_started=long_ago).session_running(), False)
-    # The long session: alive, and started when we recorded it.
-    own_start = w.process_running_since(os.getpid())
-    check("Startzeit des eigenen Prozesses lesbar", own_start is not None, True)
-    if own_start is not None:
+    # The long session: alive, and started when we recorded it. This needs a
+    # start time older than the quiet time, or that time answers first and the
+    # pid branch is never reached -- which is exactly what the own process,
+    # seconds old, used to do here. No process of a known age can stand in for
+    # it either: under the sandbox even pid 1 is young, because it is the init
+    # of a pid namespace (measured 11 September 2026). The start time is
+    # therefore staged. What the real function has to contribute is one
+    # property, and that is checked on its own: it answers WITH a zone, or the
+    # subtraction below raises TypeError (doku 3.2).
+    real_start = w.process_running_since(os.getpid())
+    check("Startzeit des eigenen Prozesses lesbar", real_start is not None, True)
+    check("Startzeit traegt ihre Zonenangabe",
+          real_start is not None and real_start.tzinfo is not None, True)
+    original_since = w.process_running_since
+    staged = now - datetime.timedelta(hours=2)
+    w.process_running_since = lambda pid: staged
+    try:
         check("nach der Ruhezeit, passende Startzeit: laufend",
               w.WatchState(session_pid=os.getpid(),
-                           session_started=own_start.isoformat()
+                           session_started=staged.isoformat()
                            ).session_running(), True)
+    finally:
+        w.process_running_since = original_since
     # A zombie answers os.kill with "exists"; the state letter gives it away.
     check("Zombie gilt als beendet",
           w.process_running_since(_leave_a_zombie()), None)
