@@ -226,6 +226,12 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 - Der **Slash-Aufruf** heißt entsprechend `/<skill-name>`, nie `/<skill-name>-de`. Wo die `description` ihn selbst nennt, gehört er ohne Kürzel dort hinein.
 - Mehrere Fassungen sind **Übersetzungen desselben Skills**, keine mehreren Skills. Sie tragen dieselben Regeln, dieselben Anker und dieselbe Struktur. Weicht eine inhaltlich ab, ist das ein Fehler, kein Sprachunterschied.
 
+**Die beiden Fassungen verweisen oben aufeinander, und zwar mit der absoluten Repo-URL.** Der Verweis steht als kursive Zeile unmittelbar unter der Datumszeile — `*[English version](…)*` in der deutschen Fassung, `*[Deutsche Fassung](…)*` in der englischen. Drei Festlegungen dazu, jede mit ihrem Grund:
+
+- **Absolut nur dort, wo die Datei in ein Paket wandert; sonst relativ.** Eine README, die mit dem Skill nach `~/.claude/skills/<skill>/` gelangt, findet dort keine Schwesterdatei — in der installierten Kopie ist ein relativer Link tot, und genau dort wird er gebraucht. Die READMEs der Repository-Wurzel behalten deshalb ihre relativen Links: Sie wandern in kein Paket.
+- **Der Zweig in der URL ist `master`, nicht `HEAD`.** Gemeint ist der **Release**-Stand, und `master` benennt ihn (`release_branch` in `.claude/git-worktree-model.json`). `blob/HEAD/…` löst GitHub auf den jeweiligen Standard-Zweig auf; beide Formen funktionieren (am 11. September 2026 gegen das Repository gemessen, je HTTP 200), aber `HEAD` würde einem Wechsel des Standard-Zweigs **still** folgen und im Zweifel auf den Entwicklungsstand zeigen. Dass `master` bei einer Umbenennung des Zweigs bricht, ist das kleinere Übel, denn dieser Bruch ist auffindbar.
+- **Auffindbar über `grep -rn "blob/master" --include="*.md"`** — am 11. September 2026 zwanzig Verweise in zwanzig Dateien, je Sprachpaar einer. Wird der Release-Zweig je umbenannt, ist das ein Durchgang und keine Suche.
+
 **Was für eine weitere Fassung spricht.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
 
 ### 5.2 Zweiteilung: dünne `SKILL.md`, nachgeladener Regelteil
