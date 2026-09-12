@@ -669,7 +669,11 @@ Prüft zuerst die Vorbedingungen, **in dieser Reihenfolge und mit der hier genan
 
 **Angelegt wird genau eines:** der Ordner `tools/`, falls er fehlt (2.7). Es ist die einzige Stelle, an der die Einrichtung etwas erzeugt, das nicht die Unit ist, und sie ist nötig, weil `--add-dir` auf einen fehlenden Ordner die Sitzung scheitern ließe (3.3). Der Grundsatz „das Skript installiert nichts nach" bleibt davon unberührt — er meint Pakete.
 
-**Entfernt wird dagegen nichts.** Eine Einrichtung aus der Zeit vor der Umbenennung von `werkzeuge/` in `tools/` behält den alten Ordner zusätzlich. Das Skript **nennt** ihn dann samt Löschbefehl, statt ihn wegzuräumen: Löschen auf einem fremden Rechner ist Sache des Nutzers, und niemand außer ihm weiß, ob er dort etwas abgelegt hat.
+**Entfernt wird dagegen nichts, benannt schon.** Das Entpacken eines Pakets über eine bestehende Installation überschreibt und ergänzt, löscht aber nie — Überbleibsel früherer Stände bleiben deshalb liegen. Das Skript nennt drei Lagen samt Befehl, statt sie wegzuräumen: Löschen auf einem fremden Rechner ist Sache des Nutzers, und niemand außer ihm weiß, ob er dort etwas abgelegt hat.
+
+- **Der Ordner `werkzeuge/`** aus der Zeit vor der Umbenennung in `tools/`.
+- **`conflict-resolution.md` ohne Sprachkürzel** aus der Zeit vor der Sprachtrennung. Sie wird von keiner Stelle mehr gelesen — der Wächter bildet den Namen aus seiner Sprache (3.1) —, sieht aber aus wie die maßgebliche Anweisung.
+- **Mehr als ein Katalog `messages_*.py`.** Das ist kein Überbleibsel, sondern eine Lage mit anderer Wirkung: Bei genau einem Katalog entscheidet dieser die Sprache, bei mehreren der Schalter `--lang` — und die Unit übergibt keinen, es gilt also die Vorgabe (2.5, 3.1). Das Skript sagt das, weil es sonst niemand sagt; eine Warnung, kein Abbruch, denn nebeneinanderliegende Kataloge sind der normale Zustand eines Entwicklungsrechners.
 
 Danach: Unit kopieren, `systemctl --user daemon-reload`, aktivieren und **immer neu starten**, abschließend den Status ausgeben.
 
