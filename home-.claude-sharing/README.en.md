@@ -96,6 +96,14 @@ Where the group of machines begins, there is neither a synchronised folder nor a
 
 Steps 1 to 4 and 7 to 8 above apply unchanged. **Steps 5 and 6 do not apply:** there is no second set of files to unite anything with, so no conflict copies arise. Only the next machine goes through the full path.
 
+### Updating an existing installation
+
+An existing installation is not set up again but overwritten: download the current package and run `unzip -o claude-sync-watch_en_local.zip -d ~`. **The `-o` belongs there** — without it `unzip` asks about every file that already exists, one by one. Then run `~/.claude-sync-watch/install_service.sh`: only that renews the service definition and starts the watcher with the new version. Unpacking alone leaves the new files on disk and the old watcher running. Untouched by all of this: `~/.claude`, the state file `zustand.json` and the `tools/` folder.
+
+**Unpacking deletes nothing.** An installation from before the split by language therefore keeps `conflict-resolution.md` — the working instruction without a language code. It is not read any more, because the watcher builds the name from its own language (`conflict-resolution.en.md`); it merely looks like the authoritative one. The same goes for a `werkzeuge/` folder from before the rename to `tools/` and for a `__pycache__/`. The setup script names whatever it finds of these and removes nothing by itself: deleting on someone else's machine is not its business.
+
+**One folder, one catalogue.** Where several `messages_*.py` sit side by side — because both packages were unpacked, or files were copied in from the repository — the package no longer decides the language; the `--lang` switch does. The service definition passes none, so German applies. The setup script points that out as well.
+
 ### Removing the service again
 
 `~/.claude-sync-watch/uninstall_service.sh` removes the service — not the folder and not the sync. Whoever wants to get rid of the tool entirely deletes `~/.claude-sync-watch/` by hand afterwards; `~/.claude` and the Syncthing share are untouched by that.
