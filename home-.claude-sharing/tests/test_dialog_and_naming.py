@@ -2015,6 +2015,53 @@ def check_missing_notify_send(w: types.ModuleType) -> None:
 # The groups, as lists rather than as a sequence of calls: every one of them
 # runs once per language (see run_groups), and a second list of call sites
 # would drift from the first.
+def check_claude_location(w: types.ModuleType, tmp_root: Path) -> None:
+    """Where Claude Code lives is resolved, and asked for in one place.
+
+    A fixed /usr/bin/claude was the wrong assumption: the documented installer
+    puts the program under ~/.local/bin, and the setup then refused the
+    service (found 13 September 2026). The search path comes first because its
+    order is the user's own intent; the fixed candidates follow (doku 3.3).
+    """
+    print("Ort von Claude Code (3.3):")
+    eigen = tmp_root / "eigenes-heim"
+    (eigen / ".local" / "bin").mkdir(parents=True, exist_ok=True)
+    programm = eigen / ".local" / "bin" / "claude"
+    programm.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    programm.chmod(0o755)
+
+    # Ohne Treffer im Suchpfad muss die Benutzerinstallation gewinnen. HOME
+    # und PATH werden gestellt, damit der Fall nicht davon abhaengt, was
+    # dieser Rechner zufaellig installiert hat.
+    original_home, original_path = os.environ.get("HOME"), os.environ.get("PATH")
+    os.environ["HOME"], os.environ["PATH"] = str(eigen), "/nirgendwo"
+    try:
+        check("Benutzerinstallation wird gefunden",
+              w.claude_binary(), str(programm))
+    finally:
+        if original_home is not None:
+            os.environ["HOME"] = original_home
+        if original_path is not None:
+            os.environ["PATH"] = original_path
+
+    # Der Schalter ist die einzige Stelle, an der das Installskript fragt:
+    # Pfad auf die Ausgabe, ausfuehrbar ja/nein in den Rueckgabewert.
+    original_binary = w.claude_binary
+    for label, pfad, erwartet in (("ausfuehrbar", str(programm), 0),
+                                  ("nicht vorhanden",
+                                   str(tmp_root / "gibtsnicht"), 1)):
+        w.claude_binary = lambda _p=pfad: _p
+        try:
+            gedruckt = io.StringIO()
+            with contextlib.redirect_stdout(gedruckt):
+                ausgang = w.main(["--claude-path"])
+        finally:
+            w.claude_binary = original_binary
+        check(f"--claude-path, {label}: Rückgabewert", ausgang, erwartet)
+        check(f"--claude-path, {label}: Pfad ausgegeben",
+              gedruckt.getvalue().strip(), pfad)
+
+
 PLAIN_GROUPS = (
     check_dialog_answers,
     check_timeout_unit,
@@ -2026,6 +2073,7 @@ PLAIN_GROUPS = (
 )
 
 TMP_GROUPS = (
+    check_claude_location,
     check_lock,
     check_swallowed_errors,
     check_episode_clock,
