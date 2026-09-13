@@ -41,16 +41,6 @@ Stand 11. September 2026, für den nächsten Review als Vergleichsbasis:
 
 Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig; daneben nur `.research/`, `.claude/`, `.vscode/`, `.git/` und die Sandbox-Attrappen. `.research/` enthält keine README.
 
-## 5 Befunde: mittel
-
-**Vorschlag:** `git diff --name-only -z "$REF"..HEAD | while IFS= read -r -d '' f`. Kriterium: Datumszeile nicht älter als der letzte Commit, der die Datei seit `<ref>` geändert hat (`git log -1 --format=%cs "$REF"..HEAD -- "$f"`), mit `TODAY` nur als Obergrenze. In `rules.md` sagen, ob das Werkzeug vor oder nach dem Checkpoint-Commit läuft.
-
-## 6 Befunde: niedrig und Kleinkram
-
-Kleinkram wird nach Projekt-`CLAUDE.md` gesammelt und am Ende in einem Zug erledigt; jeder Punkt behält seine Nummer.
-
-- **B20 — Die Frage an den Nutzer nennt nicht alle Etappen.** `SKILL.md`, „Zuerst fragen, dann arbeiten": „READMEs, Sprachfassungen und Zip-Pakete"; die Tiefenprüfung umfasst auch Datumszeilen (Etappe 3) und den Verweisprüfer (Etappe 5), die `description` nennt die Datumszeilen. Frage vervollständigen.
-
 ## 8 Geprüft und in Ordnung
 
 Damit der nächste Review nachprüft statt neu herleitet:

@@ -11,7 +11,7 @@ Dieser Durchgang hat zwei Tiefen, und die Wahl trifft der Nutzer.
 
 **Stelle dem Nutzer diese Frage und warte auf seine Antwort:**
 
-> Soll der Durchgang nur die Dateien abgleichen, die in `dev` neu oder verändert sind — oder vorher eine Tiefenprüfung über die Inhalte der Bereiche laufen, insbesondere über die READMEs, die Sprachfassungen und die Zip-Pakete?
+> Soll der Durchgang nur die Dateien abgleichen, die in `dev` neu oder verändert sind — oder vorher eine Tiefenprüfung über die Inhalte der Bereiche laufen: die Wurzel-READMEs, Datumszeilen, Sprach-Querverweise, die Download-Pakete und die Verweise darin?
 
 - **Nur Datei-Abgleich:** Alles, was zu tun ist, steht unten in diesem Dokument. **Lade `rules.md` nicht** — sie enthält nichts, was für diesen Fall gebraucht wird, und kostet nur Kontext.
 - **Mit Tiefenprüfung:** Lies `rules.md` im Ordner dieses Skills vollständig und arbeite sie ab. **Erst die Tiefenprüfung samt der Korrekturen, die aus ihr erwachsen — der Datei-Abgleich unten kommt zuletzt** (der allgemeine Fall davon steht im nächsten Abschnitt).
