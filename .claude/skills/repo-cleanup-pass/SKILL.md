@@ -23,6 +23,7 @@ Dieser Durchgang hat zwei Tiefen, und die Wahl trifft der Nutzer.
 - **Ein Checkpoint-Commit je Etappe**, nicht einer am Ende. Was auffällt, fällt oft erst zwei Etappen später auf.
 - **Mit ausdrücklichen Pfaden committen, nie mit `git add -A`.** Läuft die Bash-Sandbox, hängt sie Attrappen in den Arbeitsbaum, die wie unversionierte Dateien aussehen und nicht lesbar sind; `files/find-sandbox-masks.sh` listet sie. Aus demselben Grund ist ein rekursives Prüfwerkzeug, das mit „Permission denied" abbricht, nicht zwangsläufig kaputt.
 - **Vor jedem Commit, der Markdown einschließt**, die Tabellenprüfung des Skills `correct-zaaack-md-editor-mistakes` laufen lassen.
+- **Blockiert die Bash-Sandbox einen Schritt, nicht versuchen, das zu umgehen.** Dem Entwickler melden, welche Operation ohne Sandbox nötig ist, und ihn bitten, sie kurzzeitig abzuschalten. Nach der Operation Bescheid geben, dass er sie wieder einschalten kann.
 - **Der Datei-Abgleich ist der letzte Schritt einer Arbeitssitzung**, nicht einer von mehreren. Steht noch etwas offen, das den Entwicklungszweig ändert — eine Korrektur aus der Tiefenprüfung, ein offener Punkt aus dem Gespräch —, wird erst das erledigt. Sonst trägt der Release-Zweig zwei Commits, wo einer gereicht hätte. **Am 11. September 2026 genau so passiert:** Der Abgleich lief, danach wurden drei offene Punkte abgearbeitet, und sechs Dateien mussten hinterher nachgezogen werden. Gefunden hat das die zweifache Gegenprobe aus Schritt 4 — die ist deshalb keine Formalität.
 - **Nicht pushen.** Der Push ist Sache des Nutzers, auch am Ende eines gelungenen Durchgangs.
 
@@ -34,9 +35,13 @@ Ziel: Der Release-Zweig trägt jede Datei des Entwicklungszweigs, ausgenommen da
 
 Die Namen der Zweige und die Liste der zentralen Dateien stehen in `.claude/git-worktree-model.json` (`integration_branch`, `release_branch`, `infra_files`). Im Folgenden `dev` und `master` genannt.
 
+**Der Haupt-Checkout bleibt dabei durchgehend auf `dev`.** Das Worktree-Modell (Projekt-`CLAUDE.md`, Skill `parallel-sessions`) verbietet dem Skill, dort den Zweig zu wechseln oder zu committen — und das muss er auch nicht: `master` wird nie ausgecheckt, sondern per Git-Plumbing direkt auf Ebene der Objekte fortgeschrieben (`read-tree`/`update-index`/`write-tree`/`commit-tree`/`update-ref`, mit einer alternativen Index-Datei statt des Arbeitsbaums). Das ist kein Umweg, sondern die robustere Lösung: Sie berührt `.claude/skills/` nie und scheitert deshalb auch nicht an dessen Sandbox-Sperre.
+
+**Vorher prüfen: `git worktree list`.** Anders als `git checkout` verweigert `git update-ref` nicht, wenn der Ziel-Branch gerade in einem anderen Worktree ausgecheckt ist — es bewegt den Ref trotzdem, und diese andere Sitzung säße danach auf einem veralteten Stand. Zeigt `master` dort auf, den Nutzer fragen, statt fortzufahren.
+
 ## Was im Release-Zweig fehlen soll
 
-Zwei Klassen, und sie sind keine Nachlässigkeit:
+Drei Klassen, und sie sind keine Nachlässigkeit:
 
 1. **Skills mit Baustellenschild im Ordnernamen** (`skills/🚧_…`, `skills/🚷_…`). Sie sind unfertig und bleiben es dort, wo sie stehen.
 2. **Der Ordner `.research/`.** Untersuchungsmaterial, das den Release-Zweig nicht erreicht.
@@ -46,17 +51,31 @@ Zwei Klassen, und sie sind keine Nachlässigkeit:
 
 ## Schritt 1 — Infra verteilen, auf beide Zweige
 
-**Zentrale Dateien kommen nie aus `dev`, sondern immer aus dem Infra-Zweig.** Sonst wandert eine Fassung weiter, die dort nie beschlossen wurde.
+**Zentrale Dateien kommen nie aus `dev`, sondern immer aus dem Infra-Zweig.** Sonst wandert eine Fassung weiter, die dort nie beschlossen wurde. Die maßgebliche Pfadliste ist `infra_files` aus der Modelldatei.
+
+**Auf `dev`** — echter Dateizugriff auf den aktiven Arbeitsbaum:
 
 ```bash
-# auf dev, dann ebenso auf master:
 git restore --source=infra -- .claude/CLAUDE.md .claude/settings.json .vscode/ .gitignore .markdownlint.jsonc
 git add <dieselben Pfade> && git commit
 ```
 
-Die maßgebliche Pfadliste ist `infra_files` aus der Modelldatei, nicht die obige Zeile. Ändert sich dort etwas, gilt die Datei.
+Trifft das auf eine tatsächliche Abweichung bei einer sandbox-gesperrten Datei (`.claude/settings.json`), greift die allgemeine Sandbox-Regel oben.
 
-Gegenprobe je Zweig: `git diff --stat infra <zweig> -- <infra_files>` muss leer sein.
+**Auf `master`, ohne Checkout** — der Release-Zweig wird nie ausgecheckt, sein Tree stattdessen per Plumbing fortgeschrieben:
+
+```bash
+IDX=$(mktemp)
+GIT_INDEX_FILE="$IDX" git read-tree master
+git ls-tree -r infra -- .claude/CLAUDE.md .claude/settings.json .vscode/ .gitignore .markdownlint.jsonc \
+  | GIT_INDEX_FILE="$IDX" git update-index --index-info
+TREE=$(GIT_INDEX_FILE="$IDX" git write-tree)
+COMMIT=$(git commit-tree "$TREE" -p master -m "Infra verteilen")
+git update-ref refs/heads/master "$COMMIT"
+rm -f "$IDX"
+```
+
+Gegenprobe je Zweig, ohne Checkout: `git diff --stat infra <zweig> -- <infra_files>` muss für beide leer sein.
 
 ## Schritt 2 — Den Vollvergleich erheben
 
@@ -70,25 +89,31 @@ Das Skript gibt vier Listen aus: zu übernehmen, im Release-Zweig zu löschen, b
 
 ## Schritt 3 — Übertragen
 
+Auch dies ohne Checkout, direkt auf dem aktuellen Stand von `master` (nach Schritt 1 also inklusive Infra):
+
+**Vorher: Arbeitsverzeichnis ist die Repo-Wurzel.** Die Listen aus Schritt 2 sind wurzelrelativ; von woanders aus laufen `git ls-tree`/`update-index` an den falschen Pfaden vorbei.
+
 ```bash
 LISTEN=<Pfad aus Schritt 2>
-git checkout master
-xargs -0 -r -a "$LISTEN/take.z" git checkout dev --
-xargs -0 -r -a "$LISTEN/dele.z" git rm -q --
-git diff --cached --stat        # ansehen, dann committen
-git commit
+IDX=$(mktemp)
+GIT_INDEX_FILE="$IDX" git read-tree master
+xargs -0 -r -a "$LISTEN/take.z" git ls-tree dev -- \
+  | GIT_INDEX_FILE="$IDX" git update-index --index-info
+xargs -0 -r -a "$LISTEN/dele.z" env GIT_INDEX_FILE="$IDX" git update-index --remove --force-remove --
+TREE=$(GIT_INDEX_FILE="$IDX" git write-tree)
+COMMIT=$(git commit-tree "$TREE" -p master -m "Datei-Abgleich")
+git diff --stat master "$COMMIT"   # ansehen, dann erst den Ref bewegen
+git update-ref refs/heads/master "$COMMIT"
+rm -f "$IDX"
 ```
 
 Eine Löschung im Release-Zweig ist Teil des Abgleichs, kein Sonderfall: Was in `dev` bewusst entfallen ist, hat dort ebenfalls nichts mehr zu suchen. Sie wird aber **benannt**, nicht nebenbei ausgeführt.
 
-**`-r` ist kein Beiwerk:** Ohne es ruft `xargs` den Befehl auch bei leerer Liste einmal ohne Argumente auf, und `git rm --` ohne Pfad bricht mit `fatal: No pathspec given` ab. Eine leere Löschliste ist der Regelfall, nicht die Ausnahme.
+**`-r` ist kein Beiwerk:** Ohne es ruft `xargs` den Befehl auch bei leerer Liste einmal ohne Argumente auf — `git ls-tree dev --` ohne Pfad läse dann den ganzen Baum, `update-index --remove --force-remove --` ohne Pfad wäre dagegen harmlos, aber beides unbeabsichtigt. Eine leere Löschliste ist der Regelfall, nicht die Ausnahme.
 
 **Eine Umbenennung ist im Abgleich zwei Vorgänge**, kein eigener dritter. `branch-diff.py` erhebt den Vergleich deshalb mit `--no-renames`: Der alte Name steht dann in der Löschliste, der neue in der Übernahmeliste. Wer die Listen mit einer unabhängigen Messung vergleicht, muss das wissen — `git diff --name-only` mit Umbenennungserkennung nennt **nur** den neuen Namen, zählt also einen Pfad weniger. Beide Zahlen sind richtig; sie beantworten verschiedene Fragen.
 
-**Bekannte Bedingung: `.claude/skills/` ist unter aktiver Sandbox nur lesbar.** Enthält die Übertragungsliste Dateien von dort — etwa diesen Skill selbst —, bricht `git checkout` sie mit „Das Dateisystem ist nur lesbar" ab. Der Index bekommt den richtigen Inhalt trotzdem; nur der Arbeitsbaum lässt sich nicht schreiben. Zwei Wege:
-
-- **Sauber:** die Sandbox für den Übertrag abschalten, dann greift nichts ein.
-- **Wenn sie an bleibt:** vor dem Commit ausdrücklich prüfen, dass Index und Arbeitsbaum übereinstimmen und der Index den Stand des Quellzweigs trägt — `git diff --name-only` (unversionierte Abweichungen, muss leer sein) und je Pfad `git show dev:<pfad>` gegen `git show :<pfad>`. Stimmt beides, ist der Commit vollständig; das war beim ersten Lauf so, **weil** dort dieselben Dateien schon auf der Platte lagen. Verlangte der Übertrag an dieser Stelle einen *anderen* Inhalt, bliebe er unvollständig — dann hilft nur der erste Weg.
+**Warum Plumbing statt Checkout:** `.claude/skills/` existiert nur auf `dev`. Ein `git checkout master` im Haupt-Checkout müsste die Skill-Dateien deshalb aus dem Arbeitsbaum entfernen — unter aktiver Bash-Sandbox ist genau das gesperrt („Das Dateisystem ist nur lesbar", beobachtet). Die Plumbing-Route arbeitet nur auf Ebene der Git-Objekte und einer alternativen Index-Datei, berührt `.claude/skills/` nie und bleibt deshalb auch mit aktiver Sandbox möglich. Sie verlässt nebenbei `dev` kein einziges Mal — die frühere Rückkehr auf den Entwicklungszweig (vormals Schritt 5) entfällt damit.
 
 ## Schritt 4 — Gegenprobe, und zwar zweifach
 
@@ -110,6 +135,6 @@ Die erste Probe fängt Vergessenes, die zweite einen misslungenen Übertrag. Bei
 
 **`core.quotepath=false` ist in der ersten Probe nicht Kosmetik.** Ohne diese Angabe setzt Git Pfade mit Nicht-ASCII-Zeichen in Anführungszeichen — die Zeile beginnt dann mit `"` statt mit `skills/`, der Ausschlussfilter greift nicht, und die Probe meldet **alle** Baustellen-Skills als unerwartet. Beim ersten Lauf dieses Skills ist genau das passiert: 25 Fehlalarme, die wie ein misslungener Abgleich aussahen.
 
-## Schritt 5 — Zurück auf den Entwicklungszweig
+## Abschluss
 
-`git checkout dev`, damit die nächste Sitzung nicht versehentlich im Release-Zweig arbeitet. Dann dem Nutzer den Stand melden: welche Zweige wie viele Commits vor ihrem Remote liegen, und dass nichts gepusht ist.
+Der Haupt-Checkout stand während des ganzen Durchgangs auf `dev` und bleibt dort — ein Zurückwechseln entfällt. Dem Nutzer den Stand melden: welche Zweige wie viele Commits vor ihrem Remote liegen, und dass nichts gepusht ist.
