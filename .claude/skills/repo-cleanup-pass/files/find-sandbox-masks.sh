@@ -36,7 +36,7 @@ if [ -z "$found" ]; then
 fi
 
 echo 'Maskierte Attrappen im Arbeitsbaum (kein Repo-Inhalt):'
-printf '%s\n' "$found" | sed 's|^\./|  |'
+printf '%s\n' "$found" | sed 's/^/  /'
 echo
 printf 'Anzahl: %s\n' "$(printf '%s\n' "$found" | grep -c .)"
 echo 'Folge: mit ausdruecklichen Pfaden committen, nicht mit git add -A.'

@@ -49,7 +49,6 @@ Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig
 
 Kleinkram wird nach Projekt-`CLAUDE.md` gesammelt und am Ende in einem Zug erledigt; jeder Punkt behält seine Nummer.
 
-- **B16 — `find-sandbox-masks.sh`: die Einrückung greift nie.** `path=${path#./}` schneidet `./` ab, danach kann `sed 's|^\./|  |'` nichts ersetzen; die Liste erscheint ohne Einrückung (beobachtet im heutigen Lauf). Kosmetik.
 - **B20 — Die Frage an den Nutzer nennt nicht alle Etappen.** `SKILL.md`, „Zuerst fragen, dann arbeiten": „READMEs, Sprachfassungen und Zip-Pakete"; die Tiefenprüfung umfasst auch Datumszeilen (Etappe 3) und den Verweisprüfer (Etappe 5), die `description` nennt die Datumszeilen. Frage vervollständigen.
 
 ## 8 Geprüft und in Ordnung
