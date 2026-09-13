@@ -46,7 +46,7 @@ Drei Klassen, und sie sind keine Nachlässigkeit:
 2. **Der Ordner `.research/`.** Untersuchungsmaterial, das den Release-Zweig nicht erreicht.
 3. **Die Projekt-Skills unter `.claude/skills/`** — und damit dieser Skill selbst. Sie sind Arbeitsgerät des Entwicklungszweigs: Ein Werkzeug, das den Release-Zweig herstellt, hat in ihm nichts zu suchen. In `infra` ebenso nicht, dort liegen nur die fünf zentralen Dateien (Festlegung des Entwicklers vom 11. September 2026; Anweisung in der Projekt-CLAUDE.md).
 
-`files/branch-diff.py` kennt alle drei Klassen als Vorgabe. Die Baustellen werden nicht an einer Namensliste erkannt, sondern daran, dass der Ordnername unter `skills/` nicht mit einem alphanumerischen Zeichen beginnt — ein künftiges Schild fällt damit von selbst darunter. Die dritte Klasse hängt am Präfix `.claude/skills/` und nicht am Namen dieses Skills, damit ein künftiger zweiter Projekt-Skill ebenso von selbst darunterfällt.
+**Alle drei Klassen stehen in `files/unfinished.py`** — dem einen Ort, aus dem sich jedes Werkzeug dieses Skills und der Filter der Gegenprobe bedienen. Die Baustellen werden nicht an einer Namensliste erkannt, sondern daran, dass der Ordnername unter `skills/` nicht mit einem alphanumerischen Zeichen beginnt — ein künftiges Schild fällt damit von selbst darunter. Bewusst breiter als „beginnt mit einem Emoji": Zu viel auszuschließen fällt auf, zu wenig auszuschließen bringt einen unfertigen Skill still in den Release. Beginnt ein ausgeschlossener Ordner mit einem Zeichen, das gar kein Schild ist (etwa `_alt-kram/`), sagt das Werkzeug das ausdrücklich, statt ihn stillschweigend zu schlucken. Die dritte Klasse hängt am Präfix `.claude/skills/` und nicht am Namen dieses Skills, damit ein künftiger zweiter Projekt-Skill ebenso von selbst darunterfällt.
 
 ## Schritt 1 — Infra verteilen, auf beide Zweige
 
@@ -119,7 +119,7 @@ Eine Löschung im Release-Zweig ist Teil des Abgleichs, kein Sonderfall: Was in 
 ```bash
 # 1. Es darf nur noch das Ausgeschlossene übrig sein -- alle DREI Klassen:
 git -c core.quotepath=false diff --name-only master dev \
-  | grep -v -E '^skills/[^A-Za-z0-9]|^\.research/|^\.claude/skills/'
+  | grep -v -E "$(python3 .claude/skills/repo-cleanup-pass/files/unfinished.py --release-regex)"
 #    -> keine Ausgabe
 
 # 2. Jede übertragene Datei byteweise vergleichen:
@@ -130,7 +130,7 @@ xargs -0 -r -a "$LISTEN/take.z" -I{} sh -c \
 
 Die erste Probe fängt Vergessenes, die zweite einen misslungenen Übertrag. Beide gehören dazu; die erste allein sagt nur, dass ein Pfad existiert, nicht dass er stimmt.
 
-**Der Filter der ersten Probe muss alle Klassen führen, die oben ausgeschlossen sind.** Kommt eine hinzu und der Filter bleibt zurück, meldet die Probe genau die neu ausgeschlossenen Dateien als Vergessenes — am 11. September 2026 wären es die sieben Dateien dieses Skills gewesen, also ein Fehlalarm, der wie ein misslungener Abgleich aussieht. Wer eine Klasse ergänzt, ergänzt drei Stellen: die Liste oben, `DEFAULT_EXCLUDES` in `files/branch-diff.py` und diesen Filter.
+**Der Filter der ersten Probe bezieht sein Muster aus `files/unfinished.py`**, dem einen Ort, an dem sämtliche Ausschlussklassen dieses Skills stehen — die Werkzeuge lesen es dort ebenfalls. **Wer eine Klasse ergänzt, ergänzt genau diese eine Stelle** (und die Aufzählung oben, die sie für den Leser erklärt). Früher stand dasselbe Muster dreifach im Ordner; blieb eine Kopie zurück, meldete die Probe die neu ausgeschlossenen Dateien als Vergessenes — ein Fehlalarm, der wie ein misslungener Abgleich aussieht.
 
 **`core.quotepath=false` ist in der ersten Probe nicht Kosmetik.** Ohne diese Angabe setzt Git Pfade mit Nicht-ASCII-Zeichen in Anführungszeichen — die Zeile beginnt dann mit `"` statt mit `skills/`, der Ausschlussfilter greift nicht, und die Probe meldet **alle** Baustellen-Skills als unerwartet. Beim ersten Lauf dieses Skills ist genau das passiert: 25 Fehlalarme, die wie ein misslungener Abgleich aussahen.
 

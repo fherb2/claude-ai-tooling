@@ -62,15 +62,19 @@ Wer diese Etappe fährt, prüft mit.
 ## 3 Datumszeilen nachziehen
 
 ```bash
-bash .claude/skills/repo-cleanup-pass/files/datelines-since.sh <ref>
+python3 .claude/skills/repo-cleanup-pass/files/datelines-since.py <ref>
 ```
 
 `<ref>` ist der Stand, gegen den verglichen wird — der Commit vor Beginn des Durchgangs oder der Release-Zweig.
+
+**Erst committen, dann laufen lassen.** Der Vergleich ist `<ref>..HEAD` und sieht deshalb nur Committetes; uncommittete Arbeit im Baum taucht überhaupt nicht auf. Das Werkzeug ist nach dem Checkpoint-Commit der Etappe aussagekräftig, nicht davor.
 
 Zwei Regeln entscheiden:
 
 - **Das Datum gehört zur Datei, nicht zum Paar.** Wird nur die englische Fassung inhaltlich geändert, trägt nur sie das neue Datum. Zwei verschiedene Daten in einem Sprachpaar sind richtig, nicht schlampig.
 - **Inhaltlich geändert** heißt: mehr als Leerraum. Ein hinzugefügter Querverweis ist eine inhaltliche Änderung.
+
+Verglichen wird die Datumszeile gegen den **letzten Commit, der die Datei seit `<ref>` geändert hat** — nicht gegen heute. Sonst meldete jeder Durchgang gegen den Release-Zweig, der über mehrere Tage reicht, auch die korrekt datierten Dateien als offen. `ZUKUNFT` heißt: Die Datumszeile liegt hinter dem heutigen Tag. `unberuehrt` heißt: Auf diesem Zweig hat die Datei seit `<ref>` kein Commit angefasst — der Unterschied stammt von der Gegenseite, es ist nichts nachzuziehen.
 
 Die zweite Liste des Skripts — geändert, aber ohne Datumszeile — ist zur Kontrolle da und meistens leer von Befunden: Quelltext, Entwicklungsdateien wie Fahrplan und Implementierungsdoku, Archive und die `CLAUDE.md` selbst tragen keine.
 
