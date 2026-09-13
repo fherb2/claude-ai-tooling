@@ -30,13 +30,18 @@ Es gibt zwei, und sie sind in der Wurzel sprachlich vertauscht: `README.md` trä
 ## 2 Bereichs- und Skill-READMEs: Datumszeile und Sprach-Querverweis
 
 ```bash
-bash .claude/skills/repo-cleanup-pass/files/readme-audit.sh
+python3 .claude/skills/repo-cleanup-pass/files/readme-audit.py
 ```
 
-Das Skript listet jede versionierte README mit ihrem Datum, dem Zustand ihres Querverweises und dem Namen der zweiten Sprachfassung. Zu lesen ist es so:
+Das Skript listet jede versionierte README mit ihrem Datum, dem Zustand ihres Querverweises, der Art des Linkziels (`abs`/`rel`) und dem Namen der zweiten Sprachfassung. Gesucht wird beides nur im Kopfbereich der Datei — vor der ersten `#`-Überschrift oder zwischen ihr und der nächsten `#`/`##`-Überschrift. Ein Datum weiter unten im Fließtext gilt deshalb nicht mehr als Datumszeile.
+
+Zu lesen ist es so:
 
 - **`FEHLT` beim Querverweis ist ein Befund**, `entfaellt` nicht — letzteres heißt, dass es keine zweite Fassung gibt.
 - **`KEINS` beim Datum ist immer ein Befund.**
+- **`andere Form` und `UNSICHER` sind noch keine Befunde.** Sie heißen: gefunden, aber nicht in der vorgeschriebenen Schreibweise oder nicht an der vorgeschriebenen Stelle. Das Skript gibt dazu den Rohtext und die Zeilennummer aus — **erst die Stelle ansehen, dann entscheiden**, ob es eine Abweichung ist, die dem Entwickler vorgelegt wird. Der Grund für diese Zwischenstufe: Eine von Hand angelegte README kennt die Konventionen womöglich nicht, soll aber trotzdem auswertbar bleiben, statt als „fehlt" durchzufallen.
+- **Das Skript erkennt weit, gesegnet wird eng.** Die weite Erkennung dient allein dem Nichtübersehen. Was neu angelegt oder korrigiert wird, steht immer in der kanonischen Form an der kanonischen Stelle — die Abweichung wird dem Entwickler als Umformatierung vorgeschlagen, nicht übernommen.
+- **Fehlt `python-dateutil`**, meldet das Skript das im Kopf seiner Ausgabe und arbeitet ohne die flexible Datumserkennung weiter; eine ungewöhnlich geschriebene Datumszeile erscheint dann fälschlich als `KEINS`. Dem Entwickler die Installation empfehlen, nicht selbst installieren.
 
 **Die Form des Querverweises** — inklusive absolut/relativ und `blob/master` statt `HEAD` — steht in `skill-dev-doc.md`, Kapitel 5.1; hier absichtlich nicht wiederholt (Projekt-`CLAUDE.md`, „Querverweise zwischen den Sprachfassungen"). Andere Formen — etwa ein Blockzitat — werden angeglichen.
 
