@@ -33,19 +33,24 @@ WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
 mkdir -p "$WORK/before" "$WORK/after"
 
 unzip -qq -o "$ZIP" -d "$WORK/before"
-( cd "$WORK/before" && find . -type f | LC_ALL=C sort | xargs sha256sum ) > "$WORK/before.txt"
+( cd "$WORK/before" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum ) > "$WORK/before.txt"
 
 # The single directory inside the archive is the target name.
 TOP=$(cd "$WORK/before" && find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
 [ -n "$TOP" ] || { echo "Archiv ohne Ordner: $ZIPNAME" >&2; exit 1; }
+case "$TOP" in
+    *$'\n'*) echo "Mehr als ein Ordner im Archiv: $ZIPNAME" >&2; exit 1 ;;
+esac
 [ -f "$WORK/before/$TOP/README.md" ] || { echo "Paket enthaelt keine README.md" >&2; exit 1; }
 
 cp -p "$SRC" "$WORK/before/$TOP/README.md"
-rm -f "$ZIP"
-( cd "$WORK/before" && find "$TOP" -type f | LC_ALL=C sort | zip -9 -o -X -q "$ZIP" -@ )
+# Built next to the original, not over it: a failed check below must leave the
+# original package untouched instead of having already replaced it.
+NEW="$WORK/new.zip"
+( cd "$WORK/before" && find "$TOP" -type f | LC_ALL=C sort | zip -9 -o -X -q "$NEW" -@ )
 
-unzip -qq -o "$ZIP" -d "$WORK/after"
-( cd "$WORK/after" && find . -type f | LC_ALL=C sort | xargs sha256sum ) > "$WORK/after.txt"
+unzip -qq -o "$NEW" -d "$WORK/after"
+( cd "$WORK/after" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum ) > "$WORK/after.txt"
 
 if diff <(grep -v 'README.md$' "$WORK/before.txt") \
         <(grep -v 'README.md$' "$WORK/after.txt") > /dev/null; then
@@ -59,7 +64,12 @@ else
     same='NEIN'
 fi
 
-printf '%s  uebrige Eintraege: %s | README == Quelle: %s | %s Bytes\n' \
-    "$ZIPNAME" "$rest" "$same" "$(stat -c%s "$ZIP")"
-
-[ "$rest" = 'unveraendert' ] && [ "$same" = 'ja' ]
+if [ "$rest" = 'unveraendert' ] && [ "$same" = 'ja' ]; then
+    mv -f "$NEW" "$ZIP"
+    printf '%s  uebrige Eintraege: %s | README == Quelle: %s | %s Bytes\n' \
+        "$ZIPNAME" "$rest" "$same" "$(stat -c%s "$ZIP")"
+else
+    printf '%s  uebrige Eintraege: %s | README == Quelle: %s -- %s unveraendert gelassen\n' \
+        "$ZIPNAME" "$rest" "$same" "$ZIP" >&2
+    exit 1
+fi
