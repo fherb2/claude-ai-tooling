@@ -38,14 +38,7 @@ Das Skript listet jede versionierte README mit ihrem Datum, dem Zustand ihres Qu
 - **`FEHLT` beim Querverweis ist ein Befund**, `entfaellt` nicht — letzteres heißt, dass es keine zweite Fassung gibt.
 - **`KEINS` beim Datum ist immer ein Befund.**
 
-**Die Form des Querverweises** ist die kursive Zeile unmittelbar unter der Datumszeile, vor dem ersten Absatz:
-
-```markdown
-*[English version](README.en.md)*
-*[Deutsche Fassung](README.md)*
-```
-
-Andere Formen — etwa ein Blockzitat — werden angeglichen. Die Regel selbst, dass die deutsche README ganz oben auf die englische verweist, steht in der Projekt-`CLAUDE.md`.
+**Die Form des Querverweises** — inklusive absolut/relativ und `blob/master` statt `HEAD` — steht in `skill-dev-doc.md`, Kapitel 5.1; hier absichtlich nicht wiederholt (Projekt-`CLAUDE.md`, „Querverweise zwischen den Sprachfassungen"). Andere Formen — etwa ein Blockzitat — werden angeglichen.
 
 **Vor dem Melden nachsehen, ob der Bereich es anders festgelegt hat.** Ein Vorgabenteil eines Bereichs kann die repo-weite Regel überschreiben; erst wenn er dazu schweigt, ist ein fehlender Verweis ein Verstoß.
 
@@ -57,7 +50,7 @@ Andere Formen — etwa ein Blockzitat — werden angeglichen. Die Regel selbst, 
 
 Der Grund ist nicht Ästhetik, sondern eine falsche Aussage: Im Paket heißt die enthaltene README `README.md`, gleich welcher Sprache. Ein relativer Verweis `[Deutsche Fassung](README.md)` in der englischen Fassung zeigt dort auf **sie selbst** — der Leser klickt und bleibt, wo er war. In der deutschen Fassung zeigt `[English version](README.en.md)` ins Leere. Der Verweisprüfer aus Etappe 5 sieht nur den zweiten Fall; der erste ist der schlimmere.
 
-Die Umstellung des Bestands war am 10. September 2026 beschlossen, aber noch nicht überall ausgeführt. Wer diese Etappe fährt, prüft mit.
+Wer diese Etappe fährt, prüft mit.
 
 ---
 
