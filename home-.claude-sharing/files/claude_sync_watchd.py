@@ -61,6 +61,7 @@ import os
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -72,8 +73,17 @@ from typing import Any, Optional
 # directory on sys.path when it is started as a script, which is how the unit
 # starts it; a harness that loads this file by path has to put the folder there
 # itself (doku 3.8).
-import messages
-from messages import T
+try:
+    import messages
+    from messages import T
+except ImportError as missing:
+    # English and without T(), because the texts are exactly what is missing
+    # here. Exit 78 -- EXIT_PRECONDITION, defined below -- like every other
+    # structural precondition: with exit 1 the unit restarts every thirty
+    # seconds for ever and never reaches "failed" (doku 3.5).
+    print(f"Cannot import the message module next to this file: {missing}",
+          file=sys.stderr)
+    raise SystemExit(78)
 
 # ---------------------------------------------------------------------------
 # Configuration (doku 2.7: everything this project brings lives in one folder)
@@ -251,6 +261,13 @@ def _require_linux(what: str) -> None:
 # findable if the package is removed later, and needs no state field.
 _notify_missing_reported = False
 
+# Same rule, same reason, for the pass that finds the lock taken. As a service
+# a rejected pass left NO trace at all -- run_pass returns -1 and nobody looks
+# at it -- so a watcher blocked by a stale lock looked exactly like a watcher
+# in a quiet week (doku 2.6). Once per run, because at the pace of file events
+# it would be the chatter 2.6 rules out.
+_lock_busy_reported = False
+
 
 def syncthing_config_candidates() -> list[Path]:
     """Where Syncthing keeps its configuration, most likely first (doku 2.4).
@@ -316,7 +333,12 @@ def claude_binary() -> str:
 
 def notify(summary: str, body: str,
            seconds: int = NOTICE_SECONDS_QUIET) -> None:
-    """Show a passive desktop notification. Never raises (doku 1.8).
+    """Show a passive desktop notification.
+
+    It swallows what it can name -- a missing notify-send, an unsuccessful
+    one -- but not every way the call can fail; the platform refusal and a
+    notify-send that cannot be executed do leave it. Its one caller,
+    maybe_notify, runs it inside its guard for that reason (doku 1.8).
 
     *seconds* is a request, not a guarantee: honouring `-t` is the
     notification daemon's decision (doku 1.8).
@@ -385,7 +407,14 @@ def ask_question(title: str, text: str, ok_label: str, cancel_label: str,
     answer", handled like a deferral (doku 3.3).
     """
     _require_linux("Question dialog")
-    command = ["zenity", "--question", f"--title={title}", f"--text={text}",
+    # --no-markup, because this text carries the conflicting file names and
+    # zenity reads --text as Pango markup unless told otherwise. Measured: the
+    # parser rejects "a & b <c>" with "Entity did not end with a semicolon",
+    # and a project folder with an ampersand is not far-fetched. The flag has
+    # existed since zenity 3.x for question, info and error -- and for those
+    # three only, which is exactly where foreign strings end up (doku 3.3).
+    command = ["zenity", "--question", "--no-markup", f"--title={title}",
+               f"--text={text}",
                f"--ok-label={ok_label}", f"--cancel-label={cancel_label}"]
     if timeout_seconds is not None:
         command.append(f"--timeout={timeout_seconds}")
@@ -447,7 +476,11 @@ def show_message(title: str, text: str,
     as with every other dialog (doku 3.3).
     """
     _require_linux("Message dialog")
-    command = ["zenity", "--error", f"--title={title}", f"--text={text}"]
+    # --no-markup for the same reason as in ask_question: one of these texts
+    # quotes the command the user typed, and an ampersand in it would break
+    # the window rather than appear in it.
+    command = ["zenity", "--error", "--no-markup", f"--title={title}",
+               f"--text={text}"]
     if timeout_seconds is not None:
         command.append(f"--timeout={timeout_seconds}")
     try:
@@ -638,7 +671,10 @@ def _boot_time() -> Optional[datetime.datetime]:
     try:
         for line in Path("/proc/stat").read_text(encoding="utf-8").splitlines():
             if line.startswith("btime "):
-                return datetime.datetime.fromtimestamp(int(line.split()[1]))
+                # With its zone: session_running subtracts this time from a
+                # state stamp, and those carry one (doku 3.2).
+                return datetime.datetime.fromtimestamp(
+                    int(line.split()[1])).astimezone()
     except (OSError, ValueError, IndexError):
         return None
     return None
@@ -748,9 +784,8 @@ class WatchState:
         started = process_running_since(self.session_pid)
         if started is None:
             return False
-        try:
-            recorded = datetime.datetime.fromisoformat(self.session_started)
-        except (ValueError, TypeError):
+        recorded = _moment(self.session_started)
+        if recorded is None:
             return False
         return abs(started - recorded) <= PID_START_TOLERANCE
 
@@ -769,6 +804,23 @@ def _now() -> str:
     return datetime.datetime.now().astimezone().isoformat()
 
 
+def _moment(timestamp: str) -> Optional[datetime.datetime]:
+    """An ISO 8601 stamp as a moment WITH a zone, or None if unreadable.
+
+    One place for reading a stamp, because a naive one must never reach a
+    subtraction: naive minus aware raises TypeError (doku 3.2). Without an
+    offset the stamp is read as local time; what that costs and what it
+    saves is spelled out at the two callers, _age and session_running.
+    """
+    try:
+        moment = datetime.datetime.fromisoformat(timestamp)
+    except (ValueError, TypeError):
+        return None
+    if moment.tzinfo is None:
+        moment = moment.astimezone()
+    return moment
+
+
 def _age(timestamp: str) -> datetime.timedelta:
     """How long ago an ISO 8601 timestamp was. Unparsable counts as ancient.
 
@@ -780,12 +832,9 @@ def _age(timestamp: str) -> datetime.timedelta:
     and summer correctly by date. Its one residual: a naive stamp from the
     SECOND pass through an ambiguous hour is read an hour off, once.
     """
-    try:
-        moment = datetime.datetime.fromisoformat(timestamp)
-    except (ValueError, TypeError):
+    moment = _moment(timestamp)
+    if moment is None:
         return datetime.timedelta.max
-    if moment.tzinfo is None:
-        moment = moment.astimezone()
     return datetime.datetime.now().astimezone() - moment
 
 
@@ -857,8 +906,8 @@ def acquire_lock() -> bool:
             except FileNotFoundError:
                 # Released between the failed create and the stat: try again.
                 continue
-            holder = lock_holder()
-            if holder is not None and process_alive(holder):
+            holder, written = lock_holder()
+            if holder is not None and lock_is_held(holder, written):
                 return False
             if holder is None and age < LOCK_STALE_AFTER:
                 return False
@@ -879,22 +928,56 @@ def acquire_lock() -> bool:
     return False
 
 
-def lock_holder() -> Optional[int]:
-    """The pid recorded in the lock file, or None if it cannot be read.
+def lock_holder() -> tuple[Optional[int], Optional[datetime.datetime]]:
+    """The pid recorded in the lock file and when the file was written.
 
     None is the honest answer for "unreadable", not a guess: the caller then
-    falls back to the age limit instead of treating the lock as free.
+    falls back to the age limit instead of treating the lock as free. The
+    moment is returned because the pid alone cannot say WHOSE it is -- the
+    file has carried it since the beginning, it was only never read.
     """
     try:
-        first = LOCK_FILE.read_text(encoding="utf-8").split()
+        fields = LOCK_FILE.read_text(encoding="utf-8").split()
     except OSError:
-        return None
-    if len(first) >= 2 and first[0] == "pid":
+        return None, None
+    if len(fields) >= 2 and fields[0] == "pid":
         try:
-            return int(first[1])
+            pid = int(fields[1])
         except ValueError:
-            return None
-    return None
+            return None, None
+        return pid, (_moment(fields[2]) if len(fields) >= 3 else None)
+    return None, None
+
+
+def lock_is_held(pid: int,
+                 written: Optional[datetime.datetime]) -> bool:
+    """Whether *pid* is really the pass that wrote the lock, not a namesake.
+
+    Existence alone is not enough, and that gap could stop the watcher for
+    good: a hard end leaves the file behind -- systemd ends the service with
+    SIGTERM at logout, and a dialog stands for up to fifteen minutes -- and
+    after a reboot the kernel hands the numbers out from the start again. The
+    recorded pid then regularly belongs to a stranger, and a living stranger
+    held the lock for ever, because the age limit only decides when the pid
+    cannot be read at all (doku 3.2).
+
+    A process that started AFTER the lock was written cannot have written it.
+    That settles the reboot case completely: everything alive then started
+    after the last shutdown. Where the moment is missing -- a lock file from
+    an older version -- existence has to do; that is the previous behaviour
+    and the safe direction, because it keeps the lock instead of stealing it
+    in the middle of a dialog.
+    """
+    if not process_alive(pid):
+        return False
+    started = process_running_since(pid)
+    if started is None:
+        # Gone between the two questions, a zombie, or unreadable: none of
+        # them is a pass of ours still running.
+        return False
+    if written is None:
+        return True
+    return started <= written + PID_START_TOLERANCE
 
 
 def release_lock() -> None:
@@ -904,7 +987,7 @@ def release_lock() -> None:
     pass deletes the lock of the pass that overtook it, and a third one walks
     straight in (doku 3.2).
     """
-    holder = lock_holder()
+    holder, _ = lock_holder()
     if holder is not None and holder != os.getpid():
         print(T("journal.lock_foreign", pid=holder),
               file=sys.stderr, flush=True)
@@ -1549,6 +1632,15 @@ def maybe_notify(state: WatchState, open_conflicts: int,
     state.notice_last_shown = _now()
     try:
         notice = build_notice(state, open_conflicts, watch_dir)
+        # Inside the guard on purpose. notify() swallows a missing
+        # notify-send, but not a notify-send that is there and cannot run --
+        # wrong permissions, a damaged file. That exception used to leave
+        # run_pass BEFORE save_state: the stamp above was lost, the notice
+        # stayed due, and the traceback came back at the pace of file events.
+        # Here it costs at most one line per hour, because the stamp is set.
+        if notice is not None:
+            text, seconds = notice
+            notify(T("notify.summary"), text, seconds)
     except NotImplementedError as unsupported:
         # The documented refusal of the platform capsule (doku 2.4), not a
         # defect. Caught before the branch below on purpose: reported as a
@@ -1566,10 +1658,6 @@ def maybe_notify(state: WatchState, open_conflicts: int,
         print(T("journal.notice_failed") + "\n"
               + traceback.format_exc().rstrip(), file=sys.stderr, flush=True)
         return
-    if notice is None:
-        return
-    text, seconds = notice
-    notify(T("notify.summary"), text, seconds)
 
 
 # ---------------------------------------------------------------------------
@@ -1578,7 +1666,11 @@ def maybe_notify(state: WatchState, open_conflicts: int,
 
 def run_pass(watch_dir: Path, reason: str) -> int:
     """Search, attribute, escalate if due, notify if due. Returns conflict count."""
+    global _lock_busy_reported
     if not acquire_lock():
+        if not _lock_busy_reported:
+            _lock_busy_reported = True
+            print(T("journal.pass_busy"), file=sys.stderr, flush=True)
         return -1
     try:
         reap_finished_session()
@@ -1738,8 +1830,19 @@ def watch_forever(watch_dir: Path) -> int:
     guarded_pass(watch_dir, T("journal.reason.startup"))
 
     observer = Observer()
-    observer.schedule(ConflictHandler(), str(watch_dir), recursive=True)
-    observer.start()
+    try:
+        observer.schedule(ConflictHandler(), str(watch_dir), recursive=True)
+        observer.start()
+    except OSError as failed:
+        # The usual cause is the inotify quota: the recursive watch takes one
+        # entry per directory below the watched folder, the excluded ones
+        # included -- the search skips them, the observation does not.
+        # Structural like a missing library, so the same exit code: waiting
+        # does not heal it, and exit 1 would restart every thirty seconds
+        # while the observation never starts (doku 3.1, 3.5).
+        print(T("error.watch_setup_failed", detail=failed),
+              file=sys.stderr, flush=True)
+        return EXIT_PRECONDITION
     try:
         # The monotonic clock, not the wall clock: this interval outlives no
         # process, so it is the ONE place where a full fix is possible. It is
@@ -1833,7 +1936,14 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     # Resolved once, before the first message: a missing catalogue then fails
     # at startup instead of in the middle of a pass (doku 3.1).
-    messages.use(args.lang)
+    try:
+        messages.use(args.lang)
+    except FileNotFoundError as missing:
+        # English for the same reason as the import above, and structural for
+        # the same reason as a missing library: without texts the watcher
+        # cannot report anything, and waiting does not heal it (doku 3.5).
+        print(missing, file=sys.stderr)
+        return EXIT_PRECONDITION
 
     DRY_RUN = args.dry_run
     if args.tool_dir:
@@ -1843,18 +1953,37 @@ def main(argv: Optional[list[str]] = None) -> int:
     # Answered before the directory check below and before anything that
     # writes: this switch is read-only by contract (doku 3.5).
     if args.check_folder:
-        return check_folder(watch_dir)
+        try:
+            return check_folder(watch_dir)
+        except Exception:
+            # Without this an unexpected exception ends Python with 1 -- the
+            # very code that means "this folder is not shared". The setup
+            # script would then print the traceback as the text of that
+            # warning and advise sharing a folder that is already shared: a
+            # programming error announced as a configuration problem. A check
+            # that crashed cannot tell, and that is exactly what 2 says; the
+            # traceback goes with it, so the defect stays visible (doku 2.6).
+            traceback.print_exc()
+            return 2
 
     if not watch_dir.is_dir():
         print(T("journal.watch_dir_missing", dir=watch_dir), file=sys.stderr)
         return 1
 
+    # systemd ends the service with SIGTERM -- at logout through PartOf= and
+    # on every restart. Python has no handler for it, so the process died on
+    # the spot and no finally ran: that is how a lock file outlived a
+    # shutdown. Raising SystemExit instead lets release_lock and the
+    # observer's stop() happen (doku 3.2). It reaches the MAIN thread only, so
+    # a pass running in the observer thread is still cut short -- which is why
+    # lock_is_held, not this handler, is what resolves a lock left behind.
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
+
     if args.once:
         count = run_pass(watch_dir, T("journal.reason.single"))
-        if count < 0:
-            print(T("journal.pass_busy"), file=sys.stderr)
-            return 1
-        return 0
+        # The line belongs to run_pass now, which says it in service mode too;
+        # here only the return code is left to set.
+        return 1 if count < 0 else 0
 
     return watch_forever(watch_dir)
 

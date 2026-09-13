@@ -197,8 +197,8 @@ fi
 
 # --- 2. Own files ---------------------------------------------------------
 
-MISSING_FILES_HINT="Every file of this project has to be in this folder. Please copy the
-folder 'files/' from the repository here in full."
+MISSING_FILES_HINT="Every file of this project has to be in this folder. Please unpack the
+claude-sync-watch package into your home folder again, in full."
 
 for file in claude_sync_watchd.py "$UNIT_NAME" messages.py .stignore; do
     [ -f "$SCRIPT_DIR/$file" ] || fail \
@@ -223,6 +223,40 @@ if [ -d "$SCRIPT_DIR/werkzeuge" ]; then
 'tools' and is no longer used. It stays where it is until you remove it —
 look whether anything is in there, then:
     rm -r $SCRIPT_DIR/werkzeuge"
+fi
+
+# Same class of leftover, same reason for naming instead of removing: until the
+# working instruction carried a language code it was called plain
+# conflict-resolution.md. Unpacking a package over an older installation adds
+# the new name and leaves the old file lying there. Nothing reads it -- the
+# watcher builds the name from its own language -- but it looks like the
+# authoritative one, and this folder is meant to hold exactly what was
+# delivered.
+if [ -f "$SCRIPT_DIR/conflict-resolution.md" ]; then
+    warn "Note: $SCRIPT_DIR/conflict-resolution.md has no language code in its
+name and is left over from an installation before the working instruction was
+split by language. Nothing reads it any more. It stays until you remove it:
+    rm $SCRIPT_DIR/conflict-resolution.md"
+fi
+
+# A package brings exactly one catalogue, and then that one decides the
+# language whatever anybody passes. Several of them turn the question into a
+# different one -- the switch --lang decides, the service definition passes
+# none, and the default applies -- and nothing said that out loud so far.
+catalogue_count=0
+catalogue_names=""
+for candidate in "$SCRIPT_DIR"/messages_*.py; do
+    [ -f "$candidate" ] || continue
+    catalogue_count=$((catalogue_count + 1))
+    catalogue_names="$catalogue_names $(basename "$candidate")"
+done
+if [ "$catalogue_count" -gt 1 ]; then
+    warn "Note: this folder holds more than one message catalogue
+($catalogue_names ). A package brings exactly one. With several present the
+watcher takes the language from --lang, and the service definition passes
+none — so it speaks the default language, German (DEFAULT_LANGUAGE in
+messages.py). Remove the catalogues you do not want, or leave it as it is if
+that is what you meant."
 fi
 
 # --- 3. Prerequisites -----------------------------------------------------

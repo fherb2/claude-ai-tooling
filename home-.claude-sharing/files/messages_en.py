@@ -79,9 +79,9 @@ TEXTS = {
     "dialog.no_instruction.title": "Claude-Sync: cannot resolve the conflict",
     "dialog.no_instruction.text": (
         "The working instruction {path} is missing. Without it no conflict "
-        "session can start. Please copy the complete contents of the files/ "
-        "folder from the claude-sync-watch repository source to "
-        "~/.claude-sync-watch. The missing file '{name}' is in there as well."
+        "session can start. Please unpack the claude-sync-watch package into "
+        "your home folder again, in full; the missing file '{name}' is part "
+        "of it."
     ),
 
     "dialog.terminal_failed.title": "Claude-Sync: the terminal did not start",
@@ -179,6 +179,12 @@ TEXTS = {
         "'notify-send' is missing — the hourly notice cannot appear on "
         "screen. Please install 'libnotify-bin': sudo apt install "
         "libnotify-bin. Conflict detection and escalation are unaffected."
+    ),
+    "error.watch_setup_failed": (
+        "The directory watch cannot be set up: {detail}\n"
+        "The usual cause is the inotify quota "
+        "(fs.inotify.max_user_watches); the recursive watch takes one entry "
+        "per directory below the watched folder."
     ),
     "error.watchdog_missing": (
         "The Python watch library 'watchdog' is missing.\n"

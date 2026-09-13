@@ -1,6 +1,6 @@
 # Syncthing-Sync für `~/.claude`
 
-*Stand: 2026-09-11*
+*Stand: 2026-09-12*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.en.md)*
 
@@ -93,6 +93,14 @@ Das Skript **installiert nichts stillschweigend**: Fehlt ein Paket, nennt es die
 Dort, wo der Verbund beginnt, gibt es noch keinen abgeglichenen Ordner und keinen Knoten. Zuerst wird also der Knoten eingerichtet (`syncthing-synology-setup-guide.md`, Abschnitte 1 bis 9), und der Ordner wird **von diesem Rechner aus** angelegt — er hat den Inhalt, der Knoten ist leer.
 
 Die Schritte 1 bis 4 und 7 bis 8 von oben gelten unverändert. **Die Schritte 5 und 6 entfallen:** Es gibt keinen zweiten Bestand, mit dem sich etwas vereinigen könnte, also entstehen keine Konfliktkopien. Erst der nächste Rechner durchläuft den vollständigen Weg.
+
+### Aktualisieren
+
+Eine bestehende Installation wird nicht neu aufgesetzt, sondern überschrieben: das aktuelle Paket herunterladen und `unzip -o claude-sync-watch_de_local.zip -d ~` aufrufen. **Das `-o` gehört dazu** — ohne es fragt `unzip` bei jeder schon vorhandenen Datei einzeln nach. Danach `~/.claude-sync-watch/install_service.sh` starten: Erst das erneuert die Dienstdefinition und startet den Wächter mit der neuen Fassung. Wer nur entpackt, hat die neuen Dateien auf der Platte und den alten Wächter im Betrieb. Unberührt bleiben dabei `~/.claude`, die Zustandsdatei `zustand.json` und der Ordner `tools/`.
+
+**Entpacken löscht nichts.** Aus einer Installation von vor der Sprachtrennung bleibt deshalb `conflict-resolution.md` liegen — die Arbeitsanweisung ohne Sprachkürzel. Gelesen wird sie nicht mehr, denn der Wächter bildet den Namen aus seiner Sprache (`conflict-resolution.de.md`); sie sieht nur aus wie die maßgebliche. Dasselbe gilt für einen Ordner `werkzeuge/` aus der Zeit vor der Umbenennung in `tools/`. Das Installationsskript benennt, was es davon findet, und entfernt nichts von selbst: Auf einem fremden Rechner zu löschen ist nicht seine Sache. **Kein** Überbleibsel ist dagegen `__pycache__/` — den legt Python selbst an, sobald der Wächter seinen Meldungskatalog lädt; gelöscht entsteht er beim nächsten Lauf erneut.
+
+**Ein Ordner, ein Katalog.** Liegen mehrere `messages_*.py` nebeneinander — weil beide Pakete entpackt oder Dateien aus dem Repository dazukopiert wurden —, entscheidet nicht mehr das Paket über die Sprache, sondern der Schalter `--lang`. Die Dienstdefinition übergibt keinen, also gilt Deutsch. Auch darauf weist das Installationsskript hin.
 
 ### Wieder abmelden
 

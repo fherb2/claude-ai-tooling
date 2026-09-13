@@ -66,7 +66,7 @@ Sage ihm in diesem Fall auch, dass für einen wirklichen Fehlschlag ein geordnet
 
 Zum Schluss knapp: betroffene Paare, Entscheidung je Paar, was geschrieben und was gelöscht wurde, ob Ausschlüsse geändert wurden.
 
-**Und dann sage ausdrücklich, dass du fertig bist und das Fenster geschlossen werden kann.** Ein Satz genügt, etwa: „Damit ist alles erledigt — du kannst dieses Fenster schließen (`/exit`)." Ohne ihn bleibt die Sitzung nach dem Bericht stumm stehen, und der Nutzer kann nicht wissen, ob noch etwas kommt; im Betriebstest war genau das die einzige offene Stelle. Es braucht dafür **keinen** zusätzlichen Dialog: Der Bericht steht schon vor dem Nutzer, ein Fenster obendrauf wäre die Aufdringlichkeit, die Vorgabe 2.9 vermeiden will.
+**Und dann sage ausdrücklich, dass du fertig bist und das Fenster geschlossen werden kann.** Ein Satz genügt, etwa: „Damit ist alles erledigt — du kannst dieses Fenster schließen (`/exit`)." Ohne ihn bleibt die Sitzung nach dem Bericht stumm stehen, und der Nutzer kann nicht wissen, ob noch etwas kommt; im Betriebstest war genau das die einzige offene Stelle. Es braucht dafür **keinen** zusätzlichen Dialog: Der Bericht steht schon vor dem Nutzer, ein Fenster obendrauf wäre die Aufdringlichkeit, die hier vermieden werden soll.
 
 Warte danach nicht auf weitere Aufträge und fange nichts Neues an. Kommt doch noch eine Frage des Nutzers, beantworte sie — aber der Zweck dieser Sitzung ist mit dem Bericht erfüllt.
 
