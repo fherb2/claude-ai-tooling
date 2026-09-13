@@ -48,6 +48,8 @@ Drei Klassen, und sie sind keine Nachlässigkeit:
 
 **Alle drei Klassen stehen in `files/unfinished.py`** — dem einen Ort, aus dem sich jedes Werkzeug dieses Skills und der Filter der Gegenprobe bedienen. Die Baustellen werden nicht an einer Namensliste erkannt, sondern daran, dass der Ordnername unter `skills/` nicht mit einem alphanumerischen Zeichen beginnt — ein künftiges Schild fällt damit von selbst darunter. Bewusst breiter als „beginnt mit einem Emoji": Zu viel auszuschließen fällt auf, zu wenig auszuschließen bringt einen unfertigen Skill still in den Release. Beginnt ein ausgeschlossener Ordner mit einem Zeichen, das gar kein Schild ist (etwa `_alt-kram/`), sagt das Werkzeug das ausdrücklich, statt ihn stillschweigend zu schlucken. Die dritte Klasse hängt am Präfix `.claude/skills/` und nicht am Namen dieses Skills, damit ein künftiger zweiter Projekt-Skill ebenso von selbst darunterfällt.
 
+**Eine neue Klasse ist zweiteilig.** Der Ausschluss selbst verhindert nur künftige Übertragungen — was von der neuen Klasse bereits auf `master` liegt, muss einmalig von Hand entfernt werden. Weder `branch-diff.py` noch die Gegenprobe melden das, weil beide genau diesen Pfad ausfiltern. Genau das ist am 11. September 2026 passiert, als diese dritte Klasse eingeführt wurde: Die acht Dateien dieses Skills lagen aus dem ersten Lauf schon auf `master` und mussten von Hand entfernt werden (Commit `373b142`).
+
 ## Schritt 1 — Infra verteilen, auf beide Zweige
 
 **Zentrale Dateien kommen nie aus `dev`, sondern immer aus dem Infra-Zweig.** Sonst wandert eine Fassung weiter, die dort nie beschlossen wurde. Die maßgebliche Pfadliste ist `infra_files` aus der Modelldatei.
