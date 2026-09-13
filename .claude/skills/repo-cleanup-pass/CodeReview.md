@@ -61,14 +61,6 @@ Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig
 
 **Vorschlag:** `git diff --name-only -z "$REF"..HEAD | while IFS= read -r -d '' f`. Kriterium: Datumszeile nicht älter als der letzte Commit, der die Datei seit `<ref>` geändert hat (`git log -1 --format=%cs "$REF"..HEAD -- "$f"`), mit `TODAY` nur als Obergrenze. In `rules.md` sagen, ob das Werkzeug vor oder nach dem Checkpoint-Commit läuft.
 
-### B7 — Etappe 5 widerspricht `skill-dev-doc.md`, Anhang A.2, bei der Behandlung wiederkehrender Meldungen
-
-**Ort:** `rules.md`, Etappe 5, Tabelle, Zeile „Legitim repo-extern" („Wiederholt sich die Meldung bei jedem Durchgang, gehört der Name in die `EXTERN`-Menge des Prüfers"); `skill-dev-doc.md`, A.2, Absatz „Vier Fundarten meldet er, die keine Fehler sind" („Sie werden deshalb beim Ansehen des Ergebnisses aussortiert, nicht im Werkzeug") und die Vergleichstabelle vom 10. September 2026.
-
-**Befund:** A.2 entscheidet ausdrücklich gegen eine gepflegte Ausnahmeliste im Werkzeug und liefert stattdessen eine Tabelle der geprüften, akzeptierten Meldungen, gegen die der nächste Durchgang vergleicht. `rules.md` weist an, den Namen in `EXTERN` aufzunehmen, und erwähnt die Vergleichstabelle nicht. Wer Etappe 5 fährt, urteilt neu statt zu vergleichen, und zwar gegen die Festlegung im Quelldokument des Werkzeugs.
-
-**Vorschlag:** Den `EXTERN`-Satz streichen; stattdessen: „Meldungen gegen die Tabelle in A.2 halten; nur was dort nicht steht, ist neu zu beurteilen, und das Ergebnis wandert in diese Tabelle." Soll die Regel anders lauten, wird sie in A.2 geändert, nicht hier.
-
 ### B8 — Die Aussage zu `$TMPDIR` stimmt nicht mit dem Verhalten von `tempfile.mkdtemp` überein
 
 **Ort:** `SKILL.md`, Schritt 2, letzter Satz („**Nicht `$TMPDIR` verwenden:** Die Variable existiert nur, solange die Sandbox läuft."); `files/branch-diff.py`, Docstring („relying on $TMPDIR would break outside the sandbox") und `Path(tempfile.mkdtemp(prefix="repo-cleanup-"))`.

@@ -97,13 +97,7 @@ Das Skript baut das Archiv aus **seinem eigenen Inhalt** neu und tauscht allein 
 
 Das Werkzeug steht als Quelltext in `skill-dev-doc.md`, Anhang A.2. Ausgeführt aus `skills/` heraus prüft es jedes Paket jedes Skills und meldet Verweise auf `.md`- und `.py`-Dateien, die im Archiv nicht liegen.
 
-**Seine Meldungen sind nicht alle Fehler. Drei Klassen, und sie werden verschieden behandelt:**
-
-| Klasse | Erkennungsmerkmal | Was zu tun ist |
-| --- | --- | --- |
-| **Datei fehlt im Paket** | Die Datei existiert im Skill-Ordner | Echte Lücke: Der Nutzer bekommt einen Verweis auf etwas, das er nicht hat. Paket ergänzen — Dateiliste, also Anhang A.1 |
-| **Überholter Verweis** | Die Datei existiert nirgends | Der Verweis ist zu entfernen oder richtigzustellen, nicht die Datei zu erfinden |
-| **Legitim repo-extern** | Eine Datei des Repositories, die nie mitreist (`skill-dev-doc.md`, `implementation-doc.md`, `CLAUDE.md`) | Kein Befund. Wiederholt sich die Meldung bei jedem Durchgang, gehört der Name in die `EXTERN`-Menge des Prüfers |
+**Seine Meldungen sind nicht alle Fehler.** Die Fundarten, die keine Fehler sind, und wie damit umzugehen ist, stehen in `skill-dev-doc.md`, Anhang A.2 — dort auch die Vergleichstabelle der bereits geprüften Meldungen, gegen die zu halten ist, statt neu zu urteilen. Nur eine echte Lücke oder ein tatsächlich überholter Verweis ist ein Befund.
 
 **Der Prüfer prüft nur Existenz, nicht Sinn.** Ein Verweis, der im Paket auf die falsche Datei zeigt, gilt ihm als in Ordnung — siehe die Begründung zur Repo-URL in Etappe 2. Wer sich auf ihn allein verlässt, hält den unbelegten Teil für belegt.
 
