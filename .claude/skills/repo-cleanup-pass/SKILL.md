@@ -18,8 +18,7 @@ Dieser Durchgang hat zwei Tiefen, und die Wahl trifft der Nutzer.
 
 ## Was in jedem Fall gilt
 
-- **Jeder Befund wird einzeln vorgelegt**, nicht selbständig ausgeführt. Das gilt auch dann, wenn der Auftrag allgemein erteilt war: Der Durchgang findet regelmäßig mehr, als der Nutzer erwartet hat.
-- **Nicht voraussetzen, dass die dem Befund gegenüberstehende Stelle recht hat.** Mehrfach lag der Fehler auf der anderen Seite. Bevor etwas als Verstoß gemeldet wird, ist nachzusehen, ob es nicht ausdrücklich so festgelegt wurde.
+- **Befunde werden nach der Regel „Befundlisten abarbeiten" der Projekt-`CLAUDE.md` behandelt** — einzeln vorgelegt, nicht selbständig ausgeführt. Bevor etwas als Verstoß gemeldet wird, ist zusätzlich nachzusehen, ob es nicht ausdrücklich so festgelegt wurde.
 - **Ein Checkpoint-Commit je Etappe**, nicht einer am Ende. Was auffällt, fällt oft erst zwei Etappen später auf.
 - **Mit ausdrücklichen Pfaden committen, nie mit `git add -A`.** Läuft die Bash-Sandbox, hängt sie Attrappen in den Arbeitsbaum, die wie unversionierte Dateien aussehen und nicht lesbar sind; `files/find-sandbox-masks.sh` listet sie. Aus demselben Grund ist ein rekursives Prüfwerkzeug, das mit „Permission denied" abbricht, nicht zwangsläufig kaputt.
 - **Vor jedem Commit, der Markdown einschließt**, die Tabellenprüfung des Skills `correct-zaaack-md-editor-mistakes` laufen lassen.
