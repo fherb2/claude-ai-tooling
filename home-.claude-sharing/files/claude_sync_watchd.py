@@ -321,13 +321,35 @@ def terminal_run_flags() -> tuple[str, ...]:
 def claude_binary() -> str:
     """Absolute path of the Claude Code program (doku 3.3, 3.5).
 
-    Absolute and not resolved through the search path: a systemd user service
-    starts with a sparse environment and would not find it. That makes it a
-    platform-dependent location like the two above, and it is capsuled rather
-    than kept as a named exception -- an exception in 2.4 would reintroduce
-    through the back door the enumeration that 2.4 rejects.
+    Resolved, but always absolute -- and the two halves have different
+    reasons. ABSOLUTE, because a systemd user service starts with a sparse
+    environment: PATH is often no more than /usr/bin:/bin, so ~/.local/bin --
+    where the documented installer puts the program -- is not on it, and a
+    lookup at run time would fail exactly where the watcher runs. RESOLVED,
+    because a fixed /usr/bin/claude was simply the wrong guess: on a machine
+    installed the documented way the program sits under ~/.local/bin, and the
+    setup refused to continue (found 13 September 2026).
+
+    The search path comes first on purpose: what ``which`` finds follows the
+    order of PATH, and that is the user's own intent rather than a ranking of
+    ours. Only then the fixed candidates, the user's own location first. If
+    nothing is found, the conventional path comes back so that a message can
+    name one; whether it exists is the caller's question -- the --claude-path
+    switch answers it with its return code.
+
+    A platform-dependent location like the two above, capsuled rather than
+    kept as a named exception: an exception in 2.4 would reintroduce through
+    the back door the enumeration that 2.4 rejects.
     """
     _require_linux("Claude Code location")
+    found = shutil.which("claude")
+    if found:
+        return found
+    for candidate in (Path.home() / ".local" / "bin" / "claude",
+                      Path("/usr/local/bin/claude"),
+                      Path("/usr/bin/claude")):
+        if os.access(candidate, os.X_OK):
+            return str(candidate)
     return "/usr/bin/claude"
 
 
@@ -1925,6 +1947,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--check-folder", action="store_true",
                         help="report whether Syncthing has the watched "
                              "directory as a folder, then exit")
+    parser.add_argument("--claude-path", action="store_true",
+                        help="print the resolved path of Claude Code and "
+                             "exit; non-zero if it is not executable")
     # No choices= here on purpose: which languages exist is a property of the
     # installation, and a package that carries one catalogue speaks that one
     # whatever the switch says (messages.use). Rejecting the switch would
@@ -1949,6 +1974,16 @@ def main(argv: Optional[list[str]] = None) -> int:
     if args.tool_dir:
         set_tool_dir(Path(args.tool_dir).expanduser())
     watch_dir = Path(args.watch_dir).expanduser()
+
+    # Where Claude Code lives is resolved in ONE place, and the setup script
+    # asks for it instead of carrying a path of its own: a second copy would
+    # drift, and the Windows counterpart would grow a third (doku 2.4). The
+    # path is printed either way, so a message can name it; the return code
+    # says whether it can be run. Read-only, like the switch below.
+    if args.claude_path:
+        path = claude_binary()
+        print(path)
+        return 0 if os.access(path, os.X_OK) else 1
 
     # Answered before the directory check below and before anything that
     # writes: this switch is read-only by contract (doku 3.5).

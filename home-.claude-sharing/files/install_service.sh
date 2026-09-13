@@ -33,11 +33,20 @@ UNIT_NAME="claude-sync-watch.service"
 UNIT_TARGET_DIR="$HOME/.config/systemd/user"
 WATCH_DIR="$HOME/.claude"
 
-# Absolute on purpose -- a service starts with a sparse PATH and would not find
-# "claude" (doku 3.3). It is a variable rather than a literal so that the login
-# check below can be exercised against a stand-in; the checks themselves are
-# the one thing here that must not go untested (doku 3.5).
-CLAUDE_BIN="/usr/bin/claude"
+# Where Claude Code lives is NOT known here -- it is asked for in section 3,
+# from the watcher, which resolves it in one place (doku 2.4, 3.3). The name
+# stays a variable for the second reason it always was one: the login check
+# below is cut out by the test script and run against a stand-in, and the
+# checks themselves are the one thing here that must not go untested (3.5).
+CLAUDE_BIN=""
+
+# Checked further down is exactly the interpreter the unit starts -- NOT the
+# "python3" of this shell. On a machine whose shell carries a virtualenv in
+# PATH those are two different interpreters, and only one of them sees the
+# distribution packages: the check reported "watchdog missing" there while the
+# service was perfectly able to run, and sent the user down a dead end
+# (observed, 3.8). The name is set here because section 3 already needs it.
+SERVICE_PYTHON=/usr/bin/python3
 
 # How long the answer probe may take. A variable for the same reason as
 # the path above: the timeout case is one of the four the test covers, and
@@ -261,10 +270,30 @@ fi
 
 # --- 3. Prerequisites -----------------------------------------------------
 
-[ -x "$CLAUDE_BIN" ] || fail \
-    "$CLAUDE_BIN does not exist or is not executable." \
-"Without Claude Code no conflict session can start. Please install Claude
-Code and make sure it can be reached at $CLAUDE_BIN."
+# First of all, because every check below that asks the watcher a question
+# runs it with THIS interpreter -- and the very next one does. Checked is
+# exactly the one the unit starts, not the "python3" of this shell: on a
+# machine whose shell carries a virtualenv in PATH those are two different
+# interpreters, and only one of them sees the distribution packages. The check
+# reported "watchdog missing" there while the service was perfectly able to
+# run, and sent the user down a dead end (observed, 3.8).
+[ -x "$SERVICE_PYTHON" ] || fail \
+    "$SERVICE_PYTHON does not exist or is not executable." \
+"The service starts exactly this interpreter. Please install Python 3
+through the distribution, for example:
+
+    sudo apt install python3"
+
+# The watcher answers where Claude Code is, and this script does not decide it
+# a second time: the location is platform-dependent data and belongs in one
+# place (doku 2.4, 3.3). The path is printed either way, so the message below
+# can name what was looked at; the return code says whether it can be run.
+CLAUDE_BIN="$("$SERVICE_PYTHON" "$SCRIPT_DIR/claude_sync_watchd.py" \
+    --claude-path)" || fail \
+    "Claude Code was not found; last looked at $CLAUDE_BIN." \
+"Without Claude Code no conflict session can start. Please install it. The
+watcher looks at the search path first, then at ~/.local/bin/claude,
+/usr/local/bin/claude and /usr/bin/claude."
 
 # Present is not enough: the conflict session is worthless if the terminal
 # installation is not logged in. Without this check the service installs
@@ -351,20 +380,6 @@ The service is being installed all the same; please start
     esac
 fi
 # --- Login check: end -------------------------------------------------------
-
-# Checked is exactly the interpreter the unit starts -- NOT the "python3" of
-# this shell. On a machine whose shell carries a virtualenv in PATH those are
-# two different interpreters, and only one of them sees the distribution
-# packages: the check reported "watchdog missing" there while the service was
-# perfectly able to run, and sent the user down a dead end (observed, 3.8).
-SERVICE_PYTHON=/usr/bin/python3
-
-[ -x "$SERVICE_PYTHON" ] || fail \
-    "$SERVICE_PYTHON does not exist or is not executable." \
-"The service starts exactly this interpreter. Please install Python 3
-through the distribution, for example:
-
-    sudo apt install python3"
 
 printf 'Checking the watch library in %s …\n' "$SERVICE_PYTHON"
 ensure_package python3-watchdog \
