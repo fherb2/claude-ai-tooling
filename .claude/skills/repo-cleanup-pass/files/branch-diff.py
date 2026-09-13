@@ -11,8 +11,8 @@ the infra branch. Their list is read from .claude/git-worktree-model.json, so
 it cannot drift away from the agreement.
 
 The work lists are always written. Without --out they go into a fresh
-temporary directory whose path is printed at the end -- relying on $TMPDIR
-would break outside the sandbox, where that variable does not exist.
+temporary directory under the system temp path (that is $TMPDIR under an
+active sandbox); the path is printed at the end, always absolute.
 
 Usage:
     branch-diff.py [--from dev] [--to master] [--out DIR] [--exclude REGEX]...

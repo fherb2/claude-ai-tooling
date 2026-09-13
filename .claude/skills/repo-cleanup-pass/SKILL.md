@@ -82,7 +82,7 @@ Gegenprobe je Zweig, ohne Checkout: `git diff --stat infra <zweig> -- <infra_fil
 python3 .claude/skills/repo-cleanup-pass/files/branch-diff.py --from dev --to master
 ```
 
-Das Skript gibt vier Listen aus: zu übernehmen, im Release-Zweig zu löschen, bewusst ausgeschlossen, und die Infra-Dateien (die aus Schritt 1 kommen). Die beiden Arbeitslisten schreibt es NUL-getrennt in ein eigenes Verzeichnis, dessen Pfad es in der letzten Zeile als `LISTEN=…` nennt — NUL-getrennt, damit Pfade mit Leerzeichen und Emoji-Ordnernamen unbeschädigt bleiben. **Nicht `$TMPDIR` verwenden:** Die Variable existiert nur, solange die Sandbox läuft.
+Das Skript gibt vier Listen aus: zu übernehmen, im Release-Zweig zu löschen, bewusst ausgeschlossen, und die Infra-Dateien (die aus Schritt 1 kommen). Die beiden Arbeitslisten schreibt es NUL-getrennt in ein eigenes Verzeichnis, dessen Pfad es in der letzten Zeile als `LISTEN=…` nennt — NUL-getrennt, damit Pfade mit Leerzeichen und Emoji-Ordnernamen unbeschädigt bleiben. `--out` ist optional. Ohne Angabe landet dieses Verzeichnis unter dem System-Temp-Pfad (unter aktiver Sandbox also `$TMPDIR`) — der ausgegebene `LISTEN=`-Pfad ist in jedem Fall absolut und eindeutig.
 
 **Diese Liste wird gelesen, nicht überflogen.** Ein Bereich, der im Release-Zweig vollständig fehlt, sieht darin genauso aus wie eine geänderte Einzeldatei — und genau das ist der Fund, für den der Vollvergleich existiert. Was auffällt, wird dem Nutzer vorgelegt, bevor übertragen wird.
 
