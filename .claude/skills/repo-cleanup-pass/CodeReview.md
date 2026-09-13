@@ -45,14 +45,6 @@ Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig
 
 **Vorschlag:** `git diff --name-only -z "$REF"..HEAD | while IFS= read -r -d '' f`. Kriterium: Datumszeile nicht älter als der letzte Commit, der die Datei seit `<ref>` geändert hat (`git log -1 --format=%cs "$REF"..HEAD -- "$f"`), mit `TODAY` nur als Obergrenze. In `rules.md` sagen, ob das Werkzeug vor oder nach dem Checkpoint-Commit läuft.
 
-### B8 — Die Aussage zu `$TMPDIR` stimmt nicht mit dem Verhalten von `tempfile.mkdtemp` überein
-
-**Ort:** `SKILL.md`, Schritt 2, letzter Satz („**Nicht `$TMPDIR` verwenden:** Die Variable existiert nur, solange die Sandbox läuft."); `files/branch-diff.py`, Docstring („relying on $TMPDIR would break outside the sandbox") und `Path(tempfile.mkdtemp(prefix="repo-cleanup-"))`.
-
-**Befund (beobachtet):** `tempfile.gettempdir()` liefert unter der Sandbox `/tmp/claude-1000`, also den Wert von `$TMPDIR`. Ohne `--out` legt das Skript die Arbeitslisten genau dort ab, wo der Text sie nicht haben will. Der ausgegebene absolute Pfad bleibt nur so lange gültig, wie dieses Verzeichnis nicht weggeräumt wird; wird die Sandbox für Schritt 3 abgeschaltet (der „saubere" Weg aus Schritt 3), ist das nicht gesichert (abgeleitet). Der Docstring beschreibt die Absicht, das Skript setzt sie nicht um; der Satz in Schritt 2 ist in dieser Verkürzung falsch.
-
-**Vorschlag:** Entweder `--out` in `SKILL.md` verbindlich auf einen festen, nicht versionierten Ort setzen, oder im Skript ohne `--out` ein Verzeichnis unabhängig von `$TMPDIR` wählen (`tempfile.mkdtemp(dir="/tmp")` oder ein Pfad unter dem Repo, den `.gitignore` deckt). Den Satz in Schritt 2 danach neu fassen.
-
 ## 6 Befunde: niedrig und Kleinkram
 
 Kleinkram wird nach Projekt-`CLAUDE.md` gesammelt und am Ende in einem Zug erledigt; jeder Punkt behält seine Nummer.
