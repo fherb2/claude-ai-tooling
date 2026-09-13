@@ -2,7 +2,7 @@
 
 *Erstellt: 2026-09-11*
 
-Reviewer: Claude (Fable 5.1), im Auftrag des Entwicklers. Gegenstand sind die acht Dateien des Skill-Ordners (per `ls` bestätigt, weitere gibt es nicht): `SKILL.md`, `rules.md`, `IMPORTANT.md`, `files/branch-diff.py`, `files/find-sandbox-masks.sh`, `files/readme-audit.sh`, `files/datelines-since.sh`, `files/repack-package-readme.sh`. Diese Datei ist die eigene Befunddatei des Reviewers nach Projekt-CLAUDE.md „Reviews und ihre Bearbeitung"; sie wird bei der Nachbearbeitung mit ihrem Datum als Anhang übernommen und hier entfernt.
+Reviewer: Claude (Fable 5.1), im Auftrag des Entwicklers. Gegenstand sind die acht Dateien des Skill-Ordners (per `ls` bestätigt, weitere gibt es nicht): `SKILL.md`, `rules.md`, `IMPORTANT.md`, `files/branch-diff.py`, `files/find-sandbox-masks.sh`, `files/readme-audit.sh`, `files/datelines-since.sh`, `files/repack-package-readme.sh`. Diese Datei ist die Befunddatei des Reviewers. **Für diesen Skill wird kein Review-Anhang und keine eigene Doku angelegt** (Festlegung des Entwicklers vom 13. September 2026): Er ist Hilfsmittel für die Entwicklung dieses Repositories, kein Produkt. Abgearbeitete Befunde werden hier ersatzlos gestrichen; ist die Datei leer, wird sie gelöscht.
 
 ## 1 Umfang und Grenzen des Reviews
 
@@ -16,7 +16,9 @@ Vollständig gelesen wurden neben dem Skill-Ordner: die Projekt-`CLAUDE.md`, `sk
 
 Angelegt wurden: die Projekt-`CLAUDE.md` (Worktree-Modell, Projekt-Skills im Entwicklungszweig, Datumszeilen, ein normatives Zuhause je Aussage, Plan- und Review-Regeln), die Regeln des Worktree-Modells aus `skills/parallel-sessions/rules.de.md` (weil die Projekt-`CLAUDE.md` sie für dieses Repo verbindlich erklärt), und `skill-dev-doc.md` als Bauanleitung „für jeden Skill dieses Repositories — gleich in welchem Ordner er entsteht".
 
-**Annahme zur Geltung der `skill-dev-doc.md`:** Sie beansprucht jeden Skill des Repositories, verlangt aber in Kapitel 5 und 5.3 Dinge, die für ein Werkzeug ohne Auslieferung gegenstandslos sind (Download-Pakete, Installationskapitel, Lizenzfeld). Dieses Review legt deshalb nur die Kapitel an, die vom Verlassen des Repos unabhängig sind: Trigger (Kapitel 2), Zweiteilung (5.2), Wortwahl (7), README als Ort für Stand und Begründung (5, 6.1), Prüfwerkzeuge (Anhang A). Ob das die richtige Auswahl ist, entscheidet der Entwickler (Frage F1, Befund B10).
+**Zur Geltung der `skill-dev-doc.md` — Festlegung des Entwicklers vom 13. September 2026:** Sie gilt für diesen Skill **nicht**. Er ist Hilfsmittel für die Entwicklung dieses Repositories, kein Produkt und kein Gegenstand der Skill-Entwicklung; die Bauvorschriften für ausgelieferte Skills (README-Pflicht, Download-Paket, Lizenzfeld, Trigger-Form, Pfadausdrücke, Verbot von Verweisen auf andere Skills) binden ihn nicht.
+
+**Davon unberührt** bleibt `skill-dev-doc.md` als **normatives Zuhause** repo-weiter Festlegungen und der Werkzeuge, die dieser Skill benutzt: Kapitel 5.1 (Form der Sprachverweise) und Anhang A (Prüfwerkzeuge) gelten weiter — nicht weil sie den Skill *bauen*, sondern weil er sie *anwendet* und prüft. Befunde, die am ersten Maßstab gemessen wurden, sind hinfällig; die am zweiten gemessenen bleiben.
 
 Schweregrade: **hoch** = der Ablauf bricht oder verstößt gegen eine Schutzregel des Repos; **mittel** = falsche oder widersprüchliche Aussage, die beim nächsten Durchgang zu falschen Befunden oder unterlassener Arbeit führt; **niedrig** = Robustheit, Doppelung, Kosmetik. Wo eine Aussage nicht am laufenden System geprüft ist, steht **abgeleitet**; wo ein Lauf sie gezeigt hat, steht **beobachtet**.
 
@@ -39,35 +41,7 @@ Stand 11. September 2026, für den nächsten Review als Vergleichsbasis:
 
 Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig; daneben nur `.research/`, `.claude/`, `.vscode/`, `.git/` und die Sandbox-Attrappen. `.research/` enthält keine README.
 
-## 4 Befunde: hoch
-
-### B1 — Der Skill arbeitet im Haupt-Checkout und committet auf `dev` und `master`; das Worktree-Modell verbietet genau das
-
-**Ort:** `SKILL.md`, Schritt 1 („auf dev, dann ebenso auf master: … git commit"), Schritt 3 („git checkout master"), Schritt 5 („git checkout dev"), Abschnitt „Was in jedem Fall gilt" („Ein Checkpoint-Commit je Etappe"); `rules.md`, Einleitung („die aus ihr erwachsenden Korrekturen gehören in den Entwicklungszweig") und „Jede endet mit einem Checkpoint-Commit".
-
-**Befund:** Die Projekt-`CLAUDE.md` erklärt das Worktree-Modell für dieses Repo verbindlich. Dessen Regeln (`skills/parallel-sessions/rules.de.md`, „Das Arbeitsmodell" und „Regeln, die nie vereinfacht werden") sagen: Der Haupt-Checkout steht auf dem Integrationsbranch und gehört dem Nutzer, Claude schreibt dort keine Dateien und committet dort nur den freigegebenen Squash; der Releasebranch ist „kein Arbeitsort"; jede Handlung, die den Haupt-Checkout berührt, ist Freigabestufe „Jedes Mal". Der Skill wechselt im Haupt-Checkout den Branch, committet dort direkt auf `dev` und `master` und legt Checkpoint-Commits auf `dev` ab. Er erwähnt das Modell nicht und benennt den Widerspruch nicht. Die globale Arbeitsanweisung („Vorrang der Anweisungsebenen") verlangt: Widerspricht ein Skill einer projektspezifischen Schutzregel, gilt die Schutzregel, und der Widerspruch wird benannt.
-
-**Vorschlag:** Entscheidung des Entwicklers festhalten, im Skill selbst (Frage F2). Zwei Wege: (a) Der Skill wird als begründete Ausnahme vom Modell deklariert, mit ausdrücklicher Freigabe je Etappe und dem Hinweis, dass der Haupt-Checkout während der Schritte 3 bis 5 auf `master` steht. (b) Der Skill folgt dem Modell: Korrekturen der Tiefenprüfung auf einer Werkbank mit Squash nach `dev`; der Übertrag nach `master` in einem eigenen Worktree (`git worktree add <worktree_dir>/_release master`), sodass der Haupt-Checkout unberührt bleibt. Weg (b) löst nebenbei B2: Die Sandbox hängt die absoluten Pfade des Haupt-Checkouts `ro` ein (beobachtet), derselbe Unterpfad eines Worktrees ist davon nicht erfasst (abgeleitet). Vorbehalt: die in `parallel-sessions` dokumentierte Kollision zwischen Sandbox und Worktrees (Issue 80278).
-
-### B2 — Die „Bekannte Bedingung" zur Sandbox beschreibt einen Fall, der nicht mehr eintritt, und übersieht die Fälle, die jetzt eintreten
-
-**Ort:** `SKILL.md`, Schritt 3, Absatz „Bekannte Bedingung: `.claude/skills/` ist unter aktiver Sandbox nur lesbar" (Z. 88–91); Schritt 1.
-
-**Befund, Teil 1:** Der Absatz behandelt den Fall, dass die Übertragungsliste Dateien aus `.claude/skills/` enthält („etwa diesen Skill selbst"). Seit der dritten Ausschlussklasse (`^\.claude/skills/` in `DEFAULT_EXCLUDES`) kann dieser Fall nicht mehr eintreten: `branch-diff.py` sortiert jeden solchen Pfad in „Bewusst ausgeschlossen" (beobachtet: alle acht Dateien des Skills stehen dort). Der Absatz ist gegenstandslos und führt in die Irre.
-
-**Befund, Teil 2:** Der Sandbox-Konflikt liegt jetzt an zwei anderen Stellen. Erstens: `master` trägt den Skill-Ordner nicht mehr (beobachtet). `git checkout master` muss deshalb die acht Skill-Dateien aus dem Arbeitsbaum entfernen und `git checkout dev` sie wieder anlegen; `.claude/skills` ist unter der Sandbox als `ro` eingehängt und `test -w` verneint (beobachtet). Der Branchwechsel in Schritt 3 und 5 scheitert damit als Ganzes, nicht für einzelne Dateien (abgeleitet, Git nicht ausgeführt). Zweitens: `.claude/settings.json` gehört zu den `infra_files` und ist ebenfalls als `ro` eingehängt (beobachtet). Schritt 1 (`git restore --source=infra -- … .claude/settings.json …`) trifft dieselbe Sperre, ohne dass der Skill dort einen Hinweis trägt (abgeleitet).
-
-**Vorschlag:** Den Absatz in Schritt 3 streichen. Stattdessen eine Voraussetzung an den Anfang des Datei-Abgleichs: Unter aktiver Sandbox sind Schritt 1, 3 und 5 nicht durchführbar; die Sandbox wird für den Abgleich abgeschaltet, oder der Abgleich läuft nach Weg (b) aus B1. Der Hinweis „Der Index bekommt den richtigen Inhalt trotzdem" entfällt dann.
-
 ## 5 Befunde: mittel
-
-### B3 — Die Wurzel-READMEs verweisen im Release-Zweig auf einen Ordner, der dort fehlt (Nebenbefund außerhalb des Skill-Ordners)
-
-**Ort:** `README.md` (Wurzel), Absatz „Two files in the project root accompany …", letzter Satz („… is carried by the project's own skill `.claude/skills/repo-cleanup-pass/`"); `README.de.md`, Absatz „Zwei Dateien in der Projektwurzel begleiten …", letzter Satz.
-
-**Befund:** Beide Sätze stehen wortgleich in `master` (beobachtet: `git show master:README.md`, Zeile 27, beide Sprachen). `master` ist bei GitHub die Startseite und trägt den genannten Ordner nicht. Der Leser des veröffentlichten Standes bekommt einen Verweis ins Leere. Die Tiefenprüfung (Etappe 1) hätte das nicht gefunden: Sie prüft Tabelle, Reifezeichen, Standzeile, Sprachverweise und Auslieferungsform, nicht die Ordnerverweise in der Prosa.
-
-**Vorschlag:** Den Satz in beiden Fassungen um „nur im Entwicklungszweig `dev`" ergänzen oder den Verweis auf den Skill aus der Wurzel-README nehmen; Datumszeilen nachziehen; `master` nachziehen. Ob Etappe 1 um eine Prüfung der Prosa-Verweise auf Ordner erweitert wird, ist Ermessen des Entwicklers.
 
 ### B4 — Zwei Fassungen der Querverweis-Regel, die zweite unvollständig; der Hinweis auf eine offene Umstellung ist überholt
 
@@ -111,43 +85,16 @@ Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig
 
 **Vorschlag:** Entweder `--out` in `SKILL.md` verbindlich auf einen festen, nicht versionierten Ort setzen, oder im Skript ohne `--out` ein Verzeichnis unabhängig von `$TMPDIR` wählen (`tempfile.mkdtemp(dir="/tmp")` oder ein Pfad unter dem Repo, den `.gitignore` deckt). Den Satz in Schritt 2 danach neu fassen.
 
-### B9 — Es gibt keinen Ort für Stand, Begründungen, Messbefunde und Offenes; sie stehen im Skill-Körper
-
-**Ort:** Der Ordner insgesamt (keine `README.md`); `SKILL.md`, Z. 26 („Am 11. September 2026 genau so passiert …"), Z. 84–86, Z. 88–91, Z. 109, Z. 111 („Beim ersten Lauf … 25 Fehlalarme"); `rules.md`, Z. 56–60, Z. 99 („gemessen am 11. September 2026"); die deutschen Laufzeitmeldungen aller fünf Skripte.
-
-**Befund:** `skill-dev-doc.md`, Kapitel 5, verlangt je Skill eine `README.md` als Ort für Leistung, Feinheiten, Stand und Offenes und erlaubt der `SKILL.md`, für Begründungen dorthin zu verweisen, damit der Skilltext schlank bleibt. Die Projekt-`CLAUDE.md` sagt: „Wo es keinen Fahrplan gibt, benennt die README das Offene." Dieser Skill hat keine README. Folgen: Datierte Anekdoten und Messprotokolle stehen im Skill-Körper und in der Regeldatei und werden bei jedem Durchgang in den Kontext geladen, obwohl sie für die Ausführung nicht gebraucht werden (Kapitel 7: „Does this paragraph justify its token cost?"); der überholte Hinweis aus B4 hatte keinen anderen Platz als eine Regeldatei; und die deutschen Laufzeitmeldungen der Skripte haben keinen Vorgabenteil, der sie begründet, obwohl die Projekt-`CLAUDE.md` genau das verlangt („wo der Bereich das mit Begründung festgelegt hat"). `IMPORTANT.md` deckt nur den Verbleib im Entwicklungszweig ab.
-
-**Vorschlag:** Eine `README.md` (deutsch, ohne Paket, ohne Installationskapitel, mit Datumszeile) mit: Zweck und Abgrenzung, Stand, Begründungen und Messbefunden (die Absätze aus den genannten Zeilen wandern dorthin, im Skilltext bleibt je Regel ein Halbsatz „warum"), Grenzen der Werkzeuge, Festlegung zur Sprache der Laufzeitmeldungen, Offenes. `SKILL.md` und `rules.md` verdichten sich auf Regeln und Kommandos. Abhängig von F1.
-
-### B10 — Die Geltung der `skill-dev-doc.md` für Projekt-Skills unter `.claude/skills/` ist unbestimmt
-
-**Ort:** `skill-dev-doc.md`, Einleitung („Bauanleitung für jeden Skill dieses Repositories — gleich in welchem Ordner er entsteht") gegen Kapitel 5 („Jeder Skill liegt unter `skills/<skill-name>/`", Pflichtfeld `license`, `downloads/`) und 5.3.
-
-**Befund:** Die Doku beansprucht den Skill und verlangt zugleich Dinge, die für ein Werkzeug ohne Auslieferung gegenstandslos sind. Nach Arbeitsanweisungen §1.5 ist eine mehrdeutige Doku ein Defekt, der zu benennen ist. Dieses Review hat eine Auswahl der Kapitel angelegt (Abschnitt 2); ob sie stimmt, ist nicht aus der Doku ableitbar.
-
-**Vorschlag:** Ein Absatz in `skill-dev-doc.md` (Einleitung oder Kapitel 5), der für Skills unter `.claude/skills/` festlegt, welche Kapitel gelten. Frage F1.
-
 ## 6 Befunde: niedrig und Kleinkram
 
 Kleinkram wird nach Projekt-`CLAUDE.md` gesammelt und am Ende in einem Zug erledigt; jeder Punkt behält seine Nummer.
 
-- **B11 — „Zwei Klassen" mit drei Einträgen.** `SKILL.md`, „Was im Release-Zweig fehlen soll", Satz „Zwei Klassen, und sie sind keine Nachlässigkeit:" vor drei Punkten. Beim Ergänzen der dritten Klasse nicht nachgezogen; ein Wort. Die anderen Zählstellen („alle DREI Klassen" in Schritt 4, „Three classes" in `branch-diff.py`) stimmen.
 - **B12 — Ein Ausschluss verhindert nur den Übertrag, er räumt nichts weg.** `SKILL.md`, „Was im Release-Zweig fehlen soll". Der erste Lauf hatte den Skill nach `master` übertragen; die Kopien sind am 11. September von Hand entfernt worden (Commit 373b142, beobachtet). Weder `branch-diff.py` noch die erste Gegenprobe hätten sie je gemeldet, weil beide den Pfad ausfiltern. Ein Satz dazu im Text, damit beim nächsten Ergänzen einer Klasse das einmalige Entfernen aus `master` nicht vergessen wird.
-- **B13 — Verweis auf einen anderen Skill.** `SKILL.md`, „Was in jedem Fall gilt", Punkt „… die Tabellenprüfung des Skills `correct-zaaack-md-editor-mistakes` laufen lassen." Kapitel 2.3 der Vorgaben verbietet Verweise auf andere Skills (Begründung: Installierbarkeit). Hier kommt hinzu, dass die globale `CLAUDE.md` dieselbe Pflicht vor Markdown-Commits schon trägt; der Satz ist eine Doppelung. Entscheidung: behalten, weil der Skill nur in diesem Repo gilt, oder streichen wegen der Doppelung.
 - **B14 — Doppelung der Befundregeln.** `SKILL.md`, Z. 21–22, wiederholt fast wörtlich zwei Punkte aus Projekt-`CLAUDE.md`, „Befundlisten abarbeiten". Ein normatives Zuhause; hier genügt ein Querverweis. Der dritte Satz („Bevor etwas als Verstoß gemeldet wird, ist nachzusehen, ob es nicht ausdrücklich so festgelegt wurde") ist die eigentliche Ergänzung und kann bleiben.
 - **B15 — Zweite Gegenprobe in Schritt 4 setzt den Pfad textuell in einen Shell-String.** `xargs … -I{} sh -c '… git show dev:"{}" …'`. Ein Anführungszeichen oder `$` im Pfad bricht die Probe; der Zweck der NUL-Trennung wird an dieser Stelle unterlaufen (abgeleitet). Robust: `xargs -0 -r -n1 -a "$LISTEN/take.z" sh -c 'a=$(git show dev:"$1" | sha256sum); b=$(git show master:"$1" | sha256sum); [ "$a" = "$b" ] || echo "ABWEICHUNG: $1"' _`.
 - **B16 — `find-sandbox-masks.sh`: die Einrückung greift nie.** `path=${path#./}` schneidet `./` ab, danach kann `sed 's|^\./|  |'` nichts ersetzen; die Liste erscheint ohne Einrückung (beobachtet im heutigen Lauf). Kosmetik.
 - **B17 — `repack-package-readme.sh`, drei Kleinigkeiten (abgeleitet).** `TOP` wird bei mehr als einem Ordner im Archiv mehrzeilig, geprüft wird nur auf leer; `find … | xargs sha256sum` ohne `-print0`/`-0`; und `rules.md` zählt die Zeitstempel zur Prüfung („Vergleicht man `unzip -l` vor und nach dem Packen …"), das Skript prüft aber nur Inhalte. Klarstellen, dass der Zeitstempel-Vergleich Handarbeit ist. Bei Fehlschlag ist das Paket bereits ersetzt; der Vorzustand liegt nur noch in Git.
-- **B18 — `IMPORTANT.md` ist englisch.** Projekt-`CLAUDE.md`: Dateinamen englisch, Inhalte deutsch. Laut Commit „Hinweis des Entwicklers, korrekturgelesen" bewusst so. Zur Bestätigung (Frage F3); wenn gewollt, nichts zu tun.
-- **B19 — Unbenannte Voraussetzungen des Datei-Abgleichs.** Schritt 3 setzt voraus: sauberer Arbeitsbaum, Haupt-Checkout auf `dev`, Arbeitsverzeichnis in der Repo-Wurzel (die Listen sind wurzelrelativ, `git checkout dev -- …` löst relativ zum Arbeitsverzeichnis auf), und `master` in keinem anderen Worktree ausgecheckt (sonst verweigert `git checkout master`). Heute alle erfüllt (beobachtet), keine steht im Text. Wird B1 nach Weg (b) gelöst, entfallen die letzten beiden.
 - **B20 — Die Frage an den Nutzer nennt nicht alle Etappen.** `SKILL.md`, „Zuerst fragen, dann arbeiten": „READMEs, Sprachfassungen und Zip-Pakete"; die Tiefenprüfung umfasst auch Datumszeilen (Etappe 3) und den Verweisprüfer (Etappe 5), die `description` nennt die Datumszeilen. Frage vervollständigen.
-- **B21 — Ladeanweisung ohne Pfadausdruck.** `SKILL.md`: „Lies `rules.md` im Ordner dieses Skills". Kapitel 5.2 sieht `${CLAUDE_SKILL_DIR}/rules.md` vor. Bei einem Projekt-Skill mit festem Pfad harmlos; zur Einheitlichkeit anpassen, falls die Vorgaben gelten (F1).
-
-## 7 Fragen an den Entwickler
-
-- **F1** Gilt `skill-dev-doc.md` für `.claude/skills/`, und wenn ja, welche Kapitel? Davon hängen B9, B10, B13, B21 und das fehlende `license`-Feld ab.
-- **F2** Zu B1: Ausnahme vom Worktree-Modell im Skill festschreiben, oder den Skill auf Werkbank und Release-Worktree umbauen?
-- **F3** Ist `IMPORTANT.md` bewusst englisch (B18)?
 
 ## 8 Geprüft und in Ordnung
 
@@ -168,4 +115,6 @@ Damit der nächste Review nachprüft statt neu herleitet:
 
 ## 9 Nicht geprüft
 
-Der Datei-Abgleich selbst und `repack-package-readme.sh` wurden nicht ausgeführt. Ob Git beim Branchwechsel unter der Sandbox tatsächlich abbricht (B2), ist aus Mount-Lage und Zustand von `master` abgeleitet, nicht vorgeführt.
+`repack-package-readme.sh` wurde nicht ausgeführt.
+
+**Nachtrag 13. September 2026:** Der frühere Zweifel, ob Git beim Branchwechsel unter der Sandbox tatsächlich abbricht, ist inzwischen geklärt — beobachtet statt abgeleitet: `git stash` und `git checkout infra` scheiterten unter aktiver Sandbox tatsächlich am Entfernen von `.claude/skills/`-Dateien aus dem Arbeitsbaum, liefen nach Abschalten der Sandbox sauber durch. Der Datei-Abgleich selbst wurde daraufhin auf eine Plumbing-Route umgestellt, die diesen Konflikt strukturell vermeidet (`master`/`infra` werden nie mehr ausgecheckt) und ebenfalls real getestet — an freischwebenden Commits, nie an echten Branches.
