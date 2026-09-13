@@ -43,14 +43,6 @@ Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig
 
 ## 5 Befunde: mittel
 
-### B6 — `datelines-since.sh` verliert gequotete Pfade still und prüft gegen „heute" statt gegen das Änderungsdatum
-
-**Ort:** `files/datelines-since.sh`, beide Schleifen `git diff --name-only "$REF"..HEAD | while read -r f`; `TODAY=${2:-$(date +%F)}` und `if [ "$date" = "$TODAY" ]`; `rules.md`, Etappe 3, Satz „`<ref>` ist der Stand, gegen den verglichen wird — der Commit vor Beginn des Durchgangs oder der Release-Zweig".
-
-**Befund, Teil 1 (beobachtet):** `git diff --name-only master..HEAD` liefert 25 Pfade in Anführungszeichen (die Baustellen-Skills, Nicht-ASCII im Ordnernamen). Keiner davon erscheint in der Ausgabe des Skripts, weder in der ersten noch in der zweiten Liste: `[ -f "$f" ]` scheitert am gequoteten Namen und `continue` verschluckt die Datei. Heute ist das folgenlos, weil diese Ordner ohnehin nicht geprüft werden; der Mechanismus trifft aber jeden Pfad mit Nicht-ASCII-Zeichen. Der Skill warnt in Schritt 4 selbst vor genau diesem Effekt, und `readme-audit.sh` behandelt ihn mit `-z` richtig. Dazu: `read -r` ohne `IFS=` beschneidet Randleerzeichen.
-
-**Befund, Teil 2 (abgeleitet):** Als richtig gilt nur eine Datumszeile mit dem heutigen Datum. Sobald die Änderungen seit `<ref>` mehr als einen Tag umfassen, und `rules.md` empfiehlt als `<ref>` auch den Release-Zweig, meldet das Werkzeug jede korrekt datierte Datei als `NACHZIEHEN`. Das widerspricht der eigenen Regel „Das Datum gehört zur Datei". Außerdem sieht `"$REF"..HEAD` nur Committetes; `rules.md` sagt nicht, dass das Werkzeug erst nach dem Checkpoint-Commit aussagekräftig ist.
-
 **Vorschlag:** `git diff --name-only -z "$REF"..HEAD | while IFS= read -r -d '' f`. Kriterium: Datumszeile nicht älter als der letzte Commit, der die Datei seit `<ref>` geändert hat (`git log -1 --format=%cs "$REF"..HEAD -- "$f"`), mit `TODAY` nur als Obergrenze. In `rules.md` sagen, ob das Werkzeug vor oder nach dem Checkpoint-Commit läuft.
 
 ### B8 — Die Aussage zu `$TMPDIR` stimmt nicht mit dem Verhalten von `tempfile.mkdtemp` überein
@@ -81,7 +73,7 @@ Damit der nächste Review nachprüft statt neu herleitet:
 - Schritt 1: Gegenprobe `git diff --stat infra <zweig> -- <infra_files>` deckt auch Dateien ab, die `restore` nicht entfernt.
 - Schritt 4: `core.quotepath=false` in der ersten Probe ist nötig und begründet (die 25 gequoteten Pfade sind beobachtet); die zweite Probe vergleicht Blobs, nicht den Arbeitsbaum.
 - `readme-audit.py` (bis 13. September 2026 `readme-audit.sh`): läuft (beobachtet, 30 Zeilen für 30 versionierte READMEs, mechanisch gegengezählt, keine Befunde); NUL-sichere Pfadbehandlung und C-Sortierung beim Umbau erhalten; Partnerbestimmung deckt die Umkehrung in der Wurzel ab; Baustellen-Skills werden am ersten Zeichen erkannt, wie in `branch-diff.py`.
-- `datelines-since.sh`: Das Muster `^\*(Stand|Last updated): …\*` trifft READMEs und Snippet-Dateien gleichermaßen (Stichproben: `skills/README.md`, `skills/common-code-generation/CLAUDE-snippet.de.md`, `CLAUDE.md-Snippets/common-snippets.de.md`).
+- `datelines-since.py` (bis 13. September 2026 `.sh`): Das Muster `^\*(Stand|Last updated): …\*` trifft READMEs und Snippet-Dateien gleichermaßen (Stichproben: `skills/README.md`, `skills/common-code-generation/CLAUDE-snippet.de.md`, `CLAUDE.md-Snippets/common-snippets.de.md`).
 - `repack-package-readme.sh`: Sprachzuordnung `_de_` → `README.md`, `_en_` → `README.en.md` entspricht der README-Regel unterhalb der Wurzel; `cp -p` und `zip -9 -o -X` mit sortierter Liste entsprechen 5.3 und A.1; Rückgabewert 1 bei Abweichung.
 - `find-sandbox-masks.sh`: läuft (beobachtet, 19 Attrappen, deckungsgleich mit `git status`); `test -c`/`test -b` je Pfad statt `find -type c` ist richtig begründet; leeres Array unter `set -u` korrekt behandelt.
 - `rules.md`, Etappe 1: Reifezeichen-Liste stimmt mit der Legende beider Wurzel-READMEs überein; alle Bereichsverweise der englischen Wurzel-README zeigen auf `README.en.md`; alle sechs Bereichsordner der Wurzel stehen in der Tabelle, kein Ordner fehlt (beobachtet).

@@ -23,6 +23,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from unfinished import is_unfinished  # noqa: E402
+
 try:
     from dateutil import parser as dateparser
 except ImportError:
@@ -47,19 +50,14 @@ def repo_root():
 
 
 def readme_paths(root):
-    """Every versioned README, C-sorted, without the construction-sign skills."""
+    """Every versioned README, C-sorted, without the unfinished skills."""
     out = subprocess.run(
         ["git", "-C", root, "ls-files", "-z", "*README*.md"],
         capture_output=True, text=True, check=True,
     ).stdout
     paths = [p for p in out.split("\0") if p]
     paths.sort()
-    keep = []
-    for p in paths:
-        if p.startswith("skills/") and not p[len("skills/"):][:1].isalnum():
-            continue
-        keep.append(p)
-    return keep
+    return [p for p in paths if not is_unfinished(p)]
 
 
 def zone(lines):

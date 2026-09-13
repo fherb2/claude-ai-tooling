@@ -28,15 +28,12 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Three classes are deliberately absent from the release branch: skill folders
-# whose name does not start with an alphanumeric character (they carry a
-# construction sign), the research material, and the project's own skills under
-# .claude/skills/ -- those are working equipment of the development branch, this
-# skill included, and a tool that produces the release branch has no business
-# inside it. The third pattern hangs on the prefix and not on a folder name, so
-# a second project skill is covered without anyone having to remember it.
-DEFAULT_EXCLUDES = [r"^skills/(?![A-Za-z0-9])", r"^\.research/",
-                    r"^\.claude/skills/"]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from unfinished import RELEASE_PATTERNS, describe  # noqa: E402
+
+# The exclusion classes live in unfinished.py -- one place for every tool of
+# this skill, so a new class is added once instead of in each of them.
+DEFAULT_EXCLUDES = RELEASE_PATTERNS
 
 
 def run(*args: str) -> str:
@@ -111,7 +108,8 @@ def main() -> int:
         print(f"  - {p}")
     print(f"\nBewusst ausgeschlossen: {len(skipped_excl)}")
     for p in skipped_excl:
-        print(f"  . {p}")
+        note = describe(p)
+        print(f"  . {p}" + (f"   <- {note}" if note else ""))
     print(f"\nInfra-Dateien (kommen aus dem infra-Zweig): {len(skipped_infra)}")
     for p in skipped_infra:
         print(f"  i {p}")
