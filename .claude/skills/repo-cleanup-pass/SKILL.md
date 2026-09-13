@@ -123,12 +123,14 @@ git -c core.quotepath=false diff --name-only master dev \
 #    -> keine Ausgabe
 
 # 2. Jede übertragene Datei byteweise vergleichen:
-xargs -0 -r -a "$LISTEN/take.z" -I{} sh -c \
-  'a=$(git show dev:"{}" | sha256sum); b=$(git show master:"{}" | sha256sum); [ "$a" = "$b" ] || echo "ABWEICHUNG: {}"'
+xargs -0 -r -n1 -a "$LISTEN/take.z" sh -c \
+  'a=$(git show dev:"$1" | sha256sum); b=$(git show master:"$1" | sha256sum); [ "$a" = "$b" ] || echo "ABWEICHUNG: $1"' _
 #    -> keine Ausgabe
 ```
 
 Die erste Probe fängt Vergessenes, die zweite einen misslungenen Übertrag. Beide gehören dazu; die erste allein sagt nur, dass ein Pfad existiert, nicht dass er stimmt.
+
+**Der Pfad wandert in der zweiten Probe als Positionsparameter (`$1`) in die Shell, nicht als Text (`{}`) in den Befehl.** Enthält ein Pfad ein `"` oder ein `$`, setzt `-I{}` das roh in den Shell-Code ein — geprüft: Ein Anführungszeichen im Dateinamen bricht die Probe mit einem Syntaxfehler ab, statt den Pfad zu melden.
 
 **Der Filter der ersten Probe bezieht sein Muster aus `files/unfinished.py`**, dem einen Ort, an dem sämtliche Ausschlussklassen dieses Skills stehen — die Werkzeuge lesen es dort ebenfalls. **Wer eine Klasse ergänzt, ergänzt genau diese eine Stelle** (und die Aufzählung oben, die sie für den Leser erklärt). Früher stand dasselbe Muster dreifach im Ordner; blieb eine Kopie zurück, meldete die Probe die neu ausgeschlossenen Dateien als Vergessenes — ein Fehlalarm, der wie ein misslungener Abgleich aussieht.
 
