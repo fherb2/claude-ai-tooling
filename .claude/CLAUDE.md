@@ -66,7 +66,10 @@ Ordnername, Frontmatter-Feld `name` und Slash-Aufruf sind dasselbe; eine
 Umbenennung ändert das Verhalten jeder installierten Kopie und wird
 einzeln entschieden. Und Laufzeitmeldungen an den Entwickler dürfen
 deutsch bleiben, wo der Bereich das mit Begründung festgelegt hat
-(belegt: home-sharing, Sprachfestlegung 2.5, suchbare Journal-Anlässe).
+(belegt: home-sharing, Sprachfestlegung 2.5, suchbare Journal-Anlässe;
+ebenso die Projekt-Skills unter `.claude/skills/`, deren Meldungen
+ausschließlich dem Entwickler dieses Repositories erscheinen und den
+Entwicklungszweig nie verlassen).
 
 # Datumszeilen in READMEs und CLAUDE-Snippets
 
