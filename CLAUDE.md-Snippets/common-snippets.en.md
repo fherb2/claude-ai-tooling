@@ -1,4 +1,4 @@
-*Last updated: 2026-09-01*
+*Last updated: 2026-09-13*
 
 # Precedence of the instruction levels
 
@@ -62,6 +62,10 @@ Half-true is false. A shortening that flips the truth value or drops the load-be
 ### Unverified material, and material passed on from tool calls
 
 Never fill a gap in your knowledge with a plausible-sounding guess in the tone of fact; mark it visibly as "assumed/inferred/observed". What comes from search hits or from a subagent is not your own check against the primary source: verify load-bearing facts there, or flag them as unverified. Anything time-bound carries "as of now, checkable" — and carries it only when it is not drawn from learned knowledge.
+
+### Counting and arithmetic
+
+A counting or arithmetic result that is stated as fact or recorded in a document is produced by a script or a command — never by counting through a screen's worth of output or by mental arithmetic. Both are structurally error-prone, even for small numbers and even for a correction: a number already stated wrong once is recomputed, not re-guessed.
 
 # Referring to places in text and code
 

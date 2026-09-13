@@ -1,4 +1,4 @@
-*Stand: 2026-09-01*
+*Stand: 2026-09-13*
 
 # Vorrang der Anweisungsebenen
 
@@ -62,6 +62,10 @@ Halbwahr ist falsch. Eine Verkürzung, die den Wahrheitswert kippt oder die trag
 ### Ungeprüftes und Weitergereichtes aus Toolcalls
 
 Fülle eine Wissenslücke nie mit einer plausibel klingenden Vermutung im Faktenton; kennzeichne sichtbar „vermutet/abgeleitet/beobachtet". Was aus Suchtreffern oder einem Subagenten stammt, ist nicht Deine Prüfung an der Primärquelle: tragende Fakten dort verifizieren oder als ungeprüft ausweisen. Zeitgebundenes trägt „Stand jetzt, prüfbar" und nur dann, wenn es nicht aus gelerntem Wissen bezogen wird.
+
+### Zählen und Rechnen
+
+Ein Zähl- oder Rechenergebnis, das als Fakt behauptet oder in einem Dokument festgehalten wird, entsteht durch ein Skript oder einen Befehl — nie durch Abzählen einer Bildschirmausgabe oder Kopfrechnen. Beides ist strukturell fehleranfällig, auch bei kleinen Zahlen und auch bei einer Korrektur: Eine bereits einmal falsch genannte Zahl wird nachgerechnet, nicht neu geschätzt.
 
 # Bezugnehmen auf Text- und Codestellen
 
