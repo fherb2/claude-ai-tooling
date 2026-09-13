@@ -1883,6 +1883,24 @@ def check_folder_check(w: types.ModuleType, tmp_root: Path) -> None:
     finally:
         w.read_api_key, w.rest_get = original_key, original_get
 
+    # Ein Absturz der Prüfung darf nicht aussehen wie "nicht abgeglichen":
+    # Python endete sonst mit 1, also mit dem Wert dieser Antwort, und das
+    # Installskript riete dazu, einen längst geteilten Ordner zu teilen.
+    def kaputte_pruefung(watch_dir: Path) -> int:
+        raise RuntimeError("absichtlich kaputt")
+
+    original_check = w.check_folder
+    w.check_folder = kaputte_pruefung
+    try:
+        gemeldet = io.StringIO()
+        with contextlib.redirect_stderr(gemeldet):
+            ausgang = w.main(["--check-folder", "--watch-dir", str(shared)])
+    finally:
+        w.check_folder = original_check
+    check("Absturz der Prüfung: nicht prüfbar", ausgang, 2)
+    check("und die Rückverfolgung wird gemeldet",
+          "RuntimeError" in gemeldet.getvalue(), True)
+
     # Die zugesicherte Eigenschaft: keine Sperre, kein Schreiben.
     original_dir = w.TOOL_DIR
     w.set_tool_dir(tmp_root / "unberuehrt")
