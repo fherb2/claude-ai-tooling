@@ -43,14 +43,6 @@ Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig
 
 ## 5 Befunde: mittel
 
-### B5 — `readme-audit.sh` erkennt weder die Datumszeile noch den Querverweis in der vorgeschriebenen Form
-
-**Ort:** `files/readme-audit.sh`, Zeilen `date=$(grep -m1 -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$f" …)` und `if grep -qE '\[(English version|Deutsche Fassung)\]' "$f"`.
-
-**Befund (abgeleitet):** Als Datum gilt das erste datumsähnliche Muster irgendwo in der Datei. Eine README ohne Datumszeile, die im Text ein ISO-Datum nennt, wird nie als `KEINS` gemeldet, obwohl `rules.md` sagt, `KEINS` sei „immer ein Befund". Das Schwesterwerkzeug `datelines-since.sh` prüft das strenge Muster `^\*(Stand|Last updated): …\*`. Beim Querverweis wird nur geprüft, ob der Linktext irgendwo vorkommt; weder die Position (kursive Zeile unmittelbar unter der Datumszeile) noch die Form (Repo-URL bei paketwandernden Dateien, relativ sonst, Kapitel 5.1) wird erfasst. `rules.md` sagt „Andere Formen … werden angeglichen", das Werkzeug kann sie aber nicht zeigen; im heutigen Lauf steht bei allen 30 READMEs „vorhanden", die Form bleibt unsichtbar.
-
-**Vorschlag:** Dasselbe Datumszeilen-Muster wie in `datelines-since.sh` verwenden. Den Querverweis als eigene Zeile prüfen (`^\*\[(English version|Deutsche Fassung)\]\(`) und eine Spalte ausgeben, ob das Ziel absolut (`https://`) oder relativ ist; dann ist Kapitel 5.1 mechanisch prüfbar.
-
 ### B6 — `datelines-since.sh` verliert gequotete Pfade still und prüft gegen „heute" statt gegen das Änderungsdatum
 
 **Ort:** `files/datelines-since.sh`, beide Schleifen `git diff --name-only "$REF"..HEAD | while read -r f`; `TODAY=${2:-$(date +%F)}` und `if [ "$date" = "$TODAY" ]`; `rules.md`, Etappe 3, Satz „`<ref>` ist der Stand, gegen den verglichen wird — der Commit vor Beginn des Durchgangs oder der Release-Zweig".
@@ -88,7 +80,7 @@ Damit der nächste Review nachprüft statt neu herleitet:
 - `branch-diff.py`: läuft (beobachtet); `--no-renames` ist mit der Feldpaarung im Skript richtig begründet; `-z` macht `core.quotepath` entbehrlich; Ausschlussmuster in `DEFAULT_EXCLUDES`, Liste in `SKILL.md` und Filter der ersten Gegenprobe stimmen überein (drei Klassen); Infra-Muster aus der Modelldatei mit `(/|$)` korrekt; Richtung der Löschliste (Status `D` aus `git diff master dev` = in `master` vorhanden, in `dev` entfallen) stimmt; Arbeitslisten NUL-terminiert; `--out` funktioniert.
 - Schritt 1: Gegenprobe `git diff --stat infra <zweig> -- <infra_files>` deckt auch Dateien ab, die `restore` nicht entfernt.
 - Schritt 4: `core.quotepath=false` in der ersten Probe ist nötig und begründet (die 25 gequoteten Pfade sind beobachtet); die zweite Probe vergleicht Blobs, nicht den Arbeitsbaum.
-- `readme-audit.sh`: läuft (beobachtet, 30 Zeilen, keine Befunde); `-z` und `LC_ALL=C sort -z` richtig; Partnerbestimmung deckt die Umkehrung in der Wurzel ab; Baustellen-Skills werden am ersten Zeichen erkannt, wie in `branch-diff.py`.
+- `readme-audit.py` (bis 13. September 2026 `readme-audit.sh`): läuft (beobachtet, 30 Zeilen für 30 versionierte READMEs, mechanisch gegengezählt, keine Befunde); NUL-sichere Pfadbehandlung und C-Sortierung beim Umbau erhalten; Partnerbestimmung deckt die Umkehrung in der Wurzel ab; Baustellen-Skills werden am ersten Zeichen erkannt, wie in `branch-diff.py`.
 - `datelines-since.sh`: Das Muster `^\*(Stand|Last updated): …\*` trifft READMEs und Snippet-Dateien gleichermaßen (Stichproben: `skills/README.md`, `skills/common-code-generation/CLAUDE-snippet.de.md`, `CLAUDE.md-Snippets/common-snippets.de.md`).
 - `repack-package-readme.sh`: Sprachzuordnung `_de_` → `README.md`, `_en_` → `README.en.md` entspricht der README-Regel unterhalb der Wurzel; `cp -p` und `zip -9 -o -X` mit sortierter Liste entsprechen 5.3 und A.1; Rückgabewert 1 bei Abweichung.
 - `find-sandbox-masks.sh`: läuft (beobachtet, 19 Attrappen, deckungsgleich mit `git status`); `test -c`/`test -b` je Pfad statt `find -type c` ist richtig begründet; leeres Array unter `set -u` korrekt behandelt.
