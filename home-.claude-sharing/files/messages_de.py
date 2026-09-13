@@ -82,10 +82,9 @@ TEXTS = {
     "dialog.no_instruction.title": "Claude-Sync: Konfliktlösung nicht möglich",
     "dialog.no_instruction.text": (
         "Die Arbeitsanweisung {path} fehlt. Ohne sie kann keine "
-        "Konfliktsitzung starten. Bitte den Inhalt des files/-Ordner aus der "
-        "Repo-Quelle von claude-sync-watch vollständig nach "
-        "~/.claude-sync-watch kopieren. Dort ist auch das fehlende File "
-        "'{name}' enthalten."
+        "Konfliktsitzung starten. Bitte das Paket von claude-sync-watch "
+        "erneut vollständig in das Benutzerverzeichnis entpacken; die "
+        "fehlende Datei '{name}' ist darin enthalten."
     ),
 
     "dialog.terminal_failed.title": "Claude-Sync: Terminal konnte nicht starten",
@@ -201,6 +200,12 @@ TEXTS = {
         "Bildschirm erscheinen. Bitte 'libnotify-bin' installieren: "
         "sudo apt install libnotify-bin. Konflikterkennung und Eskalation "
         "sind unberührt."
+    ),
+    "error.watch_setup_failed": (
+        "Die Verzeichnisbeobachtung lässt sich nicht einrichten: {detail}\n"
+        "Häufigste Ursache ist das inotify-Kontingent "
+        "(fs.inotify.max_user_watches); die rekursive Beobachtung belegt je "
+        "Verzeichnis unterhalb des beobachteten Ordners einen Eintrag."
     ),
     "error.watchdog_missing": (
         "Die Python-Beobachtungsbibliothek 'watchdog' fehlt.\n"

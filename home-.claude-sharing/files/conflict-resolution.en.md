@@ -66,7 +66,7 @@ In that case also tell them that for a real failure an orderly fallback to an ea
 
 Briefly, at the end: which pairs were affected, the decision per pair, what was written and what was deleted, whether exclusions were changed.
 
-**And then say explicitly that you are finished and the window can be closed.** One sentence is enough, for example: “That is everything — you can close this window (`/exit`).” Without it the session stands mute after the report, and the user cannot know whether more is coming; in the operational test that was the one remaining loose end. This needs **no** additional dialog: the report is already in front of the user, and a window on top of it would be the intrusiveness that determination 2.9 exists to avoid.
+**And then say explicitly that you are finished and the window can be closed.** One sentence is enough, for example: “That is everything — you can close this window (`/exit`).” Without it the session stands mute after the report, and the user cannot know whether more is coming; in the operational test that was the one remaining loose end. This needs **no** additional dialog: the report is already in front of the user, and a window on top of it would be the intrusiveness that is to be avoided here.
 
 Do not wait for further instructions afterwards and do not start anything new. If a question from the user does come, answer it — but the purpose of this session is fulfilled with the report.
 
