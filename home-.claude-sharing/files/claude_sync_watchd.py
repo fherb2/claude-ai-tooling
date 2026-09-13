@@ -1953,7 +1953,18 @@ def main(argv: Optional[list[str]] = None) -> int:
     # Answered before the directory check below and before anything that
     # writes: this switch is read-only by contract (doku 3.5).
     if args.check_folder:
-        return check_folder(watch_dir)
+        try:
+            return check_folder(watch_dir)
+        except Exception:
+            # Without this an unexpected exception ends Python with 1 -- the
+            # very code that means "this folder is not shared". The setup
+            # script would then print the traceback as the text of that
+            # warning and advise sharing a folder that is already shared: a
+            # programming error announced as a configuration problem. A check
+            # that crashed cannot tell, and that is exactly what 2 says; the
+            # traceback goes with it, so the defect stays visible (doku 2.6).
+            traceback.print_exc()
+            return 2
 
     if not watch_dir.is_dir():
         print(T("journal.watch_dir_missing", dir=watch_dir), file=sys.stderr)
