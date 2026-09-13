@@ -43,14 +43,6 @@ Projektwurzel: Die sechs Bereichsordner der Übersichtstabelle sind vollständig
 
 ## 5 Befunde: mittel
 
-### B4 — Zwei Fassungen der Querverweis-Regel, die zweite unvollständig; der Hinweis auf eine offene Umstellung ist überholt
-
-**Ort:** `rules.md`, Etappe 2, Absatz „Die Form des Querverweises" mit dem Codeblock und dem Satz „Die Regel selbst … steht in der Projekt-`CLAUDE.md`" (Z. 41–48); Unterabschnitt „Der Querverweis in Dateien, die ins Paket wandern", letzter Absatz („… noch nicht überall ausgeführt. Wer diese Etappe fährt, prüft mit.", Z. 60). Mitbetroffen: `skill-dev-doc.md`, A.2, erste Zeile der Vergleichstabelle („… noch offen — **bis dahin die einzige Meldung mit Substanz**").
-
-**Befund:** Die Projekt-`CLAUDE.md` legt seit dem 11. September 2026 fest, dass die Form des Querverweises ausschließlich in `skill-dev-doc.md`, Kapitel 5.1 steht („Hier steht sie absichtlich nicht ein zweites Mal"). `rules.md` trägt eine zweite Fassung: relative Verweise als Regelform, dazu die Repo-URL für paketwandernde Dateien. Kapitel 5.1 kennt zusätzlich `blob/master` statt `HEAD` samt Begründung und den Suchweg `grep -rn "blob/master"`; das fehlt in `rules.md`. Zwei gleichrangige Fassungen derselben Festlegung verstoßen gegen „genau ein normatives Zuhause". Der Satz „noch nicht überall ausgeführt" ist überholt: Alle zehn Bereiche mit `downloads/` tragen in beiden Sprachfassungen die Repo-URL, die fünf übrigen READMEs verweisen relativ und wandern in kein Paket (beobachtet). Dieselbe überholte Aussage steht in der Tabelle in A.2; nach Projekt-`CLAUDE.md` („Treffen wir auf einen überholten Verweis, wird er mitbereinigt") gehört sie mit weg.
-
-**Vorschlag:** In Etappe 2 den Codeblock und den Satz zur Projekt-`CLAUDE.md` durch einen Verweis auf Kapitel 5.1 ersetzen; den letzten Absatz des Unterabschnitts streichen, die Festlegung vom 10. September als Verweis auf 5.1 behalten. In A.2 die erste Tabellenzeile auf den erledigten Stand bringen.
-
 ### B5 — `readme-audit.sh` erkennt weder die Datumszeile noch den Querverweis in der vorgeschriebenen Form
 
 **Ort:** `files/readme-audit.sh`, Zeilen `date=$(grep -m1 -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$f" …)` und `if grep -qE '\[(English version|Deutsche Fassung)\]' "$f"`.
