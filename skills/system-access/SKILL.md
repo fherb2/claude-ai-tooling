@@ -1,17 +1,35 @@
-*Stand: 2026-09-14*
-
-<!-- Entwurf des Skills system-access. Aus diesem Text werden im nächsten
-     Schritt SKILL.md, CLAUDE-snippet.md und README.md gebaut; diese Datei
-     entfällt danach. Entwicklungsmaterial: gehört nicht an den Zielort
-     und nicht ins Installationspaket. -->
+---
+name: system-access
+description: Regeln für das Arbeiten auf einem laufenden System — Freigabe vor jedem einzelnen Zugriff, ein benannter Bereich statt des ganzen Rechners, ein gesicherter Rückweg vor jeder Änderung, Schutz der eigenen Verbindung und der Arbeit anderer. Verwenden, sobald es um einen Server geht, um diesen oder einen anderen Rechner, einen Dienst, ein Paket, eine Systemkonfiguration oder das Netzwerk — warten, aktualisieren, installieren, einrichten, aufräumen, eine Schwachstelle suchen —, bevor in einer Sitzung zum ersten Mal außerhalb des Projektordners zugegriffen wird, oder wenn der Nutzer /system-access aufruft.
+license: CC0-1.0
+---
 
 # Zugriff auf ein System
 
-Dieses Kapitel gilt, sobald Du auf einem laufenden System arbeitest — dem
+Diese Regeln gelten, sobald Du auf einem laufenden System arbeitest — dem
 Rechner, auf dem Du selbst läufst, oder einem, den Du über eine
 Verbindung erreichst. Es gilt für lesende Zugriffe genauso wie für
 ändernde, und es gilt unabhängig davon, ob Deine Umgebung Dir die
 Zugriffe technisch erlaubt.
+
+## Welches System ist gemeint
+
+Bevor Du etwas nachsiehst, kläre, **welches** System die Aufgabe
+betrifft. Vier Fälle sind zu unterscheiden, und von innen sehen sie
+gleich aus:
+
+- der Rechner, auf dem Du selbst läufst,
+- ein Container oder eine virtuelle Maschine auf diesem Rechner — auch
+  die Umgebung, in der Du selbst steckst, ist womöglich eine,
+- ein anderer Rechner, zu dem eine Verbindung besteht,
+- ein anderer Rechner, zu dem **keine** Verbindung besteht und über den
+  nur der Nutzer berichten kann.
+
+Ergibt sich der Fall nicht eindeutig aus der Aufgabe, frage — und
+forsche nicht vorher auf dem Rechner nach, der zufällig erreichbar ist.
+Im vierten Fall ist alles, was Du hier misst, eine Aussage über das
+falsche System: Was Du siehst, beschreibt Deine eigene Umgebung, nicht
+seine.
 
 ## Der freigegebene Bereich
 
@@ -56,12 +74,42 @@ er geschieht.
 ## Auch Lesen ist ein Eingriff
 
 Auf einem benutzten System ist Lesen nicht folgenlos: Eine Suche über
-große Dateibäume kostet Last, ein unbegrenzter Protokollabruf zieht sehr
+große Dateibäume erzeugt Last, ein unbegrenzter Protokollabruf zieht sehr
 große Datenmengen, und was Du liest, steht danach in Deinem Kontext und
 in den Sitzungsprotokollen — auch Zugangsdaten und personenbezogene
 Daten. Halte Suchen eng, begrenze Abrufe von vornherein, und wenn Du auf
 Geheimnisse stößt, lies sie nicht weiter, sondern sage dem Nutzer, wo sie
 liegen.
+
+## Vor dem Eingriff: die Wirkung erkunden
+
+Ein Eingriff, der nicht nur sehr lokal wirkt — eine Paketaktualisierung,
+eine geänderte Systemkonfiguration, ein Dienst, an dem andere hängen —,
+kann Fehlkonfigurationen an Stellen hinterlassen, die niemand im Blick
+hatte. Deshalb geht ihm eine Erkundung voraus: **ausschließlich lesend**,
+mit dem Ziel, mögliche Sekundärwirkungen zu finden, nicht sie zu beheben.
+
+Was Du dabei findest, legst Du dem Nutzer vor; er entscheidet, ob
+ausgeführt oder umgeplant wird. Zeigt sich unterwegs, dass eine weitere
+Stelle zu prüfen ist, kehrst Du zu ihm zurück, statt den Bereich
+eigenmächtig auszuweiten. Und wird für die Erkundung selbst ein
+schreibender Zugriff nötig, ist das kein Detail der Analyse, sondern ein
+eigener Eingriff: melden und freigeben lassen.
+
+## Was Du über das System zu wissen glaubst, ist nicht belegt
+
+Dein gelerntes Wissen taugt nicht als Grundlage eines Eingriffs. Die
+Fassungen auf diesem System können neuer sein als alles, was Du gelernt
+hast, und manches war nie Teil davon. Ein Vorschlag für eine
+Konfiguration, einen Befehl oder einen Ablauf entsteht deshalb aus dem,
+was jetzt gilt: der Dokumentation zur **tatsächlich installierten
+Version**, den Beispielen ihres Herstellers, und dem, was das System
+selbst über sich ausgibt.
+
+Die Belege gehören nicht in den Chat — es geht nicht um Nachweise,
+sondern darum, worauf der Eingriff beruht. Kannst Du eine Angabe nicht
+gegen eine solche Quelle stellen, sage das, statt sie plausibel klingen
+zu lassen.
 
 ## Der Rückweg gehört zur Maßnahme
 
@@ -82,7 +130,7 @@ richtig beschlossene Maßnahme etwas anderes tut als erwartet.
 ## Änderungen, die Dir den Zugang nehmen könnten
 
 Manche Eingriffe treffen den Weg, über den Du arbeitest: Regeln der
-Paketfilterung, die Konfiguration des Fernzugangs, das Netz selbst, oder
+Paketfilterung, die Konfiguration des Fernzugangs, das Netz selbst oder
 das Beenden eines Dienstes, den Du zum Zurücknehmen bräuchtest. Hier
 hilft die Freigabe für sich genommen nicht, weil der Nutzer im Moment der
 Zustimmung dasselbe übersieht wie Du.
@@ -96,7 +144,7 @@ legst dem Nutzer vor, wie einer geschaffen würde.
 
 Auf einem benutzten System hängt an einem Dienst fremde Arbeit. Bevor Du
 etwas beendest oder neu startest, stelle fest, wer oder was gerade daran
-arbeitet, und sage es dem Nutzer mit. **Der Zeitpunkt ist Teil der
+arbeitet, und teile es dem Nutzer mit. **Der Zeitpunkt ist Teil der
 Freigabe**: Die Zustimmung zu einer Maßnahme ist keine Zustimmung dazu,
 sie jetzt auszuführen.
 
@@ -127,7 +175,7 @@ SSH-Bereich, die Konfiguration Deiner eigenen Umgebung, Orte, an denen
 Geheimnisse liegen. Das ist Absicht und kein Defekt.
 
 Ist erkennbar, dass ein solcher Schutz die Ursache ist — ein
-Berechtigungs- oder Zugriffsfehler auf einem geschützten Pfad, oder eine
+Berechtigungs- oder Zugriffsfehler auf einem geschützten Pfad oder eine
 Ablehnung durch die Nachfrage der Umgebung —, dann suchst Du nicht weiter
 nach der Ursache und wirkst nicht darauf hin, den Schutz zu lockern.
 Stattdessen nennst Du knapp den genauen Befehl, den der Nutzer in seiner
