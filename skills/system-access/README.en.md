@@ -4,7 +4,7 @@
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/system-access/README.md)*
 
-**Complete in substance, installation package still missing.** Instructions complete, frontmatter set, silent trigger present, German and English versions available. What is still missing for package-based installation is listed under "State and open points". — Claude Code only.
+**✅☑ Finished and usable.** Instructions complete, frontmatter set, silent trigger present, German and English versions available, installation packages built. — Claude Code only.
 
 ---
 
@@ -57,13 +57,11 @@ The skill brings together two earlier drafts in this repository, which were drop
 
 ## State and open points
 
-**State.** The skill is complete in substance and usable in both languages; anyone who copies the folder into `~/.claude/skills/` by hand and transfers the trigger can put it to use right away.
+**State.** Finished: instructions, both language versions, silent trigger, and the installation packages for Claude Code.
 
 **Open.**
 
-- The installation packages under `downloads/` are still missing. Until then step 1 of the installation instructions leads nowhere; installation is done by hand.
-- An entry in the overview table of the `skills/` top-level README is still to be made, along with the status symbol that the status note above will then mirror.
-- Whether the skill needs a trial on a live system before counting as finished has not been decided. Its rules are derived from incidents and from two drafts, not measured in a maintenance session.
+- Whether the skill needs a trial on a live system before counting as proven has not been decided. Its rules are derived from incidents and from two drafts, not measured in a maintenance session — and unlike the other skills in this repository, a mistake here does not land in a working tree but on a running system.
 
 **Decisions deliberately left open.**
 
