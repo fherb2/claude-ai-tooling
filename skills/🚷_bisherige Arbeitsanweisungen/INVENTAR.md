@@ -6,7 +6,7 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behält seine Nummer für immer, auch wenn er erledigt ist und nach Kapitel 6 wandert (analog zur Fahrplan-Nummerierungsregel des Repos). Jede Nummer kommt genau einmal vor — in Kapitel 4 oder in Kapitel 6.
 
-**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15 und T16.
+**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T29 und T30.
 
 ## 1 Die Quelldateien
 
@@ -77,8 +77,8 @@ Die schmale Spalte ohne Überschrift hinter der Nummer ist der Erledigt-Vermerk:
 | T26 | ✅ | Alte Chats und Internet als Quellen      | –   | ✓   | –   | –   | –     | –     | –   | –   |
 | T27 | ✅ | Projektspezifische Hintergrunddateien    | –   | –   | –   | –   | ✓     | –     | –   | –   |
 | T28 |  | Projekt-CLAUDE.md ergänzt, kopiert nicht | –   | –   | –   | –   | –     | –     | ✓   | –   |
-| T29 |  | Computer-Fragen zuerst verorten          | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
-| T30 |  | Änderungen außerhalb nur mit Freigabe    | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
+| T29 | ✅ | Computer-Fragen zuerst verorten          | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
+| T30 | ✅ | Änderungen außerhalb nur mit Freigabe    | –   | –   | –   | –   | –     | –     | ✓   | ✓   |
 | T31 |  | LFS-Prüfung beim ersten Git-Kontakt      | –   | –   | –   | –   | –     | –     | ✓   | –   |
 | T32 |  | Markdown: ein Absatz, eine Zeile         | –   | –   | –   | –   | –     | –     | ✓   | –   |
 | T33 |  | Deutsche Prosa nicht per Heredoc         | –   | –   | –   | –   | –     | –     | ✓   | –   |
@@ -150,22 +150,6 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 **Einordnung:** **[teilweise abgedeckt]** — das Snippet „Vorrang der Anweisungsebenen" regelt, welche Ebene gewinnt, aber nicht, was auf welche Ebene **gehört**. Der zweite Teil ist die eigentliche Hygiene-Regel und nirgends sonst festgehalten.
 
 ### H Umgebung und Wirkungsgrenzen
-
-#### T29 Computer-Fragen zuerst verorten
-
-**Aussage:** Bei einer Frage oder einem Problem zu einem Computer zuerst klären, ob der Computer gemeint ist, auf dem diese Instanz läuft, bevor selbständig darauf gesucht wird.
-
-**Fundstellen:** LOK (Allgemeine Regeln) und WEB, wortverwandt.
-
-**Einordnung:** **[nicht abgedeckt]** — einer der wenigen Posten, die in beiden Umgebungen wörtlich gebraucht werden.
-
-#### T30 Keine Änderungen außerhalb des freigegebenen Bereichs
-
-**Aussage:** Änderungen außerhalb des freigegebenen Ordners bzw. der Projektwurzel und Konfigurationsänderungen an Software oder laufenden Systemkomponenten nur nach Erklärung und ausdrücklicher Freigabe.
-
-**Fundstellen:** LOK (Allgemeine Regeln und 1.2, dort in der am 31. August verallgemeinerten Fassung) und WEB.
-
-**Einordnung:** **[teilweise abgedeckt]** — das Freigaben-Snippet regelt die Freigabe-Semantik, nicht die räumliche Grenze. Schutzregel-Charakter: Nach der Begründungslinie von `common-code-generation` („ein Skill wird nur wahrscheinlich geladen, eine Schutzregel muss sicher greifen") ist das eher Anweisungs- als Skill-Material.
 
 #### T31 LFS-Prüfung beim ersten Git-Kontakt
 
@@ -623,3 +607,25 @@ Was bleibt, ist Arbeitsmodus eines einzelnen Projekts in einer bestimmten Lage �
 **Fundstellen:** nur SCH‑A.
 
 **Einordnung:** **[nicht abgedeckt]** als allgemeine Regel — und bewusst nicht aufgenommen. Der verallgemeinerbare Kern (Hintergrund von Ziel unterscheiden) wäre erst dann ein Kandidat, wenn er in mehr als einem Projekt gebraucht würde.
+
+#### T29 Computer-Fragen zuerst verorten
+
+**Verarbeitet:** Skill `system-access`, 15. September 2026.
+
+**Aussage:** Bei einer Frage oder einem Problem zu einem Computer zuerst klären, ob der Computer gemeint ist, auf dem diese Instanz läuft, bevor selbständig darauf gesucht wird.
+
+**Fundstellen:** LOK (Allgemeine Regeln) und WEB, wortverwandt.
+
+**Einordnung:** Die frühere Einordnung „nicht abgedeckt" ist mit dem Skill überholt. Der Auslöser steht in dessen `CLAUDE-snippet.md`, und zwar im Wortlaut der LOK-Fassung: Sie hängt am **Eintreffen der Frage** und greift damit früher als ein Anker an der eigenen Handlung — bei einer bloßen Frage nach einem Computer gibt es noch keinen Zugriff, den man abwägen könnte, und die Falle ist das Losforschen. Die Ausführung trägt der Abschnitt „Welches System ist gemeint", der statt zwei Fällen vier unterscheidet: der eigene Rechner, ein Container oder eine VM darauf, ein verbundener und ein **nicht** verbundener Fremdrechner. Der letzte Fall fehlte in der Vorlage und ist der gefährlichste — dort beschreibt jede Messung das falsche System.
+
+#### T30 Keine Änderungen außerhalb des freigegebenen Bereichs
+
+**Verarbeitet:** Skill `system-access`, 15. September 2026 — geteilt, siehe Einordnung.
+
+**Aussage:** Änderungen außerhalb des freigegebenen Ordners bzw. der Projektwurzel und Konfigurationsänderungen an Software oder laufenden Systemkomponenten nur nach Erklärung und ausdrücklicher Freigabe.
+
+**Fundstellen:** LOK (Allgemeine Regeln und 1.2, dort in der am 31. August verallgemeinerten Fassung) und WEB.
+
+**Einordnung:** Der Eintrag wurde **geteilt**. Die Konfigurationsänderungen an Software und laufenden Systemkomponenten sind in den Skill gewandert und aus der `~/.claude/CLAUDE.md` entfernt. Die räumliche Grenze „keine Änderungen außerhalb der Projektwurzel" ist dort dagegen **geblieben** (Entscheidung des Entwicklers vom 15. September 2026): Sie gilt auch in Sitzungen, in denen der Skill nie auslöst, und beschreibt die Projektarbeit, nicht den Systemzugriff. Dieser Eintrag behält deshalb als einziger in Kapitel 6 eine **stehengebliebene Fundstelle**: die Projektwurzel-Zeile in LOK, §1.2. Das ist kein übersehener Rest.
+
+Der Schutzregel-Einwand dieses Eintrags — ein Skill werde nur wahrscheinlich geladen, eine Schutzregel müsse sicher greifen — ist beantwortet, nicht übergangen: Die `CLAUDE-snippet.md` des Skills trägt den Regelkern selbst und ist deshalb der längste Trigger des Repos; sie wirkt auch dann, wenn der Skill nicht geladen ist. Hinzu kommt, dass die Annahme, ein Skill sei nach einer Kompaktierung verloren, inzwischen widerlegt ist (`skill-dev-doc.md`, Kapitel 5.0).
