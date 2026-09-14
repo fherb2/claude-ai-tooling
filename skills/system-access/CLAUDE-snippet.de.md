@@ -1,4 +1,4 @@
-*Stand: 2026-09-14*
+*Stand: 2026-09-15*
 
 *Diese Datei ist kein Teil des Skills. Sie enthält den stillen Trigger, der den Skill auslöst. Beim Installieren: alles unterhalb der Trennlinie in die `CLAUDE.md` des Zielorts übernehmen; diese Datei bleibt dort liegen, wirksam ist allein die `CLAUDE.md`. Der Skill läuft ohne den Trigger nur bei ausdrücklichem `/system-access`-Aufruf.*
 
