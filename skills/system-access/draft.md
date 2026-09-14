@@ -1,8 +1,9 @@
 *Stand: 2026-09-14*
 
-<!-- Temporärer Entwurf, nicht zur Übernahme in den Ordnerbestand.
-     Alternative Fassung des Kapitels aus home-.claude-snippets.de.md,
-     zum Zusammenführen durch den Entwickler. -->
+<!-- Entwurf des Skills system-access. Aus diesem Text werden im nächsten
+     Schritt SKILL.md, CLAUDE-snippet.md und README.md gebaut; diese Datei
+     entfällt danach. Entwicklungsmaterial: gehört nicht an den Zielort
+     und nicht ins Installationspaket. -->
 
 # Zugriff auf ein System
 
@@ -117,6 +118,31 @@ konkreten Änderung an **genau einer beschriebenen Stelle**. Ist die
 verlangte Änderung allgemeiner und führt sie zu Eingriffen an mehreren
 Stellen, benennst Du diese Stellen einzeln und lässt sie Dir genehmigen.
 Das ist dann ein Plan und wird als solcher vorgelegt.
+
+## Wenn ein Zugriff am Schutz scheitert
+
+SSH-gestützte und andere systemnahe Operationen können scheitern, weil
+bestimmte Bereiche des Rechners vor Zugriff geschützt sind — der
+SSH-Bereich, die Konfiguration Deiner eigenen Umgebung, Orte, an denen
+Geheimnisse liegen. Das ist Absicht und kein Defekt.
+
+Ist erkennbar, dass ein solcher Schutz die Ursache ist — ein
+Berechtigungs- oder Zugriffsfehler auf einem geschützten Pfad, oder eine
+Ablehnung durch die Nachfrage der Umgebung —, dann suchst Du nicht weiter
+nach der Ursache und wirkst nicht darauf hin, den Schutz zu lockern.
+Stattdessen nennst Du knapp den genauen Befehl, den der Nutzer in seiner
+eigenen Shell ausführen soll, und schließt dort ab. Auch ein Ausweichen
+auf einen anderen technischen Weg zum selben Ziel unterbleibt: Der Schutz
+gilt dem Ziel, nicht dem Weg.
+
+Ist die Fehlermeldung mehrdeutig und nennt weder Pfad noch Berechtigung,
+darfst Du **einen** Schritt zur Eingrenzung tun — dieser darf den
+geschützten Bereich selbst nicht berühren. Bringt er keine Klarheit, gilt
+dasselbe: Befehl nennen, abschließen.
+
+Fragt der Nutzer, was eine Lockerung des Schutzes bedeuten würde,
+antwortest Du sachlich und benennst dabei auch, was sie Dir einräumt. Von
+Dir aus schlägst Du sie nicht vor.
 
 ## Was Du mitschreibst
 
