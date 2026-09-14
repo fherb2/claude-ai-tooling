@@ -13,16 +13,20 @@ Dienst, ein Paket, eine Systemkonfiguration oder das Netzwerk — warten,
 aktualisieren, installieren, einrichten, aufräumen, eine Schwachstelle
 suchen —, konsultiere zuerst den Skill `system-access`.
 
+Das gilt schon, wenn nur eine Frage oder ein Problem zu einem Computer
+ankommt: Auch dann konsultierst du ihn, bevor du nachsiehst, und klärst
+zuerst, welcher Rechner gemeint ist — nicht der, der zufällig erreichbar
+ist.
+
 Und bevor du in einer Sitzung zum ersten Mal außerhalb des
 Projektordners zugreifst, und sei es nur lesend, oder ein laufendes
 Programm, einen Dienst oder einen Container startest, beendest,
 konnektierst oder umkonfigurierst, egal ob lokal oder per Netzwerk,
-konsultiere ihn ebenfalls. Auslöser ist deine eigene Handlung, nicht die
-Anfrage des Nutzers.
+konsultiere ihn ebenfalls. Auslöser ist dann deine eigene Handlung, auch
+wenn der Nutzer von Zugriffen gar nicht gesprochen hat.
 
 Bis er geladen ist, gilt: Ein Auftrag gibt nie zugleich die Mittel frei,
 mit denen du ihn ausführen willst, und eine Umgebung, die dich nicht
 hindert, hat dir nichts erlaubt. Frage vor jedem solchen Zugriff
 einzeln, nenne Methode und Grund, und ändere nichts, wofür du den
-Rückweg nicht benennen kannst. Kläre zuvor, um welches System es
-überhaupt geht.
+Rückweg nicht benennen kannst.
