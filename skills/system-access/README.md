@@ -4,7 +4,7 @@
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/system-access/README.en.md)*
 
-**Inhaltlich fertig, noch ohne Installationspaket.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung. Was zur Installation per Paket noch fehlt, steht unter „Stand und Offenes". — Nur für Claude Code.
+**✅☑ Fertig und nutzbar.** Anweisungen vollständig, Frontmatter gesetzt, stiller Trigger vorhanden, deutsche und englische Fassung, Installationspakete gebaut. — Nur für Claude Code.
 
 ---
 
@@ -57,13 +57,11 @@ Der Skill fasst zwei ältere Entwürfe des Repositories zusammen, die dadurch en
 
 ## Stand und Offenes
 
-**Status.** Der Skill ist inhaltlich vollständig und in beiden Sprachen benutzbar; wer den Ordner von Hand nach `~/.claude/skills/` kopiert und den Trigger überträgt, kann ihn sofort einsetzen.
+**Status.** Fertig: Anweisungen, beide Sprachfassungen, stiller Trigger und die Installationspakete für Claude Code.
 
 **Offen.**
 
-- Die Installationspakete unter `downloads/` fehlen noch. Bis dahin trägt Schritt 1 der Installationsanleitung ins Leere; installiert wird von Hand.
-- Ein Eintrag in der Übersichtstabelle der Gesamt-README von `skills/` steht aus, samt des Statussymbols, das der Statushinweis oben dann spiegelt.
-- Ob der Skill eine Erprobung am lebenden Objekt braucht, bevor er als fertig gilt, ist nicht entschieden. Seine Regeln sind aus Vorfällen und aus zwei Entwürfen abgeleitet, nicht in einer Wartungssitzung gemessen.
+- Ob der Skill eine Erprobung am lebenden Objekt braucht, bevor er als erprobt gilt, ist nicht entschieden. Seine Regeln sind aus Vorfällen und aus zwei Entwürfen abgeleitet, nicht in einer Wartungssitzung gemessen — und anders als bei den übrigen Skills des Repositories fällt ein Fehler hier nicht in einem Arbeitsbaum an, sondern auf einem laufenden System.
 
 **Bewusst offen gelassene Entscheidungen.**
 
