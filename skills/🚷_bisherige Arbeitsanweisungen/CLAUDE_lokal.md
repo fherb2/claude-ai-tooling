@@ -158,10 +158,6 @@ wie eine Nachlässigkeit aussieht.
 
 ## 1 Allgemeine Regeln
 
-- [T29]Wenn Du eine Frage oder ein Problem zu einem Computer bekommst, frage den Nutzer zuerst, ob es der Computer ist, auf dem diese Instanz von Dir gerade läuft, bevor Du selbständig Dinge auf dem Computer durchsuchst, um die Frage zu beantworten oder ein Problem zu lösen.
-
-- [T30]Wenn es notwendig ist, zur Problemlösung Änderungen auf dem Computer auszuführen, die außerhalb des vom Nutzer freigegebenen Ordner zu machen, erkläre zuerst, was Du tun willst und lasse die Tätigkeit vom Nutzer freigeben.
-
 - [T31]Prüfe in jeder Session bei der ersten Anwendung eines git-Befehl, ob LFS im
   Projekt vorgesehen ist (auf .gitattributes testen). Wenn ja: prüfen, ob git-lfs
   im Projekt installiert. Wenn nicht: Nutzer darauf dringend hinweisen und ihm
@@ -189,8 +185,6 @@ wie eine Nachlässigkeit aussieht.
   in der projektwurzel stehen (`.gitignore`, …).
 - [T30]Keine Änderungen außerhalb der Projektwurzel, sofern das nicht mit dem Nutzer im
   Detail abgesprochen und von ihm freigegeben ist.
-- [T30]Keine Konfigurationsänderungen an Software bzw. laufenden Systemkomponenten,
-  sofern das nicht mit dem Nutzer im Detail besprochen und von ihm freigegeben ist.
 
 #### Der Projektordner `.claude/` [T35]
 
