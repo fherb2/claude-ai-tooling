@@ -221,20 +221,9 @@ for pattern in "conflict-resolution.*.md" "messages_*.py"; do
         "$MISSING_FILES_HINT"
 done
 
-[ -d "$SCRIPT_DIR/tools" ] || mkdir -p "$SCRIPT_DIR/tools"
 
-# The folder was called 'werkzeuge' until 15 August 2026. Copying the new
-# files/ over an existing installation leaves the old one behind, so it is
-# named here rather than removed: deleting on someone's machine is the user's
-# call (doku 3.5), and the folder may hold scripts nobody else knows about.
-if [ -d "$SCRIPT_DIR/werkzeuge" ]; then
-    warn "Note: $SCRIPT_DIR/werkzeuge/ is the former name of the folder
-'tools' and is no longer used. It stays where it is until you remove it —
-look whether anything is in there, then:
-    rm -r $SCRIPT_DIR/werkzeuge"
-fi
-
-# Same class of leftover, same reason for naming instead of removing: until the
+# A leftover that is named instead of removed -- deleting on someone's machine
+# is the user's call (doku 3.5): until the
 # working instruction carried a language code it was called plain
 # conflict-resolution.md. Unpacking a package over an older installation adds
 # the new name and leaves the old file lying there. Nothing reads it -- the
@@ -451,6 +440,35 @@ Please share it in Syncthing — the README says how." ;;
 Whether the folder is synchronised is therefore open. The service is being
 installed; please look in Syncthing's interface." ;;
 esac
+
+# --- Local exclusion list: begin (doku 3.5) ---------------------------------
+# Run by the test script as it stands, like the region below, with warn and the
+# two paths supplied. It has to come BEFORE that one: the authoritative
+# .stignore carries an "#include .stignore-local", and a missing include file
+# is an error to Syncthing -- so the included file has to exist before a
+# .stignore naming it can land in the synced folder.
+#
+# This block is the deliberate opposite of the one below (doku 2.8). There the
+# packaged version is authoritative and gets offered for overwriting; here it
+# is only a template. An existing local list is never touched and never even
+# asked about: overwriting it would delete exactly the machine-specific lines
+# the file exists for.
+if [ ! -f "$SCRIPT_DIR/.stignore-local" ]; then
+    # A package always carries the template, so this means the unpacking was
+    # incomplete. An empty file keeps the include valid, which is a better
+    # answer than aborting the whole installation over it.
+    : > "$SCRIPT_DIR/.stignore-local"
+    warn "The template $SCRIPT_DIR/.stignore-local was missing and has been
+created empty. Your package is incomplete -- please unpack it again in full."
+fi
+
+if [ ! -f "$WATCH_DIR/.stignore-local" ]; then
+    cp "$SCRIPT_DIR/.stignore-local" "$WATCH_DIR/.stignore-local"
+    printf 'Local exclusion list created: %s/.stignore-local\n' "$WATCH_DIR"
+else
+    printf 'Local exclusion list kept as it is.\n'
+fi
+# --- Local exclusion list: end ----------------------------------------------
 
 # --- Exclusion list: begin (doku 3.5) ---------------------------------------
 # Everything between these markers is run by the test script as it stands, with

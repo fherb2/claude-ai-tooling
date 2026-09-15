@@ -1390,11 +1390,11 @@ def check_launch_failure(w: types.ModuleType, tmp_root: Path) -> None:
 def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
     """How the session invocation is assembled (doku 3.3).
 
-    ``--add-dir`` is variadic, so it swallows every following argument as
-    another directory. With the handover text behind it the session once
-    started with NO prompt at all and showed the welcome screen instead of
-    working -- observed in the operating test, and the reason 3.3 calls this
-    order load-bearing. Nothing checked it until now.
+    The handover text goes last, behind the switch that takes exactly one
+    value. No variadic switch is passed any more -- ``--add-dir`` used to be
+    one, and with the handover text behind it the session once started with NO
+    prompt at all. That is why the absence of any variadic switch is checked
+    here and not merely assumed (appendix B of the doc).
 
     No terminal is started: ``spawn_detached`` is replaced by a recorder, which
     keeps the assurance that this script runs without a screen and without a
@@ -1429,12 +1429,9 @@ def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
         check("Programmpfad absolut, unmittelbar hinter dem Terminal",
               len(argv) > 2 and argv[2] == w.claude_binary()
               and argv[2].startswith("/"), True)
-        check("--add-dir genau einmal", argv.count("--add-dir"), 1)
-        check("--add-dir vor der Arbeitsanweisung",
-              argv.index("--add-dir")
-              < argv.index("--append-system-prompt-file"), True)
-        check("--add-dir zeigt auf den Werkzeugordner",
-              argv[argv.index("--add-dir") + 1], str(w.TOOLS_DIR))
+        # Regression guard, not a leftover: --add-dir is variadic and would
+        # swallow the handover text again. It is gone, and it stays gone.
+        check("kein --add-dir mehr im Aufruf", "--add-dir" in argv, False)
         # The value must sit directly behind its own option: anything between
         # them would be read as the file name, and the session would refuse to
         # start (doku 3.3).
@@ -1759,6 +1756,84 @@ def check_stignore_offer(w: types.ModuleType, tmp_root: Path) -> None:
     output = run_block(antwort=1, vorhanden=abweichend)
     check("abgelehnte Abweichung bleibt stehen",
           (ziel / ".stignore").read_text(encoding="utf-8"), abweichend)
+
+
+def check_stignore_local(w: types.ModuleType, tmp_root: Path) -> None:
+    """The local exclusion list is created, never overwritten (doku 3.5, 2.8).
+
+    The counterpart of check_stignore_offer and deliberately its opposite:
+    there the packaged version is authoritative and gets offered, here it is
+    only a template and an existing file is untouchable. The marked region is
+    cut out of install_service.sh and run as it stands, like the one next to
+    it. Nothing in it may ask, so the stand-in for the question is supplied all
+    the same -- a question that did appear would show up here.
+    """
+    print("Örtliche Ausschlussliste (3.5, 2.8):")
+    source = INSTALL.read_text(encoding="utf-8").splitlines()
+    start = next(i for i, line in enumerate(source)
+                 if line.startswith("# --- Local exclusion list: begin"))
+    end = next(i for i, line in enumerate(source)
+               if line.startswith("# --- Local exclusion list: end"))
+    check("markierte Strecke ist auffindbar", start < end, True)
+    local_region = "\n".join(source[start:end + 1])
+
+    # The order is the whole reason for a region of its own: the include file
+    # has to exist before a .stignore naming it can arrive (doku 2.8).
+    liste = next(i for i, line in enumerate(source)
+                 if line.startswith("# --- Exclusion list: begin"))
+    check("und sie steht vor der Ausschlussliste", end < liste, True)
+
+    stage = tmp_root / "ausschluss-lokal"
+    quelle = stage / "quelle"
+    ziel = stage / "ziel"
+    quelle.mkdir(parents=True, exist_ok=True)
+    ziel.mkdir(parents=True, exist_ok=True)
+    vorlage = "// Vorlage\n"
+
+    def run_block(vorlage_da: bool, vorhanden: str | None) -> str:
+        template = quelle / ".stignore-local"
+        if vorlage_da:
+            template.write_text(vorlage, encoding="utf-8")
+        else:
+            template.unlink(missing_ok=True)
+        wirksam = ziel / ".stignore-local"
+        if vorhanden is None:
+            wirksam.unlink(missing_ok=True)
+        else:
+            wirksam.write_text(vorhanden, encoding="utf-8")
+        script = ("set -euo pipefail\n"
+                  'warn () { printf "WARN: %s\\n" "$1"; }\n'
+                  'ask_yes_no () { printf "FRAGE[%s]: %s\\n" "$2" "$1"; '
+                  'return 0; }\n'
+                  f'SCRIPT_DIR="{quelle}"\n'
+                  f'WATCH_DIR="{ziel}"\n'
+                  + local_region)
+        result = subprocess.run(["bash", "-c", script], text=True,
+                                stdin=subprocess.DEVNULL,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT)
+        check("der Block läuft ohne Fehler durch", result.returncode, 0)
+        return result.stdout
+
+    output = run_block(vorlage_da=True, vorhanden=None)
+    check("fehlende örtliche Liste entsteht aus der Vorlage",
+          (ziel / ".stignore-local").read_text(encoding="utf-8"), vorlage)
+    check("und dabei wird nie gefragt", "FRAGE[" in output, False)
+
+    # The whole point of the file: an update must not cost a machine its own
+    # lines. Overwriting here would be the very defect it exists against.
+    eigen = "/projects/-home-jemand-privat\n"
+    output = run_block(vorlage_da=True, vorhanden=eigen)
+    check("vorhandene örtliche Liste bleibt unangetastet",
+          (ziel / ".stignore-local").read_text(encoding="utf-8"), eigen)
+    check("und auch dort wird nicht gefragt", "FRAGE[" in output, False)
+
+    output = run_block(vorlage_da=False, vorhanden=None)
+    check("fehlende Vorlage wird leer angelegt",
+          (quelle / ".stignore-local").read_text(encoding="utf-8"), "")
+    check("und das gemeldet", "WARN:" in output, True)
+    check("die Einrichtung läuft trotzdem weiter",
+          (ziel / ".stignore-local").exists(), True)
 
 
 def check_clock(w: types.ModuleType, tmp_root: Path) -> None:
@@ -2086,6 +2161,7 @@ TMP_GROUPS = (
     check_uninstall_guard,
     check_login_check,
     check_stignore_offer,
+    check_stignore_local,
     check_clock,
     check_dry_run,
     check_folder_check,

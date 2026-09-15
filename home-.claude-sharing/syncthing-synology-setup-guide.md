@@ -151,7 +151,7 @@ Weitere Zeichen: `*` überspringt keine Verzeichnistrenner, `**` schon; `?` steh
 
 Punktdateien werden **nicht** gesondert behandelt, sondern ganz normal abgeglichen. Nur Syncthings eigene Objekte (`.stfolder`, `.stignore`, `.stversions`) sind davon ausgenommen.
 
-Beispiel für ein Konfigurationsverzeichnis mit Zugangsdaten:
+Beispiel für ein Konfigurationsverzeichnis mit Zugangsdaten — **ein Beispiel, keine Vorlage zum Abschreiben.** Die für dieses Vorhaben maßgebliche Fassung steht in `files/.stignore` und ist länger; sie gehört auf jedes Gerät, den Vermittlungsknoten eingeschlossen.
 
 ```
 // Zugangsdaten niemals abgleichen - bewusst OHNE führenden Schraegstrich,
@@ -169,6 +169,8 @@ Beispiel für ein Konfigurationsverzeichnis mit Zugangsdaten:
 // Synology-Papierkorb, falls im Zielordner aktiviert
 #recycle
 ```
+
+**Auch der Knoten braucht die Muster, und dort pflegt sie niemand automatisch.** Auf den Arbeitsrechnern vergleicht das Installationsskript die wirksame Liste gegen die maßgebliche und bietet die Übernahme an; auf der Synology läuft kein solches Skript. Jede spätere Änderung an den Mustern ist dort **von Hand** nachzutragen, und nichts meldet sich, wenn das unterbleibt. Eine `#include`-Zeile gehört dort nicht hinein: Die eingebundene Datei entstünde mangels Skript nicht, und eine fehlende Include-Datei ist ein Fehler.
 
 **Ausdrücklich prüfen, ob die Muster wirklich greifen** — ein falsch formuliertes Muster sieht aus, als würde es wirken, und tut es nicht. Kontrolle schlicht dadurch, dass die betreffenden Dateien auf der Gegenseite **nicht** auftauchen.
 

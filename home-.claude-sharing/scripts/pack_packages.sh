@@ -15,7 +15,7 @@
 # multilingual conversion that was a handful of files and could be done by
 # hand. It no longer is: the file set per package is a rule with exceptions --
 # exactly one catalogue, exactly one working instruction, the README renamed,
-# tools/ and zustand.json left out. A rule with four exceptions, applied by
+# zustand.json left out. A rule with three exceptions, applied by
 # hand, is the kind of work that goes wrong on the third repetition, and a
 # package that no longer matches its source is worse than no package, because
 # nobody can see it from the outside.
@@ -64,7 +64,7 @@ TOP=".claude-sync-watch"
 
 # The files every package carries under their own name.
 COMMON=(claude_sync_watchd.py claude-sync-watch.service install_service.sh
-        uninstall_service.sh messages.py .stignore)
+        uninstall_service.sh messages.py .stignore .stignore-local)
 
 # The files that exist once per language. Their name carries the code, and they
 # keep it inside the archive: repository and target machine stay name-identical,
@@ -75,12 +75,12 @@ LANGUAGES=(de en)
 
 # What lies in files/ and deliberately does NOT go into a package. Named here
 # rather than skipped silently, because the third check below treats every
-# other unexpected name in files/ as an error: tools/ is created by the
-# installation, zustand.json is a marker that comes into being at runtime
-# (doku 2.7), __pycache__ is a leftover of any Python run, and .claude/ is one
+# other unexpected name in files/ as an error: zustand.json is a marker that
+# comes into being at runtime (doku 2.7), __pycache__ is a leftover of any
+# Python run, and .claude/ is one
 # of the tooling: Claude Code puts a .cc-writes directory there. None of them
 # is versioned, and none has anything to do with this project.
-NOT_IN_PACKAGE=(tools __pycache__ zustand.json .claude)
+NOT_IN_PACKAGE=(__pycache__ zustand.json .claude)
 
 [ -d "$SRC" ] || { printf 'Abbruch: kein Ordner %s\n' "$SRC" >&2; exit 1; }
 [ -d "$OUT" ] || { printf 'Abbruch: kein Ordner %s\n' "$OUT" >&2; exit 1; }

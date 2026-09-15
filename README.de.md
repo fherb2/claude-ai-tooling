@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Stand: 2026-09-11*
+*Stand: 2026-09-15*
 
 *[English version](README.md)*
 
@@ -24,7 +24,7 @@ Werkzeuge / Bausteine rund um die tägliche Arbeit mit Claude — claude.ai, Cla
 
 **Unterhalb dieser Seite sind die Sprachen umgekehrt verteilt.** Die Arbeitssprache dieses Repositories ist Deutsch, deshalb ist in einem Ordner die `README.md` die deutsche Fassung und die englische trägt das Kürzel: `README.en.md`. Nur hier in der Wurzel liegt in der `README.md` die englische Fassung, die deutsche daneben als `README.de.md`.
 
-Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[`skill-dev-doc.md`](skill-dev-doc.md)** trägt die Vorgaben und das Umgebungswissen für den Bau von Skills — gleich in welchem Ordner sie entstehen — und in Kapitel 10 als Gast die Regel, wie die Implementierungsdoku eines abgeschlossenen Vorhabens von ihrer Entstehungsgeschichte entlastet wird; **[`work-plan.md`](work-plan.md)** trägt die anstehenden Arbeitsschritte. Vorhaben mit eigenem Entwicklungsstand führen daneben ihre eigene Doku und ihren eigenen Arbeitsplan. Die Pflege des Repositories selbst — den Abgleich des Release-Zweigs und die Prüfung von READMEs, Sprachfassungen und Paketen — trägt der projekteigene Skill `.claude/skills/repo-cleanup-pass/`.
+Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[`skill-dev-doc.md`](skill-dev-doc.md)** trägt die Vorgaben und das Umgebungswissen für den Bau von Skills — gleich in welchem Ordner sie entstehen — und in Kapitel 10 als Gast die Regel, wie die Implementierungsdoku eines abgeschlossenen Vorhabens von ihrer Entstehungsgeschichte entlastet wird; **[`work-plan.md`](work-plan.md)** trägt die anstehenden Arbeitsschritte. Vorhaben mit eigenem Entwicklungsstand führen daneben ihre eigene Doku und ihren eigenen Arbeitsplan. Die Pflege des Repositories selbst — den Abgleich des Release-Zweigs und die Prüfung von READMEs, Sprachfassungen und Paketen — trägt der projekteigene Skill `.claude/skills/repo-cleanup-pass/` — er ist Arbeitsgerät des Entwicklungszweigs und bleibt dort; im Release-Zweig liegt er nicht.
 
 ### **Anwendungshinweise** weiter unten in dieser README:
 
@@ -46,7 +46,7 @@ Zwei Dateien in der Projektwurzel begleiten die Entwicklung aller Bausteine: **[
 
 Vermittelt wird das über einen dauerhaft laufenden NAS-Knoten. Der eigentliche Kern ist der Umgang mit dem, was Syncthing bewusst nicht löst: Gleichzeitig geänderte Dateien werden als Konfliktkopien abgelegt, ein Wächter-Dienst entdeckt sie, meldet sich und führt den Nutzer gemeinsam mit Claude durch die inhaltliche Auflösung. Installationsskripte, Dienstdefinition und eine Einrichtungsanleitung für den Vermittlungsknoten liegen bei; ausgeliefert wird es als Paket je Sprachfassung unter `downloads/`.
 
-**Stand:** Im Betrieb auf vier Rechnern beim Entwickler seit dem 11. August 2026 — Näheres in der [README des Bausteins](home-.claude-sharing/README.md).
+**Stand:** Im Dauerbetrieb seit dem 11. August 2026, erprobt über drei und mehr Rechner hinweg — Näheres in der [README des Bausteins](home-.claude-sharing/README.md).
 
 ## skills
 
