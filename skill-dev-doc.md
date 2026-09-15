@@ -237,7 +237,7 @@ Daraus folgen drei Festlegungen, die beim Schreiben leicht übersehen werden:
 **Die beiden Fassungen verweisen oben aufeinander, und zwar mit der absoluten Repo-URL.** Der Verweis steht als kursive Zeile unmittelbar unter der Datumszeile — `*[English version](…)*` in der deutschen Fassung, `*[Deutsche Fassung](…)*` in der englischen. Drei Festlegungen dazu, jede mit ihrem Grund:
 
 - **Absolut nur dort, wo die Datei in ein Paket wandert; sonst relativ.** Eine README, die mit dem Skill nach `~/.claude/skills/<skill>/` gelangt, findet dort keine Schwesterdatei — in der installierten Kopie ist ein relativer Link tot, und genau dort wird er gebraucht. Die READMEs der Repository-Wurzel behalten deshalb ihre relativen Links: Sie wandern in kein Paket.
-- **Der Zweig in der URL ist `master`, nicht `HEAD`.** Gemeint ist der **Release**-Stand, und `master` benennt ihn (`release_branch` in `.claude/git-worktree-model.json`). `blob/HEAD/…` löst GitHub auf den jeweiligen Standard-Zweig auf; beide Formen funktionieren (am 11. September 2026 gegen das Repository gemessen, je HTTP 200), aber `HEAD` würde einem Wechsel des Standard-Zweigs **still** folgen und im Zweifel auf den Entwicklungsstand zeigen. Dass `master` bei einer Umbenennung des Zweigs bricht, ist das kleinere Übel, denn dieser Bruch ist auffindbar.
+- **Der Zweig in der URL ist `master`, nicht `HEAD`.** Gemeint ist der **Release**-Stand, und `master` benennt ihn (`release_branch` in `.claude/git-branch-model.json`). `blob/HEAD/…` löst GitHub auf den jeweiligen Standard-Zweig auf; beide Formen funktionieren (am 11. September 2026 gegen das Repository gemessen, je HTTP 200), aber `HEAD` würde einem Wechsel des Standard-Zweigs **still** folgen und im Zweifel auf den Entwicklungsstand zeigen. Dass `master` bei einer Umbenennung des Zweigs bricht, ist das kleinere Übel, denn dieser Bruch ist auffindbar.
 - **Auffindbar über `grep -rn "blob/master" --include="*.md"`** — am 11. September 2026 zwanzig Verweise in zwanzig Dateien, je Sprachpaar einer. Wird der Release-Zweig je umbenannt, ist das ein Durchgang und keine Suche.
 
 **Was für eine weitere Fassung spricht.** Die Arbeitssprache dieses Repositories ist Deutsch, die Skills sollen aber weitergegeben werden können. Und die Sprache des Skilltextes ist eine Festlegung mit Wirkung: Der Körper der `SKILL.md` liegt nach dem Laden für den Rest der Sitzung im Kontext (1.2) und prägt die Sprache, in der Claude anschließend antwortet.
@@ -256,7 +256,7 @@ Beleg für die Bauform ist `temp-debug-code` (30. August 2026): `SKILL.md` → `
 
 Der Grund steckt im Ladeverhalten (1.2): Weitere Dateien im Skill-Ordner lädt Claude nur, wenn die `SKILL.md` ausdrücklich auf sie verweist — und was einmal geladen ist, bleibt für den Rest der Sitzung im Kontext. Ein Skill, der auf eine Lage auslöst, in der er oft doch nicht zum Zug kommt, schleppt seinen vollen Text sonst in jeder dieser Sitzungen mit, ohne je benutzt zu werden. Mit der Teilung kostet er dann nur die Klärungsseite.
 
-**Zwei Skills wären der falsche Weg** — sie müssten gemeinsam installiert werden, und 2.3 verbietet ohnehin, dass ein Skill auf einen anderen verweist. Die zweite Datei im selben Ordner löst beides.
+**Zwei Skills wären der falsche Weg** — sie müssten gemeinsam installiert werden, und 2.3 verbietet ohnehin, dass ein Skill auf einen anderen verweist. Die zweite Datei im selben Ordner löst beides. Das gilt für **ein** Anliegen, das nur aus Kontextgründen in zwei Dateien zerfällt. Zwei Anliegen mit je eigener Geltung — der eine gilt in Projekten, in denen der andere nie zum Zug kommt, und keiner setzt den anderen voraus — sind dagegen zwei Skills. Gekoppelt sind sie höchstens über eine Datei im Projekt, die der eine schreibt und der andere liest, nie über einen Verweis aufeinander (Beleg: `git-branch-model` und `git-workbench`, 15. September 2026 — der zweite liest aus der Konfigurationsdatei des ersten genau einen Wert und fragt sonst den Nutzer).
 
 **Vorgeschlagen wird die Teilung, wenn alle drei Bedingungen zutreffen:**
 
@@ -480,7 +480,8 @@ Stand 30. August 2026. „Web-Fassung“ nennt die Nutzungsentscheidung, nicht d
 | `temp-debug-code` | web + code | ja, gebaut | Seit dem 30. August 2026 in ein Tor und zwei Regelzweige geteilt (5.2): Mit Dateizugriff handelt Claude selbst, sonst entscheidet der Nutzer über die Kennzeichnung, und die Methodenleiter kommt hinzu. Die Suchläufe führt dort er aus, nicht Claude. Ob der Skill auf claude.ai installiert wird, bleibt Nutzungsentscheidung nach 9.3 |
 | `pedantic-text-editing` | web + code | nein, vorerst | Technisch machbar: Das Ersetzungsskript existiert (`apply_findings.py`), der mechanische Rückweg über `/mnt/user-data/outputs` ist beobachtet (1.4). Der Entwickler hat den Skill am 30. August 2026 dennoch auf Claude Code beschränkt — das Skript müsste für die Web-Welt erst überarbeitet werden. Eine Web-Fassung kommt später |
 | `correct-zaaack-md-editor-mistakes` | nur code | — | Die Werkzeuge liefen im Container, aber die Markdown-Dateien des Nutzers kommen nicht hinein und die Korrektur nicht zurück |
-| `parallel-sessions` | nur code | — | Git-Worktrees haben auf claude.ai keinen Gegenstand |
+| `git-branch-model` | nur code | — | Zweige, Merges und `git restore` haben auf claude.ai keinen Gegenstand |
+| `git-workbench` | nur code | — | Werkbänke und Git-Worktrees haben auf claude.ai keinen Gegenstand |
 | `chat-export` | nur code | — | Braucht Browser-Anbindung und ein Skript auf dem Rechner des Nutzers |
 | `recall-skills-after-compact` | nur code | — | Fähigkeit mit Hook-Auslöser (5.0); Hooks und Sitzungstranskripte gibt es nur in Claude Code |
 
@@ -608,7 +609,7 @@ Die eine Ausnahme im Quelltext (`EXTERN`) ist kein Gegenbeispiel, sondern von an
 | Meldung | Steht in | Warum kein Fehler |
 | --- | --- | --- |
 | `chrome-access.de.md`, `.en.md` | `chat-export`, aus `bridge-diagnosis.*.md` | Der Satz nennt den Ort selbst: „der im Repository dieses Skills unter … liegt" |
-| `rules.de.md`, `rules.en.md` | `parallel-sessions`, aus der README | Die README nennt in einer Klammer **beide** Fassungen, um die Zweiteilung zu erklären |
+| `rules.de.md`, `rules.en.md` | `git-branch-model` und `git-workbench`, aus der README | Die README nennt in einer Klammer **beide** Sprachfassungen, um die Zweiteilung zu erklären; im Paket liegt nur eine |
 | `quellenkarte.md` | `in-depth-online-literature-research`, aus der `SKILL.md` | Eine Datei, die im **Projekt des Nutzers** liegen soll, nicht im Paket |
 | `CLAUDE-snippet.md` | `recall-skills-after-compact`, aus `settings-json-snippet.*.md` | Der Satz verweist auf die Datei **anderer** Skills, um das eigene Gegenstück zu erklären |
 | `doku.md` | `correct-zaaack-md-editor-mistakes`, aus der README | Erfundener Dateiname in einem Beispiel-Prompt der Trigger-Messtabelle |
