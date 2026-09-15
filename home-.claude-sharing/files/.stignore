@@ -1,27 +1,51 @@
-// Zugangsdaten niemals abgleichen - bewusst OHNE führenden Schraegstrich,
-// damit die Datei auf jeder Ebene ausgeschlossen ist
+// Credentials are never synchronised -- deliberately WITHOUT a leading slash,
+// so that the file is excluded at every level
 .credentials.json
 
-// Ganze Verzeichnisse samt Inhalt
+// Machine-specific patterns, pulled in from a file that does not travel and
+// that survives an update. Placed high up on purpose: the first matching line
+// decides, so local patterns take precedence over the general ones. Only the
+// line for the credentials stays above it. Reasoning in 2.8 of the doc
+#include .stignore-local
+/.stignore-local
+
+// Whole directories, contents included. /debug, /image-cache and /plans are
+// named in the same row of the official documentation, where what you lose by
+// deleting them reads "Nothing user-facing". /plans additionally keeps a plan
+// carried out on one machine from resurfacing on another as an open task.
+// Reasoning per pattern in 3.9 of the doc
 /cache
+/debug
 /downloads
+/image-cache
+/plans
 /telemetry
 
-// Rechnergebundenes: Sitzungsmerker, Umgebung, Shell-Aufnahmen, IDE-Anbindung
-// Begruendung je Muster in 3.9 der Doku
+// Machine-bound: backup copies, session markers, environment, shell captures,
+// IDE connection
+// Reasoning per pattern in 3.9 of the doc
+/backups
 /ide
 /sessions
 /session-env
 /shell-snapshots
 
-// Momentaufnahmen vor jeder Bearbeitung, fuer /rewind. Rechnergebunden und
-// entbehrlich; ersetzt wird die Funktion durch die Checkpoint-Commits.
-// Begruendung und Preis des Ausschlusses in 1.3 der Doku
+// Sessions whose working directory was the scratchpad under /tmp. The path
+// carries the session id, so it never becomes a working directory again, and
+// after a reboot it no longer exists locally either. A directory pattern takes
+// its contents with it; the second line is belt and braces, because this one
+// carries a wildcard. See 3.9
+/projects/-tmp*
+/projects/-tmp*/**
+
+// Snapshots taken before every edit, for /rewind. Machine-bound and
+// dispensable; the function is replaced by the checkpoint commits.
+// Reasoning and the price of this exclusion in 1.3 of the doc
 /file-history
 
-// Fluechtige Dateien
+// Transient files
 *.log
 *.sock
 
-// Synology-Papierkorb, falls im Zielordner aktiviert
+// Synology recycle bin, if enabled in the target folder
 #recycle
