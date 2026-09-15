@@ -1,130 +1,62 @@
-# Rules of the worktree working model
+# Rules of the workbench
 
-These rules hold from now on for the whole session. Reasons and finer points live in the README of this skill folder (`${CLAUDE_SKILL_DIR}`) — consult it when the user asks follow-up questions, instead of reconstructing. The file name is not reliable for this: it may have been renamed during installation. Look inside the folder; if you do not find it, answer without it.
+These rules hold from now on for the whole session, in every mode. Reasons and finer points live in the README of this skill folder (`${CLAUDE_SKILL_DIR}`) — consult it when the user asks follow-up questions instead of reconstructing, and name it to them as the reference when the skill first takes effect. The file name is not reliable for this: it may have been renamed during installation. Look inside the folder; if you do not find it, answer without it.
 
-<!-- TEMP ISSUE-80278 ANFANG -->
+Concrete names are defined by `.claude/git-workbench.json` (fields: `mode`, `workbench_prefix`, `worktree_dir`). The session knows the development branch from `.claude/git-branch-model.json` (field `integration_branch`) or from the user's answer; below it is called `<integration>`.
 
-## Known collision: Bash sandbox and worktrees
+## In every mode
 
-Before the session's first `git worktree` command runs (session start or continuing on another machine), check in two steps:
+- **Never commit on a release branch.** If the project keeps a branching model, its name is there; otherwise whatever the user calls the release branch applies.
+- **`push` only after consent in the individual case** — and the push rule (below) beforehand.
+- **Command chains never rely on a lingering `cd`.** Every Git command addresses its target itself (`git -C <path>`). No command runs with its working directory inside a folder that is removed in the same go.
+- **A commit covers what belongs to the step** — documentation adjustment and the associated code change in the same commit; the commit body names the step or the plan it comes from.
+- **Larger restructurings only from a clean state** (no uncommitted diff), so that they can be checked and taken back via diff.
 
-1. **Is the Bash sandbox running in this session?** Detectable from context alone, without a tool call: a system reminder describing an active sandbox policy (mentioning, among other things, "Bash tool commands run in a sandbox"), or a notice that the sandbox was just disabled ("has been disabled"), means "on"; the absence of any such notice means "off". Undocumented behavior, observed in this form on 2 September 2026 — not a `settings.json` check, which is spread across several scopes and could therefore mislead. If it is not running: skip the rest of this section, continue as normal.
-2. **Only if it is running:** fetch [issue #80278](https://github.com/anthropics/claude-code/issues/80278) via WebFetch. Reason: the sandbox masks `.git/config.worktree` as soon as `git worktree` sets `extensions.worktreeConfig=true` — after that every Git command fails, including `git status`.
-   - Still "open": point the user to the collision and ask whether the sandbox can be turned off now or whether worktree mode is dispensable at the moment. Depending on the answer, continue with the worktree model or agree with the user how collisions will be ruled out.
-   - No longer "open": report to the user that the fix in the issue needs analyzing and this section needs revising — and that the revised version also needs reinstalling on other machines, because the skill sits there only as a copy. Then continue as normal.
+## Mode `direct`
 
-<!-- TEMP ISSUE-80278 ENDE -->
+The session commits on the branch it sits on. After every approved and executed step one commit, without asking again; it is durable and is not summarized later. There is no workbench and nothing to complete. The precondition is that nobody works in parallel in the same working tree — the user has said so by choosing this mode; do not ask about it again.
 
-## The working model
+## Mode `workbench`
 
-Four branch roles, whose concrete names `.claude/git-worktree-model.json` defines (fields: `integration_branch`, `release_branch`, `workbench_prefix`, `worktree_dir`, `infra_branch`, `infra_files`):
+**Creating.** A workbench is a short-lived branch `<workbench-prefix><topic>`, derived from `<integration>` — or from the branch the user has the session work on. Propose the `<topic>` from the task, in English and short; the user confirms it (once per session). Beforehand `git fetch` and check whether the base branch is behind its remote — if so, report and stop: the user cleans that up first.
 
-- **Release branch** (say, `master`): finished work only. Not a place to work in.
-- **Integration branch** (say, `dev`): carries everything under development. The user's main checkout sits on it; it is **their** working area — Claude writes no files there and commits there only the approved squash (see completion).
-- **Workbenches** (say, `claude-wb/<topic>`): one per simultaneous session, derived from the integration branch, each in its own worktree. Short-lived: after the squash merge it is discarded.
-- **Infra branch** (say, `infra`): an orphan branch carrying exclusively the central files (`infra_files`: the project's CLAUDE.md, editor and tool configuration, `.gitignore` …). It is **never merged**; distribution happens via `git restore --source=<infra> -- <infra-files>`, which every session runs itself in its own worktree.
+The working tree is shared: when switching to the workbench it must be clean. If unversioned work of the user is lying around, ask whether it is to be committed or stashed — never run `checkout` or `reset` over it yourself.
 
-### Session start: create your own workbench
+**An existing workbench.** If a branch with the prefix already exists, check `git log --oneline <integration>..<workbench>`. If unmerged commits lie there, settling them comes before your own work — the user decides whether they are squashed, discarded or continued. If nothing is unmerged, the workbench may be reset to the current state of `<integration>` and reused.
 
-```bash
-git fetch origin
-# Integration branch up to date? Otherwise fast-forward first:
-git rev-list --count <integration>..origin/<integration>
-# Any orphaned workbenches lying around? (see below)
-git worktree list
-# Create workbench plus worktree (location from git-worktree-model.json):
-git worktree add <worktree-dir>/<topic> -b <workbench-prefix><topic> <integration>
-```
+**Working.** After every completed and approved work step a **safety commit** on the workbench, without asking. Purpose: make a misunderstanding that surfaces only steps later correctable by a simple reset. Going back to an earlier state is allowed exclusively on the workbench, never on another branch.
 
-Propose the `<topic>` from the task — in English and short; the user confirms it (approval tiers below). From now on **all** file and Git work of this session happens in its own worktree — even when the session was started in the main checkout, then via absolute paths into it.
+**Completion — fixed checklist, in this order:**
 
-Immediately after creating it — and equally at the start of every later session on an already existing workbench — the **infra sync**:
+1. **Fetch the state of the target branch:** `git fetch`; if `<integration>` has moved on, merge it into the workbench and resolve conflicts here — not only at squash time.
+2. **Propose the squash**; the user determines the commit text. Switch to `<integration>` — in `workbench` via `git checkout <integration>` in the shared working tree, in `worktree` in the main checkout, explicitly addressed with `git -C <main-checkout>` —, then `git merge --squash <workbench>` and `git commit` **without `-a`**: committed is only what the squash put into the index, the user's unversioned hand work remains untouched. Show `git status` beforehand.
+3. **Clean up** after consent: delete the workbench branch. For a follow-up task, derive freshly.
 
-```bash
-git -C <worktree> restore --source=<infra> -- <infra-files>
-```
+## Mode `worktree`
 
-If it changes anything, report that to the user in one sentence; the changes ride along with the next checkpoint commit. After the sync, heed the session's then-valid CLAUDE.md.
+Everything from `workbench`, plus the isolation: the workbench lives in its own worktree under `<worktree-dir>`, and the main checkout stays with the user. What is added for that — creating, orphaned workbenches, working in the worktree, switching machines, the additions to the completion — is in `rules-worktree.en.md` of the same folder.
 
-### Report orphaned workbenches
+## The push rule
 
-A session ends, its worktree stays behind — nobody clears it away. Claude Code's own sweep touches only worktrees of subagents and background sessions and never the ones created with `--worktree` or by hand. So at session start check what `git worktree list` shows besides the main checkout and your own workbench, and **report every find** instead of passing over it. Two questions belong to each:
+A push publishes one branch — and leaves all others behind. Whoever pushes a branch in the evening and continues on the other machine in the morning finds there only what was pushed.
+
+Therefore, **before every push** the user asks for or the session proposes:
 
 ```bash
-git -C <worktree> status --short          # unversioned or changed work?
-git log --oneline <integration>..<branch> # unmerged commits?
+git for-each-ref --format='%(refname:short) %(upstream:short) %(upstream:track)' refs/heads
 ```
 
-A clean working tree does **not** mean there is nothing to save: the work then sits in the branch. If anything there is unmerged, it comes before your own work — otherwise a later workbench touches the same files and the old work goes under in the squash. The user decides; remove worktree and branch only after their consent.
+Every local branch that is ahead of its upstream (`[ahead n]`) or has no upstream carries unpublished work. Ask per find: "On `<branch>` there are n unpublished commits — push them too?", with yes as the proposal unless the user says otherwise. Whether a branch is still needed cannot be judged reliably; so ask instead of guessing. A branch without upstream is linked with `-u` at its first push, so that `git status` can report unpublished work from then on.
 
-### Working in the worktree — or from the main checkout
+## Initial setup
 
-Two ways lead into your own workbench, and they differ in what Claude Code enforces itself:
+Only at the user's explicit request, as a presented plan:
 
-- **Via absolute paths**, while the session stays in the main checkout. Nothing is enforced; only this skill's rules apply.
-- **With `EnterWorktree`** the session really moves in. The chat continues, only the transcript's storage follows the working directory. From then on Claude Code blocks every write into the main checkout, every redirect of Git into it (`git -C`, `--git-dir`, `GIT_DIR`, a preceding `cd`), and every command whose target it cannot verify — including heredocs with unquoted delimiters.
-
-The second way is the safer one, the first the more mobile. Whoever works isolated leaves the worktree with `ExitWorktree` before the squash merge: the merge happens in the main checkout and would otherwise be blocked.
-
-### Continuing a workbench on another machine
-
-Git synchronizes branches, never worktree directories. Across machine boundaries therefore:
-
-- **Before switching machines**, on the user's word: push the workbench — the first time with `git push -u origin <workbench>`, so that the upstream link exists and `git status` can report unpublished work.
-- **On the other machine**: `git fetch origin`, then bind a worktree to the existing branch:
-
-```bash
-# Branch does not exist locally yet:
-git worktree add --track -b <workbench> <worktree-dir>/<topic> origin/<workbench>
-# Branch exists locally (earlier session on this machine) — bind, then fast-forward:
-git worktree add <worktree-dir>/<topic> <workbench>
-```
-
-- Then as at every session start: infra sync, continue working.
-
-### Working on the workbench
-
-- After every completed work step a **checkpoint commit** in the own worktree, without asking. It covers the whole tree of the worktree — which contains only the session's own work.
-- No command that changes foreign worktrees, foreign branches or the main checkout.
-- **Command chains never rely on a lingering `cd`.** Every Git command addresses its target itself — `git -C <worktree>` for the workbench, `git -C <main-checkout>` for the squash. And no command runs with its working directory inside a worktree that is removed in the same go.
-- `push` of the workbench only after consent in the individual case.
-- **If the user asks for a push on a different branch** — the integration branch, say — **or the session itself proposes such a push**, ask **before** running it whether the open workbench should be backed up too. Whether it is still needed can't be judged reliably; so ask instead of guessing, with **"push it too" as the suggested default** unless the user says otherwise. This is the observable moment for an approaching machine switch or the end of a session — not its announcement.
-
-### Changing central files (infra)
-
-Durable changes to infra files happen **exclusively on the infra branch** — never as a workbench commit. Procedure, each time with the user's consent:
-
-```bash
-git worktree add <worktree-dir>/_infra <infra>   # temporary worktree
-# make the change there, commit
-git worktree remove <worktree-dir>/_infra
-git -C <worktree> restore --source=<infra> -- <infra-files>
-```
-
-Then report to the user: other **running** sessions pick the change up only at their next infra sync — whoever needs it immediately triggers the sync there.
-
-### Trying out infra changes (experiments)
-
-If a central change is to be tried out first, before it goes onto the infra branch — a new rule paragraph in the CLAUDE.md, a hook in the settings, a changed linter configuration —, the workbench may change its copy of the infra file for that. Conditions:
-
-- The changed block is enclosed in the marks `<!-- INFRA-EXPERIMENT ANFANG <workbench> <date> -->` and `<!-- INFRA-EXPERIMENT ENDE -->`.
-- The experiment always ends through the infra sync (one command, see above) — never by editing back by hand, and the experimental version is **never** merged.
-- If the rule proves itself, it is entered anew, without marks, on the infra branch (previous section).
-- If an infra sync in between brings new central changes, re-insert the marked block afterwards.
-
-### Completing a task
-
-Fixed checklist, in this order:
-
-1. **Infra sync**: `git diff <infra> -- <infra-files>` must be empty; otherwise `restore` — which also ends every experiment.
-2. **Experiment search**: `grep -rn "INFRA-EXPERIMENT" <worktree>` must be empty.
-3. **Fetch the integration state**: `git fetch`; if the integration branch has moved on, merge it into the workbench and resolve conflicts here — not only at squash time.
-4. **Propose the squash merge**; the user determines the commit text. If the session sits isolated in the worktree, `ExitWorktree` first — otherwise the main checkout is blocked. Execution in the main checkout on the integration branch, **explicitly addressed there** (`git -C <main-checkout>`), never via the working directory of a running chain — a `cd` from an earlier link lingers, and a squash inside the workbench's own worktree merges the branch into itself: "nothing to commit", the chain breaks mid-procedure (observed four times in one day, 26 August 2026). So: `git -C <main-checkout> merge --squash <workbench>`, then there `git commit` **without `-a`** — committed is only what the squash put into the index, the user's unversioned hand work remains untouched. Show `git status` beforehand.
-5. **Clean up** after consent: remove the worktree (`git worktree remove`), delete the workbench branch. For a follow-up task, derive freshly from the integration branch.
-
-### Initial setup of the model
-
-Only at the user's explicit request, as a presented plan. Steps: settle the names (integration, release and infra branch, workbench prefix, storage location — as the storage location, absent any other instruction, `.claude/worktrees/` **inside** the repository is proposed: that is where Claude Code creates its own worktrees, moving there with `EnterWorktree` needs no separate approval, the path derives from the repo path on every machine, and above all the worktree then lies inside the folder the user's editor has open — outside it they cannot see the work. The folder belongs in the `.gitignore`, otherwise its content shows up as unversioned in the main checkout) and fix the infra file list; create the integration branch if it does not exist; create the infra branch as an orphan (`git worktree add --orphan -b <infra> <tmp>`, requires Git >= 2.42) and take the infra files over via `git checkout <integration> -- <file…>`; write `.claude/git-worktree-model.json` with the fields above; check this skill's silent trigger in the project CLAUDE.md — which afterwards lives on the infra branch itself.
+1. **Settle the mode** (`direct`, `workbench`, `worktree` or `ask`), the workbench prefix (absent any other instruction `claude-wb/`) and, if `worktree` ever comes into question, the storage location — absent any other instruction `.claude/worktrees/` **inside** the repository: that is where Claude Code creates its own worktrees, moving there needs no separate approval, the path derives from the repo path on every machine, and the work lies within the editor's view.
+2. **Write `.claude/git-workbench.json`.** If the project keeps a branching model with centrally managed files, this file belongs to them; how it is committed then follows that model's rules.
+3. **`.gitignore`**: the worktree folder must be listed there, otherwise its content shows up as unversioned in the main checkout. How the `.gitignore` is committed follows the project's branch rules.
+4. **Check the silent trigger** in the CLAUDE.md of the target location.
+5. **Explain**: tell the user what happens automatically from now on and what is asked, and name the README as the reference.
 
 ## Approval tiers
 
@@ -132,14 +64,14 @@ These tiers apply to the actions named here even where something else has been a
 
 | Tier | Actions |
 | --- | --- |
-| **Automatic, with a report** | Reading Git commands; infra sync in the own worktree (session start and completion step 1); checkpoint commits on the own workbench; experiment search |
-| **Once per session** | Creating the own workbench plus worktree (`<topic>` is proposed) |
-| **Once per project** | Initial setup of the model; storage location of the worktrees; the infra file list and every later change to it |
-| **Every time** | `push`; every commit on the infra branch; squash merge into the integration branch; deleting branches or worktrees; every action touching foreign worktrees or the main checkout |
+| **Automatic, with a report** | Reading Git commands; safety commits on the own workbench; commits in `direct` after an approved step |
+| **Once per session** | The mode in `ask`; creating the own workbench (`<topic>` is proposed); naming the development branch when the project does not define it |
+| **Once per project** | Initial setup; prefix and storage location |
+| **Every time** | `push`; squash into the development branch; deleting branches or worktrees; every action on foreign worktrees or on the main checkout in `worktree` |
 
 ## Rules that are never simplified
 
-- No durable change to infra files outside the infra branch. Workbench changes to them are experiments: marked, mortal, never merged.
-- The infra branch is never merged and derived from no other branch. Distribution exclusively via `restore --source`.
-- Every session writes only into its own worktree. The main checkout belongs to the user; the single exception is the approved squash commit.
-- Workbench work reaches the integration branch only by squash, never as a merge commit.
+- Workbench work reaches the development branch only by squash, never as a merge commit. Otherwise the safety history becomes part of the main line, and the squash discipline is void.
+- The squash commit is executed without `-a`. With `-a`, the user's unversioned hand work rides into the squash.
+- Resets happen only on the workbench. On no other branch is history rewritten.
+- `direct` is a decision of the user, not carelessness. It is executed, not debated.
