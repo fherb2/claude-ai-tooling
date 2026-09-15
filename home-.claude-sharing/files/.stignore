@@ -9,9 +9,16 @@
 #include .stignore-local
 /.stignore-local
 
-// Whole directories, contents included
+// Whole directories, contents included. /debug, /image-cache and /plans are
+// named in the same row of the official documentation, where what you lose by
+// deleting them reads "Nothing user-facing". /plans additionally keeps a plan
+// carried out on one machine from resurfacing on another as an open task.
+// Reasoning per pattern in 3.9 of the doc
 /cache
+/debug
 /downloads
+/image-cache
+/plans
 /telemetry
 
 // Machine-bound: backup copies, session markers, environment, shell captures,
