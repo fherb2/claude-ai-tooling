@@ -109,6 +109,8 @@ Was dieses Repository tatsächlich tut, stand nirgends festgeschrieben: `master`
 
 ## 6 Teil I — Produkt: Claude arbeitet hintereinander weg
 
+**Stand: Teil I ist am 15. September 2026 vollständig ausgeführt** (Commits `956a20c` bis zum Paket-Commit auf `dev`; der empfohlene Halt entfiel auf Anweisung des Entwicklers, die Texte sind noch nicht von ihm gelesen). Teil II beginnt mit II.1.
+
 Alles auf `dev`, Betriebsart `direct`, je Schritt ein Checkpoint-Commit. Vor jedem Commit mit Markdown die Tabellenprüfung; am Ende jeder Sitzung der Aktualitätsprüfer für Pakete (Vorgaben Anhang A.3).
 
 | Schritt | Inhalt |
