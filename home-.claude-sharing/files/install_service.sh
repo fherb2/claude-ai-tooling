@@ -221,20 +221,9 @@ for pattern in "conflict-resolution.*.md" "messages_*.py"; do
         "$MISSING_FILES_HINT"
 done
 
-[ -d "$SCRIPT_DIR/tools" ] || mkdir -p "$SCRIPT_DIR/tools"
 
-# The folder was called 'werkzeuge' until 15 August 2026. Copying the new
-# files/ over an existing installation leaves the old one behind, so it is
-# named here rather than removed: deleting on someone's machine is the user's
-# call (doku 3.5), and the folder may hold scripts nobody else knows about.
-if [ -d "$SCRIPT_DIR/werkzeuge" ]; then
-    warn "Note: $SCRIPT_DIR/werkzeuge/ is the former name of the folder
-'tools' and is no longer used. It stays where it is until you remove it —
-look whether anything is in there, then:
-    rm -r $SCRIPT_DIR/werkzeuge"
-fi
-
-# Same class of leftover, same reason for naming instead of removing: until the
+# A leftover that is named instead of removed -- deleting on someone's machine
+# is the user's call (doku 3.5): until the
 # working instruction carried a language code it was called plain
 # conflict-resolution.md. Unpacking a package over an older installation adds
 # the new name and leaves the old file lying there. Nothing reads it -- the

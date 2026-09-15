@@ -10,8 +10,8 @@ Usage
                                           session; print what would happen
     claude_sync_watchd.py --watch-dir DIR override the watched directory
                                           (default: ~/.claude)
-    claude_sync_watchd.py --tool-dir DIR  override where state, instruction
-                                          file and tools live (default:
+    claude_sync_watchd.py --tool-dir DIR  override where state and the
+                                          instruction file live (default:
                                           ~/.claude-sync-watch) -- for tests,
                                           so a trial run never touches the
                                           real installation
@@ -97,16 +97,14 @@ except ImportError as missing:
 TOOL_DIR = Path.home() / ".claude-sync-watch"
 STATE_FILE = TOOL_DIR / "zustand.json"
 LOCK_FILE = TOOL_DIR / ".lauf.lock"
-TOOLS_DIR = TOOL_DIR / "tools"
 
 
 def set_tool_dir(directory: Path) -> None:
     """Point the daemon's own files at another directory (tests only)."""
-    global TOOL_DIR, STATE_FILE, LOCK_FILE, TOOLS_DIR
+    global TOOL_DIR, STATE_FILE, LOCK_FILE
     TOOL_DIR = directory
     STATE_FILE = TOOL_DIR / "zustand.json"
     LOCK_FILE = TOOL_DIR / ".lauf.lock"
-    TOOLS_DIR = TOOL_DIR / "tools"
 
 
 def instruction_file() -> Path:
@@ -1247,7 +1245,6 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
     # pid and treat the episode as in progress -- the escalation would burn,
     # silently, and the next question came half an hour later. The installer
     # covers this at setup time only, and --tool-dir bypasses it entirely.
-    TOOLS_DIR.mkdir(parents=True, exist_ok=True)
     instruction = instruction_file()
     if not instruction.is_file():
         print(T("journal.no_instruction", path=instruction),
@@ -1257,16 +1254,12 @@ def launch_session(terminal_cmd: list[str], pairs: list[ConflictPair],
             T("dialog.no_instruction.text", path=instruction,
               name=instruction.name))
         return None
-    # Argument order is load-bearing, not cosmetic: ``--add-dir`` is variadic
-    # (``--add-dir <directories...>``), so it swallows every following argument
-    # as another directory. With the prompt placed after it, the session
-    # started with no prompt at all -- observed, and the reason this ordering
-    # is fixed here. ``--append-system-prompt-file`` takes exactly one value,
-    # so the prompt is safe behind it.
+    # The handover text goes last, behind the switch that takes exactly one
+    # value. No variadic switch is passed any more; why that matters is in
+    # appendix B of the doc.
     argv = [
         *terminal_cmd,
         claude_binary(),
-        "--add-dir", str(TOOLS_DIR),
         "--append-system-prompt-file", str(instruction),
         build_handover(pairs, watch_dir),
     ]
