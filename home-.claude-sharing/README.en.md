@@ -20,7 +20,7 @@ The contribution of this project lies elsewhere: Syncthing deliberately does **n
 
 ## What travels — and what does not
 
-Everything in `~/.claude` is synchronised, including the session transcripts and chats under `projects/` — they are the actual point of the exercise. Excluded is whatever the ignore list `.stignore` names; which pattern is there for what reason is set out in chapter 3.9 of the documentation.
+Everything in `~/.claude` is synchronised, including the session transcripts and chats under `projects/` — they are the actual point of the exercise. Excluded is whatever the ignore list `.stignore` names; which pattern is there for what reason is set out in chapter 3.9 of the documentation. Next to it sits a second list for a single machine — see the next chapter.
 
 Four points worth knowing beforehand:
 
@@ -109,7 +109,12 @@ The script **installs nothing silently**: if a package is missing it names the c
 
 1. **Back up what is there.** `cp -a ~/.claude ~/.claude.before-sync` — the only fallback line of this procedure. It is released only at the end.
 2. **Unpack the tool package.** Download `downloads/claude-sync-watch_en_local.zip` from this folder, then `unzip claude-sync-watch_en_local.zip -d ~`. That creates `~/.claude-sync-watch/` with every file needed — including the English catalogue and the English working instruction, which is what makes the tool speak English. This location is **mandatory**, not a recommendation: the service definition refers to it verbatim, and the installation script refuses the service at any other location. The folder is hidden; check with `ls -d ~/.claude-sync-watch`. The service is **not** set up yet at this point.
-3. **Create the ignore list — before sharing.** `cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore`. Why beforehand: Syncthing does not synchronise this file, it has to be present on every machine separately — and if it is missing at the first sync, the credentials set off travelling. What Syncthing later shows in the *Ignore Patterns* tab is exactly this file; before sharing, that tab does not exist yet.
+3. **Create both exclusion lists — before sharing.**
+
+        cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore
+        cp ~/.claude-sync-watch/.stignore-local ~/.claude/.stignore-local
+
+   **The second line belongs here, not later:** the authoritative list pulls the local one in with `#include`, and a missing include file is an error to Syncthing — so until the service is set up the first sync would run with a list whose effect is open. The local file is empty; you only fill it once this machine is to make a selection. Why beforehand at all: Syncthing does not synchronise this file, it has to be present on every machine separately — and if it is missing at the first sync, the credentials set off travelling. What Syncthing later shows in the *Ignore Patterns* tab is exactly this file; before sharing, that tab does not exist yet.
 4. **Share the folder in Syncthing.** Four steps, details in section 7 of the setup guide: **Add Folder**; enter the same **Folder ID** as on the other devices — character for character, otherwise it counts as a different folder; set "Folder Path" to `~/.claude`; tick the node in the **Sharing** tab; save. At the node, a prompt appears asking whether to accept the folder. All devices stay on **Send & Receive**.
 5. **Wait for the initial sync.** It is done when both sides show "Up to Date". What happens meanwhile: files present on one side only get distributed; files present on both sides with differing content produce conflict copies carrying `.sync-conflict-` in the name. How many there are depends on how far the two sets have diverged — **this is the planned merge step, not a fault.**
 6. **Resolve the conflict copies, started by hand.** The watcher is not running yet, and that is deliberate: it should start out on a conflict-free state, and during an initial sync still in progress further copies would keep arriving. So do it once yourself:

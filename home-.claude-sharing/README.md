@@ -18,7 +18,7 @@ Die Eigenleistung dieses Vorhabens liegt woanders: Syncthing führt Dateien, die
 
 ## Was mitwandert — und was nicht
 
-Abgeglichen wird der gesamte Inhalt von `~/.claude`, einschließlich der Sitzungsprotokolle und Chats unter `projects/` — sie sind der eigentliche Zweck. Ausgenommen ist, was in der Ausschlussliste `.stignore` steht; welches Muster warum, sagt Kapitel 3.9 der Doku.
+Abgeglichen wird der gesamte Inhalt von `~/.claude`, einschließlich der Sitzungsprotokolle und Chats unter `projects/` — sie sind der eigentliche Zweck. Ausgenommen ist, was in der Ausschlussliste `.stignore` steht; welches Muster warum, sagt Kapitel 3.9 der Doku. Daneben gibt es eine zweite Liste für einen einzelnen Rechner — siehe das nächste Kapitel.
 
 Vier Punkte, die man vorher wissen sollte:
 
@@ -107,7 +107,12 @@ Das Skript **installiert nichts stillschweigend**: Fehlt ein Paket, nennt es die
 
 1. **Bestand sichern.** `cp -a ~/.claude ~/.claude.vor-sync` — die einzige Rückfalllinie dieses Vorgangs. Sie wird erst am Ende aufgelöst.
 2. **Werkzeugpaket entpacken.** `downloads/claude-sync-watch_de_local.zip` aus diesem Ordner herunterladen, dann `unzip claude-sync-watch_de_local.zip -d ~`. Das legt `~/.claude-sync-watch/` mit allen benötigten Dateien an. **Das Paket bestimmt die Sprache:** Dieses hier bringt den deutschen Meldungskatalog und die deutsche Arbeitsanweisung mit, das englische (`claude-sync-watch_en_local.zip`) die englischen. Einzustellen ist dazu nichts. Dieser Ort ist **Vorschrift**, keine Empfehlung: Die Dienstdefinition verweist fest darauf, und das Installationsskript verweigert den Dienst an jedem anderen Ort. Der Ordner ist versteckt; Kontrolle mit `ls -d ~/.claude-sync-watch`. Der Dienst wird hier noch **nicht** eingerichtet.
-3. **Ausschlussliste anlegen — vor dem Teilen.** `cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore`. Warum vorher: Syncthing synchronisiert diese Datei nicht, sie muss auf jedem Rechner einzeln vorhanden sein — und fehlt sie beim ersten Abgleich, wandern die Zugangsdaten los. Was Syncthing später im Reiter *Ignore Patterns* anzeigt, ist genau diese Datei; vor dem Teilen gibt es den Reiter noch nicht.
+3. **Beide Ausschlusslisten anlegen — vor dem Teilen.**
+
+        cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore
+        cp ~/.claude-sync-watch/.stignore-local ~/.claude/.stignore-local
+
+   **Die zweite Zeile gehört dazu, nicht erst später:** Die maßgebliche Liste bindet die örtliche per `#include` ein, und eine fehlende Include-Datei ist für Syncthing ein Fehler — in der Zeit bis zum Einrichten des Dienstes liefe also der Erstabgleich mit einer Liste, deren Wirkung offen ist. Die örtliche Datei ist leer; gefüllt wird sie erst, wenn dieser Rechner eine Auswahl treffen soll. Warum überhaupt vorher: Syncthing synchronisiert diese Datei nicht, sie muss auf jedem Rechner einzeln vorhanden sein — und fehlt sie beim ersten Abgleich, wandern die Zugangsdaten los. Was Syncthing später im Reiter *Ignore Patterns* anzeigt, ist genau diese Datei; vor dem Teilen gibt es den Reiter noch nicht.
 4. **Den Ordner in Syncthing teilen.** Vier Handgriffe, Einzelheiten in Abschnitt 7 des Setup-Guides: **Add Folder**; als **Folder ID** dieselbe Kennung wie auf den übrigen Geräten eintragen — zeichengleich, sonst gilt der Ordner als ein anderer; als „Folder Path" `~/.claude`; im Reiter **Sharing** den Knoten anhaken; speichern. Am Knoten erscheint die Rückfrage, ob der Ordner angenommen werden soll. Alle Geräte bleiben auf **Send & Receive**.
 5. **Erstabgleich abwarten.** Fertig, wenn die Oberfläche auf beiden Seiten „Up to Date" zeigt. Was dabei geschieht: Einseitig vorhandene Dateien werden verteilt; beidseitig vorhandene, inhaltlich verschiedene erzeugen Konfliktkopien mit `.sync-conflict-` im Namen. Wie viele es werden, hängt an der Divergenz der Bestände — **das ist der geplante Zusammenführungsschritt, kein Fehler.**
 6. **Konfliktkopien auflösen, von Hand gestartet.** Der Wächter läuft noch nicht, und das ist Absicht: Er soll auf einem konfliktfreien Stand anfangen, und während eines laufenden Erstabgleichs kämen fortlaufend neue Kopien dazwischen. Deshalb hier einmal selbst:

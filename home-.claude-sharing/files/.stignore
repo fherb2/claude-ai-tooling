@@ -32,8 +32,9 @@
 
 // Sessions whose working directory was the scratchpad under /tmp. The path
 // carries the session id, so it never becomes a working directory again, and
-// after a reboot it no longer exists locally either. The second line is needed
-// because a single asterisk does not match the path separator. See 3.9
+// after a reboot it no longer exists locally either. A directory pattern takes
+// its contents with it; the second line is belt and braces, because this one
+// carries a wildcard. See 3.9
 /projects/-tmp*
 /projects/-tmp*/**
 
