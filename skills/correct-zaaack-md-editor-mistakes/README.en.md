@@ -1,6 +1,6 @@
 # correct-zaaack-md-editor-mistakes — find and repair damaged whitespace in Markdown tables
 
-*Last updated: 2026-09-10*
+*Last updated: 2026-09-15*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/correct-zaaack-md-editor-mistakes/README.md)*
 
@@ -77,7 +77,7 @@ Three files, and each split has its reason.
 
 **The list carries paths and counts, never line numbers.** The repair tool re-reads every file anyway and derives its repairs from the current content. A line number would be stale the moment something is saved between the two runs, and would make it edit the wrong place. For the same reason the repair step runs the scanner again instead of keeping a list.
 
-**Three lists, and the differences are the heart of the matter.** `files` is the work list and alone determines the exit code. `notes` holds what is reported but deliberately never repaired. Were the notes in the work list, the blank test could never come out clean: the exit code would stay 1 forever, and a hook would fire on every commit without there ever being anything to do. That is exactly how the first version was built, and in this repository the fault would have struck at once — `home-.claude-sharing/offener_fall_chatprotokolle.md` carries a deliberate `` `uuid`s `` in line 101.
+**Three lists, and the differences are the heart of the matter.** `files` is the work list and alone determines the exit code. `notes` holds what is reported but deliberately never repaired. Were the notes in the work list, the blank test could never come out clean: the exit code would stay 1 forever, and a hook would fire on every commit without there ever being anything to do. That is exactly how the first version was built, and in this repository the fault would have struck at once: a file carried a deliberate `` `uuid`s `` — inline code with a plural s attached directly, exactly where **no** space belongs. The scanner reports such places but never repairs them.
 
 **The third list, `unreadable`, is the refusal to abort.** A file that cannot be read no longer ends the run; it is skipped and named there. The reason is the kind of failure that arises otherwise: an abort leaves **no** result, and whoever only looks at the last line takes "nothing found" and "never ran" for the same thing — for a check meant to hold before every commit, that is the worst outcome. The list deliberately does **not** touch the exit code: it says the check was incomplete, not that something needs repair. So that it is not passed over regardless, the `SKILL.md` obliges the instance to report a non-empty list to the user.
 
