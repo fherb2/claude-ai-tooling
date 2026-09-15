@@ -1,0 +1,15 @@
+{
+  "integration_branch": "dev",
+  "release_branch": "master",
+  "release_transfer": "file-sync",
+  "management_branch": "repo-management",
+  "management_files": [
+    ".claude/CLAUDE.md",
+    ".claude/settings.json",
+    ".claude/git-branch-model.json",
+    ".claude/git-workbench.json",
+    ".vscode/",
+    ".gitignore",
+    ".markdownlint.jsonc"
+  ]
+}
