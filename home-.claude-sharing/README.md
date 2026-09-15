@@ -352,4 +352,3 @@ Zwei Dinge dazu:
 - `implementation-doc.md` — die vollständige Beschreibung (Zusammenhänge, Vorgaben, Einheiten), im Anhang der Code-Review vom 13. August 2026 samt Bearbeitung
 - `work-plan.md` — der noch offene Schritt
 - `syncthing-synology-setup-guide.md` — Einrichtung des Vermittlungsknotens und der Clients
-- `offener_fall_chatprotokolle.md` — ein untersuchter, aber nicht abgeschlossener Sonderfall: Konflikte in Sitzungsprotokollen

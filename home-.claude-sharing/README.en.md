@@ -356,4 +356,3 @@ The documents below are in German.
 - `implementation-doc.md` — the complete description (context, project-wide rules, units), with the code review of 13 August 2026 and its processing in the appendix
 - `work-plan.md` — the one remaining open step
 - `syncthing-synology-setup-guide.md` — setting up the node and the clients
-- `offener_fall_chatprotokolle.md` — an investigated but unfinished special case: conflicts in session transcripts

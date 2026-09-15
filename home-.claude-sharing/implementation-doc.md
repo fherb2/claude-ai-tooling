@@ -811,7 +811,7 @@ Das Vorhaben hat Pflichtdateien, und `install_service.sh` bricht ab, wenn eine f
 
 **Umfang des letzten Reviews**, rein lesend, ohne Lauf: der Wächter vollständig gegen die Kapitel 2.1–2.9 und 3.1–3.5; `messages.py` und beide Kataloge gegeneinander und gegen jeden `T(...)`-Aufruf im Wächter; beide Einrichtungsskripte gegen 3.5; die Unit; `.stignore` gegen 3.9; beide Arbeitsanweisungen gegen 3.4 und gegeneinander; `scripts/pack_packages.sh` gegen 2.7; das Prüfskript gegen 3.8 und gegen den Wächter; beide READMEs gegeneinander und gegen die Dateinamen.
 
-**Nicht geprüft:** die drei Handproben-Skripte in `tests/` samt Helfer (sie binden den Wächter bewusst nicht ein, 3.8), die Konfigurationsanleitung, `offener_fall_chatprotokolle.md`, der Inhalt der Zip-Pakete, das Verhalten realer Terminal-Emulatoren — und alles, was einen Lauf braucht.
+**Nicht geprüft:** die drei Handproben-Skripte in `tests/` samt Helfer (sie binden den Wächter bewusst nicht ein, 3.8), die Konfigurationsanleitung, der Inhalt der Zip-Pakete, das Verhalten realer Terminal-Emulatoren — und alles, was einen Lauf braucht.
 
 **Die laufende maschinelle Deckung** beschreibt 3.8 (Prüfskript, je Gruppe eine Überschrift im Lauf) und 2.7 (das Packwerkzeug prüft die Pakete selbst). Beides ist Bestandteil der Kapitel, nicht dieses Anhangs.
 
