@@ -37,9 +37,17 @@ Nicht jeder Rechner soll alles bekommen. Ein Arbeitsplatzrechner kann die Konfig
 
     !/projects/-home-name-git-gemeinsames-projekt
     !/projects/-home-name-git-gemeinsames-projekt/**
-    /projects/*
+    !/projects/-home-name-git-gemeinsames-projekt-*
+    !/projects/-home-name-git-gemeinsames-projekt-*/**
+    /projects/**
 
 **Die Reihenfolge ist die Regel, nicht Zierde:** Die **erste** passende Zeile entscheidet über eine Datei. Die Ausnahmen stehen deshalb über dem allgemeinen Muster. Aus demselben Grund ist eine solche Positivliste einer Negativliste vorzuziehen — bei ihr kostet ein vergessener Eintrag nur, dass ein Projekt auf diesem Rechner fehlt; bei einer Negativliste landet ein neu angelegtes Projekt ungefragt dort, wo es nicht hinsoll.
+
+**Warum `**` und nicht `*`:** Ein einzelner Stern erfasst laut Syncthings Dokumentation keinen Pfadtrenner, ein doppelter schon. Mit `/projects/*` hinge die Wirkung auf tiefere Ebenen daran, dass Syncthing in gesperrte Verzeichnisse nicht hineinsteigt — was dort nirgends zugesichert ist. `/projects/**` erfasst jeden Pfad darunter unmittelbar.
+
+**Warum vier Ausnahmezeilen für ein Projekt:** Claude Code legt je **Arbeitsverzeichnis** einen Ordner an, nicht je Projekt. Wer eine Sitzung in einem Unterordner startet, bekommt einen zweiten Eintrag, dessen Name den ersten als Präfix trägt. Ohne die beiden `-*`-Zeilen bleiben diese Sitzungen zurück. **Der Preis:** Ein eigenständiges Nachbarprojekt, dessen Name zufällig so beginnt, wird mit erfasst — gibt es so eines, zähle die Unterordner lieber einzeln auf.
+
+**Den Namen ablesen, nicht bilden.** Die Umformung ersetzt jedes Sonderzeichen durch einen Bindestrich, auch den Punkt: Aus `~/.claude` wird `-home-name--claude`, mit zwei Bindestrichen. `ls ~/.claude/projects/` zeigt die Namen, wie sie wirklich heißen.
 
 **Ausschließen heißt beides zugleich.** Was hier ausgeschlossen ist, wird weder empfangen **noch gesendet**. Eine Einbahnstraße — hier hinschicken, aber nichts empfangen — gibt es in Syncthing für einzelne Unterordner nicht; die Richtungseinstellung gilt immer für den gesamten Ordner und lässt sich auch nicht je Gegenstelle unterscheiden.
 

@@ -39,9 +39,17 @@ Not every machine should get everything. A workplace machine can take the config
 
     !/projects/-home-name-git-shared-project
     !/projects/-home-name-git-shared-project/**
-    /projects/*
+    !/projects/-home-name-git-shared-project-*
+    !/projects/-home-name-git-shared-project-*/**
+    /projects/**
 
 **The order is the rule, not decoration:** the **first** matching line decides a file's fate. That is why the exceptions sit above the general pattern. For the same reason a list of allowances like this one beats a list of exclusions — here a forgotten entry only costs you a project missing on this machine, whereas with a list of exclusions a newly created project lands where it should not, unasked.
+
+**Why `**` and not `*`:** a single asterisk does not match the directory separator, per Syncthing's documentation, whereas a double one does. With `/projects/*` the effect on deeper levels would rest on Syncthing not descending into ignored directories — which is nowhere guaranteed there. `/projects/**` matches every path below it directly.
+
+**Why four exception lines for one project:** Claude Code creates one folder per **working directory**, not per project. Start a session in a subfolder and you get a second entry whose name carries the first as its prefix. Without the two `-*` lines those sessions stay behind. **The price:** a separate neighbouring project whose name happens to start the same way is caught as well — if one exists, list the subfolders individually instead.
+
+**Read the name off, do not construct it.** The transformation replaces every special character with a hyphen, the dot included: `~/.claude` becomes `-home-name--claude`, with two hyphens. `ls ~/.claude/projects/` shows the names as they really are.
 
 **Excluding means both at once.** Whatever is excluded here is neither received **nor sent**. A one-way street — send from here but receive nothing — does not exist in Syncthing for individual subfolders; the direction setting always applies to the whole folder and cannot be varied per remote device either.
 
