@@ -1,6 +1,6 @@
 # Syncthing-Sync für `~/.claude`
 
-*Stand: 2026-09-12*
+*Stand: 2026-09-15*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.en.md)*
 
@@ -26,6 +26,30 @@ Vier Punkte, die man vorher wissen sollte:
 - **`/rewind` über Rechnergrenzen entfällt.** Die Momentaufnahmen unter `file-history/` sind ausgeschlossen: Sie hängen an absoluten Pfaden des Rechners, der sie angelegt hat, und ihr Schreibmuster ist für einen Abgleich das ungünstigste im ganzen Ordner. Wer eine Sitzung auf dem anderen Rechner fortsetzt, hat dort keine Prüfpunkte zum Zurückspielen. Dafür gibt es die Versionsverwaltung des Projekts.
 - **MCP-Server im User- und Local-Scope bleiben örtlich.** Sie liegen in `~/.claude.json`, also **außerhalb** des abgeglichenen Ordners. Wer sich auf einem Rechner einen MCP-Server einrichtet, trägt ihn auf dem anderen erneut ein. Für den Project-Scope gilt das nicht: `.mcp.json` gehört ins Repo des Projekts und wandert mit ihm.
 - **Anmeldung und Gerätezustand bleiben örtlich** — ebenfalls `~/.claude.json`. Ein Kontowechsel ist deshalb eine rein örtliche Angelegenheit und erzeugt keine Konflikte.
+
+## Einzelne Projekte von einem Rechner fernhalten
+
+Nicht jeder Rechner soll alles bekommen. Ein Arbeitsplatzrechner kann die Konfiguration, die Skills und die `CLAUDE.md` vollständig übernehmen, von den Sitzungsprotokollen unter `projects/` aber nur ausgewählte Projekte — und die übrigen gar nicht. Dafür gibt es eine **zweite Ausschlussliste**, `~/.claude/.stignore-local`.
+
+**Warum eine zweite.** `.stignore` hat eine maßgebliche Fassung, die auf allen Rechnern gleich ist; `install_service.sh` gleicht sie bei jeder Aktualisierung ab und bietet die Übernahme an, mit Vorgabe Ja. Wer seine eigenen Zeilen dort hineinschreibt, verliert sie beim nächsten Update — lautlos, weil ein Druck auf die Eingabetaste genügt. `.stignore-local` wird dagegen nur angelegt, wenn sie fehlt, und nie überschrieben.
+
+**Was hineingehört und wie.** Der Rechner nimmt nur die Projekte mit, die dort ausdrücklich zugelassen sind:
+
+    !/projects/-home-name-git-gemeinsames-projekt
+    !/projects/-home-name-git-gemeinsames-projekt/**
+    /projects/*
+
+**Die Reihenfolge ist die Regel, nicht Zierde:** Die **erste** passende Zeile entscheidet über eine Datei. Die Ausnahmen stehen deshalb über dem allgemeinen Muster. Aus demselben Grund ist eine solche Positivliste einer Negativliste vorzuziehen — bei ihr kostet ein vergessener Eintrag nur, dass ein Projekt auf diesem Rechner fehlt; bei einer Negativliste landet ein neu angelegtes Projekt ungefragt dort, wo es nicht hinsoll.
+
+**Ausschließen heißt beides zugleich.** Was hier ausgeschlossen ist, wird weder empfangen **noch gesendet**. Eine Einbahnstraße — hier hinschicken, aber nichts empfangen — gibt es in Syncthing für einzelne Unterordner nicht; die Richtungseinstellung gilt immer für den gesamten Ordner und lässt sich auch nicht je Gegenstelle unterscheiden.
+
+**Wenn das Auszuschließende schon abgeglichen ist**, entscheidet die Reihenfolge darüber, was passiert. Drei Fälle, und nur der erste braucht Sorgfalt:
+
+1. **Es wird laufend neu erzeugt** (etwa `backups/`): erst das Muster setzen und wirksam werden lassen, **dann** löschen. Die Löschung bleibt dann örtlich, ist also auf jedem Rechner einzeln nötig.
+2. **Vor dem Muster löschen**: Die Löschung wandert an alle — und der Erzeuger schreibt die Datei sofort neu. Das läuft hin und her.
+3. **Eine einmalige Datei, die niemand neu erzeugt**: einfach löschen. Die Löschung wandert überall hin, und das ist hier genau richtig.
+
+**Vor jeder Aktualisierung** ist zu prüfen, ob in `~/.claude/.stignore` eigene Zeilen stehen — siehe „Aktualisieren".
 
 ## Voraussetzungen
 
@@ -95,6 +119,12 @@ Dort, wo der Verbund beginnt, gibt es noch keinen abgeglichenen Ordner und keine
 Die Schritte 1 bis 4 und 7 bis 8 von oben gelten unverändert. **Die Schritte 5 und 6 entfallen:** Es gibt keinen zweiten Bestand, mit dem sich etwas vereinigen könnte, also entstehen keine Konfliktkopien. Erst der nächste Rechner durchläuft den vollständigen Weg.
 
 ### Aktualisieren
+
+**Zuerst, noch vor dem Entpacken: eigene Zeilen retten.** Steht in `~/.claude/.stignore` etwas, das Du dort selbst eingetragen hast, überschreibt die Aktualisierung es — die maßgebliche Fassung gewinnt, und die Rückfrage hat die Vorgabe Ja. Sichtbar wird es mit
+
+    diff ~/.claude/.stignore ~/.claude-sync-watch/.stignore
+
+Alles, was dort nur für diesen Rechner gilt, gehört **vorher** nach `~/.claude/.stignore-local` (siehe „Einzelne Projekte von einem Rechner fernhalten"). Genau auf diesem Weg sind auf einem Rechner schon einmal zwei Ausschlüsse verschwunden. Nach der Umstellung auf die zweite Liste ist hier normalerweise nichts mehr zu tun — die Prüfung kostet einen Befehl und ist die einzige Gelegenheit, es zu merken.
 
 Eine bestehende Installation wird nicht neu aufgesetzt, sondern überschrieben: das aktuelle Paket herunterladen und `unzip -o claude-sync-watch_de_local.zip -d ~` aufrufen. **Das `-o` gehört dazu** — ohne es fragt `unzip` bei jeder schon vorhandenen Datei einzeln nach. Danach `~/.claude-sync-watch/install_service.sh` starten: Erst das erneuert die Dienstdefinition und startet den Wächter mit der neuen Fassung. Wer nur entpackt, hat die neuen Dateien auf der Platte und den alten Wächter im Betrieb. Unberührt bleiben dabei `~/.claude`, die Zustandsdatei `zustand.json` und der Ordner `tools/`.
 

@@ -64,7 +64,7 @@ TOP=".claude-sync-watch"
 
 # The files every package carries under their own name.
 COMMON=(claude_sync_watchd.py claude-sync-watch.service install_service.sh
-        uninstall_service.sh messages.py .stignore)
+        uninstall_service.sh messages.py .stignore .stignore-local)
 
 # The files that exist once per language. Their name carries the code, and they
 # keep it inside the archive: repository and target machine stay name-identical,

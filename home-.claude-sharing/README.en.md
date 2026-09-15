@@ -1,6 +1,6 @@
 # Syncthing sync for `~/.claude`
 
-*Last updated: 2026-09-12*
+*Last updated: 2026-09-15*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.md)*
 
@@ -28,6 +28,30 @@ Four points worth knowing beforehand:
 - **`/rewind` across machine boundaries is gone.** The snapshots under `file-history/` are excluded: they refer to absolute paths of the machine that created them, and their write pattern is the worst in the whole folder for a synchronisation. Whoever continues a session on the other machine has no checkpoints to roll back to there. That is what the project's version control is for.
 - **MCP servers in user and local scope stay local.** They live in `~/.claude.json`, which is **outside** the synchronised folder. Whoever sets up an MCP server on one machine enters it again on the other. This does not apply to the project scope: `.mcp.json` belongs in the project's repository and travels with it.
 - **Login and device state stay local** — likewise `~/.claude.json`. Switching accounts is therefore a purely local affair and produces no conflicts.
+
+## Keeping single projects off one machine
+
+Not every machine should get everything. A workplace machine can take the configuration, the skills and the `CLAUDE.md` in full, but of the session transcripts under `projects/` only selected projects — and none of the rest. That is what a **second exclusion list** is for, `~/.claude/.stignore-local`.
+
+**Why a second one.** `.stignore` has an authoritative version that is the same on every machine; `install_service.sh` compares it at every update and offers to take it over, defaulting to yes. Whoever writes their own lines in there loses them at the next update — silently, because pressing return is enough. `.stignore-local`, by contrast, is only created when it is missing and never overwritten.
+
+**What goes in, and how.** The machine takes only those projects that are explicitly allowed there:
+
+    !/projects/-home-name-git-shared-project
+    !/projects/-home-name-git-shared-project/**
+    /projects/*
+
+**The order is the rule, not decoration:** the **first** matching line decides a file's fate. That is why the exceptions sit above the general pattern. For the same reason a list of allowances like this one beats a list of exclusions — here a forgotten entry only costs you a project missing on this machine, whereas with a list of exclusions a newly created project lands where it should not, unasked.
+
+**Excluding means both at once.** Whatever is excluded here is neither received **nor sent**. A one-way street — send from here but receive nothing — does not exist in Syncthing for individual subfolders; the direction setting always applies to the whole folder and cannot be varied per remote device either.
+
+**If what you want excluded has already been synchronised**, the order decides what happens. Three cases, and only the first needs care:
+
+1. **It keeps being recreated** (`backups/`, say): set the pattern first and let it take effect, **then** delete. The deletion then stays local, so it is needed on every machine separately.
+2. **Deleting before the pattern**: the deletion travels to everyone — and whatever creates the file writes it again at once. That goes back and forth.
+3. **A one-off file that nothing recreates**: just delete it. The deletion travels everywhere, which is exactly right here.
+
+**Before every update**, check whether `~/.claude/.stignore` carries lines of your own — see "Updating an existing installation".
 
 ## Prerequisites
 
@@ -97,6 +121,12 @@ Where the group of machines begins, there is neither a synchronised folder nor a
 Steps 1 to 4 and 7 to 8 above apply unchanged. **Steps 5 and 6 do not apply:** there is no second set of files to unite anything with, so no conflict copies arise. Only the next machine goes through the full path.
 
 ### Updating an existing installation
+
+**First of all, before unpacking: rescue your own lines.** If `~/.claude/.stignore` holds anything you put there yourself, the update overwrites it — the authoritative version wins, and the question defaults to yes. This makes it visible:
+
+    diff ~/.claude/.stignore ~/.claude-sync-watch/.stignore
+
+Everything in there that applies to this machine alone belongs in `~/.claude/.stignore-local` **beforehand** (see "Keeping single projects off one machine"). This is exactly how two exclusions once disappeared from one machine. Once you have moved to the second list there is normally nothing left to do here — the check costs one command and is the only chance to notice.
 
 An existing installation is not set up again but overwritten: download the current package and run `unzip -o claude-sync-watch_en_local.zip -d ~`. **The `-o` belongs there** — without it `unzip` asks about every file that already exists, one by one. Then run `~/.claude-sync-watch/install_service.sh`: only that renews the service definition and starts the watcher with the new version. Unpacking alone leaves the new files on disk and the old watcher running. Untouched by all of this: `~/.claude`, the state file `zustand.json` and the `tools/` folder.
 
