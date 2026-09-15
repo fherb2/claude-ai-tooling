@@ -452,6 +452,35 @@ Whether the folder is synchronised is therefore open. The service is being
 installed; please look in Syncthing's interface." ;;
 esac
 
+# --- Local exclusion list: begin (doku 3.5) ---------------------------------
+# Run by the test script as it stands, like the region below, with warn and the
+# two paths supplied. It has to come BEFORE that one: the authoritative
+# .stignore carries an "#include .stignore-local", and a missing include file
+# is an error to Syncthing -- so the included file has to exist before a
+# .stignore naming it can land in the synced folder.
+#
+# This block is the deliberate opposite of the one below (doku 2.8). There the
+# packaged version is authoritative and gets offered for overwriting; here it
+# is only a template. An existing local list is never touched and never even
+# asked about: overwriting it would delete exactly the machine-specific lines
+# the file exists for.
+if [ ! -f "$SCRIPT_DIR/.stignore-local" ]; then
+    # A package always carries the template, so this means the unpacking was
+    # incomplete. An empty file keeps the include valid, which is a better
+    # answer than aborting the whole installation over it.
+    : > "$SCRIPT_DIR/.stignore-local"
+    warn "The template $SCRIPT_DIR/.stignore-local was missing and has been
+created empty. Your package is incomplete -- please unpack it again in full."
+fi
+
+if [ ! -f "$WATCH_DIR/.stignore-local" ]; then
+    cp "$SCRIPT_DIR/.stignore-local" "$WATCH_DIR/.stignore-local"
+    printf 'Local exclusion list created: %s/.stignore-local\n' "$WATCH_DIR"
+else
+    printf 'Local exclusion list kept as it is.\n'
+fi
+# --- Local exclusion list: end ----------------------------------------------
+
 # --- Exclusion list: begin (doku 3.5) ---------------------------------------
 # Everything between these markers is run by the test script as it stands, with
 # warn, ask_yes_no, the two paths and the GUI address supplied. Do not

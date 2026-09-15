@@ -2,13 +2,22 @@
 // damit die Datei auf jeder Ebene ausgeschlossen ist
 .credentials.json
 
+// Rechnerspezifische Muster, nachgeladen aus einer Datei, die nicht mitwandert
+// und die ein Update ueberlebt. Steht bewusst weit oben: Die erste passende
+// Zeile entscheidet, also gehen oertliche Muster den allgemeinen vor. Oberhalb
+// bleibt allein die Zeile fuer die Zugangsdaten. Begruendung in 2.8 der Doku
+#include .stignore-local
+/.stignore-local
+
 // Ganze Verzeichnisse samt Inhalt
 /cache
 /downloads
 /telemetry
 
-// Rechnergebundenes: Sitzungsmerker, Umgebung, Shell-Aufnahmen, IDE-Anbindung
+// Rechnergebundenes: Sicherungskopien, Sitzungsmerker, Umgebung,
+// Shell-Aufnahmen, IDE-Anbindung
 // Begruendung je Muster in 3.9 der Doku
+/backups
 /ide
 /sessions
 /session-env

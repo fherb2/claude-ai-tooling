@@ -1,0 +1,19 @@
+// Machine-specific exclusions. Deliberately empty -- every line here belongs
+// to THIS machine alone.
+//
+// Unlike .stignore, this file survives an update: install_service.sh creates
+// it when it is missing and never touches an existing one, whereas the
+// packaged .stignore is authoritative and gets offered for overwriting.
+//
+// .stignore pulls this file in with "#include", placed high up there on
+// purpose: the FIRST matching pattern decides a file's fate, so patterns
+// written here take precedence over the general ones and can also make an
+// exception from them. Only the line for the credentials sits above the
+// include and is therefore out of reach from here.
+//
+// The file excludes itself from the synchronisation, so what one machine
+// selects never reaches the others.
+//
+// Main use: keeping single project paths under projects/ off this machine.
+// How to write an entry -- and the order to follow when the thing to exclude
+// has already been synchronised -- is described in the README.
