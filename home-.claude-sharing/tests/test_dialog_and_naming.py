@@ -1390,11 +1390,11 @@ def check_launch_failure(w: types.ModuleType, tmp_root: Path) -> None:
 def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
     """How the session invocation is assembled (doku 3.3).
 
-    ``--add-dir`` is variadic, so it swallows every following argument as
-    another directory. With the handover text behind it the session once
-    started with NO prompt at all and showed the welcome screen instead of
-    working -- observed in the operating test, and the reason 3.3 calls this
-    order load-bearing. Nothing checked it until now.
+    The handover text goes last, behind the switch that takes exactly one
+    value. No variadic switch is passed any more -- ``--add-dir`` used to be
+    one, and with the handover text behind it the session once started with NO
+    prompt at all. That is why the absence of any variadic switch is checked
+    here and not merely assumed (appendix B of the doc).
 
     No terminal is started: ``spawn_detached`` is replaced by a recorder, which
     keeps the assurance that this script runs without a screen and without a
@@ -1429,12 +1429,9 @@ def check_launch_argv(w: types.ModuleType, tmp_root: Path) -> None:
         check("Programmpfad absolut, unmittelbar hinter dem Terminal",
               len(argv) > 2 and argv[2] == w.claude_binary()
               and argv[2].startswith("/"), True)
-        check("--add-dir genau einmal", argv.count("--add-dir"), 1)
-        check("--add-dir vor der Arbeitsanweisung",
-              argv.index("--add-dir")
-              < argv.index("--append-system-prompt-file"), True)
-        check("--add-dir zeigt auf den Werkzeugordner",
-              argv[argv.index("--add-dir") + 1], str(w.TOOLS_DIR))
+        # Regression guard, not a leftover: --add-dir is variadic and would
+        # swallow the handover text again. It is gone, and it stays gone.
+        check("kein --add-dir mehr im Aufruf", "--add-dir" in argv, False)
         # The value must sit directly behind its own option: anything between
         # them would be read as the file name, and the session would refuse to
         # start (doku 3.3).
