@@ -6,8 +6,8 @@ has to be deleted in the target, and what stays out on purpose. Writes the two
 work lists NUL-separated so they can be fed to `xargs -0`, which keeps paths
 with spaces and non-ASCII folder names intact.
 
-Infra files are never taken from the source branch: they are distributed from
-the infra branch. Their list is read from .claude/git-worktree-model.json, so
+Management files are never taken from the source branch: they are distributed
+from the management branch. Their list is read from .claude/git-branch-model.json, so
 it cannot drift away from the agreement.
 
 The work lists are always written. Without --out they go into a fresh
@@ -44,11 +44,11 @@ def repo_root() -> Path:
     return Path(run("git", "rev-parse", "--show-toplevel").strip())
 
 
-def infra_patterns(root: Path) -> list[str]:
-    model = root / ".claude" / "git-worktree-model.json"
+def management_patterns(root: Path) -> list[str]:
+    model = root / ".claude" / "git-branch-model.json"
     if not model.is_file():
         return []
-    entries = json.loads(model.read_text(encoding="utf-8")).get("infra_files", [])
+    entries = json.loads(model.read_text(encoding="utf-8")).get("management_files", [])
     out = []
     for e in entries:
         e = e.rstrip("/")
@@ -67,7 +67,7 @@ def main() -> int:
 
     root = repo_root()
     excl = [re.compile(p) for p in DEFAULT_EXCLUDES + args.exclude]
-    infra = [re.compile(p) for p in infra_patterns(root)]
+    management = [re.compile(p) for p in management_patterns(root)]
 
     # --no-renames is load-bearing, not a preference: with rename detection a
     # renamed file arrives as ONE record of THREE fields (R100, old, new),
@@ -84,7 +84,7 @@ def main() -> int:
     take: list[str] = []
     dele: list[str] = []
     skipped_excl: list[str] = []
-    skipped_infra: list[str] = []
+    skipped_management: list[str] = []
 
     i = 0
     while i < len(fields) - 1 and fields[i]:
@@ -92,8 +92,8 @@ def main() -> int:
         i += 2
         if any(r.match(path) for r in excl):
             skipped_excl.append(path)
-        elif any(r.match(path) for r in infra):
-            skipped_infra.append(path)
+        elif any(r.match(path) for r in management):
+            skipped_management.append(path)
         elif status == "D":
             dele.append(path)
         else:
@@ -110,8 +110,8 @@ def main() -> int:
     for p in skipped_excl:
         note = describe(p)
         print(f"  . {p}" + (f"   <- {note}" if note else ""))
-    print(f"\nInfra-Dateien (kommen aus dem infra-Zweig): {len(skipped_infra)}")
-    for p in skipped_infra:
+    print(f"\nVerwaltungsdateien (kommen aus repo-management): {len(skipped_management)}")
+    for p in skipped_management:
         print(f"  i {p}")
 
     out = Path(args.out) if args.out else Path(tempfile.mkdtemp(prefix="repo-cleanup-"))

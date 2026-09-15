@@ -32,9 +32,9 @@ Dieser Durchgang hat zwei Tiefen, und die Wahl trifft der Nutzer.
 
 Ziel: Der Release-Zweig trägt jede Datei des Entwicklungszweigs, ausgenommen das, was dort bewusst fehlen soll. Kein Merge — die Zweige haben absichtlich getrennte Historien, übertragen wird Datei für Datei.
 
-Die Namen der Zweige und die Liste der zentralen Dateien stehen in `.claude/git-worktree-model.json` (`integration_branch`, `release_branch`, `infra_files`). Im Folgenden `dev` und `master` genannt.
+Die Namen der Zweige und die Liste der Verwaltungsdateien stehen in `.claude/git-branch-model.json` (`integration_branch`, `release_branch`, `management_branch`, `management_files`). Im Folgenden `dev`, `master` und `repo-management` genannt.
 
-**Der Haupt-Checkout bleibt dabei durchgehend auf `dev`.** Das Worktree-Modell (Projekt-`CLAUDE.md`, Skill `parallel-sessions`) verbietet dem Skill, dort den Zweig zu wechseln oder zu committen — und das muss er auch nicht: `master` wird nie ausgecheckt, sondern per Git-Plumbing direkt auf Ebene der Objekte fortgeschrieben (`read-tree`/`update-index`/`write-tree`/`commit-tree`/`update-ref`, mit einer alternativen Index-Datei statt des Arbeitsbaums). Das ist kein Umweg, sondern die robustere Lösung: Sie berührt `.claude/skills/` nie und scheitert deshalb auch nicht an dessen Sandbox-Sperre.
+**Der Haupt-Checkout bleibt dabei durchgehend auf `dev`.** Das Zweigmodell (Projekt-`CLAUDE.md`, Skill `git-branch-model`) sieht für die Release-Übernahme `file-sync` keinen Checkout des Release-Zweigs vor — und der ist auch nicht nötig: `master` wird nie ausgecheckt, sondern per Git-Plumbing direkt auf Ebene der Objekte fortgeschrieben (`read-tree`/`update-index`/`write-tree`/`commit-tree`/`update-ref`, mit einer alternativen Index-Datei statt des Arbeitsbaums). Das ist kein Umweg, sondern die robustere Lösung: Sie berührt `.claude/skills/` nie und scheitert deshalb auch nicht an dessen Sandbox-Sperre.
 
 **Vorher prüfen: `git worktree list`.** Anders als `git checkout` verweigert `git update-ref` nicht, wenn der Ziel-Branch gerade in einem anderen Worktree ausgecheckt ist — es bewegt den Ref trotzdem, und diese andere Sitzung säße danach auf einem veralteten Stand. Zeigt `master` dort auf, den Nutzer fragen, statt fortzufahren.
 
@@ -44,20 +44,20 @@ Drei Klassen, und sie sind keine Nachlässigkeit:
 
 1. **Skills mit Baustellenschild im Ordnernamen** (`skills/🚧_…`, `skills/🚷_…`). Sie sind unfertig und bleiben es dort, wo sie stehen.
 2. **Der Ordner `.research/`.** Untersuchungsmaterial, das den Release-Zweig nicht erreicht.
-3. **Die Projekt-Skills unter `.claude/skills/`** — und damit dieser Skill selbst. Sie sind Arbeitsgerät des Entwicklungszweigs: Ein Werkzeug, das den Release-Zweig herstellt, hat in ihm nichts zu suchen. In `infra` ebenso nicht, dort liegen nur die fünf zentralen Dateien (Festlegung des Entwicklers vom 11. September 2026; Anweisung in der Projekt-CLAUDE.md).
+3. **Die Projekt-Skills unter `.claude/skills/`** — und damit dieser Skill selbst. Sie sind Arbeitsgerät des Entwicklungszweigs: Ein Werkzeug, das den Release-Zweig herstellt, hat in ihm nichts zu suchen. In `repo-management` ebenso nicht, dort liegen nur die Verwaltungsdateien laut `management_files` (Festlegung des Entwicklers vom 11. September 2026; Anweisung in der Projekt-CLAUDE.md).
 
 **Alle drei Klassen stehen in `files/unfinished.py`** — dem einen Ort, aus dem sich jedes Werkzeug dieses Skills und der Filter der Gegenprobe bedienen. Die Baustellen werden nicht an einer Namensliste erkannt, sondern daran, dass der Ordnername unter `skills/` nicht mit einem alphanumerischen Zeichen beginnt — ein künftiges Schild fällt damit von selbst darunter. Bewusst breiter als „beginnt mit einem Emoji": Zu viel auszuschließen fällt auf, zu wenig auszuschließen bringt einen unfertigen Skill still in den Release. Beginnt ein ausgeschlossener Ordner mit einem Zeichen, das gar kein Schild ist (etwa `_alt-kram/`), sagt das Werkzeug das ausdrücklich, statt ihn stillschweigend zu schlucken. Die dritte Klasse hängt am Präfix `.claude/skills/` und nicht am Namen dieses Skills, damit ein künftiger zweiter Projekt-Skill ebenso von selbst darunterfällt.
 
 **Eine neue Klasse ist zweiteilig.** Der Ausschluss selbst verhindert nur künftige Übertragungen — was von der neuen Klasse bereits auf `master` liegt, muss einmalig von Hand entfernt werden. Weder `branch-diff.py` noch die Gegenprobe melden das, weil beide genau diesen Pfad ausfiltern. Genau das ist am 11. September 2026 passiert, als diese dritte Klasse eingeführt wurde: Die acht Dateien dieses Skills lagen aus dem ersten Lauf schon auf `master` und mussten von Hand entfernt werden (Commit `373b142`).
 
-## Schritt 1 — Infra verteilen, auf beide Zweige
+## Schritt 1 — Verwaltungsdateien verteilen, auf beide Zweige
 
-**Zentrale Dateien kommen nie aus `dev`, sondern immer aus dem Infra-Zweig.** Sonst wandert eine Fassung weiter, die dort nie beschlossen wurde. Die maßgebliche Pfadliste ist `infra_files` aus der Modelldatei.
+**Verwaltungsdateien kommen nie aus `dev`, sondern immer aus dem Verwaltungszweig.** Sonst wandert eine Fassung weiter, die dort nie beschlossen wurde. Die maßgebliche Pfadliste ist `management_files` aus der Modelldatei; die Kommandos unten schreiben sie zum Stand vom 16. September 2026 aus.
 
 **Auf `dev`** — echter Dateizugriff auf den aktiven Arbeitsbaum:
 
 ```bash
-git restore --source=infra -- .claude/CLAUDE.md .claude/settings.json .vscode/ .gitignore .markdownlint.jsonc
+git restore --source=repo-management -- .claude/CLAUDE.md .claude/settings.json .claude/git-branch-model.json .claude/git-workbench.json .vscode/ .gitignore .markdownlint.jsonc
 git add <dieselben Pfade> && git commit
 ```
 
@@ -68,15 +68,15 @@ Trifft das auf eine tatsächliche Abweichung bei einer sandbox-gesperrten Datei 
 ```bash
 IDX=$(mktemp)
 GIT_INDEX_FILE="$IDX" git read-tree master
-git ls-tree -r infra -- .claude/CLAUDE.md .claude/settings.json .vscode/ .gitignore .markdownlint.jsonc \
+git ls-tree -r repo-management -- .claude/CLAUDE.md .claude/settings.json .claude/git-branch-model.json .claude/git-workbench.json .vscode/ .gitignore .markdownlint.jsonc \
   | GIT_INDEX_FILE="$IDX" git update-index --index-info
 TREE=$(GIT_INDEX_FILE="$IDX" git write-tree)
-COMMIT=$(git commit-tree "$TREE" -p master -m "Infra verteilen")
+COMMIT=$(git commit-tree "$TREE" -p master -m "Verwaltungsdateien verteilen")
 git update-ref refs/heads/master "$COMMIT"
 rm -f "$IDX"
 ```
 
-Gegenprobe je Zweig, ohne Checkout: `git diff --stat infra <zweig> -- <infra_files>` muss für beide leer sein.
+Gegenprobe je Zweig, ohne Checkout: `git diff --stat repo-management <zweig> -- <management_files>` muss für beide leer sein.
 
 ## Schritt 2 — Den Vollvergleich erheben
 
@@ -84,13 +84,13 @@ Gegenprobe je Zweig, ohne Checkout: `git diff --stat infra <zweig> -- <infra_fil
 python3 .claude/skills/repo-cleanup-pass/files/branch-diff.py --from dev --to master
 ```
 
-Das Skript gibt vier Listen aus: zu übernehmen, im Release-Zweig zu löschen, bewusst ausgeschlossen, und die Infra-Dateien (die aus Schritt 1 kommen). Die beiden Arbeitslisten schreibt es NUL-getrennt in ein eigenes Verzeichnis, dessen Pfad es in der letzten Zeile als `LISTEN=…` nennt — NUL-getrennt, damit Pfade mit Leerzeichen und Emoji-Ordnernamen unbeschädigt bleiben. `--out` ist optional. Ohne Angabe landet dieses Verzeichnis unter dem System-Temp-Pfad (unter aktiver Sandbox also `$TMPDIR`) — der ausgegebene `LISTEN=`-Pfad ist in jedem Fall absolut und eindeutig.
+Das Skript gibt vier Listen aus: zu übernehmen, im Release-Zweig zu löschen, bewusst ausgeschlossen, und die Verwaltungsdateien (die aus Schritt 1 kommen). Die beiden Arbeitslisten schreibt es NUL-getrennt in ein eigenes Verzeichnis, dessen Pfad es in der letzten Zeile als `LISTEN=…` nennt — NUL-getrennt, damit Pfade mit Leerzeichen und Emoji-Ordnernamen unbeschädigt bleiben. `--out` ist optional. Ohne Angabe landet dieses Verzeichnis unter dem System-Temp-Pfad (unter aktiver Sandbox also `$TMPDIR`) — der ausgegebene `LISTEN=`-Pfad ist in jedem Fall absolut und eindeutig.
 
 **Diese Liste wird gelesen, nicht überflogen.** Ein Bereich, der im Release-Zweig vollständig fehlt, sieht darin genauso aus wie eine geänderte Einzeldatei — und genau das ist der Fund, für den der Vollvergleich existiert. Was auffällt, wird dem Nutzer vorgelegt, bevor übertragen wird.
 
 ## Schritt 3 — Übertragen
 
-Auch dies ohne Checkout, direkt auf dem aktuellen Stand von `master` (nach Schritt 1 also inklusive Infra):
+Auch dies ohne Checkout, direkt auf dem aktuellen Stand von `master` (nach Schritt 1 also inklusive Verwaltungsdateien):
 
 **Vorher: Arbeitsverzeichnis ist die Repo-Wurzel.** Die Listen aus Schritt 2 sind wurzelrelativ; von woanders aus laufen `git ls-tree`/`update-index` an den falschen Pfaden vorbei.
 
