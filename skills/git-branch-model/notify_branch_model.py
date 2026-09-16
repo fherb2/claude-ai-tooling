@@ -35,8 +35,20 @@ import os
 import re
 import sys
 
+# "git" must stand at a command position -- start of the line, or after a
+# separator such as &&, ||, ;, | or $( -- optionally preceded by variable
+# assignments or "env"/"command", and the subcommand must be the first bare
+# word after git's own options (-C <path>, -c <k=v>, --git-dir=...). A "git"
+# inside a quoted string or a name like git-branch-model does not count:
+# the first live version matched those and blocked a command that merely
+# mentioned the skill (16 September 2026).
 WRITE_SUBCOMMANDS = re.compile(
-    r"\bgit\b[^&|;]*\b(commit|add|push|checkout|restore|reset|merge)\b"
+    r"(?:^|[;&|(]|\$\()\s*"
+    r"(?:\S+=\S*\s+)*(?:env\s+|command\s+)?"
+    r"git\s+"
+    r"(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--?[\w-]+(?:=\S+)?\s+)*"
+    r"(commit|add|push|checkout|restore|reset|merge)\b",
+    re.M,
 )
 SKILL = "git-branch-model"
 
