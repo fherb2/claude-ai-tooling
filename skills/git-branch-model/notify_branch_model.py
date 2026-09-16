@@ -1,24 +1,33 @@
 #!/usr/bin/env python3
-"""Notify the instance about the git-branch-model skill before a writing Git command.
+"""Make sure git-branch-model is consulted before the first writing Git command.
 
 PreToolUse hook, matcher "Bash", if "Bash(git *)". Reads the hook input JSON
-from stdin; if tool_input.command names a writing Git subcommand (commit, add,
-push, checkout, restore, reset, merge -- the same list the CLAUDE.md trigger
-anchors on) AND the project (found by walking up
-from cwd) keeps .claude/git-branch-model.json, prints a PreToolUse JSON
-output whose hookSpecificOutput.additionalContext names the skill. Plain
-stdout is NOT added to Claude's context for PreToolUse (unlike SessionStart)
--- only additionalContext is, per https://code.claude.com/docs/en/hooks.
+from stdin. It acts only if tool_input.command names a writing Git
+subcommand (commit, add, push, checkout, restore, reset, merge -- the same
+list the CLAUDE.md trigger anchors on) AND the project, found by walking up
+from cwd, keeps .claude/git-branch-model.json. Then:
 
-The hook never blocks and never runs the sync itself: it only guarantees the
-notice arrives, the way an event-anchored CLAUDE.md trigger can fail to at
-the Description-selection step (measured 16 September 2026: Sonnet loads
-only the skill whose description literally matches the request and skips
-the second trigger condition). The instance still decides whether and how
-to consult the skill.
+* If the session transcript (hook input field transcript_path) shows that
+  the skill git-branch-model has already been loaded in this session --
+  either via the Skill tool or via the slash command -- the hook stays
+  silent and the command runs.
+* Otherwise it DENIES this one command (permissionDecision "deny") with the
+  reason that git-branch-model is to be consulted first. Once the skill is
+  loaded, the transcript shows it, and the next attempt passes. So the
+  block happens at most once per session, and the sync of the management
+  files that the skill prescribes runs BEFORE the first write, not after it.
+* If the transcript cannot be read, it falls back to a plain notice
+  (additionalContext) instead of blocking: never block on missing evidence.
 
-On any error or non-match it stays silent (no stdout) and exits 0, so a
-session is never disturbed.
+Why a hook at all: measured on 16 September 2026, Sonnet loads at the anchor
+"first writing Git command" only the skill whose description literally
+matches the request and skips the second trigger condition. A PreToolUse
+hook is deterministic where a CLAUDE.md trigger is not. Why deny instead of
+notice: additionalContext does not stop the command, so the skill would be
+consulted only after the first write.
+
+The hook never runs the sync itself and never blocks a read-only command.
+On any error or non-match it stays silent (no stdout) and exits 0.
 """
 
 import json
@@ -29,18 +38,64 @@ import sys
 WRITE_SUBCOMMANDS = re.compile(
     r"\bgit\b[^&|;]*\b(commit|add|push|checkout|restore|reset|merge)\b"
 )
+SKILL = "git-branch-model"
 
 
 def find_project_root(start):
-    """Walk upward from start looking for .claude/git-branch-model.json's project root."""
+    """Walk upward from start looking for the folder holding .claude/git-branch-model.json."""
     d = os.path.abspath(start)
     while True:
-        if os.path.isfile(os.path.join(d, ".claude", "git-branch-model.json")):
+        if os.path.isfile(os.path.join(d, ".claude", SKILL + ".json")):
             return d
         parent = os.path.dirname(d)
         if parent == d:
             return None
         d = parent
+
+
+def skill_already_loaded(transcript_path):
+    """True if the transcript shows the skill loaded in this session.
+
+    Two traces count: a Skill tool_use with this skill's name (the instance
+    loaded it), or a message carrying the skill body header with this skill's
+    folder (the user called it via slash command). Sidechain entries of
+    subagents are ignored. Raises OSError if the file cannot be read.
+    """
+    marker = f"Base directory for this skill: "
+    with open(transcript_path, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            if SKILL not in line:
+                continue
+            try:
+                entry = json.loads(line)
+            except ValueError:
+                continue
+            if entry.get("isSidechain"):
+                continue
+            message = entry.get("message") or {}
+            for block in message.get("content") or []:
+                if not isinstance(block, dict):
+                    continue
+                if (
+                    block.get("type") == "tool_use"
+                    and block.get("name") == "Skill"
+                    and (block.get("input") or {}).get("skill") == SKILL
+                ):
+                    return True
+                text = block.get("text") if block.get("type") == "text" else None
+                if text and marker in text and text.split(marker, 1)[1].split("\n", 1)[0].rstrip("/").endswith("/" + SKILL):
+                    return True
+    return False
+
+
+def emit(decision=None, reason=None, context=None):
+    out = {"hookEventName": "PreToolUse"}
+    if decision:
+        out["permissionDecision"] = decision
+        out["permissionDecisionReason"] = reason
+    if context:
+        out["additionalContext"] = context
+    print(json.dumps({"hookSpecificOutput": out}))
 
 
 def main():
@@ -56,21 +111,37 @@ def main():
     if not WRITE_SUBCOMMANDS.search(command):
         return 0
 
-    cwd = hook_input.get("cwd") or "."
-    root = find_project_root(cwd)
-    if root is None:
+    if find_project_root(hook_input.get("cwd") or ".") is None:
         return 0
 
-    print(json.dumps({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "additionalContext": (
-                "[git-branch-model] This project keeps .claude/git-branch-model.json. "
-                "Before running this writing Git command, consult the skill "
-                "git-branch-model."
-            ),
-        }
-    }))
+    notice = (
+        f"[{SKILL}] This project keeps .claude/{SKILL}.json. "
+        f"Consult the skill {SKILL} before running writing Git commands."
+    )
+
+    transcript_path = hook_input.get("transcript_path")
+    if not transcript_path:
+        emit(context=notice)
+        return 0
+    try:
+        loaded = skill_already_loaded(transcript_path)
+    except OSError as err:
+        print(f"{SKILL} hook: cannot read transcript: {err}", file=sys.stderr)
+        emit(context=notice)
+        return 0
+
+    if loaded:
+        return 0
+
+    emit(
+        decision="deny",
+        reason=(
+            f"[{SKILL}] This project keeps .claude/{SKILL}.json, and the skill "
+            f"{SKILL} has not been consulted in this session yet. Consult it first "
+            f"(Skill tool: {SKILL}), then run this command again. This block "
+            f"happens once per session."
+        ),
+    )
     return 0
 
 
