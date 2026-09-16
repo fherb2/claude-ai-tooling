@@ -1,6 +1,6 @@
 # recall-skills-after-compact — nach der Kompression an die geladenen Skills erinnern
 
-*Stand: 2026-09-10*
+*Stand: 2026-09-16*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/recall-skills-after-compact/README.en.md)*
 
@@ -28,7 +28,7 @@
 
 3. **Hook verdrahten.** Das musst Du händisch tun. Alles dazu steht in `settings-json-snippet.md`: der fertige Eintrag unterhalb der Trennlinie, darüber wohin er gehört, wie er in eine bestehende `settings.json` eingefügt wird und — falls Du nicht nach `~/.claude/skills/` entpackt hast — wie der Pfad anzupassen ist. Dort steht auch eine Probe, die den Eintrag sofort prüft, ohne auf eine Kompression zu warten; führe sie aus, denn ein falscher Pfad fällt sonst nirgends auf. Die Datei bleibt danach im Skill-Ordner liegen; ihre Datumszeile zeigt, von welchem Stand der übernommene Eintrag ist.
 
-   Ohne diesen Schritt wirkt nur der Slash-Aufruf `/recall-skills-after-compact`; der garantierte Auslöser bei Kompression fehlt. In diesem Repository liegt die `settings.json` auf dem Infra-Branch — dort wird sie geändert.
+   Ohne diesen Schritt wirkt nur der Slash-Aufruf `/recall-skills-after-compact`; der garantierte Auslöser bei Kompression fehlt. In diesem Repository liegt die `settings.json` auf dem Verwaltungszweig `repo-management` — dort wird sie geändert.
 
 4. **Wirksamkeit prüfen:** In einer Sitzung mit mindestens einem Skill-Aufruf `/compact` ausführen — die Liste muss danach als Kontext-Notiz auftauchen und von der Instanz vorgetragen werden.
 
