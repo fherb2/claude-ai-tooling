@@ -100,21 +100,31 @@ Verweis anfasst, richtet sich danach. Hier steht sie absichtlich nicht ein
 zweites Mal; hier steht nur, dass sie gilt und wo sie zu finden ist
 (Festlegung des Entwicklers vom 11. September 2026).
 
-## Arbeitsmodell: Git-Worktrees
+## Arbeitsmodell: Zweigmodell und Werkbank
 
-Dieses Repo arbeitet nach dem Worktree-Modell: Jede Claude-Sitzung
-arbeitet auf einer eigenen Werkbank (`claude-wb/<topic>`) in einem eigenen
-Worktree; die Vereinbarungen stehen in `.claude/git-worktree-model.json`.
-Verfahren und Regeln: Skill `parallel-sessions` (Quelle:
-`skills/parallel-sessions/`).
+Dieses Repo führt das Zweigmodell des Skills `git-branch-model`:
+Entwicklungszweig `dev`, Release-Zweig `master`, Verwaltungszweig
+`repo-management` für die Dateien, die auf jedem Zweig gleich sein
+müssen, Release-Übernahme Datei für Datei (`file-sync`). Die
+Festlegungen stehen in `.claude/git-branch-model.json`.
+
+Committet wird nach dem Skill `git-workbench` in der Betriebsart
+`direct` (`.claude/git-workbench.json`): ein Entwickler, eine Sitzung,
+keine Parallelarbeit — jeder freigegebene Schritt ist ein dauerhafter
+Commit auf `dev`. Wird echte Parallelarbeit nötig, wechselt die
+Betriebsart auf `worktree`; Werkbänke heißen dann `claude-wb/<topic>`
+und liegen unter `.claude/worktrees/`.
+
+Die Quellen beider Skills liegen unter `skills/`; installiert sind sie
+unter `~/.claude/skills/`.
 
 ## Projekt-Skills gehören dem Entwicklungszweig
 
 Was unter `.claude/skills/` liegt, ist Arbeitsgerät für die Entwicklung
 dieses Repositories und **bleibt in `dev`**. In `master` hat es nichts zu
 suchen: Ein Werkzeug, das den Release-Zweig herstellt, ist nicht Teil des
-Releases. In `infra` ebenso nicht — dort liegen ausschließlich die fünf
-zentralen Dateien aus `infra_files`.
+Releases. In `repo-management` ebenso nicht — dort liegen nur die
+Verwaltungsdateien laut `management_files`.
 
 Das ist keine Ordnungsfrage, sondern eine Aussage darüber, was der
 Release-Zweig ist: der veröffentlichte Stand des Repositories, nicht die
