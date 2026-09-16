@@ -1,6 +1,6 @@
 # git-workbench — wie eine Claude-Sitzung committet: direkt, auf einer Werkbank oder isoliert im eigenen Worktree
 
-*Stand: 2026-09-15*
+*Stand: 2026-09-16*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/git-workbench/README.en.md)*
 
@@ -66,5 +66,7 @@ Die `README.md` bringt das Paket mit, und das aus gutem Grund: Die `SKILL.md` ve
 ## Stand und Offenes
 
 **Status:** Neufassung vom 15. September 2026 als Nachfolger des Skills `parallel-sessions`, der Zweigmodell und Werkbank vermischte. Das Zweigmodell — Entwicklungs-, Release- und Verwaltungszweig samt Verteilung der zentralen Dateien — ist herausgelöst und eine eigene Fähigkeit; dieser Skill trägt nur noch, wie eine Sitzung committet. Neu gegenüber dem Vorgänger: die Betriebsarten `direct` und `workbench` ohne Worktree, `ask` als Standard, die Push-Regel für alle Zweige statt nur für die offene Werkbank, und die Worktree-Regeln als eigene, nur bei Bedarf geladene Datei. Aus dem Vorgänger übernommen und unverändert entschieden: das Werkbank-Schema `claude-wb/<topic>` mit Schrägstrich und englischem `<topic>`; der Worktree-Ablageort `.claude/worktrees/` im Repository; die Freigabestufen.
+
+**Gemessen (16. September 2026, Verfahren nach Kapitel 4.2 der Vorgaben, 34 Läufe mit Sonnet, Opus und Fable, dazu 6 Nachläufe mit Sonnet):** Der Trigger feuert bei allen drei Modellen auf einen schlichten Commit-Auftrag mit Konfigurationsdatei; die Negativkontrolle (eine Git-Frage ohne Schreibvorhaben) bleibt still. Ohne Konfigurationsdatei — nur mit Sonnet gemessen, drei Läufe — wird der Trigger jedes Mal erkannt; tatsächlich geladen wurde der Skill einmal, die übrigen zwei Läufe hielt der Planmodus des Messaufbaus vor der Ausführung an, nicht der Trigger. Zur Zahl 34: Die Hälfte dieser Läufe sollte ohne Konfigurationsdatei laufen, lief wegen eines Fehlers im Testaufbau aber ebenfalls mit ihr (ein `reset --hard` holte die entfernte Datei aus der Historie des Testprojekts zurück); erst die Nachläufe messen den Fall ohne Datei. Der Skill ist damit am Anker „erstes schreibendes Git-Kommando" verlässlich — verlässlicher als sein Nachbar am selben Anker, dessen Description den Commit-Fall nicht trifft (siehe dessen README).
 
 **Bewusst offen gelassen.** Betriebsart, Werkbank-Präfix und Ablageort sind Festlegungen des jeweiligen Projekts und stehen in dessen `.claude/git-workbench.json` — der Skill trägt nur das Verfahren. Welcher Zweig der Entwicklungszweig ist, legt der Skill ebenfalls nicht fest: Er liest es aus dem Zweigmodell des Projekts, wenn es eines gibt, und fragt sonst.
