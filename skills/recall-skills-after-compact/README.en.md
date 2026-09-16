@@ -1,6 +1,6 @@
 # recall-skills-after-compact — recall the loaded skills after a compaction
 
-*Last updated: 2026-09-10*
+*Last updated: 2026-09-16*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/recall-skills-after-compact/README.md)*
 
@@ -28,7 +28,7 @@
 
 3. **Wire the hook.** You have to do this by hand. Everything about it is in `settings-json-snippet.md`: the ready-made entry below the separator line, and above it where it belongs, how it is merged into an existing `settings.json`, and — if you did not unpack into `~/.claude/skills/` — how to adjust the path. It also carries a check that verifies the entry right away, without waiting for a compaction; run it, because a wrong path shows up nowhere else. The file stays in the skill folder afterwards; its date line shows which state the adopted entry is from.
 
-   Without this step only the slash invocation `/recall-skills-after-compact` works; the guaranteed trigger on compaction is missing. In this repository the `settings.json` lives on the infra branch — that is where it is changed.
+   Without this step only the slash invocation `/recall-skills-after-compact` works; the guaranteed trigger on compaction is missing. In this repository the `settings.json` lives on the management branch `repo-management` — that is where it is changed.
 
 4. **Verify it works:** run `/compact` in a session with at least one skill invocation — the list must then appear as a context note and be presented by the instance.
 
