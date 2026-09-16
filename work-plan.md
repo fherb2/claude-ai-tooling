@@ -10,12 +10,6 @@ Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
-## 12 Zweigmodell und Werkbank trennen
-
-**In Arbeit seit dem 15. September 2026.** Aus `parallel-sessions` werden zwei Skills: `git-branch-model` (Führung eines Git-Projekts — Entwicklungs-, Release-, Themen- und Verwaltungszweig, Release-Übernahme, Verteilung der Verwaltungsdateien mit Richtungsprüfung) und `git-workbench` (Commit-Körnung einer Claude-Sitzung — Betriebsarten `direct`/`workbench`/`worktree`/`ask`). Die Konfigurationsdatei `.claude/git-worktree-model.json` wird in `git-branch-model.json` und `git-workbench.json` aufgeteilt, der Zweig `infra` in `repo-management` umbenannt.
-
-**Der vollständige, fixierte Plan steht in `.claude/plan-step-12.md`** — Entscheidungen, Gestaltung beider Skills, Teil I (Produkt, Claude arbeitet hintereinander weg) und Teil II (Projektumstellung, schrittweise mit dem Entwickler). Eine neue Sitzung setzt dort auf. Die eigene Plandatei ist eine vom Entwickler am 15. September 2026 freigegebene Ausnahme von der Regel „keine eigenen Plan-Dateien" der Projekt-CLAUDE.md und entfällt mit diesem Schritt.
-
 ## 11 `vscode-dev-container`: Feldnachweise abschließen
 
 **Der erste Bau ist gelaufen** (5./7. September 2026, zwei Rechner): Image gebaut, Container gestartet, Claude-Erweiterung v2.1.263 lief, Pfad und Sitzungsschlüssel wie entworfen. Was dabei auffiel, steckt in der README des Bausteins samt Prüfliste mit Spalte „geprüft"; drei fehlende Pakete (`openssh-client`, `bubblewrap`, `socat`) sind im Dockerfile nachgetragen, die Ordnerstruktur auf `.devcontainer/` + `.claude/` umgestellt.
