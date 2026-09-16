@@ -1,6 +1,6 @@
 # git-branch-model — running a Git project with a development, a release and a management branch
 
-*Last updated: 2026-09-15*
+*Last updated: 2026-09-16*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/git-branch-model/README.md)*
 
@@ -62,5 +62,7 @@ The `README.md` comes with the package, and for good reason: the `SKILL.md` refe
 ## Status and open points
 
 **Status:** New since 15 September 2026, extracted from the former skill `parallel-sessions`, which mixed branching model and workbench; this repository is at the same time the first project using the model. Decided are: the four roles; the two modes of release transfer; the sync with direction check instead of the blind sync at session start; that tooling with logic of its own may go onto the management branch when it is branch-independent; that working branches off the management branch are permissible.
+
+**Measured (16 September 2026, procedure per chapter 4.2 of the guidelines, 34 runs with Sonnet, Opus and Fable):** On a plain commit request that names neither release nor branch, the trigger fires with Opus and Fable but **not with Sonnet** — there, at the anchor "first writing Git command", only the skill whose description literally matches the request is loaded, and the check "does `.claude/git-branch-model.json` exist?" from the CLAUDE.md trigger is not carried out. As soon as `master` or a release is mentioned, it fires with all three. A description that names the commit case together with the file condition itself changes nothing (0 of 3 with Sonnet) and makes the skill over-fire in projects without a branching model; it was discarded. **Consequence for Sonnet users:** the sync of the management files then does not run at every first commit but only once an occasion with release or branch reference arrives. How the triggering can be guaranteed is open.
 
 **Deliberately left open.** The concrete branch names, the kind of release transfer and the list of management files are decisions of the respective project and live in its `.claude/git-branch-model.json` — the skill carries only the procedure and the roles. Likewise the transfer recipe for `file-sync` and the decision whether a project puts its tooling onto the management branch.

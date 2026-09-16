@@ -1,6 +1,6 @@
 # git-branch-model — ein Git-Projekt mit Entwicklungs-, Release- und Verwaltungszweig führen
 
-*Stand: 2026-09-15*
+*Stand: 2026-09-16*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/git-branch-model/README.en.md)*
 
@@ -62,5 +62,7 @@ Die `README.md` bringt das Paket mit, und das aus gutem Grund: Die `SKILL.md` ve
 ## Stand und Offenes
 
 **Status:** Neu seit dem 15. September 2026, herausgelöst aus dem früheren Skill `parallel-sessions`, der Zweigmodell und Werkbank vermischte; dieses Repository ist zugleich das erste Einsatzprojekt des Modells. Entschieden sind: die vier Rollen; die zwei Betriebsarten der Release-Übernahme; der Abgleich mit Richtungsprüfung statt des blinden Abgleichs bei Sitzungsbeginn; dass Werkzeuge mit eigener Logik auf den Verwaltungszweig dürfen, wenn sie zweigunabhängig sind; dass Arbeitszweige vom Verwaltungszweig zulässig sind.
+
+**Gemessen (16. September 2026, Verfahren nach Kapitel 4.2 der Vorgaben, 34 Läufe mit Sonnet, Opus und Fable):** Auf einen schlichten Commit-Auftrag ohne Nennung von Release oder Zweig feuert der Trigger bei Opus und Fable, bei **Sonnet nicht** — dort lädt am Anker „erstes schreibendes Git-Kommando" nur der Skill, dessen Description den Auftrag wörtlich trifft, und die Prüfung „existiert `.claude/git-branch-model.json`?" aus dem CLAUDE.md-Trigger wird nicht ausgeführt. Sobald `master` oder ein Release genannt ist, feuert er bei allen drei. Eine Description, die den Commit-Fall samt Dateibedingung selbst nennt, ändert daran nichts (0 von 3 bei Sonnet) und lässt den Skill in Projekten ohne Zweigmodell überfeuern; sie wurde verworfen. **Folge für Sonnet-Nutzer:** Der Abgleich der Verwaltungsdateien läuft dann nicht bei jedem ersten Commit, sondern erst, wenn ein Anlass mit Release- oder Zweigbezug kommt. Wie die Auslösung garantiert werden kann, ist offen.
 
 **Bewusst offen gelassen.** Die konkreten Zweignamen, die Art der Release-Übernahme und die Liste der Verwaltungsdateien sind Festlegungen des jeweiligen Projekts und stehen in dessen `.claude/git-branch-model.json` — der Skill trägt nur das Verfahren und die Rollen. Ebenso das Übertragungsrezept für `file-sync` und die Entscheidung, ob ein Projekt seine Werkzeuge auf den Verwaltungszweig legt.

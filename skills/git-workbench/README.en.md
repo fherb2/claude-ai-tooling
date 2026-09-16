@@ -1,6 +1,6 @@
 # git-workbench — how a Claude session commits: directly, on a workbench, or isolated in its own worktree
 
-*Last updated: 2026-09-15*
+*Last updated: 2026-09-16*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/git-workbench/README.md)*
 
@@ -66,5 +66,7 @@ The `README.md` comes with the package, and for good reason: the `SKILL.md` refe
 ## Status and open points
 
 **Status:** New version of 15 September 2026 as the successor of the skill `parallel-sessions`, which mixed branching model and workbench. The branching model — development, release and management branch including the distribution of the central files — has been extracted and is a capability of its own; this skill now carries only how a session commits. New compared to the predecessor: the modes `direct` and `workbench` without a worktree, `ask` as the default, the push rule for all branches instead of only the open workbench, and the worktree rules as a file of their own, loaded only when needed. Taken over from the predecessor and unchanged: the workbench scheme `claude-wb/<topic>` with slash and English `<topic>`; the worktree location `.claude/worktrees/` inside the repository; the approval tiers.
+
+**Measured (16 September 2026, procedure per chapter 4.2 of the guidelines, 34 runs with Sonnet, Opus and Fable):** The trigger fires with all three models on a plain commit request, with and without the configuration file; the negative control (a Git question without any writing intent) stays silent. The skill is thus reliable at the anchor "first writing Git command" — more reliable than its neighbour at the same anchor, whose description does not match the commit case (see that skill's README).
 
 **Deliberately left open.** Mode, workbench prefix and storage location are decisions of the respective project and live in its `.claude/git-workbench.json` — the skill carries only the procedure. Which branch is the development branch the skill does not determine either: it reads it from the project's branching model if there is one, and asks otherwise.
