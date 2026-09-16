@@ -10,6 +10,25 @@ Eine `status.md` führt das Vorhaben `skills/` nicht.
 
 Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge die Schritte hier stehen. Ab Schritt 3 ist auch die nicht festgelegt — diese Schritte hängen nicht voneinander ab.
 
+## 13 `git-branch-model`: garantierte Auslösung bei Sonnet
+
+**Unmittelbar nächster Schritt** (Festlegung des Entwicklers vom 16. September 2026 — beide Skills sollen bald abschließend lauffähig sein). Ausgangslage: Die Trigger-Messung vom 16. September 2026 (README von `git-branch-model`, „Stand und Offenes") hat gezeigt, dass Sonnet am gemeinsamen Anker mit `git-workbench` nur den Skill lädt, dessen `description` den Auftrag wörtlich trifft — die zweite Bedingung „existiert `.claude/git-branch-model.json`?" aus dem CLAUDE.md-Trigger führt es nicht aus. Eine schärfere Description hat das Problem nicht behoben (0 von 3 Läufen) und in Projekten ohne Zweigmodell zum Überfeuern geführt; verworfen.
+
+**Lösungsidee, aus einem älteren Fall übertragen** (Chat vom 2. September 2026, `recall-skills-after-compact`: dort ein `SessionStart`-Hook mit `compact`-Matcher, weil nach einer Kompaktierung kein Text-Anker existiert, an dem ein Trigger ansetzen könnte). Der heutige Fall liegt anders — ein Text-Anker existiert, nur die Priorisierung zwischen zwei passenden Skills geht bei Sonnet falsch —, aber dieselbe Bauform trägt: ein `PreToolUse`-Hook auf `Bash`, der bei einem Git-Schreibkommando greift. Die „leichte Variante" (Deine Formulierung vom 2. September): Der Hook führt den Abgleich nicht selbst aus, sondern legt der Instanz nur vor, dass `.claude/git-branch-model.json` existiert und der Skill zu konsultieren ist — die Entscheidung bleibt bei der Instanz, aber der Hinweis kommt garantiert an, nicht als Trigger-Text, der überstimmt werden kann.
+
+**Umzusetzen, mit Bau und Nachmessung als ein Schritt:**
+
+1. **Hook-Matcher festlegen.** Welche Bash-Kommandos den Hook auslösen — `git commit`, `git push`, `git checkout`, `git merge` mindestens; zu klären, ob ein Substring-Matcher auf `^git ` reicht oder feiner unterschieden werden muss (ein lesendes `git status` soll nicht auslösen).
+2. **Hook-Skript schreiben**, nach dem Muster von `recall_skills_after_compact.py` (Kap. 5.0 der Vorgaben): prüft `.claude/git-branch-model.json` im aktuellen Projekt, legt bei Vorhandensein eine knappe Anweisung auf stdout, scheitert sonst still mit Exit 0. Keine mitgelieferte Erklärung des Mechanismus (Kap. 5.0: „jede mitgelieferte Erklärung lädt zum Nachforschen ein" — am ersten Praxistest von `recall-skills-after-compact` belegt).
+3. **`settings-json-snippet.de/en.md` für `git-branch-model`** anlegen, gleich gebaut wie bei `recall-skills-after-compact`: Datumszeile, kursive Kopfnotiz (JSON wird eingefügt, nicht angehängt; Pfad trägt `$HOME`, kein Platzhalter — Kap. 5.0 nennt den Schaden: ein `/home/<user>/…`-Platzhalter wird mitkopiert, übersehen, und der Hook scheitert still), Trennlinie, der zu übernehmende `hooks`-Block. `SKILL.de/en.md` bekommt dafür Vorlage C aus Kap. 6.1 (dritter Installationsschritt „Hook verdrahten" statt „Stillen Trigger übernehmen").
+4. **Probe ohne Ereignis** in der Kopfnotiz: das Hook-Kommando von Hand ausführen, ohne auf ein echtes Git-Kommando zu warten — Pflicht nach Kap. 5.0, nicht Komfort.
+5. **Bauen im Wegwerf-Projekt**, nicht im Repo selbst: Hook einrichten, mit `claude -p` in mehreren frischen Chats gegen ein Testprojekt mit und ohne `.claude/git-branch-model.json` prüfen, ob die Anweisung ankommt und die Instanz danach tatsächlich `git-branch-model` konsultiert — nicht nur, dass der Hook feuert. Mehrere Testchats, nicht einer: Der alte Fall wurde erst nach einem fehlgeschlagenen und zwei weiteren Läufen als belegt behandelt.
+6. **Übernahme in dieses Repo**, mit Freigabe: `settings-json-snippet.de/en.md` in `~/.claude/settings.json` einfügen (die dort schon einen `hooks`-Block für `recall-skills-after-compact` trägt — einfügen, nicht ersetzen), Wirkung in einer echten Sitzung dieses Repos prüfen.
+7. **README nachziehen**: der Messbefund von heute bleibt stehen, ergänzt um „Lösung: Hook, siehe Installation"; „Stand und Offenes" verliert den Satz „wie die Auslösung garantiert werden kann, ist offen".
+8. **Zielwelt bleibt `local`** (Kap. 5.0: Hooks gibt es auf claude.ai nicht; nur `_de_local`/`_en_local`-Pakete, kein `_web`).
+
+**Danach entscheiden, nicht vorwegnehmen:** ob `git-workbench` einen entsprechenden Hook ebenfalls braucht — die Messung vom 16. September zeigt es bei allen drei Modellen zuverlässig feuernd, ein Hook wäre dort unbegründet, solange sich das nicht ändert.
+
 ## 11 `vscode-dev-container`: Feldnachweise abschließen
 
 **Der erste Bau ist gelaufen** (5./7. September 2026, zwei Rechner): Image gebaut, Container gestartet, Claude-Erweiterung v2.1.263 lief, Pfad und Sitzungsschlüssel wie entworfen. Was dabei auffiel, steckt in der README des Bausteins samt Prüfliste mit Spalte „geprüft"; drei fehlende Pakete (`openssh-client`, `bubblewrap`, `socat`) sind im Dockerfile nachgetragen, die Ordnerstruktur auf `.devcontainer/` + `.claude/` umgestellt.
