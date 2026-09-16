@@ -2,8 +2,9 @@
 """Notify the instance about the git-branch-model skill before a writing Git command.
 
 PreToolUse hook, matcher "Bash", if "Bash(git *)". Reads the hook input JSON
-from stdin; if tool_input.command names a writing Git subcommand (commit,
-push, checkout, restore, reset, merge) AND the project (found by walking up
+from stdin; if tool_input.command names a writing Git subcommand (commit, add,
+push, checkout, restore, reset, merge -- the same list the CLAUDE.md trigger
+anchors on) AND the project (found by walking up
 from cwd) keeps .claude/git-branch-model.json, prints a PreToolUse JSON
 output whose hookSpecificOutput.additionalContext names the skill. Plain
 stdout is NOT added to Claude's context for PreToolUse (unlike SessionStart)
@@ -26,7 +27,7 @@ import re
 import sys
 
 WRITE_SUBCOMMANDS = re.compile(
-    r"\bgit\b[^&|;]*\b(commit|push|checkout|restore|reset|merge)\b"
+    r"\bgit\b[^&|;]*\b(commit|add|push|checkout|restore|reset|merge)\b"
 )
 
 
