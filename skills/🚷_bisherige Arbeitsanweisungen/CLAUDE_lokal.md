@@ -96,19 +96,31 @@ steht — auch solcher aus einem früheren Auftrag. Der Skill regelt, was
 davon du selbst entfernst und was du dem Nutzer zur Entscheidung
 vorlegst.
 
-## Parallele Sitzungen und Worktree-Arbeitsmodell
+## Commits dieser Sitzung: direkt, Werkbank oder Worktree
 
 Erwähnt der Nutzer einen zweiten offenen Chat, eine zweite Claude-Instanz
 oder gleichzeitige Arbeit an diesem Repository, konsultiere sofort den
-Skill `parallel-sessions`. Ebenso, wenn im Arbeitsbaum Änderungen
-auftauchen, die nicht aus dieser Sitzung stammen.
+Skill `git-workbench`. Ebenso, wenn im Arbeitsbaum Änderungen auftauchen,
+die nicht aus dieser Sitzung stammen, oder die Sitzung in einem
+Git-Worktree beginnt.
 
 Und bevor du in einer Sitzung zum ersten Mal ein schreibendes
 Git-Kommando ausführst (`commit`, `add`, `push`, `checkout`, `restore`,
-`reset`, `merge`), prüfe: Liegt einer dieser Fälle vor, arbeitet diese
-Sitzung in einem Git-Worktree, oder existiert im Projekt die Datei
-`.claude/git-worktree-model.json`? Dann konsultiere zuerst den Skill
-`parallel-sessions`.
+`reset`, `merge`), konsultiere zuerst den Skill `git-workbench`: Er
+klärt, in welcher Betriebsart diese Sitzung committet.
+
+## Zweigmodell des Projekts
+
+Will der Nutzer etwas in den Release bringen, einen Zweig anlegen oder
+zusammenführen oder eine zentrale Datei des Projekts ändern (die
+Projekt-CLAUDE.md, Editor- oder Werkzeugkonfiguration, `.gitignore`),
+konsultiere zuerst den Skill `git-branch-model`.
+
+Und bevor du in einer Sitzung zum ersten Mal ein schreibendes
+Git-Kommando ausführst (`commit`, `add`, `push`, `checkout`, `restore`,
+`reset`, `merge`), prüfe: Existiert im Projekt die Datei
+`.claude/git-branch-model.json`? Dann konsultiere zuerst den Skill
+`git-branch-model`.
 
 ## Markdown-Tabellen: Artefakte eines WYSIWYG-Editors
 
@@ -192,14 +204,6 @@ wie eine Nachlässigkeit aussieht.
   projekteigenen `CLAUDE.md` auch die von der Engine dort abgelegten
   Einstellungs- und Rechte-Dateien). Ist er nicht vorhanden, darf er
   angelegt werden.
-- Darin liegt `arbeitsdaten.json` für Angaben, die über das Sessionende
-  hinaus gemerkt werden müssen — etwa der Name des Hauptpfads (siehe 1.7).
-  Der Name ist bewusst deutsch, damit er nicht mit Dateien der Engine
-  kollidiert.
-- Der Ordner wird **mitversioniert**, `arbeitsdaten.json` eingeschlossen —
-  Grund: es wird zwischen mehreren Rechnern und remote gearbeitet. Beim
-  Schreiben in diesen Ordner ist daher jedes Mal zu prüfen, dass die
-  `.gitignore` die Datei nicht ausschließt.
 - Credentials gehören nicht in diesen Ordner. Sie auszuschließen ist Aufgabe
   des Nutzers; fällt beim Lesen dennoch etwas dergleichen auf, ist sofort
   darauf hinzuweisen.
@@ -251,91 +255,12 @@ wie eine Nachlässigkeit aussieht.
 ### 1.6 Ohne Rückfrage erlaubt / nie ohne Zustimmung [T39]
 
 - Erlaubt: Lesen, Suchen, Tests ausführen, kurzlaufende Analysen ohne
-  Seiteneffekte, Checkpoint-Commits auf der Werkbank nach 1.7.
+  Seiteneffekte, Commits nach dem Skill `git-workbench`.
 - Nie ohne Zustimmung: push, Pakete installieren oder aktualisieren,
   Container bauen, langlaufende Jobs starten (insbesondere GPU),
   Dateien löschen.
 - Einzelne Projekte können diese Freigaben verschärfen; die projekteigene
   `CLAUDE.md` hat dann Vorrang.
-
-### 1.7 Commits und Branches [T40]
-
-Die in diesem Kapitel beschriebene Verfahrensweise kann von alternativen
-Anweisungen im Projekt überschrieben werden und verliert damit ihre
-Gültigkeit.
-
-In Projekten mit `.claude/git-worktree-model.json` gilt stattdessen der
-Skill `parallel-sessions`; das Folgende gilt nur ohne diese Datei.
-
-#### Die zwei Branches
-
-- **Hauptpfad**: der vom Nutzer parallel zu `main`/`master` geführte
-  Entwicklungspfad der aktuellen, meist komplexeren Aufgabe. Sein Name ist
-  projektabhängig und wechselt im Laufe eines Projekts. Dort wird **nicht**
-  committet — einzige Ausnahme ist der Squash-Merge (siehe unten).
-- **Werkbank**: `claude-workbench`, in allen Projekten gleich benannt. Sie
-  gehört Claude und darf jederzeit selbst aus einem anderen Branch abgeleitet
-  werden.
-
-#### Vor jedem Wechsel auf die Werkbank
-
-1. `git fetch` und `git status`. Hängt das lokale Repo hinter dem Remote her:
-   **sofort melden und abbrechen** — es wird auch von anderen Rechnern und
-   remote per VSCode an denselben Projekten gearbeitet, das bereinigt der
-   Nutzer zuerst. Fehlt dem Zweig die Upstream-Verknüpfung, ist `git status`
-   als Prüfung untauglich: Es vergleicht nur gegen den Upstream und schweigt
-   sonst über unveröffentlichte Commits. Dann ist ausdrücklich gegen den
-   Remote-Zweig zu vergleichen (`git log --oneline origin/<zweig>..<zweig>`)
-   und die Verknüpfung anschließend zu setzen.
-2. Fragen, ob der gerade ausgecheckte Branch der Hauptpfad der aktuellen
-   Tätigkeit ist. Nicht annehmen — davon hängt alles Folgende ab.
-3. Prüfen, ob die Werkbank vor dem Hauptpfad liegt. Liegt sie das nicht, wird
-   sie auf dem neuen Stand neu initialisiert und erst dann gewechselt.
-4. Vor dem Neuinitialisieren prüfen, ob die Werkbank Commits enthält, die
-   nicht im Hauptpfad sind. Wenn ja: **anhalten, Lage schildern und fragen** —
-   mögliche Wege sind ein Rebase der Werkbank auf den neuen Stand, oder erst
-   den anstehenden Squash-Merge ausführen und danach neu initialisieren. Nur
-   wenn die Werkbank nichts Unverschmolzenes enthält, wird ohne Nachfrage neu
-   initialisiert.
-5. Beim Initialisieren den Namen des Hauptpfads in
-   `<projekt>/.claude/arbeitsdaten.json` hinterlegen (siehe 1.2) — nur so ist
-   er nach einem Sessionende noch bekannt.
-- Bevor die Werkbank auf den aktuellen Stand gebracht wird, committet der
-  **Nutzer** zuerst den Hauptpfad. Danach ist zu fragen, nicht anzunehmen.
-
-#### Checkpoint-Commits (nur auf der Werkbank)
-
-- Nach jedem zugestimmten und ausgeführten Schritt automatisch ein
-  Checkpoint-Commit, ohne erneute Nachfrage. Zweck: Missverständnisse, die
-  erst Schritte später auffallen, durch einfaches Zurücksetzen korrigierbar
-  machen.
-- Eigenständiges Zurückkehren auf einen früheren Stand ist ausschließlich auf
-  der Werkbank erlaubt, nie auf einem anderen Branch.
-- Doku-Anpassung und zugehörige Codeänderung immer im selben Commit.
-- Der Commit-Body benennt den Fahrplanpunkt bzw. den Plan des Schritts.
-- Größere Umstrukturierungen nur ausgehend von einem sauberen Stand
-  (kein uncommitteter Diff), damit sie per Diff prüfbar und rücknehmbar sind.
-
-#### Abschluss einer Aufgabe: Squash-Merge
-
-- Ist eine Aufgabe abgeschlossen, wird dem Nutzer die Übernahme in den
-  Hauptpfad vorgeschlagen.
-- Ausdrücklich als **Squash-Merge** (`git merge --squash` plus ein einzelner
-  Commit), nicht als Merge-Commit: Sonst gelangen die Checkpoint-Commits doch
-  in die Historie des Hauptpfads und machen dort unkenntlich, in welchem
-  Entwicklungszustand er jeweils war.
-- Den Commit-Text legt in der Regel der Nutzer fest; er ist vor der
-  Ausführung zu erfragen.
-- Nach dem Squash-Merge wird die Werkbank verworfen und frisch vom Hauptpfad
-  neu abgeleitet. (Nötig, weil ein Squash-Commit keine Elternschaft zur
-  Werkbank hat und Git sie danach als „nicht gemergt" führt.)
-- Das Neuableiten löscht die Upstream-Verknüpfung des Zweigs. Der erste Push
-  danach ist deshalb `git push -u origin <werkbank>`; ohne `-u` bleibt sie
-  verwaist, und `git status` kann anschließend nicht mehr melden, dass lokale
-  Commits nicht veröffentlicht sind — es meldet nur einen sauberen
-  Arbeitsbereich. Genau daran ist am 13. August 2026 eine ganze
-  Arbeitssitzung auf einem Rechner unbemerkt liegengeblieben, während auf dem
-  anderen weitergearbeitet wurde.
 
 ### 1.8 Wiederkehrende Kleinigkeiten [T41]
 
