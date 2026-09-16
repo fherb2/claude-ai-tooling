@@ -6,7 +6,7 @@ Aufbau: Kapitel 1 beschreibt die Quelldateien, Kapitel 2 ihre Verwandtschaft, Ka
 
 Erstellt am 22. August 2026. Die Nummern T1–T27 sind stabil: Ein Eintrag behält seine Nummer für immer, auch wenn er erledigt ist und nach Kapitel 6 wandert (analog zur Fahrplan-Nummerierungsregel des Repos). Jede Nummer kommt genau einmal vor — in Kapitel 4 oder in Kapitel 6.
 
-**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T29 und T30.
+**Verarbeitete Einträge stehen in Kapitel 6, nicht mehr hier in Kapitel 4.** Betroffen sind T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T29, T30 und T40.
 
 ## 1 Die Quelldateien
 
@@ -157,7 +157,7 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 **Fundstellen:** nur LOK.
 
-**Einordnung:** **[nicht abgedeckt]** — Kandidat für `parallel-sessions` ist es nicht (anderes Thema); denkbar als Mini-Baustein eines künftigen Git-Skills oder als Snippet.
+**Einordnung:** **[nicht abgedeckt]** — Kandidat für `git-branch-model` ist es nicht (anderes Thema); denkbar als Mini-Baustein eines künftigen Git-Skills oder als Snippet.
 
 #### T34 Projektwurzel aufgeräumt
 
@@ -169,11 +169,11 @@ Die Guards verhalten sich unterschiedlich, sobald `debug=None` übergeben wird (
 
 #### T35 Der Projektordner `.claude/`
 
-**Aussage:** `<projekt>/.claude/` darf angelegt werden; `arbeitsdaten.json` trägt sitzungsübergreifende Angaben (deutscher Name bewusst, gegen Kollision mit Engine-Dateien); der Ordner wird mitversioniert (Arbeit über mehrere Rechner), die `.gitignore` darf ihn nicht ausschließen; Credentials gehören nicht hinein, Funde werden sofort gemeldet; zwischen Rechnern zu teilende Berechtigungen gehören in `.claude/settings.json`, nicht in `settings.local.json` (Workspace-Trust, nicht-interaktiver Modus).
+**Aussage:** `<projekt>/.claude/` darf angelegt werden; der Ordner wird mitversioniert (Arbeit über mehrere Rechner), die `.gitignore` darf ihn nicht ausschließen; Credentials gehören nicht hinein, Funde werden sofort gemeldet; zwischen Rechnern zu teilende Berechtigungen gehören in `.claude/settings.json`, nicht in `settings.local.json` (Workspace-Trust, nicht-interaktiver Modus).
 
 **Fundstellen:** nur LOK (1.2).
 
-**Einordnung:** **[nicht abgedeckt]** — hängt an T40: `arbeitsdaten.json` dient dort dem Namen des Hauptpfads. Fällt T40, ist der Rest eigenständig tragfähig.
+**Einordnung:** **[nicht abgedeckt]** — der `arbeitsdaten.json`-Teil ist mit T40 entfallen (16. September 2026); der Rest ist eigenständig tragfähig.
 
 ### A Sprache und Kontextquellen — wieder geöffnet am 31. August 2026
 
@@ -223,11 +223,11 @@ Die Gruppe war mit T1, T3 und T4 geschlossen; die neuen Quelldateien tragen zwei
 
 #### T39 Ohne Rückfrage erlaubt / nie ohne Zustimmung
 
-**Aussage:** Erlaubt ohne Nachfrage: Lesen, Suchen, Tests, kurzlaufende Analysen ohne Seiteneffekte, Checkpoint-Commits auf der Werkbank (T40). Nie ohne Zustimmung: push, Pakete installieren/aktualisieren, Container bauen, langlaufende Jobs (insbesondere GPU), Dateien löschen. Projekte dürfen verschärfen.
+**Aussage:** Erlaubt ohne Nachfrage: Lesen, Suchen, Tests, kurzlaufende Analysen ohne Seiteneffekte, Commits nach dem Skill `git-workbench` (vormals T40). Nie ohne Zustimmung: push, Pakete installieren/aktualisieren, Container bauen, langlaufende Jobs (insbesondere GPU), Dateien löschen. Projekte dürfen verschärfen.
 
 **Fundstellen:** nur LOK (1.6).
 
-**Einordnung:** **[teilweise abgedeckt]** — `parallel-sessions` führt für Worktree-Projekte eigene, vorgehende Freigabestufen; die konkreten Listen hier gelten darüber hinaus und stehen nirgends sonst. Der Werkbank-Punkt hängt an T40.
+**Einordnung:** **[teilweise abgedeckt]** — `git-workbench` führt eigene, vorgehende Freigabestufen für das Committen; die konkreten Listen hier gelten darüber hinaus und stehen nirgends sonst.
 
 #### T41 Wiederkehrende Kleinigkeiten: Regel statt Rückfrage
 
@@ -236,16 +236,6 @@ Die Gruppe war mit T1, T3 und T4 geschlossen; die neuen Quelldateien tragen zwei
 **Fundstellen:** nur LOK (1.8).
 
 **Einordnung:** **[nicht abgedeckt]**.
-
-### J Git-Arbeitsmodell ohne Worktree-Vereinbarung
-
-#### T40 Commits und Branches: das Werkbank-Modell
-
-**Aussage:** Für Projekte ohne `.claude/git-worktree-model.json`: zwei Branches (Hauptpfad des Nutzers, Werkbank `claude-workbench` für Claude), fünf Prüfschritte vor jedem Wechsel auf die Werkbank (fetch/status, Hauptpfad erfragen, Vorsprung prüfen, Unverschmolzenes melden, Hauptpfadname in `arbeitsdaten.json`), Checkpoint-Commits nur auf der Werkbank, Abschluss als Squash-Merge mit anschließendem Neuableiten der Werkbank samt `push -u` (Upstream-Falle vom 13. August 2026).
-
-**Fundstellen:** nur LOK (1.7) — der mit Abstand längste Restposten.
-
-**Einordnung:** **[teilweise abgedeckt]** — in Worktree-Projekten vollständig durch `parallel-sessions` ersetzt, und die Datei sagt das selbst. Für Projekte **ohne** das Modell trägt der Skill nur die Schreibhoheits-Sofortregel; das Werkbank-Verfahren ist nirgends übernommen. Zu entscheiden: als zweiter Regelzweig in `parallel-sessions`, als eigener Skill — oder sterben lassen, wenn künftig jedes betroffene Projekt das Worktree-Modell bekommt.
 
 ### E Projektgedächtnis über Chat-Grenzen — wieder geöffnet am 31. August 2026
 
@@ -355,7 +345,6 @@ Derzeit leer. Die letzten Einträge (T21, T22) sind am 30./31. August 2026 gesch
 
 - **Projektmethodik-Block (T46–T50, T22):** Kandidat ist `software-dev-doc-fh` (Fahrplan-Schritt 5); die lokalen Werkzeug-Skills `konzept-segmentierung` und `konsistenzpruefung` setzen Teile bereits um. T42 und T50 bilden ein Paar und gehören zusammen gedacht.
 - **Archiv-Skill für importierte Chats (T44, T45):** In der Implementierungsdoku von `chat-export` (3.3) ist ein eigener Skill für das Durchsuchen eines vorhandenen Archivs bereits vorgesehen — T44/T45 sind sein Material.
-- **Werkbank-Modell (T40):** als zweiter Regelzweig von `parallel-sessions`, als eigener Skill — oder sterben lassen, wenn betroffene Projekte künftig das Worktree-Modell bekommen.
 - **Einzelposten (T31 LFS, T33 Heredoc, T43 Beleglage):** je klein; als Snippet oder Mini-Skill denkbar, Zuschnitt offen.
 
 ### 5.4 Offene Fragen an den Entwickler
@@ -629,3 +618,13 @@ Was bleibt, ist Arbeitsmodus eines einzelnen Projekts in einer bestimmten Lage �
 **Einordnung:** Der Eintrag wurde **geteilt**. Die Konfigurationsänderungen an Software und laufenden Systemkomponenten sind in den Skill gewandert und aus der `~/.claude/CLAUDE.md` entfernt. Die räumliche Grenze „keine Änderungen außerhalb der Projektwurzel" ist dort dagegen **geblieben** (Entscheidung des Entwicklers vom 15. September 2026): Sie gilt auch in Sitzungen, in denen der Skill nie auslöst, und beschreibt die Projektarbeit, nicht den Systemzugriff. Dieser Eintrag behält deshalb als einziger in Kapitel 6 eine **stehengebliebene Fundstelle**: die Projektwurzel-Zeile in LOK, §1.2. Das ist kein übersehener Rest.
 
 Der Schutzregel-Einwand dieses Eintrags — ein Skill werde nur wahrscheinlich geladen, eine Schutzregel müsse sicher greifen — ist beantwortet, nicht übergangen: Die `CLAUDE-snippet.md` des Skills trägt den Regelkern selbst und ist deshalb der längste Trigger des Repos; sie wirkt auch dann, wenn der Skill nicht geladen ist. Hinzu kommt, dass die Annahme, ein Skill sei nach einer Kompaktierung verloren, inzwischen widerlegt ist (`skill-dev-doc.md`, Kapitel 5.0).
+
+#### T40 Commits und Branches: das Werkbank-Modell
+
+**Verarbeitet:** Skills `git-workbench` und `git-branch-model`, 15./16. September 2026 (Fahrplanschritt 12) · Gruppe J (Git-Arbeitsmodell). Die Werkbank samt Absicherungs-Commits, Squash ohne `-a`, Neuableiten und `push -u` ist die Betriebsart `workbench` von `git-workbench`; die Push-Regel dort erfasst alle lokalen Zweige statt nur der Werkbank. Der „Hauptpfad" ist der Entwicklungszweig aus `.claude/git-branch-model.json` (`git-branch-model`) — der Skill fragt danach, statt ihn anzunehmen, wie es hier Prüfschritt 2 verlangte. Ersatzlos entfallen: `claude-workbench` als fester Name (jetzt `<prefix><topic>`), `arbeitsdaten.json` (der Wert hat mit der Modelldatei ein Zuhause) und die fünf Prüfschritte als eigene Liste (Fetch, Vorsprung und Unverschmolzenes stehen in den Regeln zu „Anlegen" und „Vorhandene Werkbank"). Die Passagen in `CLAUDE_lokal.md` (1.7, die `arbeitsdaten.json`-Punkte in 1.2, der Verweis in 1.6) und in der globalen CLAUDE.md sind am 16. September 2026 entfernt.
+
+**Aussage:** Für Projekte ohne `.claude/git-worktree-model.json`: zwei Branches (Hauptpfad des Nutzers, Werkbank `claude-workbench` für Claude), fünf Prüfschritte vor jedem Wechsel auf die Werkbank (fetch/status, Hauptpfad erfragen, Vorsprung prüfen, Unverschmolzenes melden, Hauptpfadname in `arbeitsdaten.json`), Checkpoint-Commits nur auf der Werkbank, Abschluss als Squash-Merge mit anschließendem Neuableiten der Werkbank samt `push -u` (Upstream-Falle vom 13. August 2026).
+
+**Fundstellen:** nur LOK (1.7) — der mit Abstand längste Restposten.
+
+**Einordnung:** **[teilweise abgedeckt]** — in Worktree-Projekten vollständig durch `parallel-sessions` ersetzt, und die Datei sagt das selbst. Für Projekte **ohne** das Modell trägt der Skill nur die Schreibhoheits-Sofortregel; das Werkbank-Verfahren ist nirgends übernommen. Zu entscheiden: als zweiter Regelzweig in `parallel-sessions`, als eigener Skill — oder sterben lassen, wenn künftig jedes betroffene Projekt das Worktree-Modell bekommt.
