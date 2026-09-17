@@ -1,6 +1,6 @@
 # Skills for Claude Code
 
-*Last updated: 2026-09-15*
+*Last updated: 2026-09-17*
 
 *[Deutsche Fassung](README.md)*
 
@@ -18,7 +18,7 @@ Reusable skills for Claude Code, claude.ai and Claude Desktop (Chat + Cowork), t
 | [`pedantic-text-editing/`](pedantic-text-editing/README.en.md)<br>✅☑ | **Text editing with fidelity to detail** — every change presented individually for approval, not a character changed outside the approved spots, and afterwards the proof through the diff. For texts whose wording is itself the product; not for source code or documentation accompanying software. |
 | [`temp-debug-code/`](temp-debug-code/README.en.md)<br>✅☑ | **Unambiguous marking of code added or changed for an ongoing debugging session only** — not for debug code meant to stay in the source permanently.                                                                                               |
 | [`in-depth-online-literature-research/`](in-depth-online-literature-research/README.en.md)<br>✅☑ | **Thorough source and literature research that does not give up too early** — systematic variation of search terms, channels and search levels, mandatory verification of every search summary, and instead of "nothing found" a report on the search paths still open. |
-| [`🚧_software-dev-doc-fh/`](🚧_software-dev-doc-fh/README.md) (in German) | **A documentation standard for planning before coding and for the running record of what was implemented** — what is being built, which decisions were taken and why this way and not another. Documentation accompanying a software project, as the basis for coding, for debugging and for the later closing and user documentation. |
+| [`🚧_software-design-doc/`](🚧_software-design-doc/README.md) (in German) | **A documentation standard for planning before coding and for the running record of what was implemented** — what is being built, which decisions were taken and why this way and not another. Documentation accompanying a software project, as the basis for coding, for debugging and for the later closing and user documentation. |
 | [`🚧_software-task-detection/`](🚧_software-task-detection/README.md) (in German) | **Recognizing that a request amounts to software to be written or changed** — even when it never uses words like "code" or "programming". So far an idea on record along with its measurements, not yet a skill.                                    |
 | [`🚧_translation-task/`](🚧_translation-task/README.md) (in German) | **Translation of documents whose content is close to software development** — README files, concept and implementation documents, guides. Not tied to one direction of translation. |
 | [`web-code-editing/`](web-code-editing/README.en.md)<br>✅☑ | **Editing code on claude.ai**: secure the sources completely (project knowledge sits as files under `/mnt/project/`), return changed files mechanically as downloads instead of re-dictating them, small changes as a before/replace scheme in the chat. For claude.ai only.                                                        |
