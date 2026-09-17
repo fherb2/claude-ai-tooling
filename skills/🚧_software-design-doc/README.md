@@ -1,14 +1,14 @@
-# 🚧 software-dev-doc-fh — Dokumentationsstandard für Planung und laufende Mitschrift
+# 🚧 software-design-doc — Projektbegleitende Softwaredokumentation mit Festlegungsregister
 
-*Stand: 2026-08-25*
+*Stand: 2026-09-17*
 
-**🚧 In Arbeit.** Einsetzbar, aber noch nicht abgenommen: Offen ist, wie die beiden Werkzeug-Skills dieses Standards eingebunden werden (siehe „Stand und Offenes" am Ende).
+**🚧 In Arbeit — Neuaufbau seit dem 2026-09-17.** Der Skill wird um drei Dinge erweitert, die der bisherige Standard nicht hatte: eine Ableitung, wann eine Festlegung bindet und wann sie zur Disposition steht (Härte × Lage); ein Register mit Marken in der Prosa; Dokumentrollen statt fester Segmentnummern. Die Implementierungsdoku dieses Umbaus liegt in [`doc/`](doc/1_overview.md), der Fahrplan in [`doc/work-plan.md`](doc/work-plan.md). Die `SKILL.md` und der übrige Text dieser README zeigen den Stand **vor** dem Umbau und werden in Fahrplanschritt 7 ersetzt.
 
 **Gibt einen Standard für die entwicklungsbegleitende Dokumentation vor** — für alles, was vor der Kodierung geplant und während der Umsetzung mitgeschrieben wird: was umgesetzt wird, welche Festlegungen getroffen wurden und, wo es nicht selbstverständlich ist, warum so und nicht anders.
 
 **Nicht** Gegenstand sind die Dokumentation im Quelltext (Kommentare, Docstrings) und die Anwenderdokumentation des fertigen Produkts. Beide haben andere Adressaten und andere Regeln; die Anwenderdokumentation entsteht später aus Segment 1 dieses Standards, ist aber nicht dasselbe.
 
-Das Kürzel `-fh` ist Absicht: Das ist die Arbeitsweise eines bestimmten Entwicklers, bewährt in mehreren Projekten, aber ohne Anspruch, für jeden zu passen. Wer anders arbeitet, schreibt einen eigenen Skill, statt diesen zu verbiegen.
+Der Skill hieß bis zum 2026-09-17 `software-dev-doc-fh`; das Kürzel bezeichnete die Arbeitsweise eines bestimmten Entwicklers. Mit dem Umbau auf Rollen, Register und Härteregeln ist er für jeden mit einem ähnlichen Ansatz nutzbar, und der Name folgt dem Fachbegriff für diese Dokumentart: ein Design Doc mit Kontext, Zielen, Randbedingungen, Entscheidungen und Detail bis zur Ausführung (Begründung in `doc/1_overview.md`, Abschnitt 1.1).
 
 ## Installation
 
@@ -16,10 +16,10 @@ Das Kürzel `-fh` ist Absicht: Das ist die Arbeitsweise eines bestimmten Entwick
 
    | Ort         | Pfad                                      | Gilt für                  |
    | ----------- | ----------------------------------------- | ------------------------- |
-   | Persönlich  | `~/.claude/skills/software-dev-doc-fh/`   | alle Projekte des Nutzers |
-   | Projekt     | `.claude/skills/software-dev-doc-fh/`     | nur dieses Projekt        |
+   | Persönlich  | `~/.claude/skills/software-design-doc/`   | alle Projekte des Nutzers |
+   | Projekt     | `.claude/skills/software-design-doc/`     | nur dieses Projekt        |
 
-2. **Ordner `software-dev-doc-fh/` unter seinem unveränderten Namen kopieren.** Er enthält `SKILL.md`, `CLAUDE-snippet.md` und diese `README.md`. Ein Sprachkürzel trägt bisher keine der Dateien, weil es nur die deutsche Fassung gibt.
+2. **Ordner `software-design-doc/` unter seinem unveränderten Namen kopieren.** Er enthält `SKILL.md`, `CLAUDE-snippet.md` und diese `README.md`. Ein Sprachkürzel trägt bisher keine der Dateien, weil es nur die deutsche Fassung gibt.
 
 3. **Stillen Trigger übernehmen.** Der Inhalt der `CLAUDE-snippet.md` **unterhalb der Trennlinie** kommt in die `CLAUDE.md` des Zielorts; die Snippet-Datei bleibt am Zielort liegen, wirksam ist allein die `CLAUDE.md`. Sein Wortlaut ist an eine Handlung gebunden („Bevor du in einer Sitzung zum ersten Mal einen Lösungsweg vorschlägst oder zum ersten Mal eine Datei änderst …") — dieser Anker darf beim Anpassen an ein Projekt verschoben, aber nicht weggelassen werden, sonst löst der Trigger nicht mehr aus.
 

@@ -1,6 +1,6 @@
 ---
-name: software-dev-doc-fh
-description: Dokumentationsstandard für Planung vor der Kodierung und für die laufende Mitschrift des Implementierten — was umgesetzt wird, welche Festlegungen getroffen wurden und warum so und nicht anders. Vier Phasen von der Findung bis zur Implementierung, dreigeteilte Segmentstruktur, Fahrplan und Status. Verwenden, sobald eine Software-Änderung über eine lokal begrenzte Korrektur hinausgeht, oder wenn der Nutzer /software-dev-doc-fh aufruft.
+name: software-design-doc
+description: Dokumentationsstandard für Planung vor der Kodierung und für die laufende Mitschrift des Implementierten — was umgesetzt wird, welche Festlegungen getroffen wurden und warum so und nicht anders. Vier Phasen von der Findung bis zur Implementierung, dreigeteilte Segmentstruktur, Fahrplan und Status. Verwenden, sobald eine Software-Änderung über eine lokal begrenzte Korrektur hinausgeht, oder wenn der Nutzer /software-design-doc aufruft.
 license: CC0-1.0
 ---
 
