@@ -8,11 +8,11 @@ Ein Skript `files/design-doc.py` im Skill-Ordner, aufgerufen über `${CLAUDE_SKI
 
 ### 3.6.2 Aufrufprinzip
 
-Ein Aufruf je Anker (Kapitel 3.1, Abschnitt 3.1.9), nicht mehrere. Jede Voraussetzung hat einen Default, wird gesucht, ihr Fehlen exakt gemeldet, und sie ist per Argument überschreibbar (Vorgabe 2.4). Kein Kommando ändert Prosa. Das Register ändern nur `supersede`, `retire`, `fp --update` und das Schreiben von Registerzeilen, das die Instanz nach freigegebenem Plan über `add` auslöst.
+Ein Aufruf je Anker (Kapitel 3.1, Abschnitt 3.1.9), nicht mehrere. Jede Voraussetzung hat einen Default, wird gesucht, ihr Fehlen exakt gemeldet, und sie ist per Script-Argument überschreibbar (Vorgabe 2.4). Kein Kommando ändert Prosa. Das Register ändern nur `supersede`, `retire`, `fp --update` und das Schreiben von Registerzeilen, das die Instanz nach freigegebenem Plan über `add` auslöst.
 
 ### 3.6.3 Ausgabevertrag
 
-Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. Sie ist zeilenorientiert, jede Zeile beginnt mit einer Klasse in Großbuchstaben, danach Felder in fester Reihenfolge, getrennt durch ` | `, jedes Feld als `key: value`; Werte enthalten keinen senkrechten Strich. Schlüssel sind englisch; Werte dürfen deutsche Prosa sein. Keine Erzählung, keine Farben, keine Symbole, kein Fortschrittslog. Zahlen sind Zahlen, nicht Wörter. Eine Ausgabe hat höchstens etwa vierzig Zeilen; wird gekürzt, sagt die letzte Zeile, wie viele fehlen und mit welchem Argument sie erscheinen.
+Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. Sie ist zeilenorientiert, jede Zeile beginnt mit einer Klasse in Großbuchstaben, danach Felder in fester Reihenfolge, getrennt durch ` | `, jedes Feld als `key: value`; Werte enthalten keinen senkrechten Strich. Schlüssel sind englisch; Werte dürfen deutsche Prosa sein. Keine Erzählung, keine Farben, keine Symbole, kein Fortschrittslog. Zahlen sind Zahlen, nicht Wörter. Eine Ausgabe hat höchstens etwa vierzig Zeilen; wird gekürzt, sagt die letzte Zeile, wie viele fehlen und mit welchem Script-Argument sie erscheinen.
 
 | Klasse | Bedeutung | Felder |
 |---|---|---|
@@ -20,7 +20,7 @@ Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. 
 | `ITEM` | ein Gegenstand einer Liste | kommandoabhängig, feste Reihenfolge |
 | `FINDING` | ein Befund | `subject`, `issue`, `proposal` |
 | `DECIDE` | eine Entscheidungsvorlage, die das Skript nicht mechanisch lösen kann | `subject`, `question`, `options`, `proposal` |
-| `FAILED` | Abbruch | `step`, `cause`, `state`, `remedy` — die Abhilfe nennt das exakte Argument |
+| `FAILED` | Abbruch | `step`, `cause`, `state`, `remedy` — die Abhilfe nennt das exakte Script-Argument |
 | `SUMMARY` | letzte Zeile jeder Ausgabe | `items`, `findings`, `decide` als Zahlen |
 
 Exit-Codes: 0 bei `OK` ohne Befunde, 1 bei Befunden oder Entscheidungsvorlagen, 2 bei `FAILED` und bei struktureller Inkonsistenz — der Code, mit dem der Commit-Hook blockiert (Kapitel 3.7). Mit `--json` erscheint dieselbe Information als JSON-Array; die Hooks nutzen es, um `additionalContext` zu füllen. Eine unbehandelte Ausnahme ist ein Defekt; die Prüffälle enthalten absichtlich kaputte Eingaben (fehlende Klammern, falsche Schlüsselwörter, U+00A0, Dubletten), für die eine `FAILED`- oder `FINDING`-Zeile erwartet wird.
@@ -38,7 +38,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 | `check [--summary]` | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marke ohne Eintrag, Eintrag ohne Definitionsmarke, mehrere Definitionsmarken, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette; mit `--summary` nur Zahlen | 0 keine, 1 Befunde, 2 strukturell |
 | `lint --file DATEI --changed` | Git-Diff der Datei | `FINDING` je geänderter Zeile mit Normativsignal ohne Marke und je neuer Marke ohne Eintrag | 0/1 |
 | `mentions ID [--code ORDNER]` | Doku, optional Code | `ITEM` je Vorkommen: Marke, Zitat, Suchschlüssel-Treffer, mit Datei und Zeile | 0 |
-| `hardness ID [--word fixed|open]` | Register, geplante Schritte, Parameter | `ITEM` mit Härte und zutreffender Bedingung in Prosa (R1–R7) | 0 |
+| `hardness ID [--word fixed|open]` | Register, geplante Schritte, Skill-Parameter | `ITEM` mit Härte und zutreffender Bedingung in Prosa (R1–R7) | 0 |
 | `impact --chapter DATEI \| --ids …` | Graph aus Marken, Nähe, Suchschlüsseln | `ITEM` je Kandidat: `id`, `why` (Definition, Mitzitat, gleicher Absatz, Suchschlüssel), `distance` | 0 |
 | `plan-section --ids …` | Register, Härte | Gerüst des Planabschnitts „Berührte Festlegungen" | 0 |
 | `explain ID` | wie `hardness` | ein Satz für den Entwickler, ohne Prüfungsnummer | 0 |
@@ -51,13 +51,15 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 
 **Knoten** sind Festlegungen. **Kanten** entstehen aus dem Text: zwei Festlegungen, die im selben Absatz genannt sind (Definition oder Zitat), im selben Abschnitt, in Nachbarabschnitten, im selben Kapitel; dazu Treffer der Suchschlüssel als Quelle außerhalb des Graphen. Vorschlag für die Gewichte: gleicher Absatz 0,8 · Mitzitat in einem Absatz mit Funktion `relate` 0,7 · gleicher Abschnitt 0,4 · Nachbarabschnitt 0,2 · gleiches Kapitel 0,05.
 
+Diese Gewichte und die Dämpfung heißen **Graphenparameter**: Sie parametrisieren den funktionalen Zusammenhang der Auswirkungsrechnung. Sie sind **keine Skill-Parameter** — sie stehen im Skill, entweder direkt im Modul oder in einer Datei des Skill-Ordners, nie in der Projektkonfiguration. Grund: Der Entwickler kann sie nicht beurteilen; ob eine Kante „gleicher Abschnitt" 0,4 oder 0,35 wiegt, ist keine Eigenschaft seines Projekts, sondern des Verfahrens. Sie ändern sich nach einer Messung (Kapitel 3.8) und dann für alle Projekte. Was ein Projekt davon einstellt, sind allein die zwei groben Griffe `impact_model` und sein Abbruchwert — eng oder weit, nicht einzelne Gewichte (Entscheidung des Entwicklers vom 2026-09-18).
+
 **Drei Kostenfunktionen**, austauschbar, damit die Probe sie vergleicht:
 
 1. **Additiv**: Kosten je Kante 1/w, Weglänge Σ Kosten, Abbruch bei `impact_cutoff` — ein Kürzeste-Wege-Problem; networkx rechnet es direkt mit `single_source_dijkstra_path_length(G, source, cutoff, weight=funktion)` (belegt, Doku 3.6.1).
 2. **Multiplikativ nach dem Vorschlag des Entwicklers**: Weglänge Σ(Hops) / Π(Gewichte); eine schwache Kante irgendwo im Pfad verunsichert die ganze Kette. Pfadabhängig, braucht eine eigene Suche; bei Graphen mit Hunderten Knoten unproblematisch.
 3. **Produkt mit Dämpfung**: Bewertung Π w × d^Hops mit d = 0,7, Abbruch unter einer Schwelle; entspricht dem Rechenmodell in Anhang B.
 
-`impact_model: hops` ist der Sonderfall, in dem nur Kanten ab 0,7 zählen und `impact_cutoff` die Tiefe ist. Das Rechenmodell (Anhang B) zeigt: Tiefe 1 bleibt in jeder Dokugröße bei einer Handvoll Kandidaten; Tiefe 2 wächst mit der Doku und liegt bei dreihundert Festlegungen im Median über zwanzig; die gewichtete Variante ist ein stetiger Regler zwischen beiden. Was das Modell nicht sagt: ob zusätzliche Kandidaten relevant sind — das misst die Probe.
+Der Skill-Parameter `impact_model: hops` ist der Sonderfall, in dem nur Kanten ab 0,7 zählen und `impact_cutoff` die Tiefe ist. Das Rechenmodell (Anhang B) zeigt: Tiefe 1 bleibt in jeder Dokugröße bei einer Handvoll Kandidaten; Tiefe 2 wächst mit der Doku und liegt bei dreihundert Festlegungen im Median über zwanzig; die gewichtete Variante ist ein stetiger Regler zwischen beiden. Was das Modell nicht sagt: ob zusätzliche Kandidaten relevant sind — das misst die Probe.
 
 ### 3.6.6 Der Lint
 

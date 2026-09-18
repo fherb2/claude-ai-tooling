@@ -4,7 +4,7 @@ Stand (2026-09-17): Entschieden sind der Begriff des geplanten Schritts und die 
 
 ### 3.4.1 Geplante Schritte
 
-Ein geplanter Schritt ist ein noch offener Schritt der Projektplanung — wo immer er steht: in einer Fahrplandatei, im Abschnitt „Offen" einer README, in einer Notiz. Der Skill setzt keine Fahrplandatei voraus. Er liest geplante Schritte aus Abschnitten mit der Rolle `plan` (Kapitel 3.3) und aus den Dateien, die der Parameter `planned_steps` nennt (Kapitel 3.5). Ein Schritt ist der Text unter einer Überschrift bis zur nächsten Überschrift gleicher oder höherer Ordnung. Erledigte Schritte verlassen die Planung; die Nummern der übrigen werden nicht neu vergeben, neue zählen hoch — ein Rückblick auf „Schritt n" bleibt so eindeutig.
+Ein geplanter Schritt ist ein noch offener Schritt der Projektplanung — wo immer er steht: in einer Fahrplandatei, im Abschnitt „Offen" einer README, in einer Notiz. Der Skill setzt keine Fahrplandatei voraus. Er liest geplante Schritte aus Abschnitten mit der Rolle `plan` (Kapitel 3.3) und aus den Dateien, die der Skill-Parameter `planned_steps` nennt (Kapitel 3.5). Ein Schritt ist der Text unter einer Überschrift bis zur nächsten Überschrift gleicher oder höherer Ordnung. Erledigte Schritte verlassen die Planung; die Nummern der übrigen werden nicht neu vergeben, neue zählen hoch — ein Rückblick auf „Schritt n" bleibt so eindeutig.
 
 ### 3.4.2 Umbauziel
 

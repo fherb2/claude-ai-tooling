@@ -26,7 +26,7 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-14 | Kennungen für Schritte | 3.4.4 | klein | 2 |
 | Q-15 | Wann bei fehlender Doku gefragt wird | `3_5_startup_parameters.md`, 3.5.5 | mittel | 3 |
 | Q-16 | Standardwert von `mode` | 3.5.5 | mittel | 3 |
-| Q-17 | `layout` als Parameter | 3.5.5 | klein | 3 |
+| Q-17 | `layout` als Skill-Parameter | 3.5.5 | klein | 3 |
 | Q-18 | `impact_cutoff` ein oder zwei Felder | 3.5.5 | klein | 3 |
 | Q-19 | Repositories mit mehreren Vorhaben | 3.5.5 | mittel | 3 |
 | Q-20 | Graphenmodell (gesondert) | `3_6_script.md`, 3.6.9 | groß | 5 |
@@ -55,7 +55,7 @@ Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schri
 
 ## 3 Regelteil Skillstart
 
-Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Parameterdatei, `mode: off`, „Doku wächst an Festlegungen". Hängt an: Schritt 1; Q-07, Q-15 bis Q-19. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
+Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterdatei, `mode: off`, „Doku wächst an Festlegungen". Hängt an: Schritt 1; Q-07, Q-15 bis Q-19. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
 
 ## 4 Skript Stufe 1
 
@@ -71,7 +71,7 @@ H1 bis H3 nach Kapitel 3.7: Frontmatter-Einbindung, Pfadauflösung prüfen, Zeit
 
 ## 7 Skill zusammensetzen
 
-Dünne `SKILL.md` (Lage, Parameter, Nachladen, Frontmatter-Hooks), `standard.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.8, Regelteile aus Schritt 1 bis 3, `rules-hardness.md` aus Kapitel 3.1, `CLAUDE-snippet.md` mit dem geankerten Trigger, README in beiden Sprachen, Datumszeilen. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
+Dünne `SKILL.md` (Lage, Skill-Parameter, Nachladen, Frontmatter-Hooks), `standard.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.8, Regelteile aus Schritt 1 bis 3, `rules-hardness.md` aus Kapitel 3.1, `CLAUDE-snippet.md` mit dem geankerten Trigger, README in beiden Sprachen, Datumszeilen. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
 
 ## 8 Probe
 

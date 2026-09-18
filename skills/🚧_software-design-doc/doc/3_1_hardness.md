@@ -29,10 +29,10 @@ Die entwicklungsbegleitende Doku hält Festlegungen fest. Ob eine Festlegung in 
 | Ereigniszeile | datierte Zeile im Register zur Festlegung | `friction` — Arbeit musste um die Festlegung herum gebaut werden · `upheld` — gegen eine Idee oder einen Befund geprüft und bestätigt · `pending` — eine Frage an den Entwickler ist offen |
 | geplanter Schritt | noch offener Schritt der Projektplanung, wo immer er steht (Fahrplandatei, Abschnitt „Offen" einer README, Notiz); eine Fahrplandatei wird nicht vorausgesetzt | nennt sein Umbauziel: IDs oder ein Kapitel (Kapitel 3.4) |
 | `mode` | wie die Sitzung die Doku liest | `execute` — Beschlossenes umsetzen · `design` — etwas neu denken, Alternativen suchen |
-| `friction_threshold` | Zahl der `friction`-Zeilen, ab der eine Festlegung `open` wird | Parameter, Standard 2; für Festlegungen aus Abschnitten mit der Funktion `global` gilt eine Stufe höher (Standard 3) |
+| `friction_threshold` | Zahl der `friction`-Zeilen, ab der eine Festlegung `open` wird | Skill-Parameter, Standard 2; für Festlegungen aus Abschnitten mit der Funktion `global` gilt eine Stufe höher (Standard 3) |
 | `assumptions_on_approval` | was die Freigabe eines Plans mit den darin gelisteten Annahmen tut | `accept` (Standard) — sie werden `accepted` · `keep` — sie bleiben `assumed` |
 
-Beide Parameter wohnen in der Parameterdatei (Kapitel 3.5). Fehlen sie, gilt der Standard.
+Beide sind Skill-Parameter und wohnen in der Skill-Parameterdatei (Kapitel 3.5). Fehlen sie, gilt der Standard.
 
 ### 3.1.3 Schritt 1 — Kontakt und Vollständigkeit
 
@@ -91,7 +91,7 @@ Jeder Plan trägt diesen Abschnitt. Er ist der Zwischenspeicher aller Annahmen b
 
 **Je Eintrag:** ID (oder Wortlaut, wenn noch keine ID existiert), Kapitel, `kind`, `reason` oder Quelle, `status`, abgeleitete Härte mit der zutreffenden Bedingung in Prosa, und — bei Kollision — der geparkte Satz. Bei `pending` die Frage in Prosa.
 
-**Freigabesatz.** Bei `assumptions_on_approval: accept` steht im Abschnitt: „Die Freigabe dieses Plans bestätigt die hier gelisteten Annahmen, soweit der Entwickler nichts anderes sagt." Bei `keep` fehlt der Satz. Das Wort des Entwicklers je Plan schlägt den Parameter: „nur ablegen" → dieser Plan wie `keep`; „gilt als bestätigt" → wie `accept`.
+**Freigabesatz.** Bei `assumptions_on_approval: accept` steht im Abschnitt: „Die Freigabe dieses Plans bestätigt die hier gelisteten Annahmen, soweit der Entwickler nichts anderes sagt." Bei `keep` fehlt der Satz. Das Wort des Entwicklers je Plan schlägt den Skill-Parameter: „nur ablegen" → dieser Plan wie `keep`; „gilt als bestätigt" → wie `accept`.
 
 **Korrektur in Prosa.** Sagt der Entwickler etwas zu einem Eintrag („das ist eine Hardwaregrenze", „das haben wir wegen der Latenz so entschieden"), übersetzst Du das in die Attribute und zeigst die Zuordnung, bevor Du schreibst.
 
