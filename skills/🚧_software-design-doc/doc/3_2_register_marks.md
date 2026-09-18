@@ -63,7 +63,7 @@ Was alt ist, darf nicht unmarkiert in der Prosa stehen — denn genau der unmark
 | abgelöste Festlegung (`superseded`) | war bindend, ist durch eine neue ersetzt | Registereintrag bleibt mit Datum und Nachfolger | der normative Satz wird umgeschrieben oder gestrichen; bleibt er als Begründung stehen, trägt er die Marke der abgelösten ID und ist so maschinell als Geschichte erkennbar |
 | Historie (alte Reviews, Verlauf) | Beurteilungsmaterial | Anhang, Rolle `appendix` | nichts Neues |
 
-Weil IDs stabil sind und das Register den Nachfolger kennt, löst sich jeder alte Verweis weiter auf; niemand muss quer durchs Projekt suchen, bevor er weiterarbeiten darf. Die Grenze zwischen Kapiteln und Anhang aus dem bisherigen Standard bleibt unberührt: In die Prosa kommt nichts Neues; die verworfene Alternative steht dort, wo sie schon immer stand — in der Argumentation — oder als eine Zeile im Register.
+Weil IDs stabil sind und das Register den Nachfolger kennt, löst sich jeder alte Verweis weiter auf; niemand muss quer durchs Projekt suchen, bevor er weiterarbeiten darf. Die Grenze zwischen Kapiteln und Anhang aus dem Vorläufer (Anhang A, Abschnitt A.9) bleibt unberührt: In die Prosa kommt nichts Neues; die verworfene Alternative steht dort, wo sie schon immer stand — in der Argumentation — oder als eine Zeile im Register.
 
 ### 3.2.7 Nachmarkierung einer bestehenden Doku
 

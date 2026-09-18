@@ -48,7 +48,7 @@ Dazu Rollen, die arc42 nicht kennt, weil es Architektur beschreibt und nicht Pro
 | `plan` | `target:`-Zeilen werden gelesen (Kapitel 3.4) |
 | `register` | Registergrammatik gilt (Kapitel 3.2) |
 
-Erweiterbar, indem der Regelteil eine neue Rolle mit ihrer Funktion definiert. Die Funktion `nonbinding` für `concept` löst ein Problem, das der bisherige Standard nicht adressierte: Findungstexte neben der bindenden Doku, die die Instanz genauso als Gesetz las.
+Erweiterbar, indem der Regelteil eine neue Rolle mit ihrer Funktion definiert. Die Funktion `nonbinding` für `concept` löst ein Problem, das der Vorläufer (Anhang A) nicht adressierte: Findungstexte neben der bindenden Doku, die die Instanz genauso als Gesetz las.
 
 ### 3.3.4 Das Dreiersschema des Vorläufers als Rollensatz
 
@@ -61,7 +61,7 @@ Geprüft am 2026-09-17: arc42 (belegt: zwölf Abschnitte, Lizenz, deutsche Fassu
 ### 3.3.6 Entscheidungsgrundlagen
 
 > **[Q-08] Entscheidungsgrundlage — Umfang des Rollensatzes**
-> Kontext: arc42 hat zwölf Abschnitte. Alle als Rollen anzubieten ist vollständig, aber für kleine Projekte viel; ein Kern deckt die drei alten Segmente ab und lässt den Rest als Erweiterung.
+> Kontext: arc42 hat zwölf Abschnitte. Alle als Rollen anzubieten ist vollständig, aber für kleine Projekte viel; ein Kern deckt die drei Segmente des Vorläufers (Anhang A) ab und lässt den Rest als Erweiterung.
 > Optionen: (a) alle zwölf plus die fünf Projektrollen; (b) ein Kern — `goals`, `constraints`, `context`, `strategy`, `building-blocks`, `runtime`, `crosscutting` — plus Projektrollen, der Rest wird bei Bedarf ergänzt; (c) nur die drei alten Segmente als Rollen (`relations`, `rules`, `units`) und die arc42-Namen als Empfehlung im Regeltext.
 > Vorschlag: (a) — die Tabelle kostet nichts, und ein Projekt benutzt, was es braucht; die Funktion jeder Rolle ist ohnehin einer von sechs Werten.
 > Gewicht: groß · Blockiert: Fahrplanschritt 1

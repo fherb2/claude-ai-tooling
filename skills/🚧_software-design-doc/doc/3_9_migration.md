@@ -4,7 +4,7 @@ Stand (2026-09-17): Vorschlag; jede Passage der Anweisungsdateien wird beim Umzu
 
 ### 3.9.1 Umzug aus der globalen Anweisungsdatei (früher T1)
 
-Abschnitt 2 der globalen `~/.claude/CLAUDE.md` (2.1 Phasen bis 2.6 Fahrplan und Status) ist der Sache nach dieser Skill. Er wandert in den Regelteil `standard.md`, angepasst nach Kapitel 1.8: Segmente als empfohlene Rollen, Phasen je Bereich, Planungsort nach Kapitel 3.4. In der Anweisungsdatei bleiben der geankerte Trigger aus `CLAUDE-snippet.md` und die Abgrenzung der Präambel, wann der Abschnitt überhaupt gilt. Anzupassen ist außerdem 1.9 Kontext-Haushalt: „Detaillierung des Fahrplans vor der Komprimierung" wird zu „Planung an ihrem Ort vertiefen und im Schritt darauf verweisen".
+Abschnitt 2 der globalen `~/.claude/CLAUDE.md` (2.1 Phasen bis 2.6 Fahrplan und Status) ist der Sache nach dieser Skill; sein Inhalt ist der des Vorläufers (Anhang A). Er wandert in den Regelteil `standard.md`, angepasst nach Kapitel 1.8: Segmente als empfohlene Rollen, Phasen je Bereich, Planungsort nach Kapitel 3.4. In der Anweisungsdatei bleiben der geankerte Trigger aus `CLAUDE-snippet.md` und die Abgrenzung der Präambel, wann der Abschnitt überhaupt gilt. Anzupassen ist außerdem 1.9 Kontext-Haushalt: „Detaillierung des Fahrplans vor der Komprimierung" wird zu „Planung an ihrem Ort vertiefen und im Schritt darauf verweisen".
 
 Die Doppelungen in der Projekt-`CLAUDE.md` dieses Repositories — „Wo ein Plan steht", „Fahrplan-Nummerierung", „`work-plan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich" — werden auf das reduziert, was repositoryspezifisch ist. Für jede Fundstelle gilt danach die Probe: Sie nennt den Fahrplan, oder sie beschreibt ihn — beides zugleich darf keine mehr.
 
