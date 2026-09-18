@@ -12,10 +12,10 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 |---|---|---|---|---|
 | Q-01 | Wortlaut der Vorgaben 2.5–2.7 | `2_rules.md`, vor 2.8 | mittel | 4 |
 | Q-02 | Ereigniszeile `upheld` | `3_1_hardness.md`, Anfang | klein | 1 |
-| Q-03 | Marke vor oder nach Satzzeichen | `3_2_register_marks.md`, 3.2.10 | klein | 1 |
+| Q-03 | Marker vor oder nach Satzzeichen | `3_2_register_marks.md`, 3.2.10 | klein | 1 |
 | Q-04 | Fingerabdruck: ob und wie | 3.2.10 | mittel | 5 |
 | Q-05 | Suchschlüssel | 3.2.10 | mittel | 1 |
-| Q-06 | Zitatmarken außerhalb `relate` | 3.2.10 | klein | — |
+| Q-06 | Zitatmarker außerhalb `relate` | 3.2.10 | klein | — |
 | Q-07 | Rückfalloption Wortlaut-Anker | 3.2.10 | klein | 3 |
 | Q-08 | Umfang des Rollensatzes | `3_3_document_roles.md`, 3.3.6 | groß | 1 |
 | Q-09 | Rolle `decisions` | 3.3.6 | mittel | 1 |
@@ -45,9 +45,9 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 
 Vor Schritt 1 zu klären: Q-02, Q-03, Q-05, Q-08 bis Q-11. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-07, Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
 
-## 1 Regelteil Marken und Register
+## 1 Regelteil Marker und Register
 
-Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markenformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Ergebnis: Entwurf im Chat, danach Datei im Skill-Ordner. Hängt an: Q-02, Q-03, Q-05, Q-08 bis Q-11. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
+Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Ergebnis: Entwurf im Chat, danach Datei im Skill-Ordner. Hängt an: Q-02, Q-03, Q-05, Q-08 bis Q-11. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
 
 ## 2 Regelteil Planung
 
@@ -59,7 +59,7 @@ Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterd
 
 ## 4 Skript Stufe 1
 
-`files/design-doc.py` mit `list`, `show`, `next-id`, `add`, `check`, `mentions`, `hardness`, `impact --hops`, `plan-section`, `explain`; Ausgabevertrag nach Kapitel 3.6; Prüffälle mit Fixture und beschädigten Varianten. Hängt an: Schritt 1 und 2 (für `target:`). Aufwand: 3 bis 4 Sitzungen. Fehleranfälligkeit hoch: Parsing-Ränder (U+00A0, Klammern in Prosa, umbrochenes Layout), Kapitelableitung bei verschobenen Marken. Vor dem ersten Code den Skill `common-code-generation` laden.
+`files/design-doc.py` mit `list`, `show`, `next-id`, `add`, `check`, `mentions`, `hardness`, `impact --hops`, `plan-section`, `explain`; Ausgabevertrag nach Kapitel 3.6; Prüffälle mit Fixture und beschädigten Varianten. Hängt an: Schritt 1 und 2 (für `target:`). Aufwand: 3 bis 4 Sitzungen. Fehleranfälligkeit hoch: Parsing-Ränder (U+00A0, Klammern in Prosa, umbrochenes Layout), Kapitelableitung bei verschobenen Markern. Vor dem ersten Code den Skill `common-code-generation` laden.
 
 ## 5 Skript Stufe 2
 
@@ -71,11 +71,11 @@ H1 bis H3 nach Kapitel 3.7: Frontmatter-Einbindung, Pfadauflösung prüfen, Zeit
 
 ## 7 Skill zusammensetzen
 
-Dünne `SKILL.md` (Lage, Skill-Parameter, Nachladen, Frontmatter-Hooks), `standard.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.8, Regelteile aus Schritt 1 bis 3, `rules-hardness.md` aus Kapitel 3.1, `CLAUDE-snippet.md` mit dem geankerten Trigger, README in beiden Sprachen, Datumszeilen. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
+Dünne `SKILL.md` (Lage, Skill-Parameter, Nachladen, Frontmatter-Hooks), `standard.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.9, Regelteile aus Schritt 1 bis 3, `rules-hardness.md` aus Kapitel 3.1, `CLAUDE-snippet.md` mit dem geankerten Trigger, README in beiden Sprachen, Datumszeilen. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
 
 ## 8 Probe
 
-Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Kostenfunktion, Fingerabdruck, H3, Zitatmarken außerhalb `relate`); zweiter Durchlauf an einer echten Doku empfohlen. Hängt an: Schritt 4 bis 7; Q-28. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Die Fixture ist nicht die Doku des Entwicklers.
+Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Kostenfunktion, Fingerabdruck, H3, Zitatmarker außerhalb `relate`); zweiter Durchlauf an einer echten Doku empfohlen. Hängt an: Schritt 4 bis 7; Q-28. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Die Fixture ist nicht die Doku des Entwicklers.
 
 ## 9 Migration und Installation
 

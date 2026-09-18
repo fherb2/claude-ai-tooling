@@ -16,7 +16,7 @@ Anlass war die Überlegung, die Härteableitung durch eine Fuzzy-Inferenz in ein
 
 ## B.2 Vorhandene Werkzeuge für IDs, Register und Lebenszyklus (2026-09-17)
 
-Kein Werkzeug leistet die Kombination aus Prosa mit Inline-Marken, Attributregister, Härtelebenszyklus und Pflege durch den Agenten. Jede Komponente existiert einzeln:
+Kein Werkzeug leistet die Kombination aus Prosa mit Inline-Markern, Attributregister, Härtelebenszyklus und Pflege durch den Agenten. Jede Komponente existiert einzeln:
 
 | Werkzeug | Was es vormacht | Was ihm für dieses Vorhaben fehlt | Status |
 |---|---|---|---|

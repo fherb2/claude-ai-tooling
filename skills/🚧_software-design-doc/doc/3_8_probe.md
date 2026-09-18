@@ -4,11 +4,11 @@ Stand (2026-09-17): Vorschlag; die Messgrößen und Schwellen sind vom Entwickle
 
 ### 3.8.1 Zweck
 
-Die logische und codetechnische Seite des Vorhabens gilt als durchdrungen; was bleibt, ist empirisch und durch Nachdenken nicht zu klären: ob die Instanz die Marken in der Praxis setzt, ob sie Kollisionen parkt statt abzuschießen, wie hoch die Fehlalarmquote des Lints ist, wie lang die Kandidatenlisten werden und was der Skill an Kontext kostet. Die Probe ist das Tor vor der Migration (Kapitel 3.9): Scheitert sie an Marken oder Parken, ist das Design falsch; scheitert sie an Kandidaten oder Lint, werden Skill-Parameter und Graphenparameter justiert.
+Die logische und codetechnische Seite des Vorhabens gilt als durchdrungen; was bleibt, ist empirisch und durch Nachdenken nicht zu klären: ob die Instanz die Marker in der Praxis setzt, ob sie Kollisionen parkt statt abzuschießen, wie hoch die Fehlalarmquote des Lints ist, wie lang die Kandidatenlisten werden und was der Skill an Kontext kostet. Die Probe ist das Tor vor der Migration (Kapitel 3.9): Scheitert sie am Setzen der Marker oder am Parken, ist das Design falsch; scheitert sie an Kandidaten oder Lint, werden Skill-Parameter und Graphenparameter justiert.
 
 ### 3.8.2 Fixture
 
-Eine kleine Doku im Dreiersschema des Vorläufers (Anhang A) mit Rollen: ein Kapitel `relate` mit drei Absätzen und Zitatmarken, zwei Kapitel `building-blocks`, ein Abschnitt `crosscutting`, acht bis zehn Festlegungen — darunter zwei `given`, eine `pinned`, eine mit zwei `friction`-Zeilen, eine `superseded` —, drei geplante Schritte, einer mit `target:`, eine Skill-Parameterdatei mit Standardwerten, ein Code-Ordner mit ID-Kommentaren für `mentions`. Dazu beschädigte Varianten für die Prüffälle (Kapitel 3.6).
+Eine kleine Doku im Dreiersschema des Vorläufers (Anhang A) mit Rollen: ein Kapitel `relate` mit drei Absätzen und Zitatmarker, zwei Kapitel `building-blocks`, ein Abschnitt `crosscutting`, acht bis zehn Festlegungen — darunter zwei `given`, eine `pinned`, eine mit zwei `friction`-Zeilen, eine `superseded` —, drei geplante Schritte, einer mit `target:`, eine Skill-Parameterdatei mit Standardwerten, ein Code-Ordner mit ID-Kommentaren für `mentions`. Dazu beschädigte Varianten für die Prüffälle (Kapitel 3.6).
 
 ### 3.8.3 Ablauf
 
@@ -18,7 +18,7 @@ Je eine Sitzung in der Lage `execute` (ein geplanter Schritt, der zwei Festlegun
 
 | Messgröße | Schwelle für „weiter" |
 |---|---|
-| Marken bei Kontakt gesetzt, ohne Erinnerung durch H1 | mindestens 80 %; mit H1 100 % |
+| Marker bei Kontakt gesetzt, ohne Erinnerung durch H1 | mindestens 80 %; mit H1 100 % |
 | Fehlalarme des Lints | höchstens einer je zehn Doku-Edits |
 | Kandidatenliste `execute` / `design`, Median | höchstens 8 / höchstens 20; die Instanz verwirft mindestens die Hälfte nicht als irrelevant |
 | Parken statt Abschuss in `design` | jede Kollision mit `decided` wird geparkt, keine als Ablehnung formuliert |
@@ -35,7 +35,7 @@ Je eine Sitzung in der Lage `execute` (ein geplanter Schritt, der zwei Festlegun
 
 ### 3.8.5 Entscheidungstor
 
-Marken- oder Park-Schwelle verfehlt → zurück zu Kapitel 3.1 und 3.2, nicht weiter zu Kapitel 3.9. Kandidaten- oder Lint-Schwelle verfehlt → Skill-Parameter und Graphenparameter justieren, Probe wiederholen. Alle Schwellen erreicht → Entscheidung der Verzweigungen (Kostenfunktion, Fingerabdruck, H3, Zitatmarken außerhalb `relate`) und Freigabe der Migration.
+Marker- oder Park-Schwelle verfehlt → zurück zu Kapitel 3.1 und 3.2, nicht weiter zu Kapitel 3.9. Kandidaten- oder Lint-Schwelle verfehlt → Skill-Parameter und Graphenparameter justieren, Probe wiederholen. Alle Schwellen erreicht → Entscheidung der Verzweigungen (Kostenfunktion, Fingerabdruck, H3, Zitatmarker außerhalb `relate`) und Freigabe der Migration.
 
 ### 3.8.6 Was das Rechenmodell vorab sagt
 

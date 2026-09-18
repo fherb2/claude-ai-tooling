@@ -34,7 +34,7 @@ Pfadauflösung: ob `${CLAUDE_SKILL_DIR}` im Kommando eines Frontmatter-Hooks auf
 ### 3.7.5 Entscheidungsgrundlagen
 
 > **[Q-26] Entscheidungsgrundlage — H2 blockiert den Commit oder meldet nur**
-> Kontext: H2 blockiert bei struktureller Inkonsistenz (Dublette, Marke ohne Eintrag, `superseded` ohne Ziel). Das ist der einzige blockierende Eingriff des Skills. Eine Blockade ist wirksam, aber im falschen Moment lästig; ohne sie bleibt die Inkonsistenz im Repository.
+> Kontext: H2 blockiert bei struktureller Inkonsistenz (Dublette, Marker ohne Eintrag, `superseded` ohne Ziel). Das ist der einzige blockierende Eingriff des Skills. Eine Blockade ist wirksam, aber im falschen Moment lästig; ohne sie bleibt die Inkonsistenz im Repository.
 > Optionen: (a) blockieren bei struktureller Inkonsistenz, melden bei allem anderen; (b) nur melden, nie blockieren; (c) blockieren, aber per Wort des Entwicklers für einen Commit aufhebbar.
 > Vorschlag: (a) — (c) ist ohnehin gegeben, weil der Entwickler den Hook im Projekt abschalten kann.
 > Gewicht: mittel · Blockiert: Fahrplanschritt 6

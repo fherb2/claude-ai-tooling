@@ -8,13 +8,13 @@ Schlüsselwörter, Feldnamen, Rollen, Kommandos, Script-Argumente, Skill-Paramet
 
 ## 2.2 Die sieben Bedingungen
 
-Diese sieben Bedingungen halten das Vorhaben auf der Größe „ein Skill, ein Skript". Wird auch nur eine von ihnen fallen gelassen, würde es zurückwachsen: zu dem großen Softwareprojekt, das Kapitel 1.7 ausschließt — einer Editor-Erweiterung für maschinell unterstützte Softwareplanung. Jede Bedingung nennt deshalb, was ohne sie nötig würde.
+Diese sieben Bedingungen halten das Vorhaben auf der Größe „ein Skill, ein Skript". Wird auch nur eine von ihnen fallen gelassen, würde es zurückwachsen: zu dem großen Softwareprojekt, das Kapitel 1.8 ausschließt — einer Editor-Erweiterung für maschinell unterstützte Softwareplanung. Jede Bedingung nennt deshalb, was ohne sie nötig würde.
 
-1. **Marke pflichtig am Definitionsort und dort, wo Text Fakten aus verschiedenen Definitionsorten in Beziehung setzt** (Rolle mit Funktion `relate`, Kapitel 3.3); sonst optional — ohne diese Grenze müsste jede Erwähnung eines Fakts markiert und bei jeder Änderung nachgeführt werden, und das ist ohne Werkzeugunterstützung im Editor nicht zu leisten.
+1. **Marker pflichtig am Definitionsort und dort, wo Text Fakten aus verschiedenen Definitionsorten in Beziehung setzt** (Rolle mit Funktion `relate`, Kapitel 3.3); sonst optional — ohne diese Grenze müsste jede Erwähnung eines Fakts markiert und bei jeder Änderung nachgeführt werden, und das ist ohne Werkzeugunterstützung im Editor nicht zu leisten.
 2. **Kapitel dürfen umnummeriert werden.** Nichts, was der Skill maschinell liest, hängt an einer Kapitelnummer oder einem Titel; IDs tragen kein Kapitel (Kapitel 3.2) — sonst zöge jedes Einfügen und Umsortieren eine Neuvergabe von Adressen über das ganze Dokument nach sich.
-3. **Auswirkungskandidaten kommen aus dem Graphen** der Marken und aus Suchschlüsseln — Nähe im Text, Hops, Gewichte —, nie aus semantischer Suche (Kapitel 3.6) — sonst braucht das Vorhaben Einbettungen, ein Modell und einen Index, also eine eigene Infrastruktur je Projekt.
+3. **Auswirkungskandidaten kommen aus dem Graphen** der Marker und aus Suchschlüsseln — Nähe im Text, Hops, Gewichte —, nie aus semantischer Suche (Kapitel 3.6) — sonst braucht das Vorhaben Einbettungen, ein Modell und einen Index, also eine eigene Infrastruktur je Projekt.
 4. **Struktur wird durch Hook und Lint auf dem Diff erzwungen**, nicht durch Erinnerung der Instanz (Kapitel 3.7) — sonst hinge die Vollständigkeit des Registers an einer Eigenschaft, von der Kapitel 1.2 belegt, dass sie nicht trägt.
-5. **Änderungen werden über Erwähnungslisten und Fingerabdruck propagiert**, nicht über Vollabdeckung jeder Erwähnung mit Marken — sonst gilt für jede Änderung, was Bedingung 1 für das Schreiben ausschließt.
+5. **Änderungen werden über Erwähnungslisten und Fingerabdruck propagiert**, nicht über Vollabdeckung jeder Erwähnung mit Markern — sonst gilt für jede Änderung, was Bedingung 1 für das Schreiben ausschließt.
 6. **Kein automatisches Umschreiben von Prosa.** Das Skript listet, die Instanz schlägt im Plan vor, der Entwickler gibt frei — sonst bräuchte es eine verlässliche Texttransformation samt Vorschau und Rücknahme, und der Entwickler verlöre die Hoheit über seine Doku.
 7. **Keine Oberfläche; keine Einbettung fremder Werkzeuge.** Ideen werden übernommen, Programme nicht — sonst entstehen eine Editor-Erweiterung mit eigenem Lebenszyklus und eine Laufzeitabhängigkeit in jedem Zielprojekt.
 
@@ -22,7 +22,7 @@ Diese sieben Bedingungen halten das Vorhaben auf der Größe „ein Skill, ein S
 
 Was ein Abschnitt für den Skill bedeutet, sagt eine Rolle am Abschnitt (Kapitel 3.3). Kein Regelteil, kein Skript und kein Hook darf eine Funktion an eine Kapitelnummer, einen Dateinamen, ein Nummernpräfix oder einen Titel binden. Das Dreiersschema des Vorläufers (Anhang A) ist eine Empfehlung, die als Rollensatz ausgedrückt wird.
 
-Im Dokument des Entwicklers stehen vom Skill nur Adressen: Marken an Festlegungen und Rollen an Überschriften. Keine Skill-Logik, kein Attribut, kein Zustand steht dort; was eine Marke oder eine Rolle bedeutet, steht ausschließlich im Register beziehungsweise im Skill. Prüfbar: Jede Zeile im Dokument, aus der ohne Register oder Skill eine Wirkung des Skills folgen würde, ist ein Verstoß.
+Im Dokument des Entwicklers stehen vom Skill nur Adressen: Marker an Festlegungen und Rollen an Überschriften. Keine Skill-Logik, kein Attribut, kein Zustand steht dort; was ein Marker oder eine Rolle bedeutet, steht ausschließlich im Register beziehungsweise im Skill. Prüfbar: Jede Zeile im Dokument, aus der ohne Register oder Skill eine Wirkung des Skills folgen würde, ist ein Verstoß.
 
 ## 2.4 Default, Meldung, Script-Argument
 
@@ -61,13 +61,24 @@ Skill-Parameter sind die Parameter der Projektkonfiguration des Skills; sie steh
 
 Jeder Skill-Parameter hat einen Standardwert; fehlt die Datei, gilt in allem der Standard. **Ein Projekt muss nie konfigurieren, um den Skill zu benutzen.** Der Skillstart erfragt nur, was sich aus dem Projekt nicht ablesen lässt.
 
-**Aufnahmetest für einen neuen Skill-Parameter:** Er ist nur berechtigt, wenn beides gilt — der Wert lässt sich aus dem Projekt nicht ablesen, **und** es lassen sich zwei reale Projekte nennen, die ihn verschieden setzen würden. Trifft eines von beiden nicht zu, ist es keiner: Was ablesbar ist, wird abgelesen; was überall gleich wäre, wird entschieden und steht im Regelteil oder als Konstante im Skript.
+**Aufnahmetest für einen neuen Skill-Parameter:** Er ist nur berechtigt, wenn beides gilt — der Wert lässt sich aus dem Projekt nicht ablesen, **und** es lassen sich zumindest theoretisch zwei Projekte, Projekt-Ausprägungen nennen, die ihn verschieden setzen würden. Trifft eines von beiden nicht zu, ist es keiner: Was ablesbar ist, wird abgelesen; was überall gleich wäre, wird entschieden und steht im Regelteil oder als Konstante im Skript.
 
 Jeder Skill-Parameter kostet dreifach: eine Entscheidung des Entwicklers, eine Zeile Kontext bei jedem Skillstart, einen Verzweigungspfad im Skript. Wächst die Liste über etwa ein Dutzend, ist das kein Verstoß, aber ein Anlass zur Durchsicht — ein Zeichen, dass Entscheidungen als Parameter ausgelagert wurden, statt getroffen zu werden.
 
-## 2.10 Fehlende Felder blockieren nie
+## 2.10 Felder: was der Skill liest
 
-Ein fehlendes Feld macht die Prüfung stumm, die es bräuchte; die Härteliste endet dann beim Auffangwert. Eine unmarkierte Doku ist kein Fehlerzustand, sondern der Anfangszustand jedes Projekts.
+**Ein Feld ist ein Bereich, der ausgefüllt wird — und zwar nicht vom Schreibenden selbst, sondern vom Werkzeug.** In diesem Sinn kennt der Skill vier Sorten, und jede wird beim Namen genannt, wo sie vorkommt:
+
+| Sorte | Was darin steht | Wo |
+|---|---|---|
+| **Marker-Feld**, kurz **Marker** | eine Adresse: `[D-0042]`, `[>D-0042]`, `[DS:runtime]` | Prosa des Entwicklers (3.2, 3.3) |
+| **Registerfeld** | `kind`, `reason`, `source`, `instead`, `status`, `pinned`, `keys`, `fp` sowie die Ereigniszeilen | Register (3.2.5) |
+| **Skill-Parameter** | Projektkonfiguration | Skill-Parameterdatei (2.9) |
+| **Ausgabefeld** | `subject`, `issue`, `proposal`, … | Ausgabe des Skripts (3.6.3) |
+
+Dazu das **Umbauziel** `target:` als Feld eines geplanten Schritts (3.4.2).
+
+**Fehlende Felder blockieren nie.** Ein fehlendes Feld macht die Prüfung stumm, die es bräuchte; die Härteliste endet dann beim Auffangwert. Eine Doku ohne Marker ist kein Fehlerzustand, sondern der Anfangszustand jedes Projekts.
 
 ## 2.11 Annahmen machen nie `fixed`
 
@@ -79,8 +90,8 @@ Der Lint prüft geänderte Zeilen, nicht Dateien. Ein Fehlalarm erscheint genau 
 
 ## 2.13 Kein Zwang für den Entwickler
 
-Alles, was der Entwickler über das Schreiben von Prosa, das Lesen von Plänen und das Antworten in Prosa hinaus tun müsste, ist ein Verstoß gegen dieses Vorhaben. Er muss weder die Grammatik der Marken noch die des Registers noch die Namen der Härtewerte kennen. Fragen an ihn tragen Anlass und Wortlaut der Festlegung und vermeiden das Vokabular des Skills.
+Alles, was der Entwickler über das Schreiben von Prosa, das Lesen von Plänen und das Antworten in Prosa hinaus tun müsste, ist ein Verstoß gegen dieses Vorhaben. Er muss weder die Grammatik der Marker noch die des Registers noch die Namen der Härtewerte kennen. Fragen an ihn tragen Anlass und Wortlaut der Festlegung und vermeiden das Vokabular des Skills.
 
 ## 2.14 Diese Doku wendet das Vorhaben nicht auf sich an
 
-Bis zum Abschluss der Probe trägt diese Doku keine Marken, kein Register und keine Rollen; sie folgt dem bisherigen Schema. Wird das Vorhaben danach auf sich selbst angewendet, geschieht das als eigener Fahrplanschritt.
+Bis zum Abschluss der Probe trägt diese Doku keine Marker, kein Register und keine Rollen; sie folgt dem bisherigen Schema. Wird das Vorhaben danach auf sich selbst angewendet, geschieht das als eigener Fahrplanschritt.
