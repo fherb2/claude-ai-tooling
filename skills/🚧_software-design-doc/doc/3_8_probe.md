@@ -39,4 +39,4 @@ Marken- oder Park-Schwelle verfehlt → zurück zu Kapitel 3.1 und 3.2, nicht we
 
 ### 3.8.6 Was das Rechenmodell vorab sagt
 
-Das synthetische Modell im Anhang (acht Kapitel, zufällig verteilte Festlegungen, ein `relate`-Absatz zitiert je vier) ergibt für die Größe der Kandidatenliste je geänderter Festlegung: Tiefe 1 Median 4 bis 5 in jeder Dokugröße; Tiefe 2 Median 7 (40 Festlegungen), 14 (120), 22 (300); gewichtet mit Abbruch 0,40 wie Tiefe 1, mit 0,25 wie Tiefe 2. Das Modell kennt keine Relevanz; deshalb die Messgröße „verwirft mindestens die Hälfte nicht".
+Das synthetische Modell in Anhang B (acht Kapitel, zufällig verteilte Festlegungen, ein `relate`-Absatz zitiert je vier) ergibt für die Größe der Kandidatenliste je geänderter Festlegung: Tiefe 1 Median 4 bis 5 in jeder Dokugröße; Tiefe 2 Median 7 (40 Festlegungen), 14 (120), 22 (300); gewichtet mit Abbruch 0,40 wie Tiefe 1, mit 0,25 wie Tiefe 2. Das Modell kennt keine Relevanz; deshalb die Messgröße „verwirft mindestens die Hälfte nicht".

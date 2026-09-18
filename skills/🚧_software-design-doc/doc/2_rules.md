@@ -4,23 +4,23 @@ Projektweite Festlegungen für alles, was in diesem Vorhaben entsteht: Regelteil
 
 ## 2.1 Sprache und Namen
 
-Schlüsselwörter, Feldnamen, Rollen, Kommandos, Parameter und Dateinamen sind **englisch**. Die Prosa der Regelteile und dieser Doku ist deutsch. Ein Schlüsselwort ist ein Name, keine Beschreibung: Wer `decided` schreibt, meint genau diesen Zustand, und niemand darf `fixed`, `decided` und ein drittes Wort als persönliche Ausdrucksformen desselben Zustands lesen. Jeder Wert eines Feldes ist im Regelteil aufgezählt; ein nicht aufgezählter Wert ist ein Fehler, den das Skript meldet.
+Schlüsselwörter, Feldnamen, Rollen, Kommandos, Parameter und Dateinamen sind **englisch**. Die Prosa der Regelteile ist deutsch und wird danach auch in englisch als separate Distribution (Zip-File) zur Verfügung gestellt. Diese Doku ist deutsch. Ein Schlüsselwort ist ein Name, keine Beschreibung: Wer `decided` schreibt, meint genau diesen Zustand, und niemand darf `fixed`, `decided` und ein drittes Wort als persönliche Ausdrucksformen desselben Zustands lesen. Jeder Wert eines Feldes ist im Regelteil aufgezählt; ein nicht aufgezählter Wert ist ein Fehler, den das Skript meldet.
 
 ## 2.2 Die sieben Bedingungen
 
-Jede einzeln fallen gelassen, holt das Softwareprojekt zurück, das dieses Vorhaben nicht sein will:
+Diese sieben Bedingungen halten das Vorhaben auf der Größe „ein Skill, ein Skript". Wird auch nur eine von ihnen fallen gelassen, würde es zurück wachesen: zu dem großen Softwareprojekt, das Kapitel 1.7 ausschließt — einer Editor-Erweiterung für maschinell unterstützte Softwareplanung. Jede Bedingung nennt deshalb, was ohne sie nötig würde.
 
-1. **Marke pflichtig am Definitionsort und dort, wo Text Fakten aus verschiedenen Definitionsorten in Beziehung setzt** (Rolle mit Funktion `relate`, Kapitel 3.3); sonst optional.
-2. **Kapitel dürfen umnummeriert werden.** Nichts, was der Skill maschinell liest, hängt an einer Kapitelnummer oder einem Titel; IDs tragen kein Kapitel (Kapitel 3.2).
-3. **Auswirkungskandidaten kommen aus dem Graphen** der Marken und aus Suchschlüsseln — Nähe im Text, Hops, Gewichte —, nie aus semantischer Suche (Kapitel 3.6).
-4. **Struktur wird durch Hook und Lint auf dem Diff erzwungen**, nicht durch Erinnerung der Instanz (Kapitel 3.7).
-5. **Änderungen werden über Erwähnungslisten und Fingerabdruck propagiert**, nicht über Vollabdeckung jeder Erwähnung mit Marken.
-6. **Kein automatisches Umschreiben von Prosa.** Das Skript listet, die Instanz schlägt im Plan vor, der Entwickler gibt frei.
-7. **Keine Oberfläche; keine Einbettung fremder Werkzeuge.** Ideen werden übernommen, Programme nicht.
+1. **Marke pflichtig am Definitionsort und dort, wo Text Fakten aus verschiedenen Definitionsorten in Beziehung setzt** (Rolle mit Funktion `relate`, Kapitel 3.3); sonst optional — ohne diese Grenze müsste jede Erwähnung eines Fakts markiert und bei jeder Änderung nachgeführt werden, und das ist ohne Werkzeugunterstützung im Editor nicht zu leisten.
+2. **Kapitel dürfen umnummeriert werden.** Nichts, was der Skill maschinell liest, hängt an einer Kapitelnummer oder einem Titel; IDs tragen kein Kapitel (Kapitel 3.2) — sonst zöge jedes Einfügen und Umsortieren eine Neuvergabe von Adressen über das ganze Dokument nach sich.
+3. **Auswirkungskandidaten kommen aus dem Graphen** der Marken und aus Suchschlüsseln — Nähe im Text, Hops, Gewichte —, nie aus semantischer Suche (Kapitel 3.6) — sonst braucht das Vorhaben Einbettungen, ein Modell und einen Index, also eine eigene Infrastruktur je Projekt.
+4. **Struktur wird durch Hook und Lint auf dem Diff erzwungen**, nicht durch Erinnerung der Instanz (Kapitel 3.7) — sonst hinge die Vollständigkeit des Registers an einer Eigenschaft, von der Kapitel 1.2 belegt, dass sie nicht trägt.
+5. **Änderungen werden über Erwähnungslisten und Fingerabdruck propagiert**, nicht über Vollabdeckung jeder Erwähnung mit Marken — sonst gilt für jede Änderung, was Bedingung 1 für das Schreiben ausschließt.
+6. **Kein automatisches Umschreiben von Prosa.** Das Skript listet, die Instanz schlägt im Plan vor, der Entwickler gibt frei — sonst bräuchte es eine verlässliche Texttransformation samt Vorschau und Rücknahme, und der Entwickler verlöre die Hoheit über seine Doku.
+7. **Keine Oberfläche; keine Einbettung fremder Werkzeuge.** Ideen werden übernommen, Programme nicht — sonst entstehen eine Editor-Erweiterung mit eigenem Lebenszyklus und eine Laufzeitabhängigkeit in jedem Zielprojekt.
 
 ## 2.3 Rollen statt Struktur
 
-Was ein Abschnitt für den Skill bedeutet, sagt eine Rolle am Abschnitt (Kapitel 3.3). Kein Regelteil, kein Skript und kein Hook darf eine Funktion an eine Kapitelnummer, einen Dateinamen, ein Nummernpräfix oder einen Titel binden. Das alte Dreiersschema ist eine Empfehlung, die als Rollensatz ausgedrückt wird.
+Was ein Abschnitt für den Skill bedeutet, sagt eine Rolle am Abschnitt (Kapitel 3.3). Kein Regelteil, kein Skript und kein Hook darf eine Funktion an eine Kapitelnummer, einen Dateinamen, ein Nummernpräfix oder einen Titel binden. Das Dreiersschema des Vorläufers (Anhang A) ist eine Empfehlung, die als Rollensatz ausgedrückt wird.
 
 Im Dokument des Entwicklers stehen vom Skill nur Adressen: Marken an Festlegungen und Rollen an Überschriften. Keine Skill-Logik, kein Attribut, kein Zustand steht dort; was eine Marke oder eine Rolle bedeutet, steht ausschließlich im Register beziehungsweise im Skill. Prüfbar: Jede Zeile im Dokument, aus der ohne Register oder Skill eine Wirkung des Skills folgen würde, ist ein Verstoß.
 

@@ -50,9 +50,9 @@ Dazu Rollen, die arc42 nicht kennt, weil es Architektur beschreibt und nicht Pro
 
 Erweiterbar, indem der Regelteil eine neue Rolle mit ihrer Funktion definiert. Die Funktion `nonbinding` für `concept` löst ein Problem, das der bisherige Standard nicht adressierte: Findungstexte neben der bindenden Doku, die die Instanz genauso als Gesetz las.
 
-### 3.3.4 Das bisherige Dreiersschema als Rollensatz
+### 3.3.4 Das Dreiersschema des Vorläufers als Rollensatz
 
-Segment 1 „Zusammenhänge" entspricht `goals`, `constraints`, `context`, `strategy`, `runtime` und `quality`; Segment 2 „Vorgaben" entspricht `crosscutting` und `constraints`; Segment 3 „Einheiten" entspricht `building-blocks` und `deployment`. Wer das Dreiersschema weiterführt, kennzeichnet seine drei Dateien mit den passenden Rollen; die Verkettungsregel („Dateireihenfolge ergibt ein gültiges Dokument") bleibt als Empfehlung.
+Das Schema ist in Anhang A beschrieben. Segment 1 „Zusammenhänge" entspricht `goals`, `constraints`, `context`, `strategy`, `runtime` und `quality`; Segment 2 „Vorgaben" entspricht `crosscutting` und `constraints`; Segment 3 „Einheiten" entspricht `building-blocks` und `deployment`. Wer das Dreiersschema weiterführt, kennzeichnet seine drei Dateien mit den passenden Rollen; die Verkettungsregel („Dateireihenfolge ergibt ein gültiges Dokument") bleibt als Empfehlung.
 
 ### 3.3.5 Recherche zu Standards
 

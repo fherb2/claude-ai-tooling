@@ -2,7 +2,7 @@
 
 Dieses Dokument ist die Implementierungsdoku des Vorhabens `software-design-doc` — eines Skills für die projektbegleitende Softwaredokumentation: Ziel, Randbedingungen, allgemeine und spezielle Festlegungen bis zur Detailbeschreibung der Ausführung. Es folgt dem bisherigen Schema (drei Segmente, Fahrplan, Status) und wendet die neuen Ideen des Vorhabens — Marken, Register, Rollen — auf sich selbst **nicht** an; das geschieht frühestens nach der Probe (Kapitel 3.8).
 
-Die Segmente sind: dieses Kapitel 1 mit den Zusammenhängen, Kapitel 2 mit den projektweiten Vorgaben, Kapitel 3 mit den Einheiten. Daneben `work-plan.md` (Fahrplan) und `status.md`. Den Verlauf der Recherchen und das Rechenmodell trägt `appendix_research.md`.
+Die Segmente sind: dieses Kapitel 1 mit den Zusammenhängen, Kapitel 2 mit den projektweiten Vorgaben, Kapitel 3 mit den Einheiten. Daneben `work-plan.md` (Fahrplan) und `status.md`. Zwei Anhänge: **Anhang A** archiviert den Vorläufer — das Dokumentationsschema, auf dessen Erfahrungen dieses Vorhaben aufbaut und auf das die Kapitel mehrfach verweisen; **Anhang B** trägt den Verlauf der Recherchen und das Rechenmodell.
 
 Noch nicht entschiedene Punkte stehen als Zitatblöcke `[Q-nn] Entscheidungsgrundlage` dort, wo ihr Kontext steht, mit Optionen, Vorschlag und einer Zeile **Antwort:** für den Entwickler; der Leseplan dazu steht am Anfang von `work-plan.md`. Was nicht so gekennzeichnet ist, gilt als geplant.
 
@@ -17,11 +17,11 @@ Der Skill ist auf Softwareentwicklung zugeschnitten, aber nicht durchgehend: Sof
 > Optionen: (a) beim Zusammensetzen (Schritt 7) prüfen, ob die softwarespezifischen Teile in einem Regelteil isoliert sind; wenn ja, Umbenennung in `solution-design-doc` vor der Installation; (b) Name beibehalten, Domänenneutralität nicht anstreben.
 > Vorschlag: (a) — die Prüfung kostet nichts, solange nicht installiert ist.
 > Gewicht: klein · Blockiert: Fahrplanschritt 9
-> Antwort:
+> Antwort:(a), 18.9.2026
 
 ## 1.2 Ausgangslage: zwei Fehlbilder
 
-Der bisherige Standard beschreibt die entwicklungsbegleitende Doku als dreigeteiltes Dokument mit Fahrplan und Status und eine Arbeitsschleife, in der Code und Doku im Wechsel entstehen. Für größere Projekte hat sich das bewährt. In der Praxis zeigten sich zwei Fehlbilder, die beide auf denselben Ursachen beruhen.
+Der Vorläufer beschreibt die entwicklungsbegleitende Doku als dreigeteiltes Dokument mit Fahrplan und Status und eine Arbeitsschleife, in der Code und Doku im Wechsel entstehen (vollständig in Anhang A). Für größere Projekte hat sich das bewährt. In der Praxis zeigten sich zwei Fehlbilder, die beide auf denselben Ursachen beruhen.
 
 **Fehlbild Intensität.** Bei kleinen Vorhaben, bei kurzen Eingriffen in ein laufendes Projekt und bei Projekten, deren Doku anders aufgebaut ist, verweist die Instanz beharrlich auf Segmente, Fahrplan und Statusdatei und verlangt Struktur, die nichts zu halten hat. Ursache: Der Standard war als Abschnitt der globalen Anweisungsdatei in jeder Sitzung geladen und kannte keine Frage, ob und in welcher Ausbaustufe ein Projekt ihn führt.
 
@@ -84,6 +84,10 @@ Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Reg
 
 Keine Oberfläche, keine Editor-Erweiterung. Keine Einbettung fremder Werkzeuge (Anforderungs-Tracing, Entscheidungsverwaltung); ihre Ideen — Fingerabdruck, kaskadierende Meldung bei Änderung, Lebenszyklus mit Nachfolger — werden übernommen, nicht ihre Programme. Keine semantische Suche; Zusammenhänge kommen aus Marken, Nähe im Text und Suchschlüsseln. Kein automatisches Umschreiben von Prosa; das Skript listet, die Instanz schlägt im Plan vor, der Entwickler gibt frei. Kein Lesen fremder ID-Systeme; das ist eine spätere Ausbaustufe.
 
-## 1.8 Verhältnis zum bisherigen Standard
+## 1.8 Verhältnis zum Vorläufer
 
-Der Text der bisherigen `SKILL.md` — Phasen, Segmente, Prosa-Code-Grenze, Arbeitsschleife, Reviews und Anhang — bleibt als eigener Regelteil `standard.md` bestehen, mit drei Anpassungen: Die drei Segmente werden zu empfohlenen Rollen (Kapitel 3.3), nicht zu verlangter Struktur. Die Phasen gelten je Bereich, nicht je Projekt — ein Bereich kann in die Findung zurück, während der Rest in der Implementierung bleibt; die Lage „entwerfend" ist die Findungs- und Fixierungsphase für diesen Bereich. Und die Regel, wo ein Plan steht, wird durch Kapitel 3.4 ersetzt.
+**Der Vorläufer ist vollständig in Anhang A archiviert** — vier Phasen, dreigeteilte Segmentstruktur, Prosa-Code-Grenze, ein normatives Zuhause je Aussage, Arbeitsschleife, Fahrplan und Status, Reviews und ihr Anhang, dazu der stille Trigger und die Begründungen der README. Wo diese Doku Begriffe wie „Dreiersschema", „Arbeitsschleife" oder „Prosa-Code-Grenze" benutzt, ist dort nachzulesen, was sie bedeuten. Der Anhang ist nötig, weil die drei Dateien des Vorläufers mit Fahrplanschritt 7 verschwinden; danach gäbe es außerhalb der Git-Historie keine Quelle mehr.
+
+Sein Regeltext bleibt der Sache nach erhalten und wird zum Regelteil `standard.md`, mit drei Anpassungen: Die drei Segmente werden zu empfohlenen Rollen (Kapitel 3.3), nicht zu verlangter Struktur. Die Phasen gelten je Bereich, nicht je Projekt — ein Bereich kann in die Findung zurück, während der Rest in der Implementierung bleibt; die Lage „entwerfend" ist die Findungs- und Fixierungsphase für diesen Bereich. Und die Regel, wo ein Plan steht, wird durch Kapitel 3.4 ersetzt.
+
+Was der Vorläufer nicht leisten konnte und was dieses Vorhaben deshalb hinzufügt: Abweichungen und Vereinfachungen der Struktur mussten bei kleineren Projekten immer wieder neu ausgehandelt und zusätzlich in Anweisungen gebacken werden; Umstrukturierungen und Kapitelneunummerierungen waren aufwändig und fehleranfällig. An die Stelle beider Mühen treten Rollen statt Nummern, Marken statt Struktur und das Register.

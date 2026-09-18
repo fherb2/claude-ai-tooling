@@ -1,8 +1,8 @@
-# Anhang: Recherchen und Rechenmodell
+# Anhang B — Recherchen und Rechenmodell
 
 Beurteilungsmaterial zum Vorhaben, nicht Teil der Festlegungen. Statuskennzeichnung: **belegt** = am Primärdokument oder am Verlagsabstract geprüft; **unbestätigt** = nur aus Suchzusammenfassungen oder Titeln.
 
-## A.1 Fuzzy-Technik und LLM-Agenten (2026-09-16/17)
+## B.1 Fuzzy-Technik und LLM-Agenten (2026-09-16/17)
 
 Anlass war die Überlegung, die Härteableitung durch eine Fuzzy-Inferenz in einem Skript rechnen zu lassen. Die Idee wurde zurückgestellt (Entscheidungsliste statt Fuzzy, Kapitel 3.1); die Recherche bleibt als Wissensstand.
 
@@ -14,7 +14,7 @@ Anlass war die Überlegung, die Härteableitung durch eine Fuzzy-Inferenz in ein
 
 **Nicht am Primärdokument geprüft:** Song et al. 2026, Expert Systems with Applications (LLM-Konfidenz → Fuzzy-Variablen → Selbstkorrektur; „uncertainty-aware fine-tuning"); Ahmed, Hagras et al. 2026, FUZZ-IEEE (Fuzzy-Attribution für LoRA); Zhang et al. 2025, Pattern Recognition Letters. Der Abruf über das Institutsnetz scheiterte an der Bot-Erkennung der Verlage, nicht an der Lizenz; die Dateien wären über den Browser des Entwicklers zu holen.
 
-## A.2 Vorhandene Werkzeuge für IDs, Register und Lebenszyklus (2026-09-17)
+## B.2 Vorhandene Werkzeuge für IDs, Register und Lebenszyklus (2026-09-17)
 
 Kein Werkzeug leistet die Kombination aus Prosa mit Inline-Marken, Attributregister, Härtelebenszyklus und Pflege durch den Agenten. Jede Komponente existiert einzeln:
 
@@ -31,15 +31,15 @@ Kein Werkzeug leistet die Kombination aus Prosa mit Inline-Marken, Attributregis
 
 Für die Kantenrechnung: networkx bietet `single_source_dijkstra_path_length(G, source, cutoff, weight=funktion)` und `ego_graph(distance=…)` — genau die gewichtete Nachbarschaft (belegt, Doku 3.6.1). Textgraph-Bibliotheken (text2graphapi, PyTextRank) bauen Wort-Kookkurrenz-Graphen aus Rohtext; das ist die NLP-Schicht, die das Vorhaben ausschließt.
 
-## A.3 Standards für Designdokumentation (2026-09-17)
+## B.3 Standards für Designdokumentation (2026-09-17)
 
 Siehe Kapitel 3.3, Abschnitt 3.3.5. Belegt: arc42 (zwölf Abschnitte, CC BY-SA 4.0, deutsche Fassung). Unbestätigt: Google-Design-Docs, IEEE 1016, ISO/IEC/IEEE 42010.
 
-## A.4 Hook-Dokumentation (2026-09-17)
+## B.4 Hook-Dokumentation (2026-09-17)
 
 Die Hook-Referenz von Claude Code wurde für Kapitel 3.7 gelesen. Belegt: Ereignisse `PreToolUse`, `PostToolUse`, `SessionStart` mit ihren Matchern; Feld `if` in der Syntax der Berechtigungsregeln; Exit 2 blockiert bei `PreToolUse`; `additionalContext` bei `PostToolUse`; Klartext auf stdout wird bei `SessionStart` Kontext; Hooks im Skill-Frontmatter gelten ab Aufruf für die Sitzung; Pfadplatzhalter `${CLAUDE_PROJECT_DIR}` und `${CLAUDE_PLUGIN_ROOT}`.
 
-## A.5 Rechenmodell zur Größe der Kandidatenlisten
+## B.5 Rechenmodell zur Größe der Kandidatenlisten
 
 Synthetisches Modell, im Scratch der Sitzung gerechnet, nicht aufbewahrt; für die Probe neu aufzusetzen. Aufbau: acht Kapitel mit je vier Abschnitten zu je fünf Absätzen; Festlegungen zufällig verteilt; je Kapitel `relate`-Absätze, die je vier Festlegungen des Kapitels und mit 15 % Wahrscheinlichkeit je eine fremde zitieren. Kanten: gleicher Absatz 0,8; Mitzitat 0,7; gleicher Abschnitt 0,4; Nachbarabschnitt 0,2; gleiches Kapitel 0,05. Verglichen: Hops über Kanten ab 0,7 (Tiefe 1 und 2) und der beste Pfad als Produkt der Gewichte mit Dämpfung 0,7 je Hop und Abbruchschwelle.
 
