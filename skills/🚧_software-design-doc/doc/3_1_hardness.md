@@ -36,15 +36,15 @@ Beide sind Skill-Parameter und wohnen in der Skill-Parameterdatei (Kapitel 3.5).
 
 ### 3.1.3 Schritt 1 — Kontakt und Vollständigkeit
 
-**Kontakt.** Eine Festlegung ist kontaktiert, wenn sie im Plan des aktuellen Schritts oder in der Auswirkungsliste der aktuellen Idee genannt werden müsste — weil sie die Änderung begrenzt oder von ihr betroffen ist. Nicht kontaktiert ist, was nur im selben Kapitel steht. Alles Folgende gilt nur für kontaktierte Festlegungen. Kandidaten liefert das Skript aus dem Graphen der Marken (Kapitel 3.6); Du beantwortest je Kandidat, ob er berührt ist.
+**Kontakt.** Eine Festlegung ist kontaktiert, wenn sie im Plan des aktuellen Schritts oder in der Auswirkungsliste der aktuellen Idee genannt werden müsste — weil sie die Änderung begrenzt oder von ihr betroffen ist. Nicht kontaktiert ist, was nur im selben Kapitel steht. Alles Folgende gilt nur für kontaktierte Festlegungen. Kandidaten liefert das Skript aus dem Graphen der Marker (Kapitel 3.6); Du beantwortest je Kandidat, ob er berührt ist.
 
-**Unmarkierte Aussagen.** Findet `grep` im berührten Kapitel keine Marken, liest Du das Kapitel — die Arbeitsschleife des Vorläufers verlangt das ohnehin (Anhang A, Abschnitt A.8). Als unmarkierte Festlegung zählt eine Aussage nur, wenn sie als Anforderung oder Entscheidung formuliert ist: muss, soll, immer, nie, ein festgelegter Wert. Erläuterungen und Beispiele zählen nicht. Aufnahmetest: Kann Code das verletzen? Jede Aussage, die Du als bindend behandelst, nennst Du im Plan im Wortlaut; liest Du etwas hinein, sieht der Entwickler es dort.
+**Unmarkierte Aussagen.** Findet `grep` im berührten Kapitel keine Marker, liest Du das Kapitel — die Arbeitsschleife des Vorläufers verlangt das ohnehin (Anhang A, Abschnitt A.8). Als unmarkierte Festlegung zählt eine Aussage nur, wenn sie als Anforderung oder Entscheidung formuliert ist: muss, soll, immer, nie, ein festgelegter Wert. Erläuterungen und Beispiele zählen nicht. Aufnahmetest: Kann Code das verletzen? Jede Aussage, die Du als bindend behandelst, nennst Du im Plan im Wortlaut; liest Du etwas hinein, sieht der Entwickler es dort.
 
 **Annahmen statt Fragen.** Fehlt der Marker oder der Grund, bildest Du aus der Prosa selbst eine Annahme über `kind` und `reason` oder Quelle und trägst sie mit `status: assumed` in den Plan ein. Du fragst den Entwickler nur, wo Du keine Annahme bilden kannst; dann steht im Plan eine `pending`-Zeile mit der Frage. Bis zur Antwort gilt vorläufig `decided`.
 
 **Fragen an den Entwickler** — für die Vollständigkeitsfrage und für den Satz aus Prüfung R3 gelten vier Regeln:
 
-1. Ohne Skill-Vokabular. Nicht `given`/`chosen`, nicht „Härte", nicht „Marke". Sondern: „Ist das eine Vorgabe von außen — Hardware, Norm, Fremdschnittstelle — oder haben wir das so entschieden? Falls entschieden: Was war der Grund, und was wäre die Alternative gewesen?"
+1. Ohne Skill-Vokabular. Nicht `given`/`chosen`, nicht „Härte", nicht „Marker". Sondern: „Ist das eine Vorgabe von außen — Hardware, Norm, Fremdschnittstelle — oder haben wir das so entschieden? Falls entschieden: Was war der Grund, und was wäre die Alternative gewesen?"
 2. Mit Anlass. Nenne die Festlegung im Wortlaut, wo sie steht, und in einem Satz, was jetzt von der Antwort abhängt.
 3. Nichtwissen ist zulässig. Drei Antwortformen: Antwort → Attribute werden `confirmed`. „Später" → `pending` bleibt, `decided` gilt vorläufig, Du arbeitest unter dieser Annahme weiter und sagst das; in dieser Sitzung fragst Du nicht erneut, in einer späteren nur beim nächsten Kontakt; „Was ist offen?" listet alle `pending`-Zeilen. „Lass uns das durchgehen" → Gespräch über so viele Turns wie nötig; am Ende fasst Du zusammen, was Du festhalten würdest, und schreibst erst nach Bestätigung.
 4. „Grund nicht mehr bekannt" ist eine Antwort → `reason: unknown`, keine weitere Frage; in `design` sagt der geparkte Satz „Grund nicht überliefert".
@@ -95,7 +95,7 @@ Jeder Plan trägt diesen Abschnitt. Er ist der Zwischenspeicher aller Annahmen b
 
 **Korrektur in Prosa.** Sagt der Entwickler etwas zu einem Eintrag („das ist eine Hardwaregrenze", „das haben wir wegen der Latenz so entschieden"), übersetzst Du das in die Attribute und zeigst die Zuordnung, bevor Du schreibst.
 
-**Schreiben bei Ausführung.** Marken und Registerzeilen werden mit der Ausführung des Plans geschrieben — Doku und Code im Wechsel. Status: vom Entwickler angesprochen → `confirmed`; nicht angesprochen und Plan wie `accept` → `accepted`; nicht angesprochen und Plan wie `keep`, oder „später" → `assumed`. Ab jetzt findet `grep` sie; die Liste läuft ohne erneutes Lesen.
+**Schreiben bei Ausführung.** Marker und Registerzeilen werden mit der Ausführung des Plans geschrieben — Doku und Code im Wechsel. Status: vom Entwickler angesprochen → `confirmed`; nicht angesprochen und Plan wie `accept` → `accepted`; nicht angesprochen und Plan wie `keep`, oder „später" → `assumed`. Ab jetzt findet `grep` sie; die Liste läuft ohne erneutes Lesen.
 
 **Wiedervorlage.** Eine `assumed`-Festlegung steht bei jedem weiteren Kontakt erneut im Abschnitt, gekennzeichnet als Annahme, ohne erneute Frage. Bei `accept` hebt die nächste Freigabe sie auf `accepted`; bei `keep` bleibt sie, bis der Entwickler sie anspricht.
 

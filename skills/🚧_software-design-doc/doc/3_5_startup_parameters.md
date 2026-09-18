@@ -15,13 +15,13 @@ Der Skill wird durch den geankerten Trigger aus `CLAUDE-snippet.md` geladen, sob
 
 Standardname `.claude/software-design-doc.json`; jeder Skill-Parameter hat einen Standardwert, und fehlt die Datei, gilt in allem der Standard (Vorgabe 2.9). Die Doku nennt sie im Folgenden Skill-Parameterdatei, damit der Dateiname an einer Stelle austauschbar bleibt.
 
-| Feld | Werte | Standard | Bedeutung |
+| Skill-Parameter | Werte | Standard | Bedeutung |
 |---|---|---|---|
 | `mode` | `on`, `off` | `on` | Abwahl je Projekt |
 | `doc_dir` | Pfad | abgelesen | Ordner der Doku |
 | `register` | Pfad | `<doc_dir>/decisions.md` | Register (Kapitel 3.2) |
 | `planned_steps` | Liste von Pfaden | abgelesen | Dateien mit geplanten Schritten (Kapitel 3.4) |
-| `marking` | `define+relate`, `define`, `full` | `define+relate` | Pflicht der Zitatmarken |
+| `marking` | `define+relate`, `define`, `full` | `define+relate` | Pflicht der Zitatmarker |
 | `friction_threshold` | Zahl | 2 | Reibungsschwelle; Funktion `global` eine Stufe höher |
 | `assumptions_on_approval` | `accept`, `keep` | `accept` | Wirkung der Planfreigabe auf Annahmen (Kapitel 3.1) |
 | `impact_model` | `hops`, `weighted` | `hops` | Auswirkungsrechnung (Kapitel 3.6) |
@@ -33,7 +33,7 @@ Die Skill-Parameter wohnen bewusst in einer Datei mit dem Namen des Skills unter
 
 ### 3.5.3 Die Doku wächst an Festlegungen, nicht an Pflichten
 
-Keine Struktur wird gefordert, die nichts zu halten hat. Die erste Festlegung, die den Code überdauert, braucht ein Zuhause — eine Datei, die der Skill vorschlägt; die erste Marke legt das Register an; der erste Text, der Festlegungen aus verschiedenen Orten in Beziehung setzt, bekommt die Rolle `relate` vorgeschlagen; der erste Fall von mehr als einem nächsten Schritt bekommt einen Ort für geplante Schritte vorgeschlagen. Die Ausbaustufe eines Projekts ist, was es hat — nicht, was ein Skill-Parameter sagt. Die Dreiteilung des Vorläufers (Anhang A) bleibt die Empfehlung für Projekte, die groß werden (Kapitel 3.3).
+Keine Struktur wird gefordert, die nichts zu halten hat. Die erste Festlegung, die den Code überdauert, braucht ein Zuhause — eine Datei, die der Skill vorschlägt; der erste Marker legt das Register an; der erste Text, der Festlegungen aus verschiedenen Orten in Beziehung setzt, bekommt die Rolle `relate` vorgeschlagen; der erste Fall von mehr als einem nächsten Schritt bekommt einen Ort für geplante Schritte vorgeschlagen. Die Ausbaustufe eines Projekts ist, was es hat — nicht, was ein Skill-Parameter sagt. Die Dreiteilung des Vorläufers (Anhang A) bleibt die Empfehlung für Projekte, die groß werden (Kapitel 3.3).
 
 ### 3.5.4 Repositories mit mehreren Vorhaben
 

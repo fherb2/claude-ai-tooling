@@ -41,8 +41,8 @@ Dazu Rollen, die arc42 nicht kennt, weil es Architektur beschreibt und nicht Pro
 
 | Funktion | Was der Skill in einem Abschnitt mit dieser Funktion tut |
 |---|---|
-| `define` | Definitionsmarken; Standardfunktion für alles Unmarkierte |
-| `relate` | Zitatmarken Pflicht; Quelle der Kanten für die Auswirkungsrechnung (Kapitel 3.6) |
+| `define` | Definitionsmarker; Standardfunktion für alles Unmarkierte |
+| `relate` | Zitatmarker Pflicht; Quelle der Kanten für die Auswirkungsrechnung (Kapitel 3.6) |
 | `global` | Festlegungen gelten projektweit: Reibungsschwelle eine Stufe höher; Kollisionen werden als projektweit gekennzeichnet |
 | `nonbinding` | Lint und Auswirkungsrechnung überspringen den Abschnitt; Aussagen dort sind keine Festlegungen |
 | `plan` | `target:`-Zeilen werden gelesen (Kapitel 3.4) |

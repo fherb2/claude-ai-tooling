@@ -12,9 +12,9 @@ Ein Aufruf je Anker (Kapitel 3.1, Abschnitt 3.1.9), nicht mehrere. Jede Vorausse
 
 ### 3.6.3 Ausgabevertrag
 
-Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. Sie ist zeilenorientiert, jede Zeile beginnt mit einer Klasse in Großbuchstaben, danach Felder in fester Reihenfolge, getrennt durch ` | `, jedes Feld als `key: value`; Werte enthalten keinen senkrechten Strich. Schlüssel sind englisch; Werte dürfen deutsche Prosa sein. Keine Erzählung, keine Farben, keine Symbole, kein Fortschrittslog. Zahlen sind Zahlen, nicht Wörter. Eine Ausgabe hat höchstens etwa vierzig Zeilen; wird gekürzt, sagt die letzte Zeile, wie viele fehlen und mit welchem Script-Argument sie erscheinen.
+Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. Sie ist zeilenorientiert, jede Zeile beginnt mit einer Klasse in Großbuchstaben, danach Ausgabefelder in fester Reihenfolge, getrennt durch ` | `, jedes Feld als `key: value`; Werte enthalten keinen senkrechten Strich. Schlüssel sind englisch; Werte dürfen deutsche Prosa sein. Keine Erzählung, keine Farben, keine Symbole, kein Fortschrittslog. Zahlen sind Zahlen, nicht Wörter. Eine Ausgabe hat höchstens etwa vierzig Zeilen; wird gekürzt, sagt die letzte Zeile, wie viele fehlen und mit welchem Script-Argument sie erscheinen.
 
-| Klasse | Bedeutung | Felder |
+| Klasse | Bedeutung | Ausgabefelder |
 |---|---|---|
 | `OK` | Lauf erfolgreich, ein Satz — auch wenn nichts zu berichten ist | `msg` |
 | `ITEM` | ein Gegenstand einer Liste | kommandoabhängig, feste Reihenfolge |
@@ -31,15 +31,15 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 
 | Kommando | Liest | Gibt aus | Exit |
 |---|---|---|---|
-| `list [--chapter DATEI]` | Register, Marken | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness`, `label` | 0 |
+| `list [--chapter DATEI]` | Register, Marker | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness`, `label` | 0 |
 | `show ID` | Register, Doku | alle Registerzeilen der ID, Definitionsort, Zitatorte | 0 |
 | `next-id` | Register | nächste freie ID | 0 |
 | `add ID …` | — | schreibt eine Registerzeile in der Grammatik von Kapitel 3.2; nur nach freigegebenem Plan aufgerufen | 0 |
-| `check [--summary]` | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marke ohne Eintrag, Eintrag ohne Definitionsmarke, mehrere Definitionsmarken, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette; mit `--summary` nur Zahlen | 0 keine, 1 Befunde, 2 strukturell |
-| `lint --file DATEI --changed` | Git-Diff der Datei | `FINDING` je geänderter Zeile mit Normativsignal ohne Marke und je neuer Marke ohne Eintrag | 0/1 |
-| `mentions ID [--code ORDNER]` | Doku, optional Code | `ITEM` je Vorkommen: Marke, Zitat, Suchschlüssel-Treffer, mit Datei und Zeile | 0 |
+| `check [--summary]` | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette; mit `--summary` nur Zahlen | 0 keine, 1 Befunde, 2 strukturell |
+| `lint --file DATEI --changed` | Git-Diff der Datei | `FINDING` je geänderter Zeile mit Normativsignal ohne Marker und je neuem Marker ohne Eintrag | 0/1 |
+| `mentions ID [--code ORDNER]` | Doku, optional Code | `ITEM` je Vorkommen: Marker, Zitat, Suchschlüssel-Treffer, mit Datei und Zeile | 0 |
 | `hardness ID [--word fixed|open]` | Register, geplante Schritte, Skill-Parameter | `ITEM` mit Härte und zutreffender Bedingung in Prosa (R1–R7) | 0 |
-| `impact --chapter DATEI \| --ids …` | Graph aus Marken, Nähe, Suchschlüsseln | `ITEM` je Kandidat: `id`, `why` (Definition, Mitzitat, gleicher Absatz, Suchschlüssel), `distance` | 0 |
+| `impact --chapter DATEI \| --ids …` | Graph aus Markern, Nähe, Suchschlüsseln | `ITEM` je Kandidat: `id`, `why` (Definition, Mitzitat, gleicher Absatz, Suchschlüssel), `distance` | 0 |
 | `plan-section --ids …` | Register, Härte | Gerüst des Planabschnitts „Berührte Festlegungen" | 0 |
 | `explain ID` | wie `hardness` | ein Satz für den Entwickler, ohne Prüfungsnummer | 0 |
 | `fp ID [--update]` | Doku | Fingerabdruck des Definitionssatzes, Vergleich mit Register | 0/1 |
@@ -63,7 +63,7 @@ Der Skill-Parameter `impact_model: hops` ist der Sonderfall, in dem nur Kanten a
 
 ### 3.6.6 Der Lint
 
-Prüft nur geänderte Zeilen der übergebenen Datei (Git-Diff gegen den Index und gegen HEAD). Eine Zeile ist ein Befund, wenn sie ein Normativsignal trägt — Signalwörter aus `lint_signals` (Standard deutsch und englisch: muss, müssen, soll, sollen, immer, nie, niemals, darf nicht, genau, höchstens, mindestens, must, shall, always, never, at most, at least) oder einen Zahlenwert mit Einheit — und keine Marke `[D-`. Ausgenommen sind Abschnitte mit Funktion `nonbinding` und `register`, Codeblöcke, Tabellen und Zitatblöcke. Eine neue Marke ohne Registereintrag ist ebenfalls ein Befund. Der Lint schreibt nichts.
+Prüft nur geänderte Zeilen der übergebenen Datei (Git-Diff gegen den Index und gegen HEAD). Eine Zeile ist ein Befund, wenn sie ein Normativsignal trägt — Signalwörter aus `lint_signals` (Standard deutsch und englisch: muss, müssen, soll, sollen, immer, nie, niemals, darf nicht, genau, höchstens, mindestens, must, shall, always, never, at most, at least) oder einen Zahlenwert mit Einheit — und keinen Marker `[D-`. Ausgenommen sind Abschnitte mit Funktion `nonbinding` und `register`, Codeblöcke, Tabellen und Zitatblöcke. Ein neuer Marker ohne Registereintrag ist ebenfalls ein Befund. Der Lint schreibt nichts.
 
 ### 3.6.7 Der Fingerabdruck
 
