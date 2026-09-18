@@ -8,6 +8,22 @@ Abschnitt 2 der globalen `~/.claude/CLAUDE.md` (2.1 Phasen bis 2.6 Fahrplan und 
 
 Die Doppelungen in der Projekt-`CLAUDE.md` dieses Repositories — „Wo ein Plan steht", „Fahrplan-Nummerierung", „`work-plan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich" — werden auf das reduziert, was repositoryspezifisch ist. Für jede Fundstelle gilt danach die Probe: Sie nennt den Fahrplan, oder sie beschreibt ihn — beides zugleich darf keine mehr.
 
+**Was der Skill ersetzt und was bleibt.** Geprüft am 2026-09-19 gegen den Wortlaut beider Anweisungsdateien. Der Skill wird nicht gegen die bisherigen Regeln getestet; geprüft wird, welche von ihnen mit seinem Einbau entfallen können.
+
+| Fundstelle | Was mit ihr geschieht |
+|---|---|
+| global, Abschnitt „Planung" (Ablageort erfragen: Chat, File im Projekt, `~/.claude`) | **bleibt unverändert.** Sie trägt den Vorbehalt „und der Ablageort der Planung nicht klar geregelt ist" und schaltet sich damit selbst ab, sobald der Skill ihn regelt. Für Vorhaben ohne Quellcode bleibt sie nötig. |
+| global §1.3 Plan vor Ausführung, §1.4 Abweichung heißt anhalten, §1.5 Rückfragen | **bleiben.** Sie regeln, *ob* und *wie vollständig* geplant wird, nicht *wo*. |
+| global §1.9 Kontext-Haushalt | **muss geändert werden**, nicht nur entfallen: „Detaillierung des Fahrplans" widerspricht dem Skill unmittelbar. |
+| global §2.1 bis §2.6 | **entfallen** vollständig; ihr Inhalt wird zum Regelteil `standard.md`. |
+| Projekt, „Wo ein Plan steht" (zwei Orte, keine eigenen Plan-Dateien) | **entfällt.** Der Skill kennt mehr Ablageorte; die Regel wäre danach falsch. |
+| Projekt, „Fahrplan-Nummerierung" | **entfällt** als Doppelung; der Skill sagt dasselbe (Kapitel 3.4.1). |
+| Projekt, „entwicklungszeitliche Dateien" | überwiegend **Doppelung** zu „Doku wächst an Festlegungen"; der repositoryspezifische Rest bleibt. |
+| Projekt, „Pläne aus dem Planmodus" (`~/.claude/plans/`) | **bleibt.** Anderer Gegenstand: der Planmodus von Claude Code. |
+| Projekt, Dateiname `work-plan.md` statt `fahrplan.md` | **bleibt.** Repositoryspezifische Festlegung. |
+
+Ein früher notiertes §1.7 („Der Commit-Body benennt den Fahrplanpunkt") existiert nicht mehr; Abschnitt 1 der globalen Datei springt von 1.6 auf 1.8.
+
 ### 3.9.2 Die Werkzeug-Skills (Fahrplanschritt 5 des Repositories)
 
 `konzept-segmentierung` und `konsistenzpruefung` dürfen den Fahrplan weiter benutzen, aber nicht mehr definieren; ihre Sätze werden daraufhin durchgesehen, und wo sie eine Eigenschaft des Fahrplans behaupten, wird daraus ein Verweis. Ob beide in dieses Vorhaben überführt und dem Namensschema angeglichen werden, entscheidet der Entwickler; der Abschnitt „Zusammenspiel mit anderen Skills" der bisherigen `SKILL.md` verstößt gegen die Vorgabe, dass kein Skill-Körper auf einen anderen Skill dieses Verzeichnisses verweist, und wird beim Zusammensetzen (Fahrplan, Paket 7) aufgelöst.
