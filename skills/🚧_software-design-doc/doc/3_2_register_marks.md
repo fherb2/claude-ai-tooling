@@ -13,7 +13,7 @@ Zwei Formen, beide ASCII, beide ohne Leerzeichen, in Markdown als normaler Text 
 - **Definitionsmarke** `[D-0042]` — genau eine je Festlegung, am Satz, der sie ausspricht. Spannt sich eine Festlegung über mehrere Sätze, steht die Marke am Ende des letzten.
 - **Zitatmarke** `[>D-0042]` — an jeder weiteren Stelle, die die Festlegung heranzieht; das `>` liest sich als „siehe".
 
-Pflicht ist die Definitionsmarke immer und die Zitatmarke in Abschnitten mit der Funktion `relate` (Kapitel 3.3); sonst ist die Zitatmarke optional. Der Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Aufnahmetest, was überhaupt eine Definitionsmarke bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keine.
+Pflicht ist die Definitionsmarke immer und die Zitatmarke in Abschnitten mit der Funktion `relate` (Kapitel 3.3); sonst ist die Zitatmarke optional. Der Skill-Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Aufnahmetest, was überhaupt eine Definitionsmarke bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keine.
 
 Beispiel eines Absatzes mit drei Festlegungen (die IDs und Werte sind erfunden):
 
@@ -31,7 +31,7 @@ Wird eine Festlegung inhaltlich zu einer anderen — etwa von einer Kapitelfestl
 
 ### 3.2.4 Register — Ort
 
-Eine Datei je Doku, Standardname `decisions.md` im Ordner der Doku. Das Skript findet sie in dieser Reihenfolge: Argument `--register` → Parameterdatei → eine Zeile `[register: pfad]` in der Dokudatei → Standard im Ordner der Datei. Findet es nichts, meldet es, wo es gesucht hat und mit welchem Argument der Aufrufer es hinführt (Vorgabe 2.4). Damit darf eine Doku ihr Register in einem anderen Ordner führen und aus jeder Dokudatei darauf verweisen.
+Eine Datei je Doku, Standardname `decisions.md` im Ordner der Doku. Das Skript findet sie in dieser Reihenfolge: Script-Argument `--register` → Skill-Parameterdatei → eine Zeile `[register: pfad]` in der Dokudatei → Standard im Ordner der Datei. Findet es nichts, meldet es, wo es gesucht hat und mit welchem Script-Argument der Aufrufer es hinführt (Vorgabe 2.4). Damit darf eine Doku ihr Register in einem anderen Ordner führen und aus jeder Dokudatei darauf verweisen.
 
 ### 3.2.5 Register — Grammatik
 
@@ -104,7 +104,7 @@ Das Graphenmodell — was eine Kante ist und wie sie gewichtet wird — ist in K
 
 > **[Q-06] Entscheidungsgrundlage — Zitatmarken außerhalb der Funktion `relate`**
 > Kontext: Pflicht sind Zitatmarken nur in Abschnitten mit Funktion `relate`; in Bausteinkapiteln untereinander sind sie optional. Ob `mentions` ohne sie zu viel übersieht, kann erst die Probe zeigen.
-> Optionen: (a) bei „optional" bleiben und die Probe entscheiden lassen; (b) von vornherein Pflicht überall (Parameter `marking: full` als Standard).
+> Optionen: (a) bei „optional" bleiben und die Probe entscheiden lassen; (b) von vornherein Pflicht überall (Skill-Parameter `marking: full` als Standard).
 > Vorschlag: (a).
 > Gewicht: klein · Blockiert: nichts vor der Probe
 > Antwort:

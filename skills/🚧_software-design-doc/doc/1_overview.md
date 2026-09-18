@@ -8,12 +8,12 @@ Noch nicht entschiedene Punkte stehen als Zitatblöcke `[Q-nn] Entscheidungsgrun
 
 ## 1.1 Name des Skills
 
-Der Skill hieß `software-dev-doc-fh`. Das Kürzel `-fh` bezeichnete die Arbeitsweise eines bestimmten Entwicklers; mit der Verallgemeinerung auf Rollen, Register und Härteregeln ist der Skill für jeden mit einem ähnlichen Ansatz nutzbar, und das Kürzel entfällt. Der neue Name ist `software-design-doc`: Was der Skill pflegt, ist im Fachjargon ein Design Doc — Kontext und Ziel, Randbedingungen, Entscheidungen mit Alternativen, Detail bis zur Ausführung. Das Präfix `software-` vermeidet die Verwechslung mit Produkt- oder Oberflächendesign, die `design-doc` allein hätte. Erwogen wurden außerdem `solution-design-doc` und `living-design-doc` (das die parallele Pflege zum Code betont, aber mit dem etablierten Begriff „Living Documentation" für generierte Doku kollidiert). Die Entscheidung ist bis zur Installation ohne Kosten umkehrbar; Parameterdatei und Skript folgen dem Namen (Kapitel 3.5 und 3.6).
+Der Skill hieß `software-dev-doc-fh`. Das Kürzel `-fh` bezeichnete die Arbeitsweise eines bestimmten Entwicklers; mit der Verallgemeinerung auf Rollen, Register und Härteregeln ist der Skill für jeden mit einem ähnlichen Ansatz nutzbar, und das Kürzel entfällt. Der neue Name ist `software-design-doc`: Was der Skill pflegt, ist im Fachjargon ein Design Doc — Kontext und Ziel, Randbedingungen, Entscheidungen mit Alternativen, Detail bis zur Ausführung. Das Präfix `software-` vermeidet die Verwechslung mit Produkt- oder Oberflächendesign, die `design-doc` allein hätte. Erwogen wurden außerdem `solution-design-doc` und `living-design-doc` (das die parallele Pflege zum Code betont, aber mit dem etablierten Begriff „Living Documentation" für generierte Doku kollidiert). Die Entscheidung ist bis zur Installation ohne Kosten umkehrbar; Skill-Parameterdatei und Skript folgen dem Namen (Kapitel 3.5 und 3.6).
 
 Der Skill ist auf Softwareentwicklung zugeschnitten, aber nicht durchgehend: Softwarespezifisch sind der Regeltext des Vorläufers als Regelteil (Phasen, Segmente, Arbeitsschleife; Anhang A), die Signalwörter des Lints und die Suche nach Erwähnungen im Code. Der Kern — Festlegungen mit Härte, Register, Rollen, geplante Schritte — kennt keinen Code und könnte andere Entwicklungsaufgaben ebenso tragen. Ob er das tut, zeigt sich erst, wenn die Regelteile geschrieben sind; dann wäre `solution-design-doc` der passendere Name.
 
 > **[Q-32] Entscheidungsgrundlage — Name nach Abschluss der Regelteile prüfen**
-> Kontext: `software-design-doc` ist akzeptiert. Der Kern des Skills ist domänenneutral, die Ränder sind es nicht. Sollte sich am Ende zeigen, dass die softwarespezifischen Teile abtrennbar sind (eigener Regelteil, eigener Parameter), trüge der Skill auch andere Entwicklungsaufgaben, und der Name wäre zu eng.
+> Kontext: `software-design-doc` ist akzeptiert. Der Kern des Skills ist domänenneutral, die Ränder sind es nicht. Sollte sich am Ende zeigen, dass die softwarespezifischen Teile abtrennbar sind (eigener Regelteil, eigener Skill-Parameter), trüge der Skill auch andere Entwicklungsaufgaben, und der Name wäre zu eng.
 > Optionen: (a) beim Zusammensetzen (Schritt 7) prüfen, ob die softwarespezifischen Teile in einem Regelteil isoliert sind; wenn ja, Umbenennung in `solution-design-doc` vor der Installation; (b) Name beibehalten, Domänenneutralität nicht anstreben.
 > Vorschlag: (a) — die Prüfung kostet nichts, solange nicht installiert ist.
 > Gewicht: klein · Blockiert: Fahrplanschritt 9
@@ -61,13 +61,13 @@ Dass die Instanz Marken und Registerzeilen tatsächlich schreibt, sichern nicht 
 
 ## 1.4 Bild des fertigen Systems
 
-Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze eine Marke tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen. Der Skill selbst besteht aus einer dünnen `SKILL.md`, die Lage und Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.8), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
+Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze eine Marke tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen. Der Skill selbst besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.8), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
 
 ## 1.5 Der Arbeitsablauf entlang der Anker
 
 Der Skill greift nicht kontinuierlich ein, sondern an benannten Handlungen. Die Reihenfolge in einer Sitzung:
 
-1. **Skillstart.** Die Instanz liest die Parameterdatei oder erhebt aus dem Projekt, was sich ablesen lässt, und fragt nur, was sich nicht ablesen lässt (Kapitel 3.5). Ist der Skill für das Projekt abgewählt, endet er hier.
+1. **Skillstart.** Die Instanz liest die Skill-Parameterdatei oder erhebt aus dem Projekt, was sich ablesen lässt, und fragt nur, was sich nicht ablesen lässt (Kapitel 3.5). Ist der Skill für das Projekt abgewählt, endet er hier.
 2. **Bereich öffnen.** Für den anstehenden Schritt oder die besprochene Idee listet das Skript die Festlegungen des berührten Bereichs mit ihrer Härte und meldet Abweichungen zwischen Prosa und Register (Kapitel 3.6).
 3. **Lage bestimmen.** Aus dem Auftrag folgt, ob die Sitzung ausführt oder entwirft; im Zweifel eine Frage (Kapitel 3.1).
 4. **Plan schreiben.** Jeder Plan trägt den Abschnitt „Berührte Festlegungen": Welche Festlegungen der Schritt berührt, welche Attribute die Instanz annimmt, welche Härte folgt, welche Kollisionen geparkt werden. Das Skript liefert das Gerüst; die Auswirkungskandidaten kommen aus dem Graphen der Marken (Kapitel 3.6). Der Entwickler liest, korrigiert in Prosa oder gibt frei (Kapitel 3.1 und 3.4).
@@ -78,7 +78,7 @@ Ein Projekt, dessen Doku noch keine Marke trägt, kommt am Berührungspunkt in d
 
 ## 1.6 Der Weg zur Fertigstellung
 
-Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Register und Marken, Planung und Skillstart; das Skript in zwei Stufen; die Hooks; das Zusammensetzen des Skills; die Probe; die Migration aus den bisherigen Anweisungsdateien. Die **Probe** (Kapitel 3.8) ist das Tor: Erst wenn sie zeigt, dass die Instanz die Marken setzt und Kollisionen parkt, werden die globalen Anweisungen umgezogen und der Skill installiert (Kapitel 3.9). Scheitert die Probe an diesen beiden Punkten, ist das Design falsch, nicht ein Parameter.
+Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Register und Marken, Planung und Skillstart; das Skript in zwei Stufen; die Hooks; das Zusammensetzen des Skills; die Probe; die Migration aus den bisherigen Anweisungsdateien. Die **Probe** (Kapitel 3.8) ist das Tor: Erst wenn sie zeigt, dass die Instanz die Marken setzt und Kollisionen parkt, werden die globalen Anweisungen umgezogen und der Skill installiert (Kapitel 3.9). Scheitert die Probe an diesen beiden Punkten, ist das Design falsch, nicht ein Skill-Parameter.
 
 ## 1.7 Was dieses Vorhaben nicht ist
 

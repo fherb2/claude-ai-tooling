@@ -21,7 +21,7 @@ Die Datei `noch-geplant.md` des Skills ist am 2026-09-17 in diese Doku übergega
 1. Baustellenschild vom Ordnernamen entfernen: `skills/software-design-doc/`.
 2. Ordner nach `~/.claude/skills/software-design-doc/` kopieren; das Frontmatter der `SKILL.md` trägt H1 und H2.
 3. Inhalt der `CLAUDE-snippet.md` unterhalb der Trennlinie in die `CLAUDE.md` des Zielorts übernehmen; die Snippet-Datei bleibt am Zielort liegen.
-4. Je Projekt: Parameterdatei anlegen lassen, wenn gewünscht; H3 anbieten.
+4. Je Projekt: Skill-Parameterdatei anlegen lassen, wenn gewünscht; H3 anbieten.
 5. Verweise im Repository nachziehen: Zeile in `skills/README.md` und `skills/README.en.md`, Fahrplanschritte 5 und 6 des Repositories, `skill-dev-doc.md`, wo der alte Name steht.
 
 ### 3.9.5 Entscheidungsgrundlagen

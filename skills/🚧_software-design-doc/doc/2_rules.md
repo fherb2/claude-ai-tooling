@@ -4,11 +4,11 @@ Projektweite Festlegungen für alles, was in diesem Vorhaben entsteht: Regelteil
 
 ## 2.1 Sprache und Namen
 
-Schlüsselwörter, Feldnamen, Rollen, Kommandos, Parameter und Dateinamen sind **englisch**. Die Prosa der Regelteile ist deutsch und wird danach auch in englisch als separate Distribution (Zip-File) zur Verfügung gestellt. Diese Doku ist deutsch. Ein Schlüsselwort ist ein Name, keine Beschreibung: Wer `decided` schreibt, meint genau diesen Zustand, und niemand darf `fixed`, `decided` und ein drittes Wort als persönliche Ausdrucksformen desselben Zustands lesen. Jeder Wert eines Feldes ist im Regelteil aufgezählt; ein nicht aufgezählter Wert ist ein Fehler, den das Skript meldet.
+Schlüsselwörter, Feldnamen, Rollen, Kommandos, Script-Argumente, Skill-Parameter und Dateinamen sind **englisch**. Die Prosa der Regelteile ist deutsch und wird danach auch in englisch als separate Distribution (Zip-File) zur Verfügung gestellt. Diese Doku ist deutsch. Ein Schlüsselwort ist ein Name, keine Beschreibung: Wer `decided` schreibt, meint genau diesen Zustand, und niemand darf `fixed`, `decided` und ein drittes Wort als persönliche Ausdrucksformen desselben Zustands lesen. Jeder Wert eines Feldes ist im Regelteil aufgezählt; ein nicht aufgezählter Wert ist ein Fehler, den das Skript meldet.
 
 ## 2.2 Die sieben Bedingungen
 
-Diese sieben Bedingungen halten das Vorhaben auf der Größe „ein Skill, ein Skript". Wird auch nur eine von ihnen fallen gelassen, würde es zurück wachesen: zu dem großen Softwareprojekt, das Kapitel 1.7 ausschließt — einer Editor-Erweiterung für maschinell unterstützte Softwareplanung. Jede Bedingung nennt deshalb, was ohne sie nötig würde.
+Diese sieben Bedingungen halten das Vorhaben auf der Größe „ein Skill, ein Skript". Wird auch nur eine von ihnen fallen gelassen, würde es zurückwachsen: zu dem großen Softwareprojekt, das Kapitel 1.7 ausschließt — einer Editor-Erweiterung für maschinell unterstützte Softwareplanung. Jede Bedingung nennt deshalb, was ohne sie nötig würde.
 
 1. **Marke pflichtig am Definitionsort und dort, wo Text Fakten aus verschiedenen Definitionsorten in Beziehung setzt** (Rolle mit Funktion `relate`, Kapitel 3.3); sonst optional — ohne diese Grenze müsste jede Erwähnung eines Fakts markiert und bei jeder Änderung nachgeführt werden, und das ist ohne Werkzeugunterstützung im Editor nicht zu leisten.
 2. **Kapitel dürfen umnummeriert werden.** Nichts, was der Skill maschinell liest, hängt an einer Kapitelnummer oder einem Titel; IDs tragen kein Kapitel (Kapitel 3.2) — sonst zöge jedes Einfügen und Umsortieren eine Neuvergabe von Adressen über das ganze Dokument nach sich.
@@ -24,14 +24,16 @@ Was ein Abschnitt für den Skill bedeutet, sagt eine Rolle am Abschnitt (Kapitel
 
 Im Dokument des Entwicklers stehen vom Skill nur Adressen: Marken an Festlegungen und Rollen an Überschriften. Keine Skill-Logik, kein Attribut, kein Zustand steht dort; was eine Marke oder eine Rolle bedeutet, steht ausschließlich im Register beziehungsweise im Skill. Prüfbar: Jede Zeile im Dokument, aus der ohne Register oder Skill eine Wirkung des Skills folgen würde, ist ein Verstoß.
 
-## 2.4 Default, Meldung, Argument
+## 2.4 Default, Meldung, Script-Argument
 
-Jede Voraussetzung eines Skripts — Registerort, Doku-Ordner, Dateien mit geplanten Schritten, Parameter — hat einen Default. Das Skript sucht den Default selbst. Findet es ihn nicht, meldet es exakt, wo es gesucht hat und mit welchem Argument der Aufrufer es beim nächsten Mal hinführt; dann hilft die Instanz dem Skript nach und ruft es erneut auf. Der Entwickler wird zu keiner Ablage gezwungen; wer vom Default abweicht, zahlt einen Zwischenschritt der Instanz, sonst nichts.
+Jede Voraussetzung eines Skripts — Registerort, Doku-Ordner, Dateien mit geplanten Schritten, Skill-Parameter — hat einen Default. Das Skript sucht den Default selbst. Findet es ihn nicht, meldet es exakt, wo es gesucht hat und mit welchem Script-Argument der Aufrufer es beim nächsten Mal hinführt; dann hilft die Instanz dem Skript nach und ruft es erneut auf. Der Entwickler wird zu keiner Ablage gezwungen; wer vom Default abweicht, zahlt einen Zwischenschritt der Instanz, sonst nichts.
 
 ## 2.5 Jede Ausgabe ist eine Aussage
 
-Ein Skript endet immer mit einer von vier Aussageklassen, an den Exit-Codes festgemacht (Kapitel 3.6): `OK` mit einem Satz, auch wenn nichts zu berichten ist; `FINDINGS` mit einer Zeile je Gegenstand, jede mit Befund und Vorschlag; `DECIDE` mit einer Entscheidungsvorlage, die als solche gekennzeichnet ist; `FAILED` mit Schritt, Ursache, Zustand zu diesem Zeitpunkt und Abhilfe einschließlich des exakten Arguments. Kein Fortschrittslog, kein Trace als Antwort, keine Zeile, die die Instanz interpretieren müsste, ohne dass eine Entscheidung daran hängt. Eine unbehandelte Ausnahme ist ein Defekt des Skripts; die Prüffälle enthalten absichtlich kaputte Eingaben, damit „keine Befunde" belegt ist und nicht behauptet.
+Ein Skript endet immer mit einer von vier Aussageklassen, an den Exit-Codes festgemacht (Kapitel 3.6): `OK` mit einem Satz, auch wenn nichts zu berichten ist; `FINDINGS` mit einer Zeile je Gegenstand, jede mit Befund und Vorschlag; `DECIDE` mit einer Entscheidungsvorlage, die als solche gekennzeichnet ist; `FAILED` mit Schritt, Ursache, Zustand zu diesem Zeitpunkt und Abhilfe einschließlich des exakten Script-Arguments. Kein Fortschrittslog, kein Trace als Antwort, keine Zeile, die die Instanz interpretieren müsste, ohne dass eine Entscheidung daran hängt. Eine unbehandelte Ausnahme ist ein Defekt des Skripts; die Prüffälle enthalten absichtlich kaputte Eingaben, damit „keine Befunde" belegt ist und nicht behauptet.
 
+**Begründung:** Ein Script ist rein logische Mechanik. Es kann nur definierte Zustände durchlaufen. Für jeden dieser Zustände ist eine Beschreibung nur einmalig beim Kodieren mit einem verständlichen Text als Zeichenkette zu versehen. Auf die Abarbeitung sind Computer spezialisiert und sie führen diese extrem effizient aus. Wird dabei ein Zustand nicht (nur dieses eine Mal beim Kodieren) mit einer aussagekräftigen Zeichenkette belegt, muss die Instanz eines LLM, die dieses Script startet und gezwungen ist, die Antwort des Scripts zu interpretieren, jedes Mal neu in mehreren Schritten die Situation analysieren, gegebenenfalls weitere Prüfungen ausführen, Informationen über das Script aus seinem Quellcode heraus holen und alles so vollständig analysieren, um klar zu entscheiden. Dieser Vorgang ist im Vergleich zu einem Script, indem vielleicht nur ein paar Byte für eine gut beschreibende Zeichenkette fehlen, ein unbeschreiblich (sinnloser) Ressourcenaufwand: kostet **extrem viel mehr** Zeit, Energie und damit auch Geld.
+ 
 ## 2.6 Skripte entscheiden, was mechanisch entscheidbar ist
 
 Was sich aus den Feldern und Dateien mechanisch ableiten lässt — die Härte, die nächste freie ID, ein Abgleich, eine Zählung —, entscheidet das Skript und gibt das Ergebnis als Fakt aus. Nur was sich nicht kodieren lässt, geht als `DECIDE` an die Instanz, und die Ausgabe trennt sichtbar, was Fakt ist und was Entscheidungsvorlage. Eine Vorlage nennt den Gegenstand, die Frage, die Optionen und den Vorschlag des Skripts.
@@ -40,20 +42,28 @@ Was sich aus den Feldern und Dateien mechanisch ableiten lässt — die Härte, 
 
 Rechenzeit von Skripten und Hooks ist vernachlässigbar. Kosten entstehen, wenn die Instanz ein Skript starten und überwachen, eine Ausgabe zu einer Entscheidung verarbeiten, etwas formulieren oder eine Datei ändern muss — der Dateiedit ist der teuerste Vorgang. Daraus: ein Skriptaufruf je Anker, nicht mehrere; Ausgaben sind **entscheidungsfertig** — eine Zeile je Gegenstand mit der Stelle, an der die Instanz nur noch ja/nein oder einen Wert einträgt; das Gerüst des Planabschnitts liefert das Skript, nicht Rohdaten, aus denen die Instanz es baut.
 
+Noch allgemeiner formuliert: Das, was sich mechanisch-logisch an Arbeit bündeln lässt und zwischen drinnen der Instanz für einen Entscheidungsprozess vorgelegt werden muss, um die mechanisch-logische Arbeit fortzusetzen, wird so in Scripts verpackt, dass die Aufrufhäufigkeit durch die Instanz minimiert wird. Lassen sich auf diese Weise Ergebnisse, die der Instanz vorgelegt werden sollen, bündeln, dann soll der Instanz dieses Bündel in geeigneter Form strukturiert nach einem Scriptablauf vorgelegt werden, anstatt von der Instanz für jedes Element dieses Bündels das Script erneut starten zu lassen.
+
 > **[Q-01] Entscheidungsgrundlage — Wortlaut der Vorgaben 2.5 bis 2.7**
 > Kontext: Die drei Vorgaben (Ausgabevertrag, mechanisch entscheiden, Kostenmodell) sind aus Deinen Hinweisen der letzten Runde formuliert und von Dir im Wortlaut nicht gesehen. Sie binden Kapitel 3.6 und 3.7.
 > Optionen: (a) Wortlaut bestätigen; (b) einzelne Sätze ändern — welche?
 > Vorschlag: (a).
 > Gewicht: mittel · Blockiert: Fahrplanschritt 4
-> Antwort:
+> Antwort: Geändert. Erledigt.
 
 ## 2.8 Hooks sind nur lesend
 
 Kein Hook ändert eine Datei. Hooks prüfen, melden und blockieren; das Ändern bleibt bei der Instanz nach Freigabe. Die einzige Blockade ist der Commit bei struktureller Inkonsistenz von Prosa und Register.
 
-## 2.9 Parameter
+## 2.9 Skill-Parameter
 
-Höchstens zwölf Parameter, jeder mit Standardwert. Fehlt die Parameterdatei, gilt in allem der Standard. Der Skillstart erfragt nur, was sich aus dem Projekt nicht ablesen lässt.
+Skill-Parameter sind die Parameter der Projektkonfiguration des Skills; sie stehen in der **Skill-Parameterdatei** (Standardname `.claude/software-design-doc.json`) und gelten je Projekt. Sie umfassen Festlegungen (`mode`, `marking`) ebenso wie Schwellen (`friction_threshold`).
+
+Jeder Skill-Parameter hat einen Standardwert; fehlt die Datei, gilt in allem der Standard. **Ein Projekt muss nie konfigurieren, um den Skill zu benutzen.** Der Skillstart erfragt nur, was sich aus dem Projekt nicht ablesen lässt.
+
+**Aufnahmetest für einen neuen Skill-Parameter:** Er ist nur berechtigt, wenn beides gilt — der Wert lässt sich aus dem Projekt nicht ablesen, **und** es lassen sich zwei reale Projekte nennen, die ihn verschieden setzen würden. Trifft eines von beiden nicht zu, ist es keiner: Was ablesbar ist, wird abgelesen; was überall gleich wäre, wird entschieden und steht im Regelteil oder als Konstante im Skript.
+
+Jeder Skill-Parameter kostet dreifach: eine Entscheidung des Entwicklers, eine Zeile Kontext bei jedem Skillstart, einen Verzweigungspfad im Skript. Wächst die Liste über etwa ein Dutzend, ist das kein Verstoß, aber ein Anlass zur Durchsicht — ein Zeichen, dass Entscheidungen als Parameter ausgelagert wurden, statt getroffen zu werden.
 
 ## 2.10 Fehlende Felder blockieren nie
 
