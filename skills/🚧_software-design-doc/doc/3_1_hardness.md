@@ -2,7 +2,7 @@
 
 ## 3.1 Härte einer Festlegung — Ableitung und Wirkung
 
-Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassungen aus Arbeitspunkt 2: Die Ereigniszeile „bestätigt" heißt `upheld` statt `confirmed`, weil `confirmed` zugleich ein Statuswert ist (Kapitel 3.2); und „Segment 2" ist ersetzt durch „Abschnitte mit der Funktion `global`" (Kapitel 3.3). Dieser Text wird später wörtlich der Regelteil `rules-hardness.md` des Skills; Adressat ist dort die Instanz („Du"), der Mensch heißt „der Entwickler".
+Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassungen aus Arbeitspunkt 2: Die Ereigniszeile „bestätigt" des Vorläufers (Anhang A) heißt `upheld` statt `confirmed`, weil `confirmed` zugleich ein Statuswert ist (Kapitel 3.2); und „Segment 2" ist ersetzt durch „Abschnitte mit der Funktion `global`" (Kapitel 3.3). Dieser Text wird später wörtlich der Regelteil `rules-hardness.md` des Skills; Adressat ist dort die Instanz („Du"), der Mensch heißt „der Entwickler".
 
 > **[Q-02] Entscheidungsgrundlage — Umbenennung der Ereigniszeile in `upheld`**
 > Kontext: Im finalen Text von Arbeitspunkt 1 hieß die Ereigniszeile „gegen eine Idee geprüft und bestätigt" `confirmed` — dasselbe Wort wie der Statuswert `confirmed` (vom Entwickler bestätigt). In einer Grammatik, in der beides in derselben Klammer stehen kann, ist das eine echte Mehrdeutigkeit für Leser und `grep`. Ich habe die Ereigniszeile in diesem Text bereits `upheld` genannt.
@@ -38,7 +38,7 @@ Beide Parameter wohnen in der Parameterdatei (Kapitel 3.5). Fehlen sie, gilt der
 
 **Kontakt.** Eine Festlegung ist kontaktiert, wenn sie im Plan des aktuellen Schritts oder in der Auswirkungsliste der aktuellen Idee genannt werden müsste — weil sie die Änderung begrenzt oder von ihr betroffen ist. Nicht kontaktiert ist, was nur im selben Kapitel steht. Alles Folgende gilt nur für kontaktierte Festlegungen. Kandidaten liefert das Skript aus dem Graphen der Marken (Kapitel 3.6); Du beantwortest je Kandidat, ob er berührt ist.
 
-**Unmarkierte Aussagen.** Findet `grep` im berührten Kapitel keine Marken, liest Du das Kapitel — die Arbeitsschleife verlangt das ohnehin. Als unmarkierte Festlegung zählt eine Aussage nur, wenn sie als Anforderung oder Entscheidung formuliert ist: muss, soll, immer, nie, ein festgelegter Wert. Erläuterungen und Beispiele zählen nicht. Aufnahmetest: Kann Code das verletzen? Jede Aussage, die Du als bindend behandelst, nennst Du im Plan im Wortlaut; liest Du etwas hinein, sieht der Entwickler es dort.
+**Unmarkierte Aussagen.** Findet `grep` im berührten Kapitel keine Marken, liest Du das Kapitel — die Arbeitsschleife des Vorläufers verlangt das ohnehin (Anhang A, Abschnitt A.8). Als unmarkierte Festlegung zählt eine Aussage nur, wenn sie als Anforderung oder Entscheidung formuliert ist: muss, soll, immer, nie, ein festgelegter Wert. Erläuterungen und Beispiele zählen nicht. Aufnahmetest: Kann Code das verletzen? Jede Aussage, die Du als bindend behandelst, nennst Du im Plan im Wortlaut; liest Du etwas hinein, sieht der Entwickler es dort.
 
 **Annahmen statt Fragen.** Fehlt der Marker oder der Grund, bildest Du aus der Prosa selbst eine Annahme über `kind` und `reason` oder Quelle und trägst sie mit `status: assumed` in den Plan ein. Du fragst den Entwickler nur, wo Du keine Annahme bilden kannst; dann steht im Plan eine `pending`-Zeile mit der Frage. Bis zur Antwort gilt vorläufig `decided`.
 
@@ -99,7 +99,7 @@ Jeder Plan trägt diesen Abschnitt. Er ist der Zwischenspeicher aller Annahmen b
 
 **Wiedervorlage.** Eine `assumed`-Festlegung steht bei jedem weiteren Kontakt erneut im Abschnitt, gekennzeichnet als Annahme, ohne erneute Frage. Bei `accept` hebt die nächste Freigabe sie auf `accepted`; bei `keep` bleibt sie, bis der Entwickler sie anspricht.
 
-Die Länge des Abschnitts ist ein Maß für die Schrittgröße: Nennt ein Plan mehr als etwa fünfzehn Festlegungen, ist der Schritt zu groß — zerlegen, wie es der Standard für Kontrollfluss im Plan schon verlangt.
+Die Länge des Abschnitts ist ein Maß für die Schrittgröße: Nennt ein Plan mehr als etwa fünfzehn Festlegungen, ist der Schritt zu groß — zerlegen, wie es der Vorläufer für Kontrollfluss im Plan schon verlangt (Anhang A, Abschnitt A.4).
 
 ### 3.1.7 Fehlende und unlesbare Felder
 

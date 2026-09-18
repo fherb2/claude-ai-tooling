@@ -47,7 +47,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 
 ### 3.6.5 Das Auswirkungsmodul
 
-`impact.py` kapselt Kanten, Gewichte, Kostenfunktion und Abbruch, weil genau hier später nachjustiert wird. Es beantwortet die Frage: Welche Festlegungen sind Kandidaten dafür, von einer Änderung an einer gegebenen Festlegung oder einem Kapitel berührt zu sein? Der Name folgt der Auswirkungsanalyse, die der bisherige Standard als Aufgabe von Segment 1 nennt.
+`impact.py` kapselt Kanten, Gewichte, Kostenfunktion und Abbruch, weil genau hier später nachjustiert wird. Es beantwortet die Frage: Welche Festlegungen sind Kandidaten dafür, von einer Änderung an einer gegebenen Festlegung oder einem Kapitel berührt zu sein? Der Name folgt der Auswirkungsanalyse, die der Vorläufer als Aufgabe von Segment 1 nennt (Anhang A, Abschnitt A.6).
 
 **Knoten** sind Festlegungen. **Kanten** entstehen aus dem Text: zwei Festlegungen, die im selben Absatz genannt sind (Definition oder Zitat), im selben Abschnitt, in Nachbarabschnitten, im selben Kapitel; dazu Treffer der Suchschlüssel als Quelle außerhalb des Graphen. Vorschlag für die Gewichte: gleicher Absatz 0,8 · Mitzitat in einem Absatz mit Funktion `relate` 0,7 · gleicher Abschnitt 0,4 · Nachbarabschnitt 0,2 · gleiches Kapitel 0,05.
 
@@ -88,7 +88,7 @@ Eine Fixture-Doku mit Register, geplanten Schritten und Code-Kommentaren (Kapite
 > Antwort:
 
 > **[Q-22] Entscheidungsgrundlage — Name `impact` statt „Kontakt"**
-> Kontext: Im Gespräch hieß der Vorgang „Kontakt"; Du wolltest etwas mit Bezug zu Graph oder Semantik. `impact` folgt der Auswirkungsanalyse des bisherigen Standards. Alternativen: `neighborhood`, `related`, `reach`.
+> Kontext: Im Gespräch hieß der Vorgang „Kontakt"; Du wolltest etwas mit Bezug zu Graph oder Semantik. `impact` folgt der Auswirkungsanalyse des Vorläufers (Anhang A). Alternativen: `neighborhood`, `related`, `reach`.
 > Optionen: (a) `impact`; (b) eine der Alternativen; (c) ein anderes Wort.
 > Vorschlag: (a).
 > Gewicht: klein · Blockiert: Fahrplanschritt 4

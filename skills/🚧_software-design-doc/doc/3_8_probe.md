@@ -8,7 +8,7 @@ Die logische und codetechnische Seite des Vorhabens gilt als durchdrungen; was b
 
 ### 3.8.2 Fixture
 
-Eine kleine Doku im Dreiersschema mit Rollen: ein Kapitel `relate` mit drei Absätzen und Zitatmarken, zwei Kapitel `building-blocks`, ein Abschnitt `crosscutting`, acht bis zehn Festlegungen — darunter zwei `given`, eine `pinned`, eine mit zwei `friction`-Zeilen, eine `superseded` —, drei geplante Schritte, einer mit `target:`, eine Parameterdatei mit Standardwerten, ein Code-Ordner mit ID-Kommentaren für `mentions`. Dazu beschädigte Varianten für die Prüffälle (Kapitel 3.6).
+Eine kleine Doku im Dreiersschema des Vorläufers (Anhang A) mit Rollen: ein Kapitel `relate` mit drei Absätzen und Zitatmarken, zwei Kapitel `building-blocks`, ein Abschnitt `crosscutting`, acht bis zehn Festlegungen — darunter zwei `given`, eine `pinned`, eine mit zwei `friction`-Zeilen, eine `superseded` —, drei geplante Schritte, einer mit `target:`, eine Parameterdatei mit Standardwerten, ein Code-Ordner mit ID-Kommentaren für `mentions`. Dazu beschädigte Varianten für die Prüffälle (Kapitel 3.6).
 
 ### 3.8.3 Ablauf
 
