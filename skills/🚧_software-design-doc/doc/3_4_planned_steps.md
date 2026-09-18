@@ -32,7 +32,7 @@ Wo eine Planung steht, entscheidet sich bei jeder Planung einzeln nach Länge un
 
 Wächst eine Planung beim Ausarbeiten über die zehn Sätze hinaus, bleibt sie nicht im Schritt, sondern wandert an einen der beiden anderen Orte und hinterlässt einen Verweis. Nach der Ausführung wandert, was zur Beurteilung nötig bleibt, in die Doku — Kapitel oder Anhang, nach der Grenze, die der Standard dafür kennt —; die Planungsdatei wird gelöscht, und die Zeile in der Statusdatei nennt sie. Es steht höchstens eine unausgeführte Planung je Schritt.
 
-Die Regel des Kontext-Haushalts ändert sich mit: Wird der Kontext knapp, ist die nächste Handlung nicht „den Fahrplan detaillieren", sondern „die Planung an ihrem Ort vertiefen und im Schritt darauf verweisen". Der Review-Anhang behält seine Funktion, verliert aber den Sonderstatus: Die Bearbeitung eines Befundes ist der Anwendungsfall von Ort 2, eine Planung, deren Begründung überdauern muss.
+Die Regel des Kontext-Haushalts ändert sich mit: Wird der Kontext knapp, ist die nächste Handlung nicht „den Fahrplan detaillieren", sondern „die Planung an ihrem Ort vertiefen und im Schritt darauf verweisen". Der Review-Anhang (Anhang A, Abschnitt A.9) behält seine Funktion, verliert aber den Sonderstatus: Die Bearbeitung eines Befundes ist der Anwendungsfall von Ort 2, eine Planung, deren Begründung überdauern muss.
 
 Die Statusdatei trägt ausschließlich abgearbeitete Schritte in der Reihenfolge des Abschlusses; Entscheidungen gehören sofort in das zuständige Kapitel.
 
