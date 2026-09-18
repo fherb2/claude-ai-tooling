@@ -79,32 +79,40 @@ Der Skill erbringt sieben unterscheidbare Leistungen. Sie sind nicht alle gleich
 
 ### 1.5.1 Erstanlage einer begleitenden Doku
 
-Das ist der Fall, in dem ein Projekt noch keine begleitende Doku hat und der Entwickler eine haben will. Er ist selten, aber folgenreich: Was hier entsteht, prägt die Arbeit der nächsten Monate.
+Das ist der Fall, in dem ein Projekt noch keine begleitende Doku hat und der Entwickler eine haben will. Er ist folgenreich: Was hier entsteht, prägt die Arbeit der nächsten Monate.
 
 **Auslöser.** Nur ein ausdrücklicher Auftrag des Entwicklers. Der Skill bietet die Erstanlage **nie von sich aus an** — von selbst wächst die Doku an Festlegungen und nicht an Pflichten (Leistung 2 und 3). Ein Projekt, das nur einen Schritt zu erledigen hat, bekommt kein Gerüst, sondern eine Festlegung mit einem Zuhause.
 
-**Kein Fragebogen.** Die Erstanlage folgt derselben Regel wie alles andere: Die Instanz bildet Annahmen, legt sie im Plan vor, der Entwickler korrigiert in Prosa (1.3.4). Sie stellt also **nicht** fünf Fragen nacheinander, sondern liest zuerst das Projekt und legt dann **einen vollständigen Vorschlag** vor, in dem jede Annahme sichtbar ist und die verworfenen Alternativen benannt sind.
+**Klärung im Gespräch, kein Formular.** Die Erstanlage folgt derselben Regel wie alles andere: Die Instanz bildet Annahmen, legt sie im Plan vor, der Entwickler korrigiert in Prosa (1.3.4). Sie arbeitet also keine Fragenliste ab, sondern liest zuerst das Projekt und legt dann **einen vollständigen Vorschlag** vor, in dem jede Annahme sichtbar ist und die verworfenen Alternativen benannt sind.
 
-**Was die Instanz vorher liest** — alles ohne Rückfrage, alles nur lesend: Gibt es schon Text, der als Doku gemeint ist (README, `docs/`, Konzeptdateien)? Wie groß ist der Code, wie viele Module? Gibt es eine Liste offener Schritte? Führt das Repository mehrere Vorhaben? Wie schreibt der Entwickler Prosa — ein Absatz je Zeile oder umbrochen? Daraus folgt der Vorschlag; was sich nicht ablesen lässt, wird angenommen und als Annahme gekennzeichnet.
+Ganz ohne Klärung geht es dennoch nicht: Was sich aus dem Projekt nicht ablesen lässt und wofür es keine tragfähige Annahme gibt, wird besprochen — so wenige Punkte wie möglich, jeder mit einem Vorschlag, und die Antworten wandern in die Skill-Parameterdatei, damit sie nie zweimal erfragt werden. Dazu gehört regelmäßig die Frage, ob die Einstiegsform einen eigenen Ordner bekommt oder ihre eine Datei ohne Ordner im Projekt liegt.
+
+**Was die Instanz vorher liest** — alles im Projekt ohne Rückfrage, alles nur lesend: Gibt es schon Text, der als Doku gemeint ist (README, `docs/`, Konzeptdateien)? Wie groß ist der Code, wie viele Module? Gibt es eine Liste offener Schritte? Führt das Repository mehrere Vorhaben? Wie schreibt der Entwickler Prosa — ein Absatz je Zeile oder umbrochen? Daraus folgt der Vorschlag; was sich nicht ablesen lässt, wird angenommen und als Annahme gekennzeichnet.
 
 **Der Vorschlag im Plan** nennt sechs Dinge, jedes mit Begründung in einem Satz:
 
-1. **Ort der Doku** — ein Ordner, Vorschlag der im Projekt übliche oder `doc/`.
+1. **Ort der Doku** — ein Ordner, Vorschlag der im Projekt übliche (falls das klar aus den Informationen über die bestehende Projektstruktur hervorgeht) oder `dev-doc/`, `design-doc/`, `accompanying-doc/`, `accomp-doc/`, `accomp-dev-doc/` oder `accomp-design-doc/`. Beachte: Dieser Skill dient einer projektbegleitenden Dokumentation der Entwicklung und nicht einer in sich abgeschlossenen Projektdokumentation oder Anwenderdokumentation. Der übliche Ordner `doc/` für die Dokumentation des fertigen Projektvorhabens ist deshalb meist nicht der richtige Platz. Das sollte dem Entwickler gesagt werden, wenn er `doc/` unter der Projektwurzel vorschlägt. Letztlich ist aber jede finale Vorgabe des Entwicklers als Platz dieser Dokumentation zu akzeptieren.
 2. **Gliederung** — eine der drei Formen unten, mit Begründung, warum diese zur Größe des Vorhabens passt.
 3. **Rollen der Abschnitte** — welcher Abschnitt welche Rolle trägt (Kapitel 3.3). Besonders: ob es einen Abschnitt gibt, der Festlegungen zueinander in Beziehung setzt (Funktion `relate`). Das ist die folgenreichste Einzelheit der Erstanlage, denn ohne einen solchen Text hat die Auswirkungsrechnung keine Kanten über Kapitelgrenzen hinweg (1.5.4).
-4. **Ort des Registers** — Standard ist `decisions.md` im Doku-Ordner.
-5. **Ort der geplanten Schritte** — eigene Datei oder Abschnitt mit der Rolle `plan` in einer vorhandenen Datei.
+4. **Ort des Registers** — Standard ist `decisions.md` im Doku-Ordner. Dem Entwickler kann aber angeboten werden, die Metainformationen stattdessen in einem Ordner unterhalb von `.claude/` abzulegen.
+5. **Ort der geplanten Schritte** — eigene Datei oder Abschnitt mit der Rolle `plan` in einer vorhandenen Datei. Bei einer eigenen Datei für diesen Zweck wird dem Entwickler angeboten, diese ebenfalls im Doku-Ordner anzulegen oder alternativ unterhalb von `.claude/`.
 6. **Layout der Prosa** — ein Absatz je Zeile oder Umbruch mit Leerzeilen; abgelesen, wo möglich.
 
 **Die drei Gliederungsformen**, die der Skill anbietet:
 
 | Form | Woraus sie besteht | Wofür |
 |---|---|---|
-| **Einstiegsform** | eine Datei mit der Rolle `building-blocks`, dazu das Register | kleine Vorhaben; ein Modul; alles, was eine Person überblickt |
-| **Dreiteilung** | Zusammenhänge (`relate`), Vorgaben (`global`), Einheiten (`building-blocks`) — das Schema des Vorläufers (Anhang A) | der bewährte Mittelweg; wächst mit |
+| **Einstiegsform** | eine einzige Datei als `accompanying-doc` mit der Rolle `building-blocks`, dazu das Register | kleine Vorhaben; ein Modul; alles, was eine Person überblickt |
+| **Dreiteilung** | Funktionale Aufgabenbeschreibung und Zusammenhänge (`relate`), Grundsätzliche Vorgaben (`global`), Details in Planung und Ausführung der zum Projekt gehörigen Module bzw. Einheiten (`building-blocks`), dazu Zusatzinformationen in Form von Anhängen zur Doku oder eigenen Dateien (auch an anderen Orten des Projekts, wie z.B. `research/`, `datasheets/` und Ähnliche.) — das Schema des Vorläufers (Anhang A) | der bewährte Mittelweg; wächst mit |
 | **Sichtenform** | ein Kern nach arc42: Ziele, Randbedingungen, Kontext, Lösungsstrategie, Bausteine, Laufzeit, Querschnitt | große oder langlebige Systeme; Projekte, die arc42 ohnehin führen |
 
-Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, warum sie hier nicht passen. Der Entwickler kann in Prosa widersprechen („nimm die Sichtenform"), und die Instanz baut den Plan um — nicht die Dateien.
+Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, warum sie hier nicht passen oder alternativ auch sinnvoll wären. Der Entwickler kann in Prosa widersprechen („nimm die Sichtenform"), und die Instanz baut den Plan um — nicht die Dateien.
+
+**Planungen und Arbeitsschritte:** Mit dem Entwickler ist zu klären, wie der Projektfortschritt im Ganzen bzw. in großen Abschnitten sowie im Detail geplant werden soll:
+
+- Soll es eine Art "Fahrplan" über mehrere Entwicklungsschritte hinaus geben? Wenn ja, in einer eigenen Datei (`work-plan.md`) oder innerhalb eines anderen Dokuments?
+- Soll die detaillierte Planung eines oder weniger aufeinanderfolgenden Schritte nur im Chat bleiben, immer in einer eigenen Datei angelegt werden (`plan-<bezeichnung>.md`, wohin?) oder in voller Detaillierung in den `work-plan` oder einer vergleichbaren Datei des Projekts?
+- Werden abgearbeitete Schritte aufgezeichnet? Wenn ja: In einer eigenen Datei (`status.md` oder `history.md`), die die abgearbeiteten Schritte als Liste aus dem `work-plan` übernimmt (der Text wandert dorthin), oder in einer entsprechenden Sektion des `work-plan` oder der Doku selbst?
 
 **Was nach der Freigabe entsteht:** die Dateien der gewählten Form, jede mit Überschriften und Rollenmarkern, aber **ohne leere Kapitelhüllen**; das Register als leere Datei mit ihrer Rolle; die Skill-Parameterdatei mit den Werten, die aus dem Plan folgen — damit sie in keiner späteren Sitzung erneut erfragt werden. Ein Gerüst ist eine Ordnung, kein Vorrat: Ein Abschnitt entsteht, wenn er etwas zu halten hat.
 
@@ -116,7 +124,7 @@ Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, waru
 
 ### 1.5.2 Einstieg in eine vorhandene Doku
 
-Der Regelfall, denn die meisten Projekte haben schon Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration**: Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1 und 3.2.7). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.5.5).
+Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration**: Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1 und 3.2.7). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.5.5).
 
 ### 1.5.3 Laufende Pflege während der Implementierung
 
