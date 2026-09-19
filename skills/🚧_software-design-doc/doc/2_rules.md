@@ -44,13 +44,6 @@ Rechenzeit von Skripten und Hooks ist vernachlässigbar. Kosten entstehen, wenn 
 
 Noch allgemeiner formuliert: Das, was sich mechanisch-logisch an Arbeit bündeln lässt und zwischen drinnen der Instanz für einen Entscheidungsprozess vorgelegt werden muss, um die mechanisch-logische Arbeit fortzusetzen, wird so in Scripts verpackt, dass die Aufrufhäufigkeit durch die Instanz minimiert wird. Lassen sich auf diese Weise Ergebnisse, die der Instanz vorgelegt werden sollen, bündeln, dann soll der Instanz dieses Bündel in geeigneter Form strukturiert nach einem Scriptablauf vorgelegt werden, anstatt von der Instanz für jedes Element dieses Bündels das Script erneut starten zu lassen.
 
-> **[Q-01] Entscheidungsgrundlage — Wortlaut der Vorgaben 2.5 bis 2.7**
-> Kontext: Die drei Vorgaben (Ausgabevertrag, mechanisch entscheiden, Kostenmodell) sind aus Deinen Hinweisen der letzten Runde formuliert und von Dir im Wortlaut nicht gesehen. Sie binden Kapitel 3.6 und 3.7.
-> Optionen: (a) Wortlaut bestätigen; (b) einzelne Sätze ändern — welche?
-> Vorschlag: (a).
-> Gewicht: mittel · Blockiert: Fahrplanschritt 4
-> Antwort: Geändert. Erledigt.
-
 ## 2.8 Hooks sind nur lesend
 
 Kein Hook ändert eine Datei. Hooks prüfen, melden und blockieren; das Ändern bleibt bei der Instanz nach Freigabe. Die einzige Blockade ist der Commit bei struktureller Inkonsistenz von Prosa und Register.

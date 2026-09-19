@@ -10,7 +10,6 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 
 | Q | Thema | Ort | Gewicht | Blockiert |
 |---|---|---|---|---|
-| Q-01 | Wortlaut der Vorgaben 2.5–2.7 | `2_rules.md`, vor 2.8 | mittel | 4 |
 | Q-02 | Ereigniszeile `upheld` | `3_1_hardness.md`, Anfang | klein | 1 |
 | Q-03 | Marker vor oder nach Satzzeichen | `3_2_register_marks.md`, 3.2.10 | klein | 1 |
 | Q-04 | Fingerabdruck: ob und wie | 3.2.10 | mittel | 5 |
@@ -41,9 +40,8 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-29 | Verbleib der Werkzeug-Skills | `3_9_migration.md`, 3.9.5 | mittel | 9 |
 | Q-30 | Reihenfolge der Freigaben beim Umzug | 3.9.5 | klein | 9 |
 | Q-31 | Trigger-Anker nach `mode: off` | 3.9.5 | klein | 9 |
-| Q-32 | Name nach Abschluss der Regelteile prüfen | `1_overview.md`, 1.1 | klein | 9 |
 
-Vor Schritt 1 zu klären: Q-02, Q-03, Q-05, Q-08 bis Q-11. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-07, Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
+Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01 und Q-32. Vor Schritt 1 zu klären: Q-02, Q-03, Q-05, Q-08 bis Q-11. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-07, Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
 
 ## 1 Regelteil Marker und Register
 
@@ -79,7 +77,7 @@ Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Ko
 
 ## 9 Migration und Installation
 
-Kapitel 3.9: Umzug aus der globalen Anweisungsdatei Passage für Passage, Bereinigung der Projekt-`CLAUDE.md`, Werkzeug-Skills, Baustellenschild, Installation, Verweise im Repository. Hängt an: Schritt 8 bestanden; Q-29 bis Q-32. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Der Umzug berührt globale Anweisungen.
+Kapitel 3.9: Umzug aus der globalen Anweisungsdatei Passage für Passage, Bereinigung der Projekt-`CLAUDE.md`, Werkzeug-Skills, Baustellenschild, Installation, Verweise im Repository. Hängt an: Schritt 8 bestanden; Q-29 bis Q-31 (Q-32 geklärt, siehe status.md). Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Der Umzug berührt globale Anweisungen.
 
 ## Summe
 

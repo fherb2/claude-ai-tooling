@@ -10,14 +10,7 @@ Noch nicht entschiedene Punkte stehen als Zitatblöcke `[Q-nn] Entscheidungsgrun
 
 Der Skill hieß `software-dev-doc-fh`. Das Kürzel `-fh` bezeichnete die Arbeitsweise eines bestimmten Entwicklers; mit der Verallgemeinerung auf Rollen, Register und Härteregeln ist der Skill für jeden mit einem ähnlichen Ansatz nutzbar, und das Kürzel entfällt. Der neue Name ist `software-design-doc`: Was der Skill pflegt, ist im Fachjargon ein Design Doc — Kontext und Ziel, Randbedingungen, Entscheidungen mit Alternativen, Detail bis zur Ausführung. Das Präfix `software-` vermeidet die Verwechslung mit Produkt- oder Oberflächendesign, die `design-doc` allein hätte. Erwogen wurden außerdem `solution-design-doc` und `living-design-doc` (das die parallele Pflege zum Code betont, aber mit dem etablierten Begriff „Living Documentation" für generierte Doku kollidiert). Die Entscheidung ist bis zur Installation ohne Kosten umkehrbar; Skill-Parameterdatei und Skript folgen dem Namen (Kapitel 3.5 und 3.6).
 
-Der Skill ist auf Softwareentwicklung zugeschnitten, aber nicht durchgehend: Softwarespezifisch sind der Regeltext des Vorläufers als Regelteil (Phasen, Segmente, Arbeitsschleife; Anhang A), die Signalwörter des Lints und die Suche nach Erwähnungen im Code. Der Kern — Festlegungen mit Härte, Register, Rollen, geplante Schritte — kennt keinen Code und könnte andere Entwicklungsaufgaben ebenso tragen. Ob er das tut, zeigt sich erst, wenn die Regelteile geschrieben sind; dann wäre `solution-design-doc` der passendere Name.
-
-> **[Q-32] Entscheidungsgrundlage — Name nach Abschluss der Regelteile prüfen**
-> Kontext: `software-design-doc` ist akzeptiert. Der Kern des Skills ist domänenneutral, die Ränder sind es nicht. Sollte sich am Ende zeigen, dass die softwarespezifischen Teile abtrennbar sind (eigener Regelteil, eigener Skill-Parameter), trüge der Skill auch andere Entwicklungsaufgaben, und der Name wäre zu eng.
-> Optionen: (a) beim Zusammensetzen (Schritt 7) prüfen, ob die softwarespezifischen Teile in einem Regelteil isoliert sind; wenn ja, Umbenennung in `solution-design-doc` vor der Installation; (b) Name beibehalten, Domänenneutralität nicht anstreben.
-> Vorschlag: (a) — die Prüfung kostet nichts, solange nicht installiert ist.
-> Gewicht: klein · Blockiert: Fahrplanschritt 9
-> Antwort:(a), 18.9.2026
+Der Skill ist auf Softwareentwicklung zugeschnitten, aber nicht durchgehend: Softwarespezifisch sind der Regeltext des Vorläufers als Regelteil (Phasen, Segmente, Arbeitsschleife; Anhang A), die Signalwörter des Lints und die Suche nach Erwähnungen im Code. Der Kern — Festlegungen mit Härte, Register, Rollen, geplante Schritte — kennt keinen Code und könnte andere Entwicklungsaufgaben ebenso tragen. **Entschieden am 2026-09-18:** Beim Zusammensetzen des Skills wird geprüft, ob die softwarespezifischen Teile in einem eigenen Regelteil isoliert sind. Sind sie es, wird der Skill vor der Installation in `solution-design-doc` umbenannt; die Prüfung kostet nichts, solange nicht installiert ist (Fahrplanschritt 9).
 
 ## 1.2 Ausgangslage: zwei Fehlbilder
 
