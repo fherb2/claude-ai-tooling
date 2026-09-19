@@ -108,7 +108,7 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 
 ## 1.5 Ein Beispiel von Anfang bis Ende
 
-Sieben Szenen an einem erfundenen, sehr kleinen Vorhaben: Ein Werkzeug liest Messwerte von einem Sensor und schreibt sie in eine Datei. Das Beispiel zeigt jeden Begriff aus 1.4 im Gebrauch und macht sichtbar, wer wann handelt. Wer es gelesen hat, findet in Kapitel 2 und 3 nur noch Einzelheiten.
+Acht Szenen an einem erfundenen Vorhaben: Ein Werkzeug liest Messwerte von einem Sensor und schreibt sie in eine Datei. Die ersten sieben sind ausgeführt und zeigen jeden Begriff aus 1.4 im Gebrauch; die achte springt ein Jahr weiter und beschreibt — ohne Ausführung — einen Umbau an einem gewachsenen Vorhaben, weil erst dort die Auswirkungsrechnung etwas beiträgt. Wer das gelesen hat, findet in Kapitel 2 und 3 nur noch Einzelheiten.
 
 ### 1.5.1 Szene 1 — Der Entwickler lässt eine Doku anlegen
 
@@ -231,9 +231,30 @@ Die neue Festlegung bekommt eine neue ID; die alte bleibt im Register stehen und
 
 In der Prosa wird der Satz umgeschrieben und trägt jetzt `[D-0007]`. Und die alten Verweise? Ein Commit-Text von letztem Monat nennt D-0002, ein älterer Absatz zitiert sie — beide lösen weiterhin auf, denn das Register kennt die Nachfolgerin und `show D-0002` nennt sie. **Niemand muss vor dem Weiterarbeiten das Projekt nach alten Verweisen absuchen.**
 
-### 1.5.8 Was der Entwickler in diesen sieben Szenen getan hat
+### 1.5.8 Szene 8 — Ein Jahr später: der Umbau, und wozu die Auswirkungsrechnung da ist
 
-Er hat Prosa geschrieben, Pläne gelesen und **viermal in Prosa geantwortet**: einmal zum Ordner, einmal zu Datenblatt und CSV, einmal zur Idee, einmal zur Blockgröße.
+Die sieben Szenen zeigen alles außer einem: Wozu die Kantenrechnung über den Graphen gut ist. Sie zeigen es nicht, weil sie es nicht können — das Vorhaben hat einen Abschnitt und einen Absatz, in dem jede Festlegung neben jeder anderen steht. Der Graph gäbe dort alle zurück, und alle wären unerheblich. **Die Auswirkungsrechnung verdient sich erst, wenn eine Doku mehrere Kapitel hat und es einen Text mit der Funktion `relate` gibt.** Diese Szene beschreibt einen solchen Fall in seinen Schritten, ohne ihn auszuführen.
+
+**Die Lage.** Aus dem Testwerkzeug ist die Software eines Geräts geworden. Mehrere Sensoren hängen über I2C am Controller, jeder mit eigenem Treiber; geschrieben wird nicht mehr in eine Datei, sondern in eine SQLite-Datenbank; die Doku hat Kapitel für Hardware und Treiber, für die Speicherung und für die Auswertung, dazu einen Übersichtstext mit der Funktion `relate`. Jetzt sollen Statuswerte per LoRaWAN übertragen werden. Der Transceiver bringt einen eigenen Temperatursensor mit — der bisher verbaute kann entfallen. Programm und Doku sind zu überarbeiten.
+
+**Warum das ein schwieriger Umbau ist.** Nicht die Frage „was ändert sich am Temperatursensor" ist das Problem, sondern „was hat stillschweigend vorausgesetzt, dass es ihn gibt". Solche Voraussetzungen nennen ihren Gegenstand oft nicht beim Namen. Eine Festlegung in der Auswertung — etwa, dass über eine bestimmte Zahl von Messwerten gemittelt wird, weil sonst das Rauschen durchschlägt — hängt an der Rauschcharakteristik des alten Sensors, ohne ihn zu erwähnen. Der neue hat andere Werte. Eine Textsuche findet diesen Satz nicht; der Graph findet ihn, weil er im Übersichtstext im selben Absatz zitiert wird wie die Temperaturmessung.
+
+**Die Schritte:**
+
+1. **Erst die Idee, dann der Umbau.** Der Entwickler bringt den Vorschlag; die Instanz arbeitet zunächst in der Lage `design` — trägt der Ersatz überhaupt, was kostet er, welche Festlegungen stehen dagegen. Erst wenn entschieden ist, wechselt die Sitzung nach `execute`.
+2. **Bereich öffnen.** Das Skript listet die Festlegungen der berührten Kapitel mit ihrer abgeleiteten Härte und meldet Abweichungen zwischen Prosa und Register.
+3. **Auswirkungskandidaten suchen.** Für jede Festlegung, die entfällt oder sich ändert, liefert die Auswirkungsrechnung Kandidaten aus drei Quellen: Nähe im Text, Mitzitat im `relate`-Text, Treffer der Suchschlüssel. Je Kandidat nennt sie, **warum** er einer ist und wie weit er entfernt liegt.
+4. **Je Kandidat entscheiden.** Die Instanz beantwortet für jeden, ob er wirklich berührt ist, und nennt bei den bestätigten die gemessenen Umbaukosten. Hier taucht der Satz aus der Auswertung auf, den niemand mehr im Kopf hatte.
+5. **Härten ansehen.** Die Festlegungen über die alte Hardware sind `given` — nach Prüfung R3 also `fixed`. Aber ihre Quelle ist hinfällig geworden: Das Datenblatt beschreibt ein Bauteil, das nicht mehr verbaut wird. Genau dafür sagt die Instanz den Satz „Quelle noch aktuell?" — und der Entwickler öffnet sie mit einem Wort.
+6. **Den Planabschnitt füllen.** „Berührte Festlegungen" wird lang. Das ist selbst eine Aussage: Nennt ein Plan mehr als etwa fünfzehn Festlegungen, ist der Schritt zu groß und wird zerlegt — etwa in „Treiber und Hardware", „Schema und Speicherung", „Auswertung anpassen", jeder mit eigenem Umbauziel.
+7. **Ausführen.** Die Festlegung über die I2C-Adresse des alten Sensors entfällt ersatzlos (`retired`); die über die Temperaturmessung bekommt eine Nachfolgerin (`superseded by`); für LoRaWAN — Übertragungsintervall, Nutzlast, Sendeleistung — entstehen neue Festlegungen mit neuen IDs. Der Übersichtstext bekommt die neuen Zitatmarker, und damit hat der Graph beim nächsten Umbau wieder Kanten.
+8. **Die Abrechnung.** Am Ende lässt sich sagen, was die Rechnung beigetragen hat: wie viele Kandidaten sie vorgelegt hat, wie viele davon wirklich betroffen waren und — das ist die interessante Zahl — wie viele davon eine Textsuche nicht gefunden hätte. Diese Zahl ist die Rechtfertigung des ganzen Verfahrens; sie zu messen ist Gegenstand der Probe (Kapitel 3.8).
+
+**Noch nicht entschieden** ist, was genau eine Kante ist und wie sie gewichtet wird; deshalb nennt diese Szene keine Zahlen (Q-20 und Q-21 in Kapitel 3.6.9).
+
+### 1.5.9 Was der Entwickler in diesen Szenen getan hat
+
+In den ersten sieben Szenen hat er Prosa geschrieben, Pläne gelesen und **viermal in Prosa geantwortet**: einmal zum Ordner, einmal zu Datenblatt und CSV, einmal zur Idee, einmal zur Blockgröße. In Szene 8 kommen zwei Entscheidungen dazu — ob der Ersatz überhaupt trägt, und das Wort, das die hinfällig gewordene Hardware-Festlegung öffnet.
 
 Was er **nie** getan hat: einen Marker gesetzt, eine Registerzeile geschrieben, ein Schlüsselwort gelernt, eine Härte bestimmt, gezählt, wie oft etwas gerieben hat. Und was der Skill nie getan hat: seine Prosa umgeschrieben, ohne dass er es freigegeben hat.
 
