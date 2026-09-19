@@ -17,10 +17,10 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-05 | Suchschlüssel | 3.2.10 | mittel | 1 |
 | Q-06 | Zitatmarker außerhalb `relate` | 3.2.10 | klein | — |
 | Q-07 | Rückfalloption Wortlaut-Anker | 3.2.10 | klein | 3 |
-| Q-08 | Umfang des Rollensatzes | `3_3_document_roles.md`, 3.3.6 | groß | 1 |
-| Q-09 | Rolle `decisions` | 3.3.6 | mittel | 1 |
-| Q-10 | Namen der Funktionen | 3.3.6 | klein | 1 |
-| Q-11 | Position des Rollenmarkers | 3.3.6 | klein | 1 |
+| Q-08 | Umfang des Rollensatzes | `3_3_document_roles.md`, 3.3.5 | groß | 1 |
+| Q-09 | Rolle `decisions` | 3.3.5 | mittel | 1 |
+| Q-10 | Namen der Funktionen | 3.3.5 | klein | 1 |
+| Q-11 | Position des Rollenmarkers | 3.3.5 | klein | 1 |
 | Q-12 | Inhalt geplanter Schritte, Ablageorte (früher T2) | `3_4_planned_steps.md`, 3.4.4 | groß | 2 |
 | Q-13 | Kapitelziel über Dateipfad | 3.4.4 | mittel | 2 |
 | Q-14 | Kennungen für Schritte | 3.4.4 | klein | 2 |

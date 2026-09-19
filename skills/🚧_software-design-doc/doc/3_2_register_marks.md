@@ -4,7 +4,7 @@ Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, 
 
 ### 3.2.1 Trennung von Prosa und Register
 
-Die Prosa trägt je Festlegung nur einen Marker; alle Attribute, Ereignisse und der Lebenszyklus stehen im Register. Grund: Ein Absatz, der mehrere Fakten in einem Gedankengang definiert, bleibt ein Absatz mit rotem Faden. Die Zeilenform, die ein Register braucht, gehört in eine Datei, die eine Liste ist. Der Festlegungstext hat genau ein Zuhause, die Prosa; das Register kopiert ihn nicht, sondern trägt ein Kurzlabel von wenigen Worten zur Orientierung, das ausdrücklich nicht normativ ist.
+Die Prosa trägt je Festlegung nur einen Marker; alle Attribute, Ereignisse und der Lebenszyklus stehen im Register. Warum die Trennung so verläuft, steht in Kapitel 1.3.2. Für die Umsetzung folgt daraus: Der Festlegungstext hat genau ein Zuhause, die Prosa; das Register kopiert ihn nicht, sondern trägt ein Kurzlabel von wenigen Worten zur Orientierung, das ausdrücklich nicht normativ ist und von keiner Prüfung gelesen wird.
 
 ### 3.2.2 Marker
 
@@ -27,7 +27,7 @@ Offen: ob der Marker vor oder nach dem Satzzeichen steht. Vorschlag: vor dem Sat
 
 ### 3.2.3 ID
 
-`D-0042`: ein globaler Zähler je Register, mindestens vier Stellen, nie neu vergeben, vom Skript vergeben (`next-id`). Die ID trägt kein Kapitel und keinen Ort; das Kapitel leitet das Skript aus dem Ort der Definitionsmarker ab. Grund: Kapitel werden umnummeriert, weil inhaltlich Nahes im Dokument nahe beieinander liegen soll und eine Doku von klein auf wächst; eine Adresse, die dabei lügt, ist schlechter als keine. Das `D` steht für decision.
+`D-0042`: ein globaler Zähler je Register, mindestens vier Stellen, nie neu vergeben, vom Skript vergeben (`next-id`). Die ID trägt kein Kapitel und keinen Ort; das Kapitel leitet das Skript aus dem Ort des Definitionsmarkers ab. Dass sie keins tragen darf, ist Bedingung 2 in Kapitel 2.2 — Kapitel werden umnummeriert, und eine Adresse, die dabei lügt, ist schlechter als keine. Das `D` steht für decision.
 
 Wird eine Festlegung inhaltlich zu einer anderen — etwa von einer Kapitelfestlegung zu einer projektweiten Vorgabe —, ist das eine neue Festlegung mit neuer ID; die alte wird abgelöst (3.2.6).
 

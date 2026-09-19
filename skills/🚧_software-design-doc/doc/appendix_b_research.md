@@ -33,7 +33,19 @@ Für die Kantenrechnung: networkx bietet `single_source_dijkstra_path_length(G, 
 
 ## B.3 Standards für Designdokumentation (2026-09-17)
 
-Siehe Kapitel 3.3, Abschnitt 3.3.5. Belegt: arc42 (zwölf Abschnitte, CC BY-SA 4.0, deutsche Fassung). Unbestätigt: Google-Design-Docs, IEEE 1016, ISO/IEC/IEEE 42010.
+Anlass war die Frage, woher die Namen der Inhaltsrollen kommen sollen (Kapitel 3.3.2).
+
+**arc42** (belegt an arc42.org): zwölf Abschnitte — Introduction and Goals, Constraints, Context and Scope, Solution Strategy, Building Block View, Runtime View, Deployment View, Crosscutting Concepts, Architecture Decisions, Quality Requirements, Risks and Technical Debt, Glossary. Lizenz CC BY-SA 4.0, deutsche Fassung vorhanden. Identifikatoren je Aussage schreibt arc42 nicht vor.
+
+**Google-Design-Docs** (unbestätigt, aus Sekundärquellen): Kontext und Umfang, Ziele und Nicht-Ziele, Entwurf, erwogene Alternativen, Querschnittsbelange; bewusst informell, kein fester Abschnittssatz.
+
+**IEEE 1016 Software Design Description** (unbestätigt): Sichten `context`, `composition`, `logical`, `dependency`, `information`, `patterns use`, `interface`.
+
+**ISO/IEC/IEEE 42010** (unbestätigt): definiert die Begriffe viewpoint, view und concern, schreibt aber keine Sichten vor.
+
+**Diátaxis** betrifft Anwenderdokumentation und ist hier nicht einschlägig.
+
+**Ergebnis:** arc42 ist die einzige der Quellen mit einem festen, benannten Abschnittssatz in beiden Sprachen und ohne Lizenzhürde — deshalb die Wahl. Die deutschen Entsprechungen in der Tabelle in 3.3.2 sind Modellwissen und bei der Umsetzung gegen die deutsche Vorlage zu prüfen.
 
 ## B.4 Hook-Dokumentation (2026-09-17)
 

@@ -37,6 +37,8 @@ Drei Sätze tragen das Vorhaben. Die Instanz wägt nicht, sie schlägt nach. All
 
 Ob eine Festlegung in der aktuellen Arbeit bindet oder zur Disposition steht, ergibt sich aus wenigen Feldern, die zu ihr gehören — Art (von außen gegeben oder von uns gewählt), Grund, Status, Ereigniszeilen —, und aus den Umbauzielen der geplanten Schritte des Projekts. Eine geordnete Liste einzelner Prüfungen macht daraus die **Härte** der Festlegung; aus Härte und **Lage** der Sitzung (Beschlossenes umsetzen oder etwas neu denken) folgt das Verhalten — sechs Zellen, eine Handlung je Zelle (Kapitel 3.1). Nichts davon wird kombiniert oder gewichtet; die Instanz führt Prüfungen aus, sie bildet kein Urteil.
 
+**Was bewusst nicht einfließt.** Vier Größen, die man erwarten könnte, bleiben draußen, und jede aus einem Grund. Das **Alter** einer Entscheidung: Zeitregeln sind fragil, weil Projekte verschieden schnell laufen; eine Festlegung gilt als frisch, bis sich zum ersten Mal Arbeit an ihr gerieben hat — das ist ein Ereignis und kein Datum. Die **Umbaukosten**: Sie entscheiden nicht, ob ein Gedanke verfolgt wird, sondern sie sind eine Zahl, die der Entwickler zur Entscheidung braucht; sie stehen im geparkten Satz und nicht in der Ableitung. Jede Form von **Gewichtung**: Die Prüfungen werden gelesen, nicht verrechnet — genau daran scheitert eine Instanz (1.2). Und **neues Wissen, das einen Grund hinfällig macht**: Dass eine Annahme von gestern heute nicht mehr trägt, ist beim Vorbeigehen nicht erkennbar; das braucht einen eigenen Durchgang durch die Doku und gehört deshalb in die Konsistenzprüfung, nicht in die laufende Arbeit.
+
 Die Felder **gehören** zur Festlegung, aber sie **stehen** nicht bei ihr im Text. Das ist der Punkt, an dem die folgenden Abschnitte ansetzen.
 
 ### 1.3.2 Der Mittelweg: normierte Felder, aber getrennt von der Prosa
@@ -46,6 +48,8 @@ Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre di
 ### 1.3.3 Abschnitte haben eine Rolle — und das Dokument trägt keine Bedeutung
 
 Eine Doku besteht nicht nur aus Festlegungen. Es gibt Abschnitte, in denen der Entwickler Festlegungen aus verschiedenen Teilen zueinander in Beziehung setzt — die Übersicht, ein Ablauf, die Lösungsstrategie —, Abschnitte mit Vorgaben, die im ganzen Projekt gelten, Abschnitte, die eine einzelne Einheit beschreiben, und Abschnitte, in denen nur konzipiert wird und nichts bindet. Der Skill muss diese Arten unterscheiden, denn er tut in ihnen Verschiedenes. Er darf sie aber nicht an Kapitelnummern oder Überschriften erkennen: Nummern ändern sich beim Umsortieren, Überschriften sind frei formuliert und in jeder Sprache. Deshalb trägt ein Abschnitt ein kurzes Etikett an der Überschrift — seine **Rolle**, etwa „Laufzeitsicht" oder „Randbedingungen". Auch das ist keine Formalie für den Entwickler: Die Instanz erkennt aus dem Inhalt, welche Rolle ein Abschnitt hat, schlägt sie im Plan vor und schreibt sie mit dessen Ausführung, wie die Marker; der Entwickler bestätigt oder korrigiert in Prosa. Die Rollen sind nach einem etablierten Gliederungsschema benannt, damit der Entwickler versteht, was er da bestätigt; was der Skill in einem Abschnitt mit einer bestimmten Rolle tut, steht im Skill selbst (Kapitel 3.3). Rollen gelten je Abschnitt; je Aussage gibt es nur den Marker aus 1.3.2.
+
+Wer auch die Marker nicht im Text haben will, kann sie abwählen: Das Register kann eine Festlegung stattdessen über Datei und Wortlaut eines Kernsatzes ansprechen. Das ist der Rückfallweg, und er ist fragiler — ein umformulierter Satz bricht die Adresse, und das Verfahren muss es melden, statt es zu bemerken. Der Standard sind Marker (Einzelheiten in 3.2.9).
 
 Damit steht im Dokument des Entwicklers genau zweierlei vom Skill: Marker an Festlegungen und Rollen an Überschriften. Beides sind Adressen. Aus einem Marker folgt nichts, ohne das Register zu lesen; aus einer Rolle folgt nichts, ohne den Skill zu lesen. **Keine Skill-Logik, kein Attribut, kein Zustand steht im Dokument des Entwicklers** — die Bedeutung liegt immer außerhalb. Das ist der Grundsatz, der die Doku lesbar hält und den Entwickler frei lässt, und Kapitel 2 macht ihn zur Vorgabe.
 
@@ -273,6 +277,8 @@ Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreierss
 
 Der Skill erbringt sieben unterscheidbare Leistungen. Sie sind nicht alle gleich häufig und nicht alle gleich eingreifend; was sie verbindet, ist die Rollenverteilung aus 1.3.4 — der Entwickler schreibt Prosa und entscheidet, die Instanz führt Buch, Skript und Hooks kontrollieren.
 
+**Über allen steht ein Grundsatz: Die Doku wächst an Festlegungen, nicht an Pflichten.** Keine Struktur wird gefordert, die nichts zu halten hat, und keine Leistung wird erbracht, für die es keinen Anlass gibt. Die Ausbaustufe eines Projekts ist, was es hat — nicht, was eine Einstellung behauptet. Daraus folgt die Zurückhaltung, die allen sieben Leistungen gemeinsam ist: Die Erstanlage geschieht nur auf Auftrag, der Einstieg nur am Berührungspunkt, die Prüfung nur an benannten Handlungen. Was daraus im Einzelnen folgt — wann die erste Datei, der erste Registereintrag, die erste Rolle entsteht —, steht in Kapitel 3.5.3.
+
 | | Leistung | Auslöser | Ergebnis |
 |---|---|---|---|
 | 1 | **Erstanlage** einer begleitenden Doku (1.7.1) | ausdrücklicher Auftrag | Gerüst aus Dateien, Rollen und leerem Register |
@@ -360,7 +366,13 @@ Die Leistung, um derentwillen das Vorhaben begonnen wurde (1.2, Fehlbild Gesetz)
 
 ### 1.7.6 Prüfen und Aufräumen
 
-Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze (Kapitel 3.6 und 3.7). Dazu gehört der Lebenszyklus: Eine abgelöste Festlegung behält ihren Eintrag mit Datum und Nachfolger, damit alte Verweise sich weiter auflösen (Kapitel 3.2.6).
+Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze (Kapitel 3.6 und 3.7).
+
+**Der Lebenszyklus einer Festlegung ist Teil dieser Leistung, und er hat einen eigenen Grund.** Eine Festlegung, die überholt ist, verschwindet nicht einfach. Bliebe ihr Satz unmarkiert in der Prosa stehen, läse die Instanz ihn beim nächsten Mal als gültig — und das Fehlbild Gesetz wäre an genau dieser Stelle zurück, mit einer Festlegung, die niemand mehr vertritt. Deshalb gilt: **Was überholt ist, darf nicht unmarkiert dastehen.** Es bekommt entweder eine Nachfolgerin (`superseded … by`) oder entfällt ersatzlos (`retired`); der Eintrag im Register bleibt in beiden Fällen mit Datum bestehen.
+
+Das hat einen zweiten Nutzen, der im Alltag mehr wiegt als der erste: **Alte Verweise lösen weiter auf.** Ein Commit-Text, ein älterer Absatz, ein Code-Kommentar, der eine abgelöste ID nennt, führt nicht ins Leere — das Register kennt die Nachfolgerin. Niemand muss vor dem Weiterarbeiten das Projekt nach alten Verweisen absuchen und sie geradeziehen.
+
+Ob ein überholter Absatz in der Prosa stehen bleibt, entscheidet der Entwickler im Einzelfall — weil er als Begründung der Änderung noch wirkt, weil er Kontext verwässert, oder weil gerade keine Zeit ist. Der Mechanismus verlangt nur den Marker. Die drei Fälle und ihre Behandlung stehen in Kapitel 3.2.6.
 
 ### 1.7.7 Keine Unterstützung
 
@@ -381,7 +393,11 @@ Ein Projekt, dessen Doku noch keinen Marker trägt, kommt am Berührungspunkt in
 
 ## 1.9 Der Weg zur Fertigstellung
 
-Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Register und Marker, Planung und Skillstart; das Skript in zwei Stufen; die Hooks; das Zusammensetzen des Skills; die Probe; die Migration aus den bisherigen Anweisungsdateien. Die **Probe** (Kapitel 3.8) ist das Tor: Erst wenn sie zeigt, dass die Instanz die Marker setzt und Kollisionen parkt, werden die globalen Anweisungen umgezogen und der Skill installiert (Kapitel 3.9). Scheitert die Probe an diesen beiden Punkten, ist das Design falsch, nicht ein Skill-Parameter.
+Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Register und Marker, Planung und Skillstart; das Skript in zwei Stufen; die Hooks; das Zusammensetzen des Skills; die Probe; die Migration aus den bisherigen Anweisungsdateien.
+
+**Die Probe ist das Tor, und sie ist nötig, weil der Rest nicht zu erdenken ist.** Die logische und codetechnische Seite dieses Vorhabens lässt sich am Schreibtisch klären — ob die Härteliste widerspruchsfrei ist, ob die Grammatik parsbar bleibt, ob die Hooks feuern. Fünf Dinge lassen sich so nicht klären, weil sie vom Verhalten der Instanz und vom Zuschnitt einer echten Doku abhängen: ob die Instanz die Marker in der Praxis wirklich setzt; ob sie Kollisionen parkt statt sie abzuschießen; wie oft der Lint falschen Alarm schlägt; wie lang die Kandidatenlisten werden und wie viel davon brauchbar ist; und was der Skill an Kontext kostet. Über all das entscheidet eine Messung, nicht ein Argument.
+
+**Die beiden ersten Punkte sind von anderer Art als die übrigen drei.** Setzt die Instanz die Marker nicht oder schießt sie Ideen weiterhin ab, ist nicht ein Wert falsch eingestellt, sondern das Design gescheitert — dann geht es zurück zu den Härteregeln und zum Register, nicht weiter zur Migration. Bleiben dagegen Kandidatenlisten zu lang oder meldet der Lint zu viel, sind Werte zu justieren und die Probe zu wiederholen. Erst wenn alle Schwellen erreicht sind, werden die globalen Anweisungen umgezogen und der Skill installiert (Kapitel 3.9). Der Aufbau der Probe, ihre Messgrößen und Schwellen stehen in Kapitel 3.8.
 
 ## 1.10 Was dieses Vorhaben nicht ist
 

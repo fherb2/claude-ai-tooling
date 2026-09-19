@@ -2,9 +2,9 @@
 
 Stand (2026-09-17): Vorschlag; die Messgrößen und Schwellen sind vom Entwickler noch nicht bestätigt.
 
-### 3.8.1 Zweck
+### 3.8.1 Gegenstand
 
-Die logische und codetechnische Seite des Vorhabens gilt als durchdrungen; was bleibt, ist empirisch und durch Nachdenken nicht zu klären: ob die Instanz die Marker in der Praxis setzt, ob sie Kollisionen parkt statt abzuschießen, wie hoch die Fehlalarmquote des Lints ist, wie lang die Kandidatenlisten werden und was der Skill an Kontext kostet. Die Probe ist das Tor vor der Migration (Kapitel 3.9): Scheitert sie am Setzen der Marker oder am Parken, ist das Design falsch; scheitert sie an Kandidaten oder Lint, werden Skill-Parameter und Graphenparameter justiert.
+**Wozu die Probe da ist und was ihr Ausgang entscheidet, steht in Kapitel 1.9.** Hier steht, wie sie aufgebaut ist: woran gemessen wird, in welcher Reihenfolge, und bei welchem Wert der Weg abzweigt.
 
 ### 3.8.2 Fixture
 
