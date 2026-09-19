@@ -59,25 +59,203 @@ Was er tut: Prosa schreiben, den Planabschnitt „Berührte Festlegungen" lesen 
 
 Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht Anweisungen, sondern **ein Skript und Hooks**, die nach jedem Doku-Edit und vor jedem Commit lesend prüfen (Kapitel 3.6 und 3.7). Anweisungen, die eine Haltung beschreiben, feuern nicht zuverlässig (1.2); ein Hook feuert immer.
 
-## 1.4 Bild des fertigen Systems
+## 1.4 Die Begriffe im Überblick
 
-Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen. Der Skill selbst besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.9), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
+Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollständig aufgezählt: Ein nicht aufgeführter Wert ist ein Fehler, den das Skript meldet (Vorgabe 2.1). Ausführlich beschrieben wird jeder Begriff dort, wo die letzte Spalte hinweist.
 
-## 1.5 Welche Arten der Unterstützung es gibt
+**Was in der Prosa des Entwicklers steht**
+
+| Begriff | Bedeutung | Werte | Ausführlich |
+|---|---|---|---|
+| **Festlegung** | eine Aussage, die etwas bindend festhält. Aufnahmetest: Kann Code sie verletzen? | — | 3.2 |
+| **Marker** | ein Feld in der Prosa, gefüllt mit einer Adresse und nichts sonst. Drei Arten: Definitionsmarker `[D-0042]` am Satz, der die Festlegung ausspricht; Zitatmarker `[>D-0042]` an Stellen, die sie heranziehen; Rollenmarker `[DS:runtime]` an einer Überschrift | — | 3.2.2, 3.3 |
+| **ID** | der stabile Schlüssel einer Festlegung; global je Register, wird nie neu vergeben, trägt kein Kapitel | `D-0042` | 3.2.3 |
+| **Rolle** | sagt, worum es in einem Abschnitt geht; daraus folgt, was der Skill dort tut | `goals`, `constraints`, `context`, `strategy`, `building-blocks`, `runtime`, `deployment`, `crosscutting`, `decisions`, `quality`, `risks`, `glossary`, `plan`, `status`, `concept`, `appendix`, `register` | 3.3.2 |
+| **Funktion** | was der Skill in einem Abschnitt mit dieser Rolle tut | `define`, `relate`, `global`, `nonbinding`, `plan`, `register` | 3.3.3 |
+
+**Was im Register steht** — je Festlegung eine Gruppe von Zeilen
+
+| Begriff | Bedeutung | Werte | Ausführlich |
+|---|---|---|---|
+| **Art** (`kind`) | woher die Festlegung kommt | `given` — von außen vorgegeben (Physik, Hardware, Fremdschnittstelle, Norm) · `chosen` — von uns entschieden | 3.1.2 |
+| **Grund** (`reason`), **Quelle** (`source`) | warum so, beziehungsweise woher | Freitext · `in prose` — steht in der Doku selbst · `unknown` — nicht mehr bekannt | 3.2.5 |
+| **Alternative** (`instead`) | die stärkste verworfene Alternative, mit dem Grund der Ablehnung; eine Zeile | Freitext · `in prose` | 3.2.5 |
+| **Status** (`status`) | wie die Attribute zustande kamen — der Fußabdruck | `assumed` — Lesart der Instanz, nicht bestätigt · `accepted` — stand in einem freigegebenen Plan, nicht einzeln angesprochen · `confirmed` — vom Entwickler selbst bestätigt oder korrigiert | 3.1.2 |
+| **Festgeschrieben** (`pinned`) | ausdrückliche Entscheidung, eine gewählte Festlegung nicht wieder aufzumachen | ja/nein | 3.1.2 |
+| **Suchschlüssel** (`keys`) | zwei bis vier markante Begriffe; finden unmarkierte Erwähnungen | Freitext | 3.2.5 |
+| **Fingerabdruck** (`fp`) | Kurzhash des Definitionssatzes; erkennt, dass die Definition sich geändert hat | Hexzeichen | 3.6.7 |
+| **Ereigniszeile** | eine **datierte Zeile, die festhält, dass der Festlegung etwas widerfahren ist.** Sie ändert die Festlegung nicht, sondern sammelt Erfahrung mit ihr — und daraus folgt später ihre Härte | `friction` — Arbeit musste um die Festlegung herum gebaut werden · `upheld` — sie wurde gegen eine Idee oder einen Befund geprüft und hat standgehalten · `pending` — eine Frage an den Entwickler ist offen | 3.1.2, 3.2.5 |
+| **Lebenszyklus** | was am Ende mit ihr geschieht | `superseded … by <ID>` — durch eine neue ersetzt · `retired` — entfällt ersatzlos | 3.2.6 |
+
+**Was die Sitzung bestimmt**
+
+| Begriff | Bedeutung | Werte | Ausführlich |
+|---|---|---|---|
+| **Härte** (`hardness`) | wie bindend eine Festlegung **jetzt** ist; wird bei jedem Kontakt neu abgeleitet und **nie gespeichert** | `fixed` — nicht zur Diskussion · `decided` — gilt, darf hinterfragt werden · `open` — steht zur Disposition | 3.1.4 |
+| **Lage** (`mode`) | wie die Sitzung die Doku liest | `execute` — Beschlossenes umsetzen · `design` — etwas neu denken | 3.1.5 |
+| **Kontakt** | eine Festlegung ist kontaktiert, wenn sie im Plan des Schritts oder in der Auswirkungsliste der Idee genannt werden müsste | — | 3.1.3 |
+| **Parken** | eine Kollision in der Lage `design` in einem Satz festhalten, statt den Gedanken abzubrechen | — | 3.1.5 |
+
+**Was die Planung trägt**
+
+| Begriff | Bedeutung | Werte | Ausführlich |
+|---|---|---|---|
+| **Geplanter Schritt** | ein noch offener Schritt der Projektplanung, wo immer er steht | — | 3.4.1 |
+| **Umbauziel** (`target:`) | die Zeile, mit der ein Schritt sagt, was er umbauen will | IDs oder eine Kapiteldatei | 3.4.2 |
+| **Planabschnitt** | „Berührte Festlegungen" — der Abschnitt jedes Plans, in dem der Entwickler die Annahmen sieht | — | 3.1.6 |
+
+**Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
+
+## 1.5 Ein Beispiel von Anfang bis Ende
+
+Sieben Szenen an einem erfundenen, sehr kleinen Vorhaben: Ein Werkzeug liest Messwerte von einem Sensor und schreibt sie in eine Datei. Das Beispiel zeigt jeden Begriff aus 1.4 im Gebrauch und macht sichtbar, wer wann handelt. Wer es gelesen hat, findet in Kapitel 2 und 3 nur noch Einzelheiten.
+
+### 1.5.1 Szene 1 — Der Entwickler lässt eine Doku anlegen
+
+> **Entwickler:** „Leg mir eine begleitende Doku an."
+
+Die Instanz liest das Projekt — eine Python-Datei, eine README, kein Doku-Ordner, keine Liste offener Schritte — und legt einen **Plan** vor: Einstiegsform, weil es ein Modul ist; Ordner `dev-doc/` mit der einen Datei `accompanying-doc.md`; Register `dev-doc/decisions.md`; geplante Schritte vorerst als Abschnitt in der README; Layout ein Absatz je Zeile, aus der README abgelesen. Dreiteilung und Sichtenform nennt sie mit je einem Satz, warum sie hier zu groß wären. Ein Punkt bleibt zu klären, weil er sich nicht ablesen lässt: ob es überhaupt einen eigenen Ordner geben soll.
+
+> **Entwickler:** „Ja, mit Ordner."
+
+Nach der Freigabe entstehen zwei Dateien und die Skill-Parameterdatei. Sonst nichts — keine leeren Kapitel.
+
+### 1.5.2 Szene 2 — Die ersten Festlegungen entstehen
+
+Der Entwickler schreibt in `accompanying-doc.md`:
+
+> ## Erfassung
+>
+> Der Sensor liefert Messwerte mit 100 Hz; schneller kann er nicht. Das Werkzeug liest sie in einer eigenen Schleife und schreibt sie blockweise zu je 1000 Werten, weil ein Schreibzugriff je Einzelwert das Dateisystem ausbremst. Das Format ist CSV.
+
+Der Hook H1 läuft nach dem Edit und meldet in den Kontext: drei Sätze mit Normativsignal ohne Marker, und die Überschrift hat keine Rolle. Die Instanz **fragt nicht**, sondern bildet Annahmen und legt sie im Plan vor:
+
+> **Berührte Festlegungen**
+>
+> | Wortlaut | Art | Grund/Quelle | Status | Härte |
+> |---|---|---|---|---|
+> | „liefert Messwerte mit 100 Hz" | `given` | Grenze des Sensors — Quelle vermutet, Datenblatt? | `assumed` | `decided` |
+> | „blockweise zu je 1000 Werten" | `chosen` | steht in der Prosa: Schreibzugriff je Einzelwert bremst das Dateisystem | `assumed` | `decided` |
+> | „Das Format ist CSV" | `chosen` | kein Grund genannt — `pending`: Warum CSV? | `assumed` | `decided` |
+>
+> Rolle für „Erfassung": `building-blocks`.
+> Die Freigabe dieses Plans bestätigt die gelisteten Annahmen, soweit Du nichts anderes sagst.
+
+> **Entwickler:** „Die 100 Hz stehen im Datenblatt. CSV, weil der Auswerter es direkt liest — binär wäre kleiner, aber dann braucht es ein eigenes Lesewerkzeug."
+
+Die Instanz zeigt, wie sie das einträgt, und schreibt nach der Freigabe. Die Prosa bekommt drei Marker und einen Halbsatz, den der Entwickler geliefert hat:
+
+> ## Erfassung [DS:building-blocks]
+>
+> Der Sensor liefert Messwerte mit 100 Hz [D-0001]; schneller kann er nicht. Das Werkzeug liest sie in einer eigenen Schleife und schreibt sie blockweise zu je 1000 Werten [D-0002], weil ein Schreibzugriff je Einzelwert das Dateisystem ausbremst. Das Format ist CSV [D-0003], weil der Auswerter es direkt liest.
+
+Und `dev-doc/decisions.md` bekommt seine ersten Einträge:
+
+```
+[D-0001 given confirmed] Abtastrate des Sensors
+[D-0001 source] Datenblatt des Sensors: 100 Hz sind das Maximum
+[D-0001 keys] Abtastrate; 100 Hz; Sensor
+
+[D-0002 chosen accepted] Blockgröße beim Schreiben
+[D-0002 reason] in prose
+[D-0002 keys] Blockgröße; blockweise; 1000
+
+[D-0003 chosen confirmed] Dateiformat
+[D-0003 reason] in prose
+[D-0003 instead] Binärformat — kleiner, braucht aber ein eigenes Lesewerkzeug
+[D-0003 keys] CSV; Dateiformat; Auswerter
+```
+
+Der Unterschied zwischen `confirmed` und `accepted` ist der Fußabdruck: D-0001 und D-0003 hat der Entwickler selbst angesprochen, D-0002 lief im freigegebenen Plan mit. Später ist ablesbar, was nachgeprüft wurde und was nur mitlief.
+
+### 1.5.3 Szene 3 — Ein Schritt wird umgesetzt
+
+Lage `execute`. Der Plan für „Schreiben implementieren" berührt D-0002 und D-0003; beide sind `decided`, es gibt keine Kollision. Der Planabschnitt listet sie, sonst geschieht nichts. **Der Entwickler sieht zwei Zeilen und liest weiter.** Das ist der Normalfall, und der Skill schweigt darin.
+
+### 1.5.4 Szene 4 — Reibung entsteht
+
+Wochen später soll eine Live-Anzeige dazukommen. Sie braucht einzelne Werte und greift sie vor dem Blockpuffer ab — ein Sonderweg, den es nur wegen D-0002 gibt. Die Instanz erkennt das beim Schreiben des Plans und trägt mit dessen Ausführung eine Ereigniszeile ein:
+
+```
+[D-0002 friction 2026-10-02] Live-Anzeige umgeht den Blockpuffer, weil sie einzelne Werte braucht
+```
+
+Der Entwickler hat dazu nichts getan und nichts entschieden. Die Zeile ändert nichts an D-0002 — sie sammelt Erfahrung.
+
+### 1.5.5 Szene 5 — Eine Idee, die nicht abgeschossen wird
+
+> **Entwickler:** „Könnten wir nicht binär schreiben? Die Dateien werden riesig."
+
+Das ist keine Aufgabe, sondern eine Idee. Die Instanz wechselt in die Lage `design` und sagt es: „Ich lese die Doku hier als Stand, nicht als Vorgabe." Die Härte von D-0003 ist `decided` — Kollision, aber kein Abbruch. Sie **parkt** in einem Satz:
+
+> „Das berührt D-0003 (CSV, weil der Auswerter es direkt liest). Verworfen wurde Binär damals, weil ein eigenes Lesewerkzeug gefehlt hätte — das wäre neu zu bewerten, seit es den Auswerter als eigenes Programm gibt. Umbaukosten: zwei Stellen in der Doku, drei im Code."
+
+Und führt den Gedanken dann zu Ende: Blockformat mit Kopfsatz, CSV-Ausgabe als eigenes Kommando, Abschätzung der Dateigröße. **Genau das leistete der Vorläufer nicht** — dort wäre die Idee an D-0003 gescheitert, bevor sie ausformuliert war.
+
+> **Entwickler:** „Interessant, aber nicht jetzt."
+
+```
+[D-0003 upheld 2026-10-05] Gegen die Idee Binärformat geprüft; der Grund trägt weiter
+```
+
+Die Zeile ist wichtiger, als sie aussieht: Sie verhindert, dass dieselbe Idee in drei Monaten erneut aufgemacht wird, und sie setzt den Reibungszähler für D-0003 zurück.
+
+### 1.5.6 Szene 6 — Die zweite Reibung öffnet eine Festlegung
+
+Noch später soll ein Netzwerk-Streaming dazukommen, das ebenfalls Einzelwerte braucht — der zweite Umweg um denselben Blockpuffer:
+
+```
+[D-0002 friction 2026-11-13] Netzwerk-Streaming braucht Einzelwerte; zweiter Umweg am Blockpuffer
+```
+
+Beim nächsten Plan, der D-0002 berührt, rechnet das Skript die Härte neu: zwei `friction`-Zeilen seit der letzten `upheld`-Zeile, Schwelle ist 2 — Prüfung R6 greift, die Härte ist **`open`**. Die Instanz sagt einen Satz:
+
+> „Die feste Blockgröße steht inzwischen zur Disposition: Zweimal musste Arbeit um sie herum gebaut werden. Soll ich Alternativen ausarbeiten?"
+
+Niemand hat sich das gemerkt, niemand hat es gezählt. Es steht im Register, und ein Kommando liest es ab.
+
+### 1.5.7 Szene 7 — Ablösung, und warum alte Verweise trotzdem auflösen
+
+> **Entwickler:** „Ja, mach die Blockgröße einstellbar."
+
+Die neue Festlegung bekommt eine neue ID; die alte bleibt im Register stehen und zeigt auf ihre Nachfolgerin:
+
+```
+[D-0002 superseded 2026-11-20 by D-0007] Blockgröße ist jetzt einstellbar
+
+[D-0007 chosen confirmed] Blockgröße einstellbar, Standard 1000
+[D-0007 reason] in prose
+[D-0007 instead] feste Blockgröße — zwei Verbraucher brauchten Einzelwerte
+[D-0007 keys] Blockgröße; einstellbar; Standard 1000
+```
+
+In der Prosa wird der Satz umgeschrieben und trägt jetzt `[D-0007]`. Und die alten Verweise? Ein Commit-Text von letztem Monat nennt D-0002, ein älterer Absatz zitiert sie — beide lösen weiterhin auf, denn das Register kennt die Nachfolgerin und `show D-0002` nennt sie. **Niemand muss vor dem Weiterarbeiten das Projekt nach alten Verweisen absuchen.**
+
+### 1.5.8 Was der Entwickler in diesen sieben Szenen getan hat
+
+Er hat Prosa geschrieben, Pläne gelesen und **viermal in Prosa geantwortet**: einmal zum Ordner, einmal zu Datenblatt und CSV, einmal zur Idee, einmal zur Blockgröße.
+
+Was er **nie** getan hat: einen Marker gesetzt, eine Registerzeile geschrieben, ein Schlüsselwort gelernt, eine Härte bestimmt, gezählt, wie oft etwas gerieben hat. Und was der Skill nie getan hat: seine Prosa umgeschrieben, ohne dass er es freigegeben hat.
+
+## 1.6 Bild des fertigen Systems
+
+Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen. Der Skill selbst besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
+
+## 1.7 Welche Arten der Unterstützung es gibt
 
 Der Skill erbringt sieben unterscheidbare Leistungen. Sie sind nicht alle gleich häufig und nicht alle gleich eingreifend; was sie verbindet, ist die Rollenverteilung aus 1.3.4 — der Entwickler schreibt Prosa und entscheidet, die Instanz führt Buch, Skript und Hooks kontrollieren.
 
 | | Leistung | Auslöser | Ergebnis |
 |---|---|---|---|
-| 1 | **Erstanlage** einer begleitenden Doku (1.5.1) | ausdrücklicher Auftrag | Gerüst aus Dateien, Rollen und leerem Register |
-| 2 | **Einstieg** in eine vorhandene Doku (1.5.2) | Berührungspunkt | Marker und Registerzeilen für die berührten Festlegungen |
-| 3 | **Laufende Pflege** (1.5.3) | Plan und seine Ausführung | Doku und Code im Wechsel; Ereigniszeilen |
-| 4 | **Auswirkungen finden** (1.5.4) | Änderung an einer Festlegung | Kandidatenliste, gemessene Umbaukosten |
-| 5 | **Einen Bereich neu denken** (1.5.5) | Idee, Bitte um Alternativen | zu Ende gedachte Vorschläge, geparkte Kollisionen |
-| 6 | **Prüfen und Aufräumen** (1.5.6) | Bereich öffnen, Commit, Sitzungsstart | Befunde; Lebenszyklus abgelöster Festlegungen |
-| 7 | **Nichts tun** (1.5.7) | `mode: off` | keine Wirkung |
+| 1 | **Erstanlage** einer begleitenden Doku (1.7.1) | ausdrücklicher Auftrag | Gerüst aus Dateien, Rollen und leerem Register |
+| 2 | **Einstieg** in eine vorhandene Doku (1.7.2) | Berührungspunkt | Marker und Registerzeilen für die berührten Festlegungen |
+| 3 | **Laufende Pflege** (1.7.3) | Plan und seine Ausführung | Doku und Code im Wechsel; Ereigniszeilen |
+| 4 | **Auswirkungen finden** (1.7.4) | Änderung an einer Festlegung | Kandidatenliste, gemessene Umbaukosten |
+| 5 | **Einen Bereich neu denken** (1.7.5) | Idee, Bitte um Alternativen | zu Ende gedachte Vorschläge, geparkte Kollisionen |
+| 6 | **Prüfen und Aufräumen** (1.7.6) | Bereich öffnen, Commit, Sitzungsstart | Befunde; Lebenszyklus abgelöster Festlegungen |
+| 7 | **Nichts tun** (1.7.7) | `mode: off` | keine Wirkung |
 
-### 1.5.1 Erstanlage einer begleitenden Doku
+### 1.7.1 Erstanlage einer begleitenden Doku
 
 Das ist der Fall, in dem ein Projekt noch keine begleitende Doku hat und der Entwickler eine haben will. Er ist folgenreich: Was hier entsteht, prägt die Arbeit der nächsten Monate.
 
@@ -93,7 +271,7 @@ Ganz ohne Klärung geht es dennoch nicht: Was sich aus dem Projekt nicht ablesen
 
 1. **Ort der Doku** — ein Ordner, Vorschlag der im Projekt übliche (falls das klar aus den Informationen über die bestehende Projektstruktur hervorgeht) oder `dev-doc/`, `design-doc/`, `accompanying-doc/`, `accomp-doc/`, `accomp-dev-doc/` oder `accomp-design-doc/`. Beachte: Dieser Skill dient einer projektbegleitenden Dokumentation der Entwicklung und nicht einer in sich abgeschlossenen Projektdokumentation oder Anwenderdokumentation. Der übliche Ordner `doc/` für die Dokumentation des fertigen Projektvorhabens ist deshalb meist nicht der richtige Platz. Das sollte dem Entwickler gesagt werden, wenn er `doc/` unter der Projektwurzel vorschlägt. Letztlich ist aber jede finale Vorgabe des Entwicklers als Platz dieser Dokumentation zu akzeptieren.
 2. **Gliederung** — eine der drei Formen unten, mit Begründung, warum diese zur Größe des Vorhabens passt.
-3. **Rollen der Abschnitte** — welcher Abschnitt welche Rolle trägt (Kapitel 3.3). Besonders: ob es einen Abschnitt gibt, der Festlegungen zueinander in Beziehung setzt (Funktion `relate`). Das ist die folgenreichste Einzelheit der Erstanlage, denn ohne einen solchen Text hat die Auswirkungsrechnung keine Kanten über Kapitelgrenzen hinweg (1.5.4).
+3. **Rollen der Abschnitte** — welcher Abschnitt welche Rolle trägt (Kapitel 3.3). Besonders: ob es einen Abschnitt gibt, der Festlegungen zueinander in Beziehung setzt (Funktion `relate`). Das ist die folgenreichste Einzelheit der Erstanlage, denn ohne einen solchen Text hat die Auswirkungsrechnung keine Kanten über Kapitelgrenzen hinweg (1.7.4).
 4. **Ort des Registers** — Standard ist `decisions.md` im Doku-Ordner. Dem Entwickler kann aber angeboten werden, die Metainformationen stattdessen in einem Ordner unterhalb von `.claude/` abzulegen.
 5. **Ort der geplanten Schritte** — eigene Datei oder Abschnitt mit der Rolle `plan` in einer vorhandenen Datei. Bei einer eigenen Datei für diesen Zweck wird dem Entwickler angeboten, diese ebenfalls im Doku-Ordner anzulegen oder alternativ unterhalb von `.claude/`.
 6. **Layout der Prosa** — ein Absatz je Zeile oder Umbruch mit Leerzeilen; abgelesen, wo möglich.
@@ -118,37 +296,37 @@ Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, waru
 
 **Was nicht entsteht:** kein Inhalt, den der Entwickler nicht geliefert hat. Die Instanz füllt keine Ziele, keine Randbedingungen und keine Vorgaben aus eigener Vermutung — sie legt Überschriften an und sagt, was dort hingehört.
 
-**Grenze zur Leistung 2.** Hat das Projekt bereits eine Doku, gibt es keine Erstanlage. Dann gilt der Einstieg (1.5.2): Die vorhandene Struktur bleibt, wie sie ist, und bekommt am Berührungspunkt Rollen und Marker. Eine vorhandene Doku wird nie umgebaut, um zu einer der drei Formen zu passen.
+**Grenze zur Leistung 2.** Hat das Projekt bereits eine Doku, gibt es keine Erstanlage. Dann gilt der Einstieg (1.7.2): Die vorhandene Struktur bleibt, wie sie ist, und bekommt am Berührungspunkt Rollen und Marker. Eine vorhandene Doku wird nie umgebaut, um zu einer der drei Formen zu passen.
 
 **Umkehrbarkeit.** Alles, was die Erstanlage erzeugt, ist gewöhnlicher Text und eine Konfigurationsdatei. Die Form ist keine Festlegung auf Dauer: Wer später von der Einstiegsform zur Dreiteilung wechselt, verschiebt Prosa und ändert Rollenmarker; IDs, Register und Ereigniszeilen bleiben davon unberührt, weil keine von ihnen an einer Datei oder einem Kapitel hängt (Bedingung 2 in Kapitel 2.2).
 
-### 1.5.2 Einstieg in eine vorhandene Doku
+### 1.7.2 Einstieg in eine vorhandene Doku
 
-Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration**: Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1 und 3.2.7). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.5.5).
+Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration**: Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1 und 3.2.7). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.7.5).
 
-### 1.5.3 Laufende Pflege während der Implementierung
+### 1.7.3 Laufende Pflege während der Implementierung
 
 Was der Vorläufer die Arbeitsschleife nannte (Anhang A, Abschnitt A.8), bleibt: Doku und Code entstehen im Wechsel, nicht nacheinander. Neu ist die Buchführung, die dabei mitläuft — Marker und Registerzeilen werden mit der Ausführung eines freigegebenen Plans geschrieben, Reibung wird vermerkt, wenn ein Sonderfall nur wegen einer Festlegung existiert, und eine verworfene Idee hinterlässt eine Bestätigungszeile. Der Entwickler sieht davon den Planabschnitt „Berührte Festlegungen" und sonst nichts.
 
-### 1.5.4 Auswirkungen einer Änderung finden
+### 1.7.4 Auswirkungen einer Änderung finden
 
 Soll eine Festlegung geändert werden, liefert das Skript die Kandidaten, die davon berührt sein könnten: über den Graphen der Marker, über die Nähe im Text und über Suchschlüssel (Kapitel 3.6.5). Die Instanz entscheidet je Kandidat, ob er wirklich betroffen ist, und nennt die gemessenen Umbaukosten. Das ersetzt die Suche, die der Vorläufer über Segment 1 von Hand verlangte — und es ist der Grund, warum ein Text mit der Funktion `relate` so wertvoll ist.
 
-### 1.5.5 Einen Bereich neu denken
+### 1.7.5 Einen Bereich neu denken
 
 Die Leistung, um derentwillen das Vorhaben begonnen wurde (1.2, Fehlbild Gesetz). Bittet der Entwickler um Alternativen oder bringt eine Idee, liest die Instanz die Doku als **Stand, nicht als Vorgabe**, führt den Gedanken zu Ende und parkt jede Kollision in einem Satz, statt sie als Ablehnung zu formulieren. Welche Festlegung dabei wie schwer wiegt, sagt ihre Härte (Kapitel 3.1).
 
-### 1.5.6 Prüfen und Aufräumen
+### 1.7.6 Prüfen und Aufräumen
 
 Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze (Kapitel 3.6 und 3.7). Dazu gehört der Lebenszyklus: Eine abgelöste Festlegung behält ihren Eintrag mit Datum und Nachfolger, damit alte Verweise sich weiter auflösen (Kapitel 3.2.6).
 
-### 1.5.7 Keine Unterstützung
+### 1.7.7 Keine Unterstützung
 
 Ein Projekt kann den Skill abwählen (`mode: off`). Dann fordert er nichts, schlägt nichts vor und zitiert keine Regel; vorhandene Doku wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt (Kapitel 3.5.1). Das ist eine gültige Betriebsart, keine Nachlässigkeit.
 
-## 1.6 Der Arbeitsablauf entlang der Anker
+## 1.8 Der Arbeitsablauf entlang der Anker
 
-Abschnitt 1.5 sagt, **welche** Leistungen der Skill erbringt; dieser Abschnitt sagt, **an welchen Handlungen** sie ausgelöst werden. Der Skill greift nicht kontinuierlich ein, sondern an benannten Handlungen. Die Reihenfolge in einer Sitzung:
+Abschnitt 1.7 sagt, **welche** Leistungen der Skill erbringt; dieser Abschnitt sagt, **an welchen Handlungen** sie ausgelöst werden. Der Skill greift nicht kontinuierlich ein, sondern an benannten Handlungen. Die Reihenfolge in einer Sitzung:
 
 1. **Skillstart.** Die Instanz liest die Skill-Parameterdatei oder erhebt aus dem Projekt, was sich ablesen lässt, und fragt nur, was sich nicht ablesen lässt (Kapitel 3.5). Ist der Skill für das Projekt abgewählt, endet er hier.
 2. **Bereich öffnen.** Für den anstehenden Schritt oder die besprochene Idee listet das Skript die Festlegungen des berührten Bereichs mit ihrer Härte und meldet Abweichungen zwischen Prosa und Register (Kapitel 3.6).
@@ -159,15 +337,15 @@ Abschnitt 1.5 sagt, **welche** Leistungen der Skill erbringt; dieser Abschnitt s
 
 Ein Projekt, dessen Doku noch keinen Marker trägt, kommt am Berührungspunkt in das Schema: Nur die Festlegungen, die ein Schritt tatsächlich berührt, werden markiert — über den Plan, nie als Gesamtmigration. Eine völlig unmarkierte Doku erhält den wichtigsten Gewinn sofort, weil das Auffangergebnis der Härteliste zusammen mit der Lage „entwerfend" das Parken von Kollisionen statt ihres Abschusses bedeutet.
 
-## 1.7 Der Weg zur Fertigstellung
+## 1.9 Der Weg zur Fertigstellung
 
 Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Register und Marker, Planung und Skillstart; das Skript in zwei Stufen; die Hooks; das Zusammensetzen des Skills; die Probe; die Migration aus den bisherigen Anweisungsdateien. Die **Probe** (Kapitel 3.8) ist das Tor: Erst wenn sie zeigt, dass die Instanz die Marker setzt und Kollisionen parkt, werden die globalen Anweisungen umgezogen und der Skill installiert (Kapitel 3.9). Scheitert die Probe an diesen beiden Punkten, ist das Design falsch, nicht ein Skill-Parameter.
 
-## 1.8 Was dieses Vorhaben nicht ist
+## 1.10 Was dieses Vorhaben nicht ist
 
 Keine Oberfläche, keine Editor-Erweiterung. Keine Einbettung fremder Werkzeuge (Anforderungs-Tracing, Entscheidungsverwaltung); ihre Ideen — Fingerabdruck, kaskadierende Meldung bei Änderung, Lebenszyklus mit Nachfolger — werden übernommen, nicht ihre Programme. Keine semantische Suche; Zusammenhänge kommen aus Markern, Nähe im Text und Suchschlüsseln. Kein automatisches Umschreiben von Prosa; das Skript listet, die Instanz schlägt im Plan vor, der Entwickler gibt frei. Kein Lesen fremder ID-Systeme; das ist eine spätere Ausbaustufe.
 
-## 1.9 Verhältnis zum Vorläufer
+## 1.11 Verhältnis zum Vorläufer
 
 **Der Vorläufer ist vollständig in Anhang A archiviert** — vier Phasen, dreigeteilte Segmentstruktur, Prosa-Code-Grenze, ein normatives Zuhause je Aussage, Arbeitsschleife, Fahrplan und Status, Reviews und ihr Anhang, dazu der stille Trigger und die Begründungen der README. Wo diese Doku Begriffe wie „Dreiersschema", „Arbeitsschleife" oder „Prosa-Code-Grenze" benutzt, ist dort nachzulesen, was sie bedeuten. Der Anhang ist nötig, weil die drei Dateien des Vorläufers mit Fahrplanschritt 7 verschwinden; danach gäbe es außerhalb der Git-Historie keine Quelle mehr.
 
