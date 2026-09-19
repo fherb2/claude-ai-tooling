@@ -71,7 +71,7 @@ H1 bis H3 nach Kapitel 3.7: Frontmatter-Einbindung, Pfadauflösung prüfen, Zeit
 
 ## 7 Skill zusammensetzen
 
-Dünne `SKILL.md` (Lage, Skill-Parameter, Nachladen, Frontmatter-Hooks), `standard.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.9, Regelteile aus Schritt 1 bis 3, `rules-hardness.md` aus Kapitel 3.1, `CLAUDE-snippet.md` mit dem geankerten Trigger, README in beiden Sprachen, Datumszeilen. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
+Dünne `SKILL.md` (Lage, Skill-Parameter, Nachladen, Frontmatter-Hooks), `standard.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.11, Regelteile aus Schritt 1 bis 3, `rules-hardness.md` aus Kapitel 3.1, `CLAUDE-snippet.md` mit dem geankerten Trigger, README in beiden Sprachen, Datumszeilen. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
 
 ## 8 Probe
 
