@@ -1,5 +1,11 @@
 # 3 Einheiten
 
+**Was in dieses Segment gehört.** Kapitel 1 sagt, was der Skill funktional leisten soll — es ist die Quelle jeder Tätigkeit bei der Implementierung. Kapitel 2 legt die allgemein gültigen Vorgaben fest, mit denen das zu erfüllen ist. Kapitel 3 trägt allein die Detaillierung, die zum Implementieren nötig ist oder sich aus ihr ergibt: Regeltexte im Wortlaut, Grammatiken, Kommandos, Tabellen, Schnittstellen.
+
+Daraus folgen drei Prüfungen für jeden Absatz hier: Steht hier eine **Absicht** oder **Begründung**, die nicht schon in Kapitel 1 steht, gehört sie dorthin. Steht hier eine **prüfbare Regel**, die über eine Einheit hinaus gilt, gehört sie nach Kapitel 2. Steht hier **Beurteilungsmaterial** — Recherchen, verworfene Wege, Messungen —, gehört es in die Anhänge.
+
+**Eine Besonderheit.** Einige Kapitel dieses Segments werden später **wörtlich zum Text des Skills** (etwa 3.1 als `rules-hardness.md`). Sie sind dann nicht eine zweite Beschreibung dessen, was Kapitel 1 beschreibt, sondern das Erzeugnis selbst — Kapitel 1 beschreibt, Kapitel 3 **ist**. Wo ein solcher Text eine Absicht wiederholen muss, damit er für sich lesbar bleibt, geschieht das knapp und mit Verweis auf die Stelle in Kapitel 1, die sie normativ trägt.
+
 ## 3.1 Härte einer Festlegung — Ableitung und Wirkung
 
 Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassungen aus Arbeitspunkt 2: Die Ereigniszeile „bestätigt" des Vorläufers (Anhang A) heißt `upheld` statt `confirmed`, weil `confirmed` zugleich ein Statuswert ist (Kapitel 3.2); und „Segment 2" ist ersetzt durch „Abschnitte mit der Funktion `global`" (Kapitel 3.3). Dieser Text wird später wörtlich der Regelteil `rules-hardness.md` des Skills; Adressat ist dort die Instanz („Du"), der Mensch heißt „der Entwickler".
@@ -129,4 +135,4 @@ Bei `fixed` oder `decided` in `execute`: nichts. Bei einer Kollision in `design`
 
 ### 3.1.10 Bewusst nicht Teil dieses Regelteils
 
-Alter der Entscheidung — Zeitregeln sind fragil; eine Festlegung ist „frisch", bis ihre erste `friction`-Zeile kommt. Umbaukosten als Eingang — sie entscheiden nicht, ob ein Gedanke verfolgt wird; sie stehen als Zahl im geparkten Satz. Gewichtung jeder Art — die Liste kennt nur Reihenfolge. Neues Wissen, das einen Grund kippt — ist live nicht erkennbar; gehört als Durchgang „Gründe noch gültig?" in die Konsistenzprüfung (Skill `konsistenzpruefung`).
+Vier Eingänge, die man erwarten könnte und die die Liste nicht kennt — Alter der Entscheidung, Umbaukosten, Gewichtung, neues Wissen. Die Begründungen stehen in Kapitel 1.3.1; hier nur, was bei der Umsetzung zu beachten ist: Das Skript berechnet keine Altersgröße, es reicht Umbaukosten nur als Zahl in den geparkten Satz durch, es summiert und gewichtet die Prüfungen nicht, und es prüft nicht, ob ein Grund noch gilt — Letzteres ist Gegenstand des Skills `konsistenzpruefung`.

@@ -10,7 +10,7 @@ Zwei Schichten sind zu trennen, weil die eine für den Menschen und die andere f
 
 ### 3.3.2 Inhaltsrollen
 
-Die Inhaltsrollen folgen dem arc42-Schema, einem seit Jahren etablierten, frei lizenzierten (CC BY-SA 4.0) Gliederungsstandard für Architektur- und Designdokumentation, der in deutscher und englischer Fassung vorliegt. Seine zwölf Abschnitte decken genau das ab, was das Vorhaben „projektbegleitende Softwaredokumentation mit Ziel, Randbedingungen, Festlegungen bis zur Ausführung" nennt. Die englischen Abschnittsnamen sind an der Primärquelle belegt (arc42.org, 2026-09-17); die deutschen Entsprechungen in der Tabelle sind Modellwissen und bei der Umsetzung gegen die deutsche Vorlage zu prüfen.
+Die Inhaltsrollen folgen dem arc42-Schema. Warum diese Quelle und nicht eine der drei anderen erwogenen, steht in Anhang B, Abschnitt B.3; dort auch der Hinweis, dass die deutschen Entsprechungen in der Tabelle noch gegen die deutsche Vorlage zu prüfen sind.
 
 | Rolle | arc42 | deutsch (zu prüfen) | Funktion für den Skill |
 |---|---|---|---|
@@ -54,11 +54,7 @@ Erweiterbar, indem der Regelteil eine neue Rolle mit ihrer Funktion definiert. D
 
 Das Schema ist in Anhang A beschrieben. Segment 1 „Zusammenhänge" entspricht `goals`, `constraints`, `context`, `strategy`, `runtime` und `quality`; Segment 2 „Vorgaben" entspricht `crosscutting` und `constraints`; Segment 3 „Einheiten" entspricht `building-blocks` und `deployment`. Wer das Dreiersschema weiterführt, kennzeichnet seine drei Dateien mit den passenden Rollen; die Verkettungsregel („Dateireihenfolge ergibt ein gültiges Dokument") bleibt als Empfehlung.
 
-### 3.3.5 Recherche zu Standards
-
-Geprüft am 2026-09-17: arc42 (belegt: zwölf Abschnitte, Lizenz, deutsche Fassung vorhanden; keine Vorgabe von Identifikatoren je Aussage). Google-Design-Docs (unbestätigt, aus Sekundärquellen: Kontext und Umfang, Ziele und Nicht-Ziele, Entwurf, erwogene Alternativen, Querschnittsbelange; bewusst informell). IEEE 1016 Software Design Description (unbestätigt: Sichten context, composition, logical, dependency, information, patterns use, interface). ISO/IEC/IEEE 42010 (unbestätigt: Begriffe viewpoint, view, concern; schreibt keine Sichten vor). Die Diátaxis-Gliederung betrifft Anwenderdokumentation und ist hier nicht einschlägig. Ergebnis: arc42 ist die einzige der Quellen mit einem festen, benannten Abschnittssatz in beiden Sprachen und ohne Lizenzhürde — deshalb die Wahl.
-
-### 3.3.6 Entscheidungsgrundlagen
+### 3.3.5 Entscheidungsgrundlagen
 
 > **[Q-08] Entscheidungsgrundlage — Umfang des Rollensatzes**
 > Kontext: arc42 hat zwölf Abschnitte. Alle als Rollen anzubieten ist vollständig, aber für kleine Projekte viel; ein Kern deckt die drei Segmente des Vorläufers (Anhang A) ab und lässt den Rest als Erweiterung.

@@ -2,9 +2,11 @@
 
 Stand (2026-09-17): Die drei Hooks sind spezifiziert; die Hook-Dokumentation von Claude Code wurde am selben Tag gegen die hier genutzten Ereignisse, Matcher, Filter, Exit-Codes und JSON-Felder geprüft. Einzelheiten der Pfadauflösung sind offen und am Ende benannt.
 
-### 3.7.1 Zweck
+### 3.7.1 Gegenstand
 
-Hooks ersetzen die Erinnerung der Instanz, nicht der Regeltext. Das Repository hat den Nachweis erbracht: Der Hook des Skills `git-branch-model` schloss eine Lücke, die keine Anweisung schloss. Alle drei Hooks sind nur lesend (Vorgabe 2.8); sie prüfen, melden und — genau einer — blockieren. Was sie nicht leisten, ist das Urteil, ob ein Satz eine Festlegung ist; sie erzwingen, dass das Urteil gefällt und aufgeschrieben wird.
+**Warum die Einhaltung an Hooks hängt und nicht am Regeltext, steht in Kapitel 1.3.5.** Hier steht, welche drei es gibt und wie sie gebaut sind. Zwei Eigenschaften gelten für alle: Sie sind nur lesend (Vorgabe 2.8) — sie prüfen, melden, und genau einer blockiert. Und sie fällen kein Urteil darüber, ob ein Satz eine Festlegung ist; sie erzwingen nur, dass das Urteil gefällt und aufgeschrieben wird.
+
+Der Nachweis, dass ein Hook trägt, wo eine Anweisung nicht trägt, liegt in diesem Repository vor: Der Hook des Skills `git-branch-model` schloss eine Lücke, die keine Formulierung schloss.
 
 ### 3.7.2 Die drei Hooks
 
