@@ -29,7 +29,6 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-22 | Name `impact` | 3.6.9 | klein | 4 |
 | Q-23 | Standardausgabe Zeilen oder JSON | 3.6.9 | klein | 4 |
 | Q-24 | Dateiname des Skripts | 3.6.9 | klein | 4 |
-| Q-25 | networkx optional oder Voraussetzung | 3.6.9 | klein | 5 |
 | Q-26 | H2 blockiert oder meldet | `3_7_hooks.md`, 3.7.5 | mittel | 6 |
 | Q-27 | H3 bauen oder zurückstellen | 3.7.5 | klein | 6 |
 | Q-28 | Messgrößen und Schwellen der Probe | `3_8_probe.md`, vor 3.8.5 | mittel | 8 |
@@ -37,7 +36,7 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-30 | Reihenfolge der Freigaben beim Umzug | 3.9.5 | klein | 9 |
 | Q-31 | Trigger-Anker nach `mode: off` | 3.9.5 | klein | 9 |
 
-Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01, Q-08 bis Q-11 und Q-32. Vor Schritt 1 zu klären: Q-02, Q-03, Q-05. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-07, Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
+Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01, Q-08 bis Q-11, Q-25 und Q-32. Vor Schritt 1 zu klären: Q-02, Q-03, Q-05. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-07, Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
 
 ## 1 Regelteil Marker und Register
 
@@ -57,7 +56,7 @@ Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterd
 
 ## 5 Skript Stufe 2
 
-`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4; Q-04, Q-20, Q-21, Q-25. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
+`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4; Q-04, Q-20, Q-21. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
 
 ## 6 Hooks
 
