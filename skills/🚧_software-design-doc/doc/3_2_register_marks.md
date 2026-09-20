@@ -15,7 +15,7 @@ Zwei Formen, beide ASCII, beide ohne Leerzeichen, in Markdown als normaler Text 
 - **Definitionsmarker** `[D-0042]` — genau eine je Festlegung, am Satz, der sie ausspricht. Spannt sich eine Festlegung über mehrere Sätze, steht der Marker am Ende des letzten.
 - **Zitatmarker** `[>D-0042]` — an jeder weiteren Stelle, die die Festlegung heranzieht; das `>` liest sich als „siehe".
 
-Pflicht ist die Definitionsmarker immer und die Zitatmarker in Abschnitten mit der Funktion `relate` (Kapitel 3.3); sonst ist die Zitatmarker optional. Der Skill-Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Aufnahmetest, was überhaupt eine Definitionsmarker bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keine.
+Pflicht ist die Definitionsmarker immer und die Zitatmarker in Abschnitten mit der Funktion `relate` (Kapitel 1.3.3); sonst ist die Zitatmarker optional. Der Skill-Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Aufnahmetest, was überhaupt eine Definitionsmarker bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keine.
 
 Beispiel eines Absatzes mit drei Festlegungen (die IDs und Werte sind erfunden):
 
