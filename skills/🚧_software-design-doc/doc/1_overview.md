@@ -38,13 +38,6 @@ Die Felder **gehören** zur Festlegung, aber sie **stehen** nicht bei ihr im Tex
 
 Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre die Doku unlesbar und der Entwickler in ein formales Konzept gezwungen, das ihn einschränkt und mit Zusatzaufgaben belastet — inakzeptabel. Stünde umgekehrt gar nichts Maschinenlesbares im Text, müsste die Instanz jede Aussage interpretieren, und das Fehlbild Gesetz wäre zurück. Der Mittelweg: **Die Felder sind normiert, aber sie liegen in einem Register neben der Doku; die Prosa trägt je Festlegung nur einen kurzen Marker — eine Adresse, nichts sonst** (Kapitel 3.2). So bleibt der rote Faden eines Absatzes für den Leser erhalten, ein Absatz mit drei Festlegungen bleibt ein Absatz, und `grep` findet trotzdem alles zu einer Festlegung.
 
-> **[Q-03] Entscheidungsgrundlage — Platzierung des Markers im Satz**
-> Kontext: Der Definitionsmarker steht am Satz, der die Festlegung ausspricht. Für `grep` ist die Position gleichgültig; für das Lesen nicht.
-> Optionen: (a) vor dem Satzzeichen — „… fasst 64 Einträge [D-0042]." wie im Beispiel in 3.2.2; (b) nach dem Satzzeichen — „… fasst 64 Einträge. [D-0042]".
-> Vorschlag: (a) — der Marker liest sich als Teil des Satzes, und ein Satz mit mehreren Festlegungen bleibt eindeutig zuordenbar.
-> Gewicht: klein · Blockiert: Fahrplanschritt 1
-> Antwort: Ok: a.
-
 ### 1.3.3 Abschnitte haben eine Rolle — im Dokument steht ihr Name, im Skill ihre Wirkung
 
 **Das Problem: Der Skill muss wissen, in welcher Art Text er gerade steht.** Eine Doku besteht nicht nur aus Festlegungen, und nicht jede Stelle verlangt vom Skill dasselbe. Sechs Arten von Text kommen in einer entwicklungsbegleitenden Doku vor, und in jeder verhält sich der Skill anders:
@@ -97,14 +90,9 @@ Zwei Rollen verdienen einen eigenen Satz. **`decisions` bleibt neben dem Registe
 
 **Wo eine Rolle gilt und wo sie endet.** Im Regelfall steht die Rolle an der Überschrift und gilt für den ganzen Abschnitt, Unterabschnitte eingeschlossen, soweit die keine eigene tragen. Das allein reicht aber nicht: Ein Entwickler fügt in ein erklärendes Kapitel einen Absatz „Hinweis: Wenn …" ein, der eine Festlegung ausspricht, oder in ein Bausteinkapitel einen Absatz, in dem er nur laut denkt. Deshalb kann die Rolle auch **an einem Absatz** wechseln: Der Absatz trägt seinen eigenen Rollenmarker, die Rolle gilt für diesen Absatz, und danach gilt wieder die des Abschnitts. Feiner als der Absatz wird nicht gewechselt (entschieden am 2026-09-21), weil es dafür kein Bedürfnis gibt — die Ebene darunter ist der Satz, und für den Satz gibt es bereits den Marker: Ein einzelner Satz, der in nichtbindendem Umfeld eine Festlegung ausspricht, trägt seinen Definitionsmarker, und **der Definitionsmarker geht der Rolle vor**; ein erläuternder Satz in bindendem Umfeld braucht gar nichts, er bekommt schlicht keinen Marker (Aufnahmetest: Kann Code das verletzen?). Trägt nichts eine Rolle, gilt alles als `building-blocks`; der Skill schlägt beim ersten Kontakt vor, den Text mit den Zusammenhängen zu kennzeichnen — schlägt vor, verlangt nicht. Die Form des Rollenmarkers steht in Kapitel 3.3.1.
 
-Wer auch die Marker nicht im Text haben will, kann sie abwählen: Das Register kann eine Festlegung stattdessen über Datei und Wortlaut eines Kernsatzes ansprechen. Das ist der Rückfallweg, und er ist fragiler — ein umformulierter Satz bricht die Adresse, und das Verfahren muss es melden, statt es zu bemerken. Der Standard sind Marker (Einzelheiten in 3.2.9).
+**Marker werden vorgeschlagen, nicht verfügt** (entschieden am 2026-09-21). Bevor in einer Doku zum ersten Mal Marker entstehen, legt die Instanz vor, was sie einbauen will und wozu — was die Klammern leisten und was ohne sie nicht geht —, und der Entwickler entscheidet daraufhin. Er kann sie abwählen: Seine Doku bleibt dann unmarkiert, und das ist kein Fehlerzustand, sondern der Anfangszustand jedes Projekts (1.7.2). Der Skill arbeitet weiter — er liest die Doku, bestimmt die Lage und parkt Kollisionen, statt sie abzuschießen; das ist der wichtigste Gewinn, und den gibt es ohne jeden Marker (1.8). Was entfällt, ist die Buchführung: ohne Adresse kein Registereintrag zu einer Festlegung, keine Ereigniszeilen, keine Auswirkungsrechnung. Das ist etwas anderes als die Abwahl des Skills insgesamt (`mode: off`, 1.7.7) — dort tut er nichts, hier tut er, was ohne Adressen geht.
 
-> **[Q-07] Entscheidungsgrundlage — Rückfalloption ohne Marker (Wortlaut-Anker)**
-> Kontext: 3.2.9 erlaubt, das Register über Datei und Wortlaut eines Kernsatzes zu ankern, wenn ein Entwickler keine Klammern im Text will. Das ist fragiler und kostet im Skript einen zweiten Ankermechanismus.
-> Optionen: (a) beibehalten als Wahl beim Skillstart; (b) streichen — Marker sind der einzige Weg; (c) auf später verschieben.
-> Vorschlag: (c) — erst bauen, wenn ein Projekt es braucht; im Regeltext als Möglichkeit nennen.
-> Gewicht: klein · Blockiert: Fahrplanschritt 3
-> Antwort:
+**Ein dritter Weg ist erwogen und zurückgestellt** (entschieden am 2026-09-21): Das Register könnte eine Festlegung statt über einen Marker über Datei und Wortlaut eines Kernsatzes ansprechen und die Prosa ganz unberührt lassen. Er ist fragiler — ein umformulierter Satz bricht die Adresse, und das Verfahren muss es melden, statt es zu bemerken —, und er kostet einen zweiten Ankermechanismus im Skript. Der Regeltext nennt ihn als Möglichkeit; gebaut wird er erst, wenn ein Projekt ihn braucht (Kapitel 3.2.9).
 
 Damit steht im Dokument des Entwicklers genau zweierlei vom Skill: Marker an Festlegungen und Rollen an Überschriften oder Absätzen. Beides sind Adressen. Aus einem Marker folgt nichts, ohne das Register zu lesen; aus einer Rolle folgt nichts, ohne den Skill zu lesen. **Keine Skill-Logik, kein Attribut, kein Zustand steht im Dokument des Entwicklers.** Das ist der Grundsatz, der die Doku lesbar hält und den Entwickler frei lässt, und Kapitel 2 macht ihn zur Vorgabe.
 

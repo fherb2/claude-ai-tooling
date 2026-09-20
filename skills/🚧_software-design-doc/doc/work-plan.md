@@ -10,8 +10,6 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 
 | Q | Thema | Ort | Gewicht | Blockiert |
 |---|---|---|---|---|
-| Q-03 | Marker vor oder nach Satzzeichen | `1_overview.md`, 1.3.2 | klein | 1 |
-| Q-07 | Rückfalloption Wortlaut-Anker | 1.3.3 | klein | 3 |
 | Q-26 | H2 blockiert oder meldet | 1.3.5 | mittel | 6 |
 | Q-02 | Ereigniszeile `upheld` | 1.4 | klein | 1 |
 | Q-19 | Repositories mit mehreren Vorhaben | 1.5 | mittel | 3 |
@@ -36,11 +34,11 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-29 | Verbleib der Werkzeug-Skills | `3_9_migration.md`, 3.9.5 | mittel | 9 |
 | Q-30 | Reihenfolge der Freigaben beim Umzug | 3.9.5 | klein | 9 |
 
-Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01, Q-08 bis Q-11, Q-25 und Q-32. Vor Schritt 1 zu klären: Q-02, Q-03, Q-05. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-07, Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
+Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01, Q-03, Q-07, Q-08 bis Q-11, Q-25 und Q-32. Vor Schritt 1 zu klären: Q-02, Q-05. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
 
 ## 1 Regelteil Marker und Register
 
-Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Ergebnis: Entwurf im Chat, danach Datei im Skill-Ordner. Hängt an: Q-02, Q-03, Q-05. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
+Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Ergebnis: Entwurf im Chat, danach Datei im Skill-Ordner. Hängt an: Q-02, Q-05. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
 
 ## 2 Regelteil Planung
 
@@ -48,7 +46,7 @@ Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schri
 
 ## 3 Regelteil Skillstart
 
-Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterdatei, `mode: off`, „Doku wächst an Festlegungen". Hängt an: Schritt 1; Q-07, Q-15 bis Q-19. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
+Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterdatei, `mode: off`, „Doku wächst an Festlegungen". Hängt an: Schritt 1; Q-15 bis Q-19. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
 
 ## 4 Skript Stufe 1
 
