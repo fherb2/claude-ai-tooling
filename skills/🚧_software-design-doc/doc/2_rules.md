@@ -22,7 +22,7 @@ Diese sieben Bedingungen halten das Vorhaben auf der Größe „ein Skill, ein S
 
 Was ein Abschnitt für den Skill bedeutet, sagt eine Rolle am Abschnitt (Kapitel 1.3.3). Kein Regelteil, kein Skript und kein Hook darf eine Funktion an eine Kapitelnummer, einen Dateinamen, ein Nummernpräfix oder einen Titel binden. Das Dreiersschema des Vorläufers (Anhang A) ist eine Empfehlung, die als Rollensatz ausgedrückt wird.
 
-Im Dokument des Entwicklers stehen vom Skill nur Adressen: Marker an Festlegungen und Rollen an Überschriften. Keine Skill-Logik, kein Attribut, kein Zustand steht dort; was ein Marker oder eine Rolle bedeutet, steht ausschließlich im Register beziehungsweise im Skill. Prüfbar: Jede Zeile im Dokument, aus der ohne Register oder Skill eine Wirkung des Skills folgen würde, ist ein Verstoß.
+Im Dokument des Entwicklers stehen vom Skill nur Adressen: Marker an Festlegungen und Rollen an Überschriften oder Absätzen. Keine Skill-Logik, kein Attribut, kein Zustand steht dort; was ein Marker oder eine Rolle bedeutet, steht ausschließlich im Register beziehungsweise im Skill. Prüfbar: Jede Zeile im Dokument, aus der ohne Register oder Skill eine Wirkung des Skills folgen würde, ist ein Verstoß.
 
 ## 2.4 Default, Meldung, Script-Argument
 
