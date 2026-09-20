@@ -42,20 +42,6 @@ Keine Struktur wird gefordert, die nichts zu halten hat. Die erste Festlegung, d
 
 ### 3.5.5 Entscheidungsgrundlagen
 
-> **[Q-15] Entscheidungsgrundlage — Wann bei fehlender Doku gefragt wird**
-> Kontext: Ein Projekt ohne begleitende Doku und ohne Skill-Parameterdatei: Der Trigger feuert, sobald eine Änderung über eine lokale Korrektur hinausgeht. Fragt der Skill dann sofort („soll ich Festlegungen festhalten?"), nervt er bei jedem kleinen Vorhaben; fragt er nie, entsteht keine Doku.
-> Optionen: (a) erst fragen, wenn im Plan eine Festlegung entsteht, die den Code überdauert — der Aufnahmetest „kann Code das verletzen?" ist der Auslöser; (b) einmal beim ersten Feuern des Triggers; (c) nie fragen, nur auf Aufruf des Skills.
-> Vorschlag: (a) — das ist „Doku wächst an Festlegungen" konsequent zu Ende gedacht.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 3
-> Antwort:
-
-> **[Q-16] Entscheidungsgrundlage — Standardwert von `mode`**
-> Kontext: Fehlt die Skill-Parameterdatei, gilt der Standard. `on` heißt: Der Skill führt das Projekt, sobald der Trigger feuert (mit der Bremse aus Q-15). `ask` hieße: einmal je Sitzung fragen, wie `git-workbench` es tut.
-> Optionen: (a) `on`; (b) `ask`, mit Angebot, die Skill-Parameterdatei anzulegen; (c) `off` — nur Projekte mit Skill-Parameterdatei führen den Skill.
-> Vorschlag: (a) mit Q-15 (a): Der Skill wird erst spürbar, wenn er etwas zu tun hat.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 3
-> Antwort:
-
 > **[Q-17] Entscheidungsgrundlage — `layout` als Skill-Parameter**
 > Kontext: Ob ein Absatz eine Zeile ist oder umbricht, lässt sich aus einer vorhandenen Doku messen; bei leerer Doku gibt es nichts zu messen, und die Instanz muss wissen, wie sie schreiben soll.
 > Optionen: (a) Skill-Parameter mit Standard `one-line`, abgelesen wenn möglich; (b) keiner, immer ablesen, bei leerer Doku fragen; (c) keiner, immer `one-line`.
@@ -70,9 +56,3 @@ Keine Struktur wird gefordert, die nichts zu halten hat. Die erste Festlegung, d
 > Gewicht: klein · Blockiert: Fahrplanschritt 3
 > Antwort:
 
-> **[Q-19] Entscheidungsgrundlage — Repositories mit mehreren Vorhaben**
-> Kontext: 3.5.4 lässt ein Vorhaben über Rollenmarker und `[register: pfad]` vom Repo-Standard abweichen; der Skill folgt dem Vorhaben, in dem die berührten Dateien liegen. Das ist ein Vorschlag ohne Probe.
-> Optionen: (a) so; (b) je Vorhaben eine eigene Skill-Parameterdatei in seinem Ordner, die die Repo-Datei überlagert; (c) nur eine Doku je Repository.
-> Vorschlag: (a) — keine zweite Skill-Parameterdatei; die Zeile im Dokument reicht.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 3
-> Antwort:

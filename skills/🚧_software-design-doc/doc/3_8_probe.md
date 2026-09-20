@@ -1,6 +1,6 @@
 ## 3.8 Die Probe
 
-Stand (2026-09-17): Vorschlag; die Messgrößen und Schwellen sind vom Entwickler noch nicht bestätigt.
+Stand (2026-09-17): Vorschlag; die Messgrößen und Schwellen sind vom Entwickler noch nicht bestätigt (Q-28, Kapitel 1.9).
 
 ### 3.8.1 Gegenstand
 
@@ -25,13 +25,6 @@ Je eine Sitzung in der Lage `execute` (ein geplanter Schritt, der zwei Festlegun
 | Kontext-Mehraufwand auf Doku-Schritten | höchstens 20 % gegenüber demselben Schritt ohne Skill, grob aus dem Kontextverbrauch |
 | Inkonsistenzen, die einen Commit überleben | keine |
 | Fingerabdruck-Rauschen | höchstens eine Fehlmeldung je zehn kosmetische Edits |
-
-> **[Q-28] Entscheidungsgrundlage — Messgrößen und Schwellen der Probe**
-> Kontext: Die Tabelle in 3.8.4 ist mein Vorschlag. Die Schwellen entscheiden, ob das Vorhaben in die Migration geht oder zurück ins Design. Zu streng heißt Stillstand; zu locker heißt, dass die zwei Fehlbilder zurückkommen.
-> Optionen: je Zeile (a) übernehmen, (b) Schwelle ändern, (c) Messgröße streichen oder ergänzen.
-> Vorschlag: übernehmen; die Zeile „Kontext-Mehraufwand" ist die unsicherste, weil grob messbar.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 8
-> Antwort:
 
 ### 3.8.5 Entscheidungstor
 

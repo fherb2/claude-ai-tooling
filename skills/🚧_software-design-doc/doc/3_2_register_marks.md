@@ -1,6 +1,6 @@
 ## 3.2 Marker und Register
 
-Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Offen und am Ende benannt: das Graphenmodell (gesondert zu besprechen), Details der Fingerabdruck-Normalisierung, die Platzierung des Markers im Satz und die Pflicht von Zitatmarker außerhalb der Funktion `relate`.
+Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Offen sind das Graphenmodell (Q-20, gesondert zu besprechen), der Fingerabdruck (Q-04), die Platzierung des Markers im Satz (Q-03), die Suchschlüssel (Q-05), die Zitatmarkerpflicht außerhalb `relate` (Q-06) und die Rückfalloption (Q-07); die Entscheidungsgrundlagen dazu stehen an ihren Funktionsstellen in Kapitel 1 (Leseplan in `work-plan.md`).
 
 ### 3.2.1 Trennung von Prosa und Register
 
@@ -23,7 +23,7 @@ Beispiel eines Absatzes mit drei Festlegungen (die IDs und Werte sind erfunden):
 
 Der Grund und die verworfene Alternative stehen in der Prosa, wo sie gedacht wurden; das Register verweist mit `in prose` darauf.
 
-Offen: ob der Marker vor oder nach dem Satzzeichen steht. Vorschlag: vor dem Satzzeichen, wie im Beispiel; für `grep` ist es gleichgültig.
+Ob der Marker vor oder nach dem Satzzeichen steht, ist noch offen (Q-03); das Beispiel zeigt die vorgeschlagene Form.
 
 ### 3.2.3 ID
 
@@ -79,41 +79,3 @@ Ob ein Absatz eine Zeile ist oder nach einer festen Breite umbricht und Absätze
 
 Wo ein Entwickler keine Klammern im Text will, ankert das Register die Festlegung über Datei und Wortlaut eines Kernsatzes. Das ist fragiler — ein editierter Satz bricht den Anker, `check` meldet es — und lässt die Prosa unberührt. Die Wahl trifft der Skillstart; der Standard sind Marker.
 
-### 3.2.10 Entscheidungsgrundlagen
-
-Das Graphenmodell — was eine Kante ist und wie sie gewichtet wird — ist in Kapitel 3.6 als [Q-20] geführt und wird gesondert besprochen.
-
-> **[Q-03] Entscheidungsgrundlage — Platzierung des Markers im Satz**
-> Kontext: Die Definitionsmarker steht am Satz, der die Festlegung ausspricht. Für `grep` ist die Position gleichgültig; für das Lesen nicht.
-> Optionen: (a) vor dem Satzzeichen — „… fasst 64 Einträge [D-0042]." wie im Beispiel in 3.2.2; (b) nach dem Satzzeichen — „… fasst 64 Einträge. [D-0042]".
-> Vorschlag: (a) — der Marker liest sich als Teil des Satzes, und ein Satz mit mehreren Festlegungen bleibt eindeutig zuordenbar.
-> Gewicht: klein · Blockiert: Fahrplanschritt 1
-> Antwort:
-
-> **[Q-04] Entscheidungsgrundlage — Fingerabdruck: ob und wie**
-> Kontext: Der Fingerabdruck erkennt, dass ein Definitionssatz geändert wurde, und löst die Meldung „Zitatstellen prüfen" aus (Idee aus Doorstops „suspect links"). Er kostet je Festlegung eine Registerzeile und erzeugt bei kosmetischen Edits Rauschen, das nur die Normalisierung dämpft (U+00A0, Leerraum, Satzzeichen am Ende, Kleinschreibung).
-> Optionen: (a) in Stufe 2 des Skripts bauen und in der Probe messen; (b) weglassen, Änderungspropagation nur über Marker und Suchschlüssel; (c) erst nach der Probe entscheiden.
-> Vorschlag: (a); die Probe misst das Rauschen (Kapitel 3.8).
-> Gewicht: mittel · Blockiert: Fahrplanschritt 5
-> Antwort:
-
-> **[Q-05] Entscheidungsgrundlage — Suchschlüssel**
-> Kontext: Zwei bis vier markante Begriffe je Festlegung im Register finden unmarkierte Erwähnungen (`mentions`) und liefern Kandidaten außerhalb des Graphen (`impact`). Wer sie wählt und pflegt, entscheidet über ihre Qualität.
-> Optionen: (a) die Instanz wählt sie beim Anlegen der Festlegung, Pflege nur bei Reibung oder wenn `mentions` sichtbar Erwähnungen verfehlt; (b) der Entwickler bestätigt sie im Planabschnitt wie die übrigen Attribute; (c) ohne Suchschlüssel, nur Marker.
-> Vorschlag: (a), mit Anzeige im Planabschnitt, damit Du sie korrigieren kannst, ohne dass sie eine eigene Frage kosten.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 1
-> Antwort:
-
-> **[Q-06] Entscheidungsgrundlage — Zitatmarker außerhalb der Funktion `relate`**
-> Kontext: Pflicht sind Zitatmarker nur in Abschnitten mit Funktion `relate`; in Bausteinkapiteln untereinander sind sie optional. Ob `mentions` ohne sie zu viel übersieht, kann erst die Probe zeigen.
-> Optionen: (a) bei „optional" bleiben und die Probe entscheiden lassen; (b) von vornherein Pflicht überall (Skill-Parameter `marking: full` als Standard).
-> Vorschlag: (a).
-> Gewicht: klein · Blockiert: nichts vor der Probe
-> Antwort:
-
-> **[Q-07] Entscheidungsgrundlage — Rückfalloption ohne Marker (Wortlaut-Anker)**
-> Kontext: 3.2.9 erlaubt, das Register über Datei und Wortlaut eines Kernsatzes zu ankern, wenn ein Entwickler keine Klammern im Text will. Das ist fragiler und kostet im Skript einen zweiten Ankermechanismus.
-> Optionen: (a) beibehalten als Wahl beim Skillstart; (b) streichen — Marker sind der einzige Weg; (c) auf später verschieben.
-> Vorschlag: (c) — erst bauen, wenn ein Projekt es braucht; im Regeltext als Möglichkeit nennen.
-> Gewicht: klein · Blockiert: Fahrplanschritt 3
-> Antwort:

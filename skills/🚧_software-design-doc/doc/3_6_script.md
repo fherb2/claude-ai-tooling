@@ -1,6 +1,6 @@
 ## 3.6 Das Skript
 
-Stand (2026-09-17): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschlag mit weitgehender Zustimmung; das Auswirkungsmodul ist in seinem Graphenmodell noch gesondert zu besprechen.
+Stand (2026-09-17): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschlag mit weitgehender Zustimmung; das Auswirkungsmodul ist in seinem Graphenmodell noch gesondert zu besprechen (Q-20, Kapitel 1.7.4).
 
 ### 3.6.1 Ort, Name, Laufzeit
 
@@ -77,7 +77,6 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 
 Was ein Kommando **nicht** hat, ist ebenso Festlegung: Es gibt kein `add` für eine einzelne Registerzeile. Registerzeilen entstehen ausschließlich über `apply` aus einem freigegebenen Plan — in einem Aufruf, nicht in zehn (Kapitel 1.3.6).
 
-
 ### 3.6.5 Das Auswirkungsmodul
 
 **Wozu das Modul da ist und woran es sich rechtfertigt, steht in Kapitel 1.7.4.** Hier steht, woraus es rechnet. `impact.py` kapselt Kanten, Gewichte, Kostenfunktion und Abbruch, weil genau hier später nachjustiert wird; der Name folgt der Auswirkungsanalyse, die der Vorläufer als Aufgabe von Segment 1 nennt (Anhang A, Abschnitt A.6).
@@ -107,13 +106,6 @@ Kurzhash (acht Hexzeichen aus SHA-256) des Definitionssatzes nach Normalisierung
 Eine Fixture-Doku mit Register, geplanten Schritten und Code-Kommentaren (Kapitel 3.8) und dazu absichtlich beschädigte Varianten. Für jedes Kommando: erwartete `ITEM`-Zeilen auf der guten Fixture, erwartete `FINDING`- oder `FAILED`-Zeilen auf den beschädigten. „Keine Befunde" gilt erst als belegt, wenn die beschädigten Varianten gefunden werden.
 
 ### 3.6.9 Entscheidungsgrundlagen
-
-> **[Q-20] Entscheidungsgrundlage — Das Graphenmodell (gesondert zu besprechen)**
-> Kontext: Du hast die Aussage „eine Kante entsteht, wenn zwei Festlegungen im selben Absatz genannt werden" als allgemeingültige Definition angezweifelt und eine gesonderte Besprechung gewünscht. 3.6.5 ist der Vorschlagsstand: Knoten sind Festlegungen; Kanten entstehen aus gemeinsamem Vorkommen (Absatz, Abschnitt, Nachbarabschnitt, Kapitel) mit abnehmenden Gewichten; Suchschlüssel-Treffer sind eine Quelle außerhalb des Graphen. Offen ist grundsätzlich: Was soll eine Kante bedeuten — „steht im Text nahe" oder „hängt inhaltlich zusammen"? Beides deckt sich nur teilweise, und nur das Erste ist mechanisch.
-> Optionen: hier nur Sammelstelle für Gesichtspunkte; die Besprechung führt zur Festlegung.
-> Vorschlag: keiner vorab.
-> Gewicht: groß · Blockiert: Fahrplanschritt 5
-> Antwort:
 
 > **[Q-21] Entscheidungsgrundlage — Kostenfunktion der Auswirkungsrechnung**
 > Kontext: Drei Kostenfunktionen sind vorgesehen (additiv 1/w; Deine Σ Hops / Π Gewichte; Produkt mit Dämpfung). Die Probe soll sie vergleichen; eine Vorabpräferenz würde die Reihenfolge der Umsetzung bestimmen.
