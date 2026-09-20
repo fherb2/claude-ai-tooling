@@ -125,11 +125,19 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 
 **Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
 
-## 1.5 Ein Beispiel von Anfang bis Ende
+## 1.5 Bild des fertigen Systems
+
+Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen.
+
+**„Je Doku", nicht „je Projekt" — das ist Absicht.** Ein Repository kann mehrere Vorhaben tragen, jedes mit eigener Doku, eigener Gliederung und eigenem Register; in diesem Repository ist genau das der Fall. Der Skill darf deshalb nicht von einer Doku je Projekt ausgehen und keine über Ordnergrenzen hinweg vereinheitlichen. Er folgt dem Vorhaben, in dem die berührten Dateien liegen: Register, Rollen und geplante Schritte bestimmen sich aus dessen Umgebung, nicht aus einer Einstellung am Repository. Wie er das Vorhaben findet, steht in Kapitel 3.5.4.
+
+**Der Skill selbst** besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
+
+## 1.6 Ein Beispiel von Anfang bis Ende
 
 Acht Szenen an einem erfundenen Vorhaben: Ein Werkzeug liest Messwerte von einem Sensor und schreibt sie in eine Datei. Die ersten sieben sind ausgeführt und zeigen jeden Begriff aus 1.4 im Gebrauch; die achte springt ein Jahr weiter und beschreibt — ohne Ausführung — einen Umbau an einem gewachsenen Vorhaben, weil erst dort die Auswirkungsrechnung etwas beiträgt. Wer das gelesen hat, findet in Kapitel 2 und 3 nur noch Einzelheiten.
 
-### 1.5.1 Szene 1 — Der Entwickler lässt eine Doku anlegen
+### 1.6.1 Szene 1 — Der Entwickler lässt eine Doku anlegen
 
 > **Entwickler:** „Leg mir eine begleitende Doku an."
 
@@ -139,7 +147,7 @@ Die Instanz liest das Projekt — eine Python-Datei, eine README, kein Doku-Ordn
 
 Nach der Freigabe entstehen zwei Dateien und die Skill-Parameterdatei. Sonst nichts — keine leeren Kapitel.
 
-### 1.5.2 Szene 2 — Die ersten Festlegungen entstehen
+### 1.6.2 Szene 2 — Die ersten Festlegungen entstehen
 
 Der Entwickler schreibt in `accompanying-doc.md`:
 
@@ -187,11 +195,11 @@ Und `dev-doc/decisions.md` bekommt seine ersten Einträge:
 
 Der Unterschied zwischen `confirmed` und `accepted` ist der Fußabdruck: D-0001 und D-0003 hat der Entwickler selbst angesprochen, D-0002 lief im freigegebenen Plan mit. Später ist ablesbar, was nachgeprüft wurde und was nur mitlief.
 
-### 1.5.3 Szene 3 — Ein Schritt wird umgesetzt
+### 1.6.3 Szene 3 — Ein Schritt wird umgesetzt
 
 Lage `execute`. Der Plan für „Schreiben implementieren" berührt D-0002 und D-0003; beide sind `decided`, es gibt keine Kollision. Der Planabschnitt listet sie, sonst geschieht nichts. **Der Entwickler sieht zwei Zeilen und liest weiter.** Das ist der Normalfall, und der Skill schweigt darin.
 
-### 1.5.4 Szene 4 — Reibung entsteht
+### 1.6.4 Szene 4 — Reibung entsteht
 
 Wochen später soll eine Live-Anzeige dazukommen. Sie braucht einzelne Werte und greift sie vor dem Blockpuffer ab — ein Sonderweg, den es nur wegen D-0002 gibt. Die Instanz erkennt das beim Schreiben des Plans und trägt mit dessen Ausführung eine Ereigniszeile ein:
 
@@ -201,7 +209,7 @@ Wochen später soll eine Live-Anzeige dazukommen. Sie braucht einzelne Werte und
 
 Der Entwickler hat dazu nichts getan und nichts entschieden. Die Zeile ändert nichts an D-0002 — sie sammelt Erfahrung.
 
-### 1.5.5 Szene 5 — Eine Idee, die nicht abgeschossen wird
+### 1.6.5 Szene 5 — Eine Idee, die nicht abgeschossen wird
 
 > **Entwickler:** „Könnten wir nicht binär schreiben? Die Dateien werden riesig."
 
@@ -219,7 +227,7 @@ Und führt den Gedanken dann zu Ende: Blockformat mit Kopfsatz, CSV-Ausgabe als 
 
 Die Zeile ist wichtiger, als sie aussieht: Sie verhindert, dass dieselbe Idee in drei Monaten erneut aufgemacht wird, und sie setzt den Reibungszähler für D-0003 zurück.
 
-### 1.5.6 Szene 6 — Die zweite Reibung öffnet eine Festlegung
+### 1.6.6 Szene 6 — Die zweite Reibung öffnet eine Festlegung
 
 Noch später soll ein Netzwerk-Streaming dazukommen, das ebenfalls Einzelwerte braucht — der zweite Umweg um denselben Blockpuffer:
 
@@ -233,7 +241,7 @@ Beim nächsten Plan, der D-0002 berührt, rechnet das Skript die Härte neu: zwe
 
 Niemand hat sich das gemerkt, niemand hat es gezählt. Es steht im Register, und ein Kommando liest es ab.
 
-### 1.5.7 Szene 7 — Ablösung, und warum alte Verweise trotzdem auflösen
+### 1.6.7 Szene 7 — Ablösung, und warum alte Verweise trotzdem auflösen
 
 > **Entwickler:** „Ja, mach die Blockgröße einstellbar."
 
@@ -250,7 +258,7 @@ Die neue Festlegung bekommt eine neue ID; die alte bleibt im Register stehen und
 
 In der Prosa wird der Satz umgeschrieben und trägt jetzt `[D-0007]`. Und die alten Verweise? Ein Commit-Text von letztem Monat nennt D-0002, ein älterer Absatz zitiert sie — beide lösen weiterhin auf, denn das Register kennt die Nachfolgerin und `show D-0002` nennt sie. **Niemand muss vor dem Weiterarbeiten das Projekt nach alten Verweisen absuchen.**
 
-### 1.5.8 Szene 8 — Ein Jahr später: der Umbau, und wozu die Auswirkungsrechnung da ist
+### 1.6.8 Szene 8 — Ein Jahr später: der Umbau, und wozu die Auswirkungsrechnung da ist
 
 Die sieben Szenen zeigen alles außer einem: Wozu die Kantenrechnung über den Graphen gut ist. Sie zeigen es nicht, weil sie es nicht können — das Vorhaben hat einen Abschnitt und einen Absatz, in dem jede Festlegung neben jeder anderen steht. Der Graph gäbe dort alle zurück, und alle wären unerheblich. **Die Auswirkungsrechnung verdient sich erst, wenn eine Doku mehrere Kapitel hat und es einen Text mit der Funktion `relate` gibt.** Diese Szene beschreibt einen solchen Fall in seinen Schritten, ohne ihn auszuführen.
 
@@ -278,17 +286,11 @@ Die sieben Szenen zeigen alles außer einem: Wozu die Kantenrechnung über den G
 
 **Noch nicht entschieden** ist, was genau eine Kante ist und wie sie gewichtet wird; deshalb nennt diese Szene keine Zahlen (Q-20 und Q-21 in Kapitel 3.6.9).
 
-### 1.5.9 Was der Entwickler in diesen Szenen getan hat
+### 1.6.9 Was der Entwickler in diesen Szenen getan hat
 
 In den ersten sieben Szenen hat er Prosa geschrieben, Pläne gelesen und **viermal in Prosa geantwortet**: einmal zum Ordner, einmal zu Datenblatt und CSV, einmal zur Idee, einmal zur Blockgröße. In Szene 8 kommen zwei Entscheidungen dazu — ob der Ersatz überhaupt trägt, und das Wort, das die hinfällig gewordene Hardware-Festlegung öffnet.
 
 Was er **nie** getan hat: einen Marker gesetzt, eine Registerzeile geschrieben, ein Schlüsselwort gelernt, eine Härte bestimmt, gezählt, wie oft etwas gerieben hat. Und was der Skill nie getan hat: seine Prosa umgeschrieben, ohne dass er es freigegeben hat.
-
-## 1.6 Bild des fertigen Systems
-
-Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen.
-
-**„Je Doku", nicht „je Projekt" — das ist Absicht.** Ein Repository kann mehrere Vorhaben tragen, jedes mit eigener Doku, eigener Gliederung und eigenem Register; in diesem Repository ist genau das der Fall. Der Skill darf deshalb nicht von einer Doku je Projekt ausgehen und keine über Ordnergrenzen hinweg vereinheitlichen. Er folgt dem Vorhaben, in dem die berührten Dateien liegen: Register, Rollen und geplante Schritte bestimmen sich aus dessen Umgebung, nicht aus einer Einstellung am Repository. Wie er das Vorhaben findet, steht in Kapitel 3.5.4. Der Skill selbst besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
 
 ## 1.7 Welche Arten der Unterstützung es gibt
 
@@ -379,7 +381,7 @@ Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anw
 
 **Woran sich das Verfahren rechtfertigt.** Für Festlegungen, die den geänderten Gegenstand nennen, genügen die Suchschlüssel. Das Geflecht verdient sich allein an den anderen. Stellt die Probe fest, dass es keine solchen Funde gibt, ist die Rechnung überflüssig und der Skill behält nur die Erwähnungssuche. Diese eine Zahl entscheidet über den Bestand des ganzen Teils.
 
-**Was es voraussetzt.** Beziehungen über Kapitelgrenzen hinweg entstehen nur dort, wo ein Text Festlegungen aus verschiedenen Kapiteln gemeinsam nennt — also in einem Abschnitt mit der Funktion `relate`. Fehlt er, bleiben nur Nähe innerhalb eines Kapitels und die Suchschlüssel. Deshalb ist die Frage nach einem solchen Text die folgenreichste Einzelheit der Erstanlage (1.7.1), und deshalb zeigt Szene 8 den Nutzen erst am gewachsenen Vorhaben (1.5.8).
+**Was es voraussetzt.** Beziehungen über Kapitelgrenzen hinweg entstehen nur dort, wo ein Text Festlegungen aus verschiedenen Kapiteln gemeinsam nennt — also in einem Abschnitt mit der Funktion `relate`. Fehlt er, bleiben nur Nähe innerhalb eines Kapitels und die Suchschlüssel. Deshalb ist die Frage nach einem solchen Text die folgenreichste Einzelheit der Erstanlage (1.7.1), und deshalb zeigt Szene 8 den Nutzen erst am gewachsenen Vorhaben (1.6.8).
 
 **Was ausgeschlossen bleibt.** Keine semantische Suche, keine Einbettungen, kein Index — das wäre eine eigene Infrastruktur je Projekt und damit das große Softwareprojekt, das dieses Vorhaben nicht sein will (Bedingung 3 in Kapitel 2.2). Alles, was der Skill über Zusammenhänge weiß, steht sichtbar im Text des Entwicklers.
 
