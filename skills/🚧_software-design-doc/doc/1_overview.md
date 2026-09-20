@@ -43,9 +43,9 @@ Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre di
 > Optionen: (a) vor dem Satzzeichen — „… fasst 64 Einträge [D-0042]." wie im Beispiel in 3.2.2; (b) nach dem Satzzeichen — „… fasst 64 Einträge. [D-0042]".
 > Vorschlag: (a) — der Marker liest sich als Teil des Satzes, und ein Satz mit mehreren Festlegungen bleibt eindeutig zuordenbar.
 > Gewicht: klein · Blockiert: Fahrplanschritt 1
-> Antwort:
+> Antwort: Ok: a.
 
-### 1.3.3 Abschnitte haben eine Rolle — und das Dokument trägt keine Bedeutung
+### 1.3.3 Abschnitte haben eine Rolle — im Dokument steht ihr Name, im Skill ihre Wirkung
 
 **Das Problem: Der Skill muss wissen, in welcher Art Text er gerade steht.** Eine Doku besteht nicht nur aus Festlegungen, und nicht jede Stelle verlangt vom Skill dasselbe. Sechs Arten von Text kommen in einer entwicklungsbegleitenden Doku vor, und in jeder verhält sich der Skill anders:
 
@@ -58,38 +58,40 @@ Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre di
 
 Diese sechs Verhaltensweisen heißen im Skill **Funktionen**, und sie tragen dort englische Namen — der Entwickler wird ihnen nie begegnen, sie stehen hier nur, damit Kapitel 3 sie benutzen kann (Namen entschieden am 2026-09-20):
 
-| Funktion | Die Textart | Was der Skill dort tut |
-|---|---|---|
-| `define` | eine Einheit wird beschrieben | Definitionsmarker sind Pflicht; Standard für alles, was keine Rolle trägt |
-| `relate` | Festlegungen verschiedener Teile werden in Beziehung gesetzt | Zitatmarker sind Pflicht; aus dem gemeinsamen Zitieren entstehen die Kanten der Auswirkungsrechnung (1.7.4) |
-| `global` | Vorgaben für das ganze Projekt | die Schwelle, ab der Reibung eine Festlegung öffnet, liegt eine Stufe höher; Kollisionen werden als projektweit gekennzeichnet |
-| `nonbinding` | nichts bindet | Lint und Auswirkungsrechnung übergehen den Text |
-| `plan` | geplante Schritte | Umbauziele werden gelesen (Kapitel 3.4) |
-| `register` | das Register | die Registergrammatik gilt (Kapitel 3.2) |
+
+| Funktion     | Die Textart                                                  | Was der Skill dort tut                                                                                                           |
+| ------------ | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| `define`     | eine Einheit wird beschrieben                                | Definitionsmarker sind Pflicht; Standard für alles, was keine Rolle trägt                                                      |
+| `relate`     | Festlegungen verschiedener Teile werden in Beziehung gesetzt | Zitatmarker sind Pflicht; aus dem gemeinsamen Zitieren entstehen die Kanten der Auswirkungsrechnung (1.7.4)                      |
+| `global`     | Vorgaben für das ganze Projekt                              | die Schwelle, ab der Reibung eine Festlegung öffnet, liegt eine Stufe höher; Kollisionen werden als projektweit gekennzeichnet |
+| `nonbinding` | nichts bindet                                                | Lint und Auswirkungsrechnung übergehen den Text                                                                                 |
+| `plan`       | geplante Schritte                                            | Umbauziele werden gelesen (Kapitel 3.4)                                                                                          |
+| `register`   | das Register                                                 | die Registergrammatik gilt (Kapitel 3.2)                                                                                         |
 
 **Woran der Skill die Textart erkennt: an einem Etikett.** Er darf sie nicht an Kapitelnummern oder Überschriften erkennen — Nummern ändern sich beim Umsortieren, Überschriften sind frei formuliert und in jeder Sprache. Deshalb trägt ein Abschnitt ein kurzes Etikett, seine **Rolle**. Ein Abschnitt ist dabei der Text unter einer Überschrift bis zur nächsten Überschrift gleicher oder höherer Ordnung. Auch die Rolle ist keine Formalie für den Entwickler: Die Instanz erkennt aus dem Inhalt, welche Rolle ein Abschnitt hat, schlägt sie im Plan vor und schreibt sie mit dessen Ausführung, wie die Marker; der Entwickler bestätigt oder korrigiert in Prosa.
 
 **Warum das Etikett den Inhalt nennt und nicht das Verhalten des Skills.** Man könnte die sechs Funktionsnamen selbst als Etikett nehmen. Aber der Entwickler muss das Etikett bestätigen und liest es an seinen eigenen Überschriften — und `relate` sagt ihm nichts über sein Kapitel, während „Laufzeitsicht" es trifft. Deshalb benennt die Rolle, **worum es in einem Abschnitt geht**, und der Skill ordnet jeder Rolle intern ihre Funktion zu. Die Namen folgen [arc42](https://arc42.org), dem etablierten Gliederungsschema für Architekturdokumentation; es ist die einzige der geprüften Quellen mit einem festen, benannten Abschnittssatz in beiden Sprachen und ohne Lizenzhürde (Anhang B, Abschnitt B.3). Dazu kommen fünf Rollen der Projektarbeit, die arc42 nicht kennt, weil es Architektur beschreibt und nicht Projektarbeit. **Entschieden am 2026-09-20:** Der Skill bietet alle zwölf arc42-Rollen an und die fünf der Projektarbeit — die Tabelle kostet nichts, und ein Projekt benutzt, was es braucht.
 
-| Rolle | Ein Abschnitt dieser Rolle beschreibt | Funktion |
-|---|---|---|
-| `goals` | Aufgabe und Ziele: was das Vorhaben erreichen soll und woran sich das misst | `define`, `relate` |
-| `constraints` | Randbedingungen, die von außen gesetzt sind: Technik, Organisation, Normen | `define`, `global` |
-| `context` | die Abgrenzung: Nachbarsysteme, Schnittstellen nach außen, Benutzer | `relate` |
-| `strategy` | die Lösungsstrategie: die Grundsatzentscheidungen, die das Ganze prägen | `relate` |
-| `building-blocks` | eine Einheit des Systems — Modul, Klasse, Prozess — mit ihren Festlegungen | `define` (Standard) |
-| `runtime` | Abläufe: wie die Einheiten im Betrieb zusammenspielen | `relate` |
-| `deployment` | die Verteilung: Hardware, Zielumgebungen, Installation | `define` |
-| `crosscutting` | Konzepte, die quer über das System gelten: Fehlerbehandlung, Protokollierung, Konventionen | `define`, `global` |
-| `decisions` | die Begründungen großer, kapitelübergreifender Entscheidungen in Prosa | `define` |
-| `quality` | Qualitätsanforderungen: was messbar gut sein muss und wie gut | `define`, `relate` |
-| `risks` | Risiken und technische Schulden: bekannt und benannt, aber nicht bindend | `nonbinding` |
-| `glossary` | die Begriffe des Vorhabens und ihre Bedeutung | `nonbinding` |
-| `plan` | geplante Schritte, wo immer sie stehen | `plan` |
-| `status` | erledigte Schritte | `nonbinding` |
-| `concept` | Findungstext: hier wird gedacht, nichts bindet | `nonbinding` |
-| `appendix` | Verlauf, Reviews, verworfene Wege — Beurteilungsmaterial | `nonbinding` |
-| `register` | das Register selbst | `register` |
+
+| Rolle             | Ein Abschnitt dieser Rolle beschreibt                                                       | Funktion            |
+| ----------------- | ------------------------------------------------------------------------------------------- | ------------------- |
+| `goals`           | Aufgabe und Ziele: was das Vorhaben erreichen soll und woran sich das misst                 | `define`, `relate`  |
+| `constraints`     | Randbedingungen, die von außen gesetzt sind: Technik, Organisation, Normen                 | `define`, `global`  |
+| `context`         | die Abgrenzung: Nachbarsysteme, Schnittstellen nach außen, Benutzer                        | `relate`            |
+| `strategy`        | die Lösungsstrategie: die Grundsatzentscheidungen, die das Ganze prägen                   | `relate`            |
+| `building-blocks` | eine Einheit des Systems — Modul, Klasse, Prozess — mit ihren Festlegungen                | `define` (Standard) |
+| `runtime`         | Abläufe: wie die Einheiten im Betrieb zusammenspielen                                      | `relate`            |
+| `deployment`      | die Verteilung: Hardware, Zielumgebungen, Installation                                      | `define`            |
+| `crosscutting`    | Konzepte, die quer über das System gelten: Fehlerbehandlung, Protokollierung, Konventionen | `define`, `global`  |
+| `decisions`       | die Begründungen großer, kapitelübergreifender Entscheidungen in Prosa                   | `define`            |
+| `quality`         | Qualitätsanforderungen: was messbar gut sein muss und wie gut                              | `define`, `relate`  |
+| `risks`           | Risiken und technische Schulden: bekannt und benannt, aber nicht bindend                    | `nonbinding`        |
+| `glossary`        | die Begriffe des Vorhabens und ihre Bedeutung                                               | `nonbinding`        |
+| `plan`            | geplante Schritte, wo immer sie stehen                                                      | `plan`              |
+| `status`          | erledigte Schritte                                                                          | `nonbinding`        |
+| `concept`         | Findungstext: hier wird gedacht, nichts bindet                                              | `nonbinding`        |
+| `appendix`        | Verlauf, Reviews, verworfene Wege — Beurteilungsmaterial                                   | `nonbinding`        |
+| `register`        | das Register selbst                                                                         | `register`          |
 
 Zwei Rollen verdienen einen eigenen Satz. **`decisions` bleibt neben dem Register bestehen** (entschieden am 2026-09-20) und doppelt es nicht: Das Register hält die Attribute jeder Festlegung, ein `decisions`-Abschnitt hält die Begründung einer großen Entscheidung in Prosa — einer, die kein einzelnes Kapitel besitzt. Und **`concept` löst ein Problem, das der Vorläufer nicht adressierte**: Findungstexte neben der bindenden Doku las die Instanz genauso als Gesetz; ein Abschnitt mit dieser Rolle ist ausdrücklich Denkraum.
 
@@ -104,7 +106,7 @@ Wer auch die Marker nicht im Text haben will, kann sie abwählen: Das Register k
 > Gewicht: klein · Blockiert: Fahrplanschritt 3
 > Antwort:
 
-Damit steht im Dokument des Entwicklers genau zweierlei vom Skill: Marker an Festlegungen und Rollen an Überschriften oder Absätzen. Beides sind Adressen. Aus einem Marker folgt nichts, ohne das Register zu lesen; aus einer Rolle folgt nichts, ohne den Skill zu lesen. **Keine Skill-Logik, kein Attribut, kein Zustand steht im Dokument des Entwicklers** — die Bedeutung liegt immer außerhalb. Das ist der Grundsatz, der die Doku lesbar hält und den Entwickler frei lässt, und Kapitel 2 macht ihn zur Vorgabe.
+Damit steht im Dokument des Entwicklers genau zweierlei vom Skill: Marker an Festlegungen und Rollen an Überschriften oder Absätzen. Beides sind Adressen. Aus einem Marker folgt nichts, ohne das Register zu lesen; aus einer Rolle folgt nichts, ohne den Skill zu lesen. **Keine Skill-Logik, kein Attribut, kein Zustand steht im Dokument des Entwicklers.** Das ist der Grundsatz, der die Doku lesbar hält und den Entwickler frei lässt, und Kapitel 2 macht ihn zur Vorgabe.
 
 ### 1.3.4 Was dem Entwickler gehört und was er trägt
 
@@ -137,11 +139,12 @@ Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht 
 
 **Wie das Ergebnis zurückkommt.** Drei Wege, und die Wahl richtet sich nach einer einzigen Frage: *Muss die Instanz das lesen, um zu entscheiden?*
 
-| Antwort | Weg | Wofür |
-|---|---|---|
-| Ja, vollständig | **inline** in der Antwort des Aufrufs | alles, worüber entschieden wird: Kandidatenlisten, Befunde, Härten. Richtwert bis etwa vierzig Zeilen |
+
+| Antwort                 | Weg                                                                                    | Wofür                                                                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Ja, vollständig        | **inline** in der Antwort des Aufrufs                                                  | alles, worüber entschieden wird: Kandidatenlisten, Befunde, Härten. Richtwert bis etwa vierzig Zeilen                           |
 | Ja, aber nur einen Teil | **Datei, dazu inline eine Kurzfassung** mit Zahlen, den ersten Einträgen und dem Pfad | lange Listen, von denen meist die Zahl genügt — etwa alle Erwähnungen einer Festlegung im Code. Die Instanz liest gezielt nach |
-| Nein | **Das Skript schreibt selbst**, inline kommt nur die Quittung | Erzeugnisse statt Entscheidungsgrundlagen: der Planabschnitt, die Registerzeilen einer Ausführung |
+| Nein                    | **Das Skript schreibt selbst**, inline kommt nur die Quittung                          | Erzeugnisse statt Entscheidungsgrundlagen: der Planabschnitt, die Registerzeilen einer Ausführung                                |
 
 Der dritte Weg ist der wichtigste, weil er die teuerste Handlung überhaupt einspart: den Dateiedit durch die Instanz. Er gilt ausdrücklich **nicht** für die Prosa des Entwicklers — die ändert das Skript nie (Bedingung 6 in Kapitel 2.2) —, sondern für das Register und für Arbeitsdokumente, die der Ablauf ohnehin erzeugt.
 
@@ -153,27 +156,29 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 
 **Was in der Prosa des Entwicklers steht**
 
-| Begriff | Bedeutung | Werte | Ausführlich |
-|---|---|---|---|
-| **Festlegung** | eine Aussage, die etwas bindend festhält. Aufnahmetest: Kann Code sie verletzen? | — | 3.2 |
-| **Marker** | ein Feld in der Prosa, gefüllt mit einer Adresse und nichts sonst. Drei Arten: Definitionsmarker `[D-0042]` am Satz, der die Festlegung ausspricht; Zitatmarker `[>D-0042]` an Stellen, die sie heranziehen; Rollenmarker `[DS:runtime]` an einer Überschrift oder einem Absatz | — | 3.2.2, 3.3 |
-| **ID** | der stabile Schlüssel einer Festlegung; global je Register, wird nie neu vergeben, trägt kein Kapitel | `D-0042` | 3.2.3 |
-| **Rolle** | sagt, worum es in einem Abschnitt geht; daraus folgt, was der Skill dort tut | `goals`, `constraints`, `context`, `strategy`, `building-blocks`, `runtime`, `deployment`, `crosscutting`, `decisions`, `quality`, `risks`, `glossary`, `plan`, `status`, `concept`, `appendix`, `register` | 1.3.3 |
-| **Funktion** | was der Skill in einem Abschnitt mit dieser Rolle tut | `define`, `relate`, `global`, `nonbinding`, `plan`, `register` | 1.3.3 |
+
+| Begriff        | Bedeutung                                                                                                                                                                                                                                                                        | Werte                                                                                                                                                                                                       | Ausführlich |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| **Festlegung** | eine Aussage, die etwas bindend festhält. Aufnahmetest: Kann Code sie verletzen?                                                                                                                                                                                                | —                                                                                                                                                                                                          | 3.2          |
+| **Marker**     | ein Feld in der Prosa, gefüllt mit einer Adresse und nichts sonst. Drei Arten: Definitionsmarker`[D-0042]` am Satz, der die Festlegung ausspricht; Zitatmarker `[>D-0042]` an Stellen, die sie heranziehen; Rollenmarker `[DS:runtime]` an einer Überschrift oder einem Absatz | —                                                                                                                                                                                                          | 3.2.2, 3.3   |
+| **ID**         | der stabile Schlüssel einer Festlegung; global je Register, wird nie neu vergeben, trägt kein Kapitel                                                                                                                                                                          | `D-0042`                                                                                                                                                                                                    | 3.2.3        |
+| **Rolle**      | sagt, worum es in einem Abschnitt geht; daraus folgt, was der Skill dort tut                                                                                                                                                                                                     | `goals`, `constraints`, `context`, `strategy`, `building-blocks`, `runtime`, `deployment`, `crosscutting`, `decisions`, `quality`, `risks`, `glossary`, `plan`, `status`, `concept`, `appendix`, `register` | 1.3.3        |
+| **Funktion**   | was der Skill in einem Abschnitt mit dieser Rolle tut                                                                                                                                                                                                                            | `define`, `relate`, `global`, `nonbinding`, `plan`, `register`                                                                                                                                              | 1.3.3        |
 
 **Was im Register steht** — je Festlegung eine Gruppe von Zeilen
 
-| Begriff | Bedeutung | Werte | Ausführlich |
-|---|---|---|---|
-| **Art** (`kind`) | woher die Festlegung kommt | `given` — von außen vorgegeben (Physik, Hardware, Fremdschnittstelle, Norm) · `chosen` — von uns entschieden | 3.1.2 |
-| **Grund** (`reason`), **Quelle** (`source`) | warum so, beziehungsweise woher | Freitext · `in prose` — steht in der Doku selbst · `unknown` — nicht mehr bekannt | 3.2.5 |
-| **Alternative** (`instead`) | die stärkste verworfene Alternative, mit dem Grund der Ablehnung; eine Zeile | Freitext · `in prose` | 3.2.5 |
-| **Status** (`status`) | wie die Attribute zustande kamen — der Fußabdruck | `assumed` — Lesart der Instanz, nicht bestätigt · `accepted` — stand in einem freigegebenen Plan, nicht einzeln angesprochen · `confirmed` — vom Entwickler selbst bestätigt oder korrigiert | 3.1.2 |
-| **Festgeschrieben** (`pinned`) | ausdrückliche Entscheidung, eine gewählte Festlegung nicht wieder aufzumachen | ja/nein | 3.1.2 |
-| **Suchschlüssel** (`keys`) | zwei bis vier markante Begriffe; finden unmarkierte Erwähnungen | Freitext | 3.2.5 |
-| **Fingerabdruck** (`fp`) | Kurzhash des Definitionssatzes; erkennt, dass die Definition sich geändert hat | Hexzeichen | 3.6.7 |
-| **Ereigniszeile** | eine **datierte Zeile, die festhält, dass der Festlegung etwas widerfahren ist.** Sie ändert die Festlegung nicht, sondern sammelt Erfahrung mit ihr — und daraus folgt später ihre Härte | `friction` — Arbeit musste um die Festlegung herum gebaut werden · `upheld` — sie wurde gegen eine Idee oder einen Befund geprüft und hat standgehalten · `pending` — eine Frage an den Entwickler ist offen | 3.1.2, 3.2.5 |
-| **Lebenszyklus** | was am Ende mit ihr geschieht | `superseded … by <ID>` — durch eine neue ersetzt · `retired` — entfällt ersatzlos | 3.2.6 |
+
+| Begriff                                     | Bedeutung                                                                                                                                                                                     | Werte                                                                                                                                                                                                              | Ausführlich |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ |
+| **Art** (`kind`)                            | woher die Festlegung kommt                                                                                                                                                                    | `given` — von außen vorgegeben (Physik, Hardware, Fremdschnittstelle, Norm) · `chosen` — von uns entschieden                                                                                                   | 3.1.2        |
+| **Grund** (`reason`), **Quelle** (`source`) | warum so, beziehungsweise woher                                                                                                                                                               | Freitext ·`in prose` — steht in der Doku selbst · `unknown` — nicht mehr bekannt                                                                                                                               | 3.2.5        |
+| **Alternative** (`instead`)                 | die stärkste verworfene Alternative, mit dem Grund der Ablehnung; eine Zeile                                                                                                                 | Freitext ·`in prose`                                                                                                                                                                                              | 3.2.5        |
+| **Status** (`status`)                       | wie die Attribute zustande kamen — der Fußabdruck                                                                                                                                           | `assumed` — Lesart der Instanz, nicht bestätigt · `accepted` — stand in einem freigegebenen Plan, nicht einzeln angesprochen · `confirmed` — vom Entwickler selbst bestätigt oder korrigiert                | 3.1.2        |
+| **Festgeschrieben** (`pinned`)              | ausdrückliche Entscheidung, eine gewählte Festlegung nicht wieder aufzumachen                                                                                                               | ja/nein                                                                                                                                                                                                            | 3.1.2        |
+| **Suchschlüssel** (`keys`)                 | zwei bis vier markante Begriffe; finden unmarkierte Erwähnungen                                                                                                                              | Freitext                                                                                                                                                                                                           | 3.2.5        |
+| **Fingerabdruck** (`fp`)                    | Kurzhash des Definitionssatzes; erkennt, dass die Definition sich geändert hat                                                                                                               | Hexzeichen                                                                                                                                                                                                         | 3.6.7        |
+| **Ereigniszeile**                           | eine**datierte Zeile, die festhält, dass der Festlegung etwas widerfahren ist.** Sie ändert die Festlegung nicht, sondern sammelt Erfahrung mit ihr — und daraus folgt später ihre Härte | `friction` — Arbeit musste um die Festlegung herum gebaut werden · `upheld` — sie wurde gegen eine Idee oder einen Befund geprüft und hat standgehalten · `pending` — eine Frage an den Entwickler ist offen | 3.1.2, 3.2.5 |
+| **Lebenszyklus**                            | was am Ende mit ihr geschieht                                                                                                                                                                 | `superseded … by <ID>` — durch eine neue ersetzt · `retired` — entfällt ersatzlos                                                                                                                             | 3.2.6        |
 
 > **[Q-02] Entscheidungsgrundlage — Umbenennung der Ereigniszeile in `upheld`**
 > Kontext: Im finalen Text von Arbeitspunkt 1 hieß die Ereigniszeile „gegen eine Idee geprüft und bestätigt" `confirmed` — dasselbe Wort wie der Statuswert `confirmed` (vom Entwickler bestätigt). In einer Grammatik, in der beides in derselben Klammer stehen kann, ist das eine echte Mehrdeutigkeit für Leser und `grep`. Ich habe die Ereigniszeile in diesem Text bereits `upheld` genannt.
@@ -184,20 +189,22 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 
 **Was die Sitzung bestimmt**
 
-| Begriff | Bedeutung | Werte | Ausführlich |
-|---|---|---|---|
-| **Härte** (`hardness`) | wie bindend eine Festlegung **jetzt** ist; wird bei jedem Kontakt neu abgeleitet und **nie gespeichert** | `fixed` — nicht zur Diskussion · `decided` — gilt, darf hinterfragt werden · `open` — steht zur Disposition | 3.1.4 |
-| **Lage** (`mode`) | wie die Sitzung die Doku liest | `execute` — Beschlossenes umsetzen · `design` — etwas neu denken | 3.1.5 |
-| **Kontakt** | eine Festlegung ist kontaktiert, wenn sie im Plan des Schritts oder in der Auswirkungsliste der Idee genannt werden müsste | — | 3.1.3 |
-| **Parken** | eine Kollision in der Lage `design` in einem Satz festhalten, statt den Gedanken abzubrechen | — | 3.1.5 |
+
+| Begriff                 | Bedeutung                                                                                                                   | Werte                                                                                                            | Ausführlich |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------ |
+| **Härte** (`hardness`) | wie bindend eine Festlegung**jetzt** ist; wird bei jedem Kontakt neu abgeleitet und **nie gespeichert**                     | `fixed` — nicht zur Diskussion · `decided` — gilt, darf hinterfragt werden · `open` — steht zur Disposition | 3.1.4        |
+| **Lage** (`mode`)       | wie die Sitzung die Doku liest                                                                                              | `execute` — Beschlossenes umsetzen · `design` — etwas neu denken                                              | 3.1.5        |
+| **Kontakt**             | eine Festlegung ist kontaktiert, wenn sie im Plan des Schritts oder in der Auswirkungsliste der Idee genannt werden müsste | —                                                                                                               | 3.1.3        |
+| **Parken**              | eine Kollision in der Lage`design` in einem Satz festhalten, statt den Gedanken abzubrechen                                 | —                                                                                                               | 3.1.5        |
 
 **Was die Planung trägt**
 
-| Begriff | Bedeutung | Werte | Ausführlich |
-|---|---|---|---|
-| **Geplanter Schritt** | ein noch offener Schritt der Projektplanung, wo immer er steht | — | 3.4.1 |
-| **Umbauziel** (`target:`) | die Zeile, mit der ein Schritt sagt, was er umbauen will | IDs oder eine Kapiteldatei | 3.4.2 |
-| **Planabschnitt** | „Berührte Festlegungen" — der Abschnitt jedes Plans, in dem der Entwickler die Annahmen sieht | — | 3.1.6 |
+
+| Begriff                   | Bedeutung                                                                                        | Werte                      | Ausführlich |
+| ------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------- | ------------ |
+| **Geplanter Schritt**     | ein noch offener Schritt der Projektplanung, wo immer er steht                                   | —                         | 3.4.1        |
+| **Umbauziel** (`target:`) | die Zeile, mit der ein Schritt sagt, was er umbauen will                                         | IDs oder eine Kapiteldatei | 3.4.2        |
+| **Planabschnitt**         | „Berührte Festlegungen" — der Abschnitt jedes Plans, in dem der Entwickler die Annahmen sieht | —                         | 3.1.6        |
 
 **Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
 
@@ -242,11 +249,12 @@ Der Hook H1 läuft nach dem Edit und meldet in den Kontext: drei Sätze mit Norm
 
 > **Berührte Festlegungen**
 >
-> | Wortlaut | Art | Grund/Quelle | Status | Härte |
-> |---|---|---|---|---|
-> | „liefert Messwerte mit 100 Hz" | `given` | Grenze des Sensors — Quelle vermutet, Datenblatt? | `assumed` | `decided` |
+>
+> | Wortlaut                        | Art      | Grund/Quelle                                                            | Status    | Härte    |
+> | ------------------------------- | -------- | ----------------------------------------------------------------------- | --------- | --------- |
+> | „liefert Messwerte mit 100 Hz" | `given`  | Grenze des Sensors — Quelle vermutet, Datenblatt?                      | `assumed` | `decided` |
 > | „blockweise zu je 1000 Werten" | `chosen` | steht in der Prosa: Schreibzugriff je Einzelwert bremst das Dateisystem | `assumed` | `decided` |
-> | „Das Format ist CSV" | `chosen` | kein Grund genannt — `pending`: Warum CSV? | `assumed` | `decided` |
+> | „Das Format ist CSV"           | `chosen` | kein Grund genannt —`pending`: Warum CSV?                              | `assumed` | `decided` |
 >
 > Rolle für „Erfassung": `building-blocks`.
 > Die Freigabe dieses Plans bestätigt die gelisteten Annahmen, soweit Du nichts anderes sagst.
@@ -388,15 +396,16 @@ Der Skill erbringt sieben unterscheidbare Leistungen. Sie sind nicht alle gleich
 > Gewicht: mittel · Blockiert: Fahrplanschritt 3
 > Antwort:
 
-| | Leistung | Auslöser | Ergebnis |
-|---|---|---|---|
-| 1 | **Erstanlage** einer begleitenden Doku (1.7.1) | ausdrücklicher Auftrag | Gerüst aus Dateien, Rollen und leerem Register |
-| 2 | **Einstieg** in eine vorhandene Doku (1.7.2) | Berührungspunkt | Marker und Registerzeilen für die berührten Festlegungen |
-| 3 | **Laufende Pflege** (1.7.3) | Plan und seine Ausführung | Doku und Code im Wechsel; Ereigniszeilen |
-| 4 | **Auswirkungen finden** (1.7.4) | Änderung an einer Festlegung | Kandidatenliste, gemessene Umbaukosten |
-| 5 | **Einen Bereich neu denken** (1.7.5) | Idee, Bitte um Alternativen | zu Ende gedachte Vorschläge, geparkte Kollisionen |
-| 6 | **Prüfen und Aufräumen** (1.7.6) | Bereich öffnen, Commit, Sitzungsstart | Befunde; Lebenszyklus abgelöster Festlegungen |
-| 7 | **Nichts tun** (1.7.7) | `mode: off` | keine Wirkung |
+
+|   | Leistung                                       | Auslöser                              | Ergebnis                                                   |
+| - | ---------------------------------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| 1 | **Erstanlage** einer begleitenden Doku (1.7.1) | ausdrücklicher Auftrag                | Gerüst aus Dateien, Rollen und leerem Register            |
+| 2 | **Einstieg** in eine vorhandene Doku (1.7.2)   | Berührungspunkt                       | Marker und Registerzeilen für die berührten Festlegungen |
+| 3 | **Laufende Pflege** (1.7.3)                    | Plan und seine Ausführung             | Doku und Code im Wechsel; Ereigniszeilen                   |
+| 4 | **Auswirkungen finden** (1.7.4)                | Änderung an einer Festlegung          | Kandidatenliste, gemessene Umbaukosten                     |
+| 5 | **Einen Bereich neu denken** (1.7.5)           | Idee, Bitte um Alternativen            | zu Ende gedachte Vorschläge, geparkte Kollisionen         |
+| 6 | **Prüfen und Aufräumen** (1.7.6)             | Bereich öffnen, Commit, Sitzungsstart | Befunde; Lebenszyklus abgelöster Festlegungen             |
+| 7 | **Nichts tun** (1.7.7)                         | `mode: off`                            | keine Wirkung                                              |
 
 ### 1.7.1 Erstanlage einer begleitenden Doku
 
@@ -421,11 +430,12 @@ Ganz ohne Klärung geht es dennoch nicht: Was sich aus dem Projekt nicht ablesen
 
 **Die drei Gliederungsformen**, die der Skill anbietet:
 
-| Form | Woraus sie besteht | Wofür |
-|---|---|---|
-| **Einstiegsform** | eine einzige Datei als `accompanying-doc` mit der Rolle `building-blocks`, dazu das Register | kleine Vorhaben; ein Modul; alles, was eine Person überblickt |
-| **Dreiteilung** | Funktionale Aufgabenbeschreibung und Zusammenhänge (`relate`), Grundsätzliche Vorgaben (`global`), Details in Planung und Ausführung der zum Projekt gehörigen Module bzw. Einheiten (`building-blocks`), dazu Zusatzinformationen in Form von Anhängen zur Doku oder eigenen Dateien (auch an anderen Orten des Projekts, wie z.B. `research/`, `datasheets/` und Ähnliche.) — das Schema des Vorläufers (Anhang A) | der bewährte Mittelweg; wächst mit |
-| **Sichtenform** | ein Kern nach arc42: Ziele, Randbedingungen, Kontext, Lösungsstrategie, Bausteine, Laufzeit, Querschnitt | große oder langlebige Systeme; Projekte, die arc42 ohnehin führen |
+
+| Form              | Woraus sie besteht                                                                                                                                                                                                                                                                                                                                                                                                           | Wofür                                                              |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Einstiegsform** | eine einzige Datei als`accompanying-doc` mit der Rolle `building-blocks`, dazu das Register                                                                                                                                                                                                                                                                                                                                  | kleine Vorhaben; ein Modul; alles, was eine Person überblickt      |
+| **Dreiteilung**   | Funktionale Aufgabenbeschreibung und Zusammenhänge (`relate`), Grundsätzliche Vorgaben (`global`), Details in Planung und Ausführung der zum Projekt gehörigen Module bzw. Einheiten (`building-blocks`), dazu Zusatzinformationen in Form von Anhängen zur Doku oder eigenen Dateien (auch an anderen Orten des Projekts, wie z.B. `research/`, `datasheets/` und Ähnliche.) — das Schema des Vorläufers (Anhang A) | der bewährte Mittelweg; wächst mit                                |
+| **Sichtenform**   | ein Kern nach arc42: Ziele, Randbedingungen, Kontext, Lösungsstrategie, Bausteine, Laufzeit, Querschnitt                                                                                                                                                                                                                                                                                                                    | große oder langlebige Systeme; Projekte, die arc42 ohnehin führen |
 
 Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, warum sie hier nicht passen oder alternativ auch sinnvoll wären. Der Entwickler kann in Prosa widersprechen („nimm die Sichtenform"), und die Instanz baut den Plan um — nicht die Dateien.
 
