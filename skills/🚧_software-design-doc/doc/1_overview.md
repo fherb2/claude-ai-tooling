@@ -39,7 +39,7 @@ Die Felder **gehören** zur Festlegung, aber sie **stehen** nicht bei ihr im Tex
 Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre die Doku unlesbar und der Entwickler in ein formales Konzept gezwungen, das ihn einschränkt und mit Zusatzaufgaben belastet — inakzeptabel. Stünde umgekehrt gar nichts Maschinenlesbares im Text, müsste die Instanz jede Aussage interpretieren, und das Fehlbild Gesetz wäre zurück. Der Mittelweg: **Die Felder sind normiert, aber sie liegen in einem Register neben der Doku; die Prosa trägt je Festlegung nur einen kurzen Marker — eine Adresse, nichts sonst** (Kapitel 3.2). So bleibt der rote Faden eines Absatzes für den Leser erhalten, ein Absatz mit drei Festlegungen bleibt ein Absatz, und `grep` findet trotzdem alles zu einer Festlegung.
 
 > **[Q-03] Entscheidungsgrundlage — Platzierung des Markers im Satz**
-> Kontext: Die Definitionsmarker steht am Satz, der die Festlegung ausspricht. Für `grep` ist die Position gleichgültig; für das Lesen nicht.
+> Kontext: Der Definitionsmarker steht am Satz, der die Festlegung ausspricht. Für `grep` ist die Position gleichgültig; für das Lesen nicht.
 > Optionen: (a) vor dem Satzzeichen — „… fasst 64 Einträge [D-0042]." wie im Beispiel in 3.2.2; (b) nach dem Satzzeichen — „… fasst 64 Einträge. [D-0042]".
 > Vorschlag: (a) — der Marker liest sich als Teil des Satzes, und ein Satz mit mehreren Festlegungen bleibt eindeutig zuordenbar.
 > Gewicht: klein · Blockiert: Fahrplanschritt 1
@@ -107,7 +107,7 @@ Was er tut: Prosa schreiben, den Planabschnitt „Berührte Festlegungen" lesen 
 
 ### 1.3.5 Was die Einhaltung sichert
 
-Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht Anweisungen, sondern **ein Skript und Hooks**, die nach jedem Doku-Edit und vor jedem Commit lesend prüfen (Kapitel 3.6 und 3.7). Anweisungen, die eine Haltung beschreiben, feuern nicht zuverlässig (1.2); ein Hook feuert immer. Diese Absicherung kommt mit dem Skill und wirkt in jedem Projekt, das ihn führt, ohne dass dort etwas einzurichten wäre; nur der Zustandsbericht am Sitzungsstart ist ein Angebot je Projekt (Kapitel 3.7).
+Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht Anweisungen, sondern **ein Skript und Hooks**: Der Hook H1 prüft nach jedem Doku-Edit, der Hook H2 vor jedem Commit — beide lesend (Kapitel 3.6 und 3.7). Anweisungen, die eine Haltung beschreiben, feuern nicht zuverlässig (1.2); ein Hook feuert immer. Diese Absicherung kommt mit dem Skill und wirkt in jedem Projekt, das ihn führt, ohne dass dort etwas einzurichten wäre; nur der Zustandsbericht am Sitzungsstart (Hook H3) ist ein Angebot je Projekt (Kapitel 3.7).
 
 > **[Q-26] Entscheidungsgrundlage — H2 blockiert den Commit oder meldet nur**
 > Kontext: H2 blockiert bei struktureller Inkonsistenz (Dublette, Marker ohne Eintrag, `superseded` ohne Ziel). Das ist der einzige blockierende Eingriff des Skills. Eine Blockade ist wirksam, aber im falschen Moment lästig; ohne sie bleibt die Inkonsistenz im Repository.
@@ -194,7 +194,7 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 
 ## 1.5 Bild des fertigen Systems
 
-Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen.
+Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker und Abschnitte ihre Rolle an der Überschrift tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen.
 
 **„Je Doku", nicht „je Projekt" — das ist Absicht.** Ein Repository kann mehrere Vorhaben tragen, jedes mit eigener Doku, eigener Gliederung und eigenem Register; in diesem Repository ist genau das der Fall. Der Skill darf deshalb nicht von einer Doku je Projekt ausgehen und keine über Ordnergrenzen hinweg vereinheitlichen. Er folgt dem Vorhaben, in dem die berührten Dateien liegen: Register, Rollen und geplante Schritte bestimmen sich aus dessen Umgebung, nicht aus einer Einstellung am Repository. Wie er das Vorhaben findet, steht in Kapitel 3.5.4.
 
