@@ -38,7 +38,7 @@ Keine Struktur wird gefordert, die nichts zu halten hat. Die erste Festlegung, d
 
 ### 3.5.4 Repositories mit mehreren Vorhaben
 
-**Dass ein Repository mehrere Vorhaben mit eigener Doku tragen kann, steht in Kapitel 1.6.** Hier steht, wie der Skill das zugehörige Vorhaben findet. Die Skill-Parameterdatei ist der Standard des Repositories. Ein Vorhaben mit eigener Doku weicht ab, indem seine Dateien Rollenmarker und eine `[register: pfad]`-Zeile tragen; der Skill folgt dann dem Vorhaben, in dem die berührten Dateien liegen. Das entspricht der Regel dieses Repositories, dass jedes Vorhaben eigenständig aufgebaut ist.
+**Dass ein Repository mehrere Vorhaben mit eigener Doku tragen kann, steht in Kapitel 1.5.** Hier steht, wie der Skill das zugehörige Vorhaben findet. Die Skill-Parameterdatei ist der Standard des Repositories. Ein Vorhaben mit eigener Doku weicht ab, indem seine Dateien Rollenmarker und eine `[register: pfad]`-Zeile tragen; der Skill folgt dann dem Vorhaben, in dem die berührten Dateien liegen. Das entspricht der Regel dieses Repositories, dass jedes Vorhaben eigenständig aufgebaut ist.
 
 ### 3.5.5 Entscheidungsgrundlagen
 
