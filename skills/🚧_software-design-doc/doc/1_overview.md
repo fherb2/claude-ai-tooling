@@ -56,6 +56,28 @@ Was er tut: Prosa schreiben, den Planabschnitt „Berührte Festlegungen" lesen 
 
 Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht Anweisungen, sondern **ein Skript und Hooks**, die nach jedem Doku-Edit und vor jedem Commit lesend prüfen (Kapitel 3.6 und 3.7). Anweisungen, die eine Haltung beschreiben, feuern nicht zuverlässig (1.2); ein Hook feuert immer.
 
+### 1.3.6 Wozu das Skript da ist und wie es aufgerufen wird
+
+**Was es übernimmt.** Vier Arbeiten, die eine Instanz zwar ausführen könnte, bei denen sie aber Urteil vortäuschen würde, wo Mechanik gefragt ist: **zählen** — wie viele Reibungszeilen seit der letzten Bestätigung; **ableiten** — welche Prüfung der Härteliste als erste zutrifft; **einsammeln** — welche Festlegungen als von einer Änderung berührt in Frage kommen; **abgleichen** — wo Prosa und Register auseinanderlaufen. Alle vier sind aus den Feldern eindeutig bestimmt. Was eindeutig bestimmt ist, gehört nicht ins Modell, sondern in ein Programm; eine Instanz, die es „im Kopf" täte, käme manchmal zum richtigen Ergebnis und niemand wüsste, wann.
+
+**Was es nie tut.** Es schreibt keine Prosa des Entwicklers um. Es entscheidet nicht, ob ein Satz eine Festlegung ist. Es beurteilt nicht, ob ein Kandidat wirklich betroffen ist. Diese drei sind Urteil und bleiben bei der Instanz; das Skript legt ihr die Grundlage vor.
+
+**Wie seine Kommandos geschnitten sind.** Nicht entlang des Datenmodells — eine ID, eine Zeile —, sondern **entlang der Anker**: Ein Kommando je Handlung, die im Ablauf ohnehin vorkommt. Bereich öffnen ist ein Aufruf, Plan schreiben ist ein Aufruf, Plan ausführen ist ein Aufruf, jede Hook-Prüfung ist ein Aufruf. Daneben gibt es feinkörnige Auskunftskommandos für eine einzelne Festlegung, aber die dienen der Nachfrage des Entwicklers („warum steht das zur Disposition?") und nicht dem Ablauf.
+
+**Warum dieser Schnitt.** Jeder Aufruf kostet die Instanz dreierlei: ihn zu starten, auf ihn zu warten und seine Antwort zu deuten — und das unabhängig davon, wie wenig er tut. Eine Schnittstelle, bei der fünfzehn berührte Festlegungen fünfzehn Aufrufe bedeuten, ist deshalb nicht bloß unschön, sondern sie macht den Skill an der teuersten Stelle teuer (Vorgabe 2.7). Daraus zwei Regeln: **Was mehrere Festlegungen betrifft, nimmt eine Liste** und nicht eine ID. Und **was die Instanz zu entscheiden hat, kommt in einem Bündel** — alle Entscheidungen eines Ankers auf einmal, nicht eine je Aufruf.
+
+**Wie das Ergebnis zurückkommt.** Drei Wege, und die Wahl richtet sich nach einer einzigen Frage: *Muss die Instanz das lesen, um zu entscheiden?*
+
+| Antwort | Weg | Wofür |
+|---|---|---|
+| Ja, vollständig | **inline** in der Antwort des Aufrufs | alles, worüber entschieden wird: Kandidatenlisten, Befunde, Härten. Richtwert bis etwa vierzig Zeilen |
+| Ja, aber nur einen Teil | **Datei, dazu inline eine Kurzfassung** mit Zahlen, den ersten Einträgen und dem Pfad | lange Listen, von denen meist die Zahl genügt — etwa alle Erwähnungen einer Festlegung im Code. Die Instanz liest gezielt nach |
+| Nein | **Das Skript schreibt selbst**, inline kommt nur die Quittung | Erzeugnisse statt Entscheidungsgrundlagen: der Planabschnitt, die Registerzeilen einer Ausführung |
+
+Der dritte Weg ist der wichtigste, weil er die teuerste Handlung überhaupt einspart: den Dateiedit durch die Instanz. Er gilt ausdrücklich **nicht** für die Prosa des Entwicklers — die ändert das Skript nie (Bedingung 6 in Kapitel 2.2) —, sondern für das Register und für Arbeitsdokumente, die der Ablauf ohnehin erzeugt.
+
+**Was daraus für die Ausgabeform folgt.** Weil die Instanz die Antwort deuten muss, ist jede Ausgabe eine Aussage und keine Rohdatenhalde: eine Zeile je Gegenstand, entscheidungsfertig, und im Fehlerfall Schritt, Ursache, Zustand und Abhilfe statt eines Protokolls. Die Vorgaben dazu stehen in Kapitel 2.5 bis 2.7, die Ausführung in Kapitel 3.6.
+
 ## 1.4 Die Begriffe im Überblick
 
 Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollständig aufgezählt: Ein nicht aufgeführter Wert ist ein Fehler, den das Skript meldet (Vorgabe 2.1). Ausführlich beschrieben wird jeder Begriff dort, wo die letzte Spalte hinweist.
@@ -264,7 +286,9 @@ Was er **nie** getan hat: einen Marker gesetzt, eine Registerzeile geschrieben, 
 
 ## 1.6 Bild des fertigen Systems
 
-Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen. Der Skill selbst besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
+Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen.
+
+**„Je Doku", nicht „je Projekt" — das ist Absicht.** Ein Repository kann mehrere Vorhaben tragen, jedes mit eigener Doku, eigener Gliederung und eigenem Register; in diesem Repository ist genau das der Fall. Der Skill darf deshalb nicht von einer Doku je Projekt ausgehen und keine über Ordnergrenzen hinweg vereinheitlichen. Er folgt dem Vorhaben, in dem die berührten Dateien liegen: Register, Rollen und geplante Schritte bestimmen sich aus dessen Umgebung, nicht aus einer Einstellung am Repository. Wie er das Vorhaben findet, steht in Kapitel 3.5.4. Der Skill selbst besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
 
 ## 1.7 Welche Arten der Unterstützung es gibt
 
@@ -335,6 +359,12 @@ Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einsti
 
 Was der Vorläufer die Arbeitsschleife nannte (Anhang A, Abschnitt A.8), bleibt: Doku und Code entstehen im Wechsel, nicht nacheinander. Neu ist die Buchführung, die dabei mitläuft — Marker und Registerzeilen werden mit der Ausführung eines freigegebenen Plans geschrieben, Reibung wird vermerkt, wenn ein Sonderfall nur wegen einer Festlegung existiert, und eine verworfene Idee hinterlässt eine Bestätigungszeile. Der Entwickler sieht davon den Planabschnitt „Berührte Festlegungen" und sonst nichts.
 
+**Dazu gehört eine Festlegung darüber, wo eine Planung liegt — und die muss der Skill treffen.** Der Vorläufer verlangte, jede Planung in den Fahrplan zu schreiben, beim betreffenden Schritt ausdetailliert. Das hat sich als falsch erwiesen: Der Fahrplan trägt, **was** zu tun ist und in welcher Dringlichkeit, nicht **wie** — er ist keine Dokumentation und keine Planungsablage. Die Formulierung „in aufgabenangemessener Detaillierung" meinte die Präzision des Ziels und wurde als Ausbreitung des Weges gelesen.
+
+Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anweisungen widersprechen sich. Die globale Regel nennt drei mögliche Orte und fragt, wenn keiner geregelt ist; die Projektregel dieses Repositories verbietet eigene Plan-Dateien. Solange beides nebeneinandersteht, hängt die Antwort davon ab, welche Datei zuerst gelesen wird. Der Skill entscheidet die Frage einmal für alle Projekte, und die globale Regel tritt dann von selbst zurück — sie gilt nur, „wenn der Ablageort nicht klar geregelt ist".
+
+**Was daraus folgt, ist noch nicht entschieden**: nach welchem Maß sich der Ort einer Planung bestimmt und welche Orte es gibt. Der Vorschlag und die offene Frage stehen in Kapitel 3.4.3.
+
 ### 1.7.4 Auswirkungen einer Änderung finden
 
 **Das Bedürfnis.** Soll eine Festlegung geändert werden oder entfallen, muss vorher feststehen, welche anderen Festlegungen davon berührt sind. Wer das übersieht, merkt es erst, wenn etwas nicht mehr zusammenpasst — und dann ist die Ursache schwer zu finden, weil ein Übersehen keine Spur hinterlässt.
@@ -352,6 +382,8 @@ Was der Vorläufer die Arbeitsschleife nannte (Anhang A, Abschnitt A.8), bleibt:
 **Was es voraussetzt.** Beziehungen über Kapitelgrenzen hinweg entstehen nur dort, wo ein Text Festlegungen aus verschiedenen Kapiteln gemeinsam nennt — also in einem Abschnitt mit der Funktion `relate`. Fehlt er, bleiben nur Nähe innerhalb eines Kapitels und die Suchschlüssel. Deshalb ist die Frage nach einem solchen Text die folgenreichste Einzelheit der Erstanlage (1.7.1), und deshalb zeigt Szene 8 den Nutzen erst am gewachsenen Vorhaben (1.5.8).
 
 **Was ausgeschlossen bleibt.** Keine semantische Suche, keine Einbettungen, kein Index — das wäre eine eigene Infrastruktur je Projekt und damit das große Softwareprojekt, das dieses Vorhaben nicht sein will (Bedingung 3 in Kapitel 2.2). Alles, was der Skill über Zusammenhänge weiß, steht sichtbar im Text des Entwicklers.
+
+**Eine Wahl, die der Entwickler bewusst treffen können muss.** Die Rechnung läuft ohne jede fremde Bibliothek; sie kann aber eine benutzen, wenn eine vorhanden ist, und rechnet dann schneller und in mehr Varianten. Vorhanden ist so etwas auf einem Entwicklungsrechner meist nur zufällig — und **was niemand kennt, installiert niemand.** Deshalb gilt: Braucht der Skill die Rechnung zum ersten Mal und die Bibliothek fehlt, erklärt die Instanz dem Entwickler in zwei Sätzen, was sie besser machen würde, und fragt. Er kann sie installieren lassen, selbst installieren oder ablehnen — und **seine Antwort wird festgehalten**, damit die Frage nie zweimal kommt. Drei Zustände sind zu unterscheiden: noch nicht geprüft und nicht gefragt (der Anfangszustand), benutzen, nicht benutzen. Ohne die Bibliothek arbeitet der Skill vollständig weiter; sie ist Beschleunigung, nicht Voraussetzung. Die Einzelheiten stehen in Kapitel 3.5.2 und 3.6.1.
 
 ### 1.7.5 Einen Bereich neu denken
 
