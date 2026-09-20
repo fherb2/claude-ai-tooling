@@ -40,7 +40,44 @@ Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre di
 
 ### 1.3.3 Abschnitte haben eine Rolle — und das Dokument trägt keine Bedeutung
 
-Eine Doku besteht nicht nur aus Festlegungen. Es gibt Abschnitte, in denen der Entwickler Festlegungen aus verschiedenen Teilen zueinander in Beziehung setzt — die Übersicht, ein Ablauf, die Lösungsstrategie —, Abschnitte mit Vorgaben, die im ganzen Projekt gelten, Abschnitte, die eine einzelne Einheit beschreiben, und Abschnitte, in denen nur konzipiert wird und nichts bindet. Der Skill muss diese Arten unterscheiden, denn er tut in ihnen Verschiedenes. Er darf sie aber nicht an Kapitelnummern oder Überschriften erkennen: Nummern ändern sich beim Umsortieren, Überschriften sind frei formuliert und in jeder Sprache. Deshalb trägt ein Abschnitt ein kurzes Etikett an der Überschrift — seine **Rolle**, etwa „Laufzeitsicht" oder „Randbedingungen". Auch das ist keine Formalie für den Entwickler: Die Instanz erkennt aus dem Inhalt, welche Rolle ein Abschnitt hat, schlägt sie im Plan vor und schreibt sie mit dessen Ausführung, wie die Marker; der Entwickler bestätigt oder korrigiert in Prosa. Die Rollen sind nach einem etablierten Gliederungsschema benannt, damit der Entwickler versteht, was er da bestätigt; was der Skill in einem Abschnitt mit einer bestimmten Rolle tut, steht im Skill selbst (Kapitel 3.3). Rollen gelten je Abschnitt; je Aussage gibt es nur den Marker aus 1.3.2.
+Eine Doku besteht nicht nur aus Festlegungen. Es gibt Abschnitte, in denen der Entwickler Festlegungen aus verschiedenen Teilen zueinander in Beziehung setzt — die Übersicht, ein Ablauf, die Lösungsstrategie —, Abschnitte mit Vorgaben, die im ganzen Projekt gelten, Abschnitte, die eine einzelne Einheit beschreiben, und Abschnitte, in denen nur konzipiert wird und nichts bindet. Der Skill muss diese Arten unterscheiden, denn er tut in ihnen Verschiedenes. Er darf sie aber nicht an Kapitelnummern oder Überschriften erkennen: Nummern ändern sich beim Umsortieren, Überschriften sind frei formuliert und in jeder Sprache. Deshalb trägt ein Abschnitt ein kurzes Etikett an der Überschrift — seine **Rolle**, etwa „Laufzeitsicht" oder „Randbedingungen". Auch das ist keine Formalie für den Entwickler: Die Instanz erkennt aus dem Inhalt, welche Rolle ein Abschnitt hat, schlägt sie im Plan vor und schreibt sie mit dessen Ausführung, wie die Marker; der Entwickler bestätigt oder korrigiert in Prosa. Rollen gelten je Abschnitt; je Aussage gibt es nur den Marker aus 1.3.2. Trägt nichts eine Rolle, gilt alles als Baustein-Beschreibung (`building-blocks`, siehe unten); der Skill schlägt beim ersten Kontakt vor, den Text mit den Zusammenhängen zu kennzeichnen — schlägt vor, verlangt nicht.
+
+**Zwei Schichten, getrennt nach Leser.** Die **Inhaltsrollen** benennen, worum es in einem Abschnitt geht. Sie sind für den Menschen da — er liest sie im Plan und an seinen Überschriften, also müssen ihre Namen ihm etwas sagen. Benannt sind sie nach arc42, dem etablierten Gliederungsschema für Architekturdokumentation; es ist die einzige der geprüften Quellen mit einem festen, benannten Abschnittssatz in beiden Sprachen und ohne Lizenzhürde (Anhang B, Abschnitt B.3). Die **Funktionen** benennen, was der Skill in einem Abschnitt tut. Sie folgen aus der Rolle, sind Skill-intern, und der Entwickler muss sie nicht kennen. Der Grund für die Trennung: „Beziehungen" ist als Funktion richtig, aber als Beschreibung eines Kapitels für den Menschen unbrauchbar — er sieht dort Spezifikationen, Abläufe, Klassen und Methoden.
+
+**Die sechs Funktionen** (Namen entschieden am 2026-09-20):
+
+| Funktion | Was der Skill in einem Abschnitt damit tut |
+|---|---|
+| `define` | Hier entstehen Festlegungen: Definitionsmarker sind Pflicht. Standardfunktion für alles, was keine Rolle trägt |
+| `relate` | Hier zieht der Text Festlegungen aus verschiedenen Orten gemeinsam heran: Zitatmarker sind Pflicht, und aus dem gemeinsamen Zitieren bezieht die Auswirkungsrechnung ihre Kanten über Kapitelgrenzen (1.7.4) |
+| `global` | Die Festlegungen dieses Abschnitts gelten projektweit: Die Schwelle, ab der Reibung sie öffnet, liegt eine Stufe höher, und Kollisionen werden als projektweit gekennzeichnet |
+| `nonbinding` | Nichts hier bindet: Lint und Auswirkungsrechnung übergehen den Abschnitt |
+| `plan` | Hier stehen geplante Schritte: Der Skill liest ihre Umbauziele (Kapitel 3.4) |
+| `register` | Das Register selbst: Hier gilt dessen Grammatik (Kapitel 3.2) |
+
+**Die Inhaltsrollen.** Entschieden am 2026-09-20: Der Skill bietet alle zwölf arc42-Rollen an, dazu fünf Rollen der Projektarbeit, die arc42 nicht kennt, weil es Architektur beschreibt und nicht Projektarbeit — die Tabelle kostet nichts, und ein Projekt benutzt, was es braucht.
+
+| Rolle | Ein Abschnitt dieser Rolle beschreibt | Funktion |
+|---|---|---|
+| `goals` | Aufgabe und Ziele: was das Vorhaben erreichen soll und woran sich das misst | `define`, `relate` |
+| `constraints` | Randbedingungen, die von außen gesetzt sind: Technik, Organisation, Normen | `define`, `global` |
+| `context` | die Abgrenzung: Nachbarsysteme, Schnittstellen nach außen, Benutzer | `relate` |
+| `strategy` | die Lösungsstrategie: die Grundsatzentscheidungen, die das Ganze prägen | `relate` |
+| `building-blocks` | eine Einheit des Systems — Modul, Klasse, Prozess — mit ihren Festlegungen | `define` (Standard) |
+| `runtime` | Abläufe: wie die Einheiten im Betrieb zusammenspielen | `relate` |
+| `deployment` | die Verteilung: Hardware, Zielumgebungen, Installation | `define` |
+| `crosscutting` | Konzepte, die quer über das System gelten: Fehlerbehandlung, Protokollierung, Konventionen | `define`, `global` |
+| `decisions` | die Begründungen großer, kapitelübergreifender Entscheidungen in Prosa | `define` |
+| `quality` | Qualitätsanforderungen: was messbar gut sein muss und wie gut | `define`, `relate` |
+| `risks` | Risiken und technische Schulden: bekannt und benannt, aber nicht bindend | `nonbinding` |
+| `glossary` | die Begriffe des Vorhabens und ihre Bedeutung | `nonbinding` |
+| `plan` | geplante Schritte, wo immer sie stehen | `plan` |
+| `status` | erledigte Schritte | `nonbinding` |
+| `concept` | Findungstext: hier wird gedacht, nichts bindet | `nonbinding` |
+| `appendix` | Verlauf, Reviews, verworfene Wege — Beurteilungsmaterial | `nonbinding` |
+| `register` | das Register selbst | `register` |
+
+Zwei Rollen verdienen einen eigenen Satz. **`decisions` bleibt neben dem Register bestehen** (entschieden am 2026-09-20) und doppelt es nicht: Das Register hält die Attribute jeder Festlegung, ein `decisions`-Abschnitt hält die Begründung einer großen Entscheidung in Prosa — einer, die kein einzelnes Kapitel besitzt. Und **`concept` löst ein Problem, das der Vorläufer nicht adressierte**: Findungstexte neben der bindenden Doku las die Instanz genauso als Gesetz; ein Abschnitt mit dieser Rolle ist ausdrücklich Denkraum.
 
 Wer auch die Marker nicht im Text haben will, kann sie abwählen: Das Register kann eine Festlegung stattdessen über Datei und Wortlaut eines Kernsatzes ansprechen. Das ist der Rückfallweg, und er ist fragiler — ein umformulierter Satz bricht die Adresse, und das Verfahren muss es melden, statt es zu bemerken. Der Standard sind Marker (Einzelheiten in 3.2.9).
 
@@ -48,7 +85,7 @@ Damit steht im Dokument des Entwicklers genau zweierlei vom Skill: Marker an Fes
 
 ### 1.3.4 Was dem Entwickler gehört und was er trägt
 
-Ihm gehört die Doku: Gliederung, Reihenfolge, Nummerierung, Sprache der Überschriften, Layout, ob Dreiersschema des Vorläufers (Anhang A) oder freiere Form, wo das Register liegt, wo geplante Schritte stehen. Der Skill bindet nichts an Nummern, Dateinamen oder Titel — nur an Rollen (Kapitel 3.3) —, und er fordert keine Struktur, die nichts zu halten hat; die Doku wächst an Festlegungen, nicht an Pflichten (Kapitel 3.5). Der Entwickler muss weder die Grammatik der Marker noch die des Registers noch die Namen der Härtewerte kennen.
+Ihm gehört die Doku: Gliederung, Reihenfolge, Nummerierung, Sprache der Überschriften, Layout, ob Dreiersschema des Vorläufers (Anhang A) oder freiere Form, wo das Register liegt, wo geplante Schritte stehen. Der Skill bindet nichts an Nummern, Dateinamen oder Titel — nur an Rollen (1.3.3) —, und er fordert keine Struktur, die nichts zu halten hat; die Doku wächst an Festlegungen, nicht an Pflichten (Kapitel 3.5). Der Entwickler muss weder die Grammatik der Marker noch die des Registers noch die Namen der Härtewerte kennen.
 
 Was er tut: Prosa schreiben, den Planabschnitt „Berührte Festlegungen" lesen und in Prosa antworten. Was er hinnimmt — das ist der ehrliche Preis: Klammern im Text, eine Registerdatei neben der Doku und einen Abschnitt in jedem Plan. Marker und Registerzeilen schreibt die Instanz mit der Ausführung eines freigegebenen Plans; schreibt der Entwickler selbst Prosa, findet der Lint unmarkierte Festlegungen, und die Instanz schlägt die Marker im nächsten Plan vor. Die Buchführung trägt die Instanz, die Kontrolle tragen Skript und Hooks — nie der Entwickler.
 
@@ -89,8 +126,8 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 | **Festlegung** | eine Aussage, die etwas bindend festhält. Aufnahmetest: Kann Code sie verletzen? | — | 3.2 |
 | **Marker** | ein Feld in der Prosa, gefüllt mit einer Adresse und nichts sonst. Drei Arten: Definitionsmarker `[D-0042]` am Satz, der die Festlegung ausspricht; Zitatmarker `[>D-0042]` an Stellen, die sie heranziehen; Rollenmarker `[DS:runtime]` an einer Überschrift | — | 3.2.2, 3.3 |
 | **ID** | der stabile Schlüssel einer Festlegung; global je Register, wird nie neu vergeben, trägt kein Kapitel | `D-0042` | 3.2.3 |
-| **Rolle** | sagt, worum es in einem Abschnitt geht; daraus folgt, was der Skill dort tut | `goals`, `constraints`, `context`, `strategy`, `building-blocks`, `runtime`, `deployment`, `crosscutting`, `decisions`, `quality`, `risks`, `glossary`, `plan`, `status`, `concept`, `appendix`, `register` | 3.3.2 |
-| **Funktion** | was der Skill in einem Abschnitt mit dieser Rolle tut | `define`, `relate`, `global`, `nonbinding`, `plan`, `register` | 3.3.3 |
+| **Rolle** | sagt, worum es in einem Abschnitt geht; daraus folgt, was der Skill dort tut | `goals`, `constraints`, `context`, `strategy`, `building-blocks`, `runtime`, `deployment`, `crosscutting`, `decisions`, `quality`, `risks`, `glossary`, `plan`, `status`, `concept`, `appendix`, `register` | 1.3.3 |
+| **Funktion** | was der Skill in einem Abschnitt mit dieser Rolle tut | `define`, `relate`, `global`, `nonbinding`, `plan`, `register` | 1.3.3 |
 
 **Was im Register steht** — je Festlegung eine Gruppe von Zeilen
 
@@ -324,7 +361,7 @@ Ganz ohne Klärung geht es dennoch nicht: Was sich aus dem Projekt nicht ablesen
 
 1. **Ort der Doku** — ein Ordner, Vorschlag der im Projekt übliche (falls das klar aus den Informationen über die bestehende Projektstruktur hervorgeht) oder `dev-doc/`, `design-doc/`, `accompanying-doc/`, `accomp-doc/`, `accomp-dev-doc/` oder `accomp-design-doc/`. Beachte: Dieser Skill dient einer projektbegleitenden Dokumentation der Entwicklung und nicht einer in sich abgeschlossenen Projektdokumentation oder Anwenderdokumentation. Der übliche Ordner `doc/` für die Dokumentation des fertigen Projektvorhabens ist deshalb meist nicht der richtige Platz. Das sollte dem Entwickler gesagt werden, wenn er `doc/` unter der Projektwurzel vorschlägt. Letztlich ist aber jede finale Vorgabe des Entwicklers als Platz dieser Dokumentation zu akzeptieren.
 2. **Gliederung** — eine der drei Formen unten, mit Begründung, warum diese zur Größe des Vorhabens passt.
-3. **Rollen der Abschnitte** — welcher Abschnitt welche Rolle trägt (Kapitel 3.3). Besonders: ob es einen Abschnitt gibt, der Festlegungen zueinander in Beziehung setzt (Funktion `relate`). Das ist die folgenreichste Einzelheit der Erstanlage, denn ohne einen solchen Text hat die Auswirkungsrechnung keine Kanten über Kapitelgrenzen hinweg (1.7.4).
+3. **Rollen der Abschnitte** — welcher Abschnitt welche Rolle trägt (1.3.3). Besonders: ob es einen Abschnitt gibt, der Festlegungen zueinander in Beziehung setzt (Funktion `relate`). Das ist die folgenreichste Einzelheit der Erstanlage, denn ohne einen solchen Text hat die Auswirkungsrechnung keine Kanten über Kapitelgrenzen hinweg (1.7.4).
 4. **Ort des Registers** — Standard ist `decisions.md` im Doku-Ordner. Dem Entwickler kann aber angeboten werden, die Metainformationen stattdessen in einem Ordner unterhalb von `.claude/` abzulegen.
 5. **Ort der geplanten Schritte** — eigene Datei oder Abschnitt mit der Rolle `plan` in einer vorhandenen Datei. Bei einer eigenen Datei für diesen Zweck wird dem Entwickler angeboten, diese ebenfalls im Doku-Ordner anzulegen oder alternativ unterhalb von `.claude/`.
 6. **Layout der Prosa** — ein Absatz je Zeile oder Umbruch mit Leerzeilen; abgelesen, wo möglich.
