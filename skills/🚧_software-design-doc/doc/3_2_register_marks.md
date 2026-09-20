@@ -1,6 +1,6 @@
 ## 3.2 Marker und Register
 
-Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Offen sind das Graphenmodell (Q-20, gesondert zu besprechen), der Fingerabdruck (Q-04), die Platzierung des Markers im Satz (Q-03), die Suchschlüssel (Q-05), die Zitatmarkerpflicht außerhalb `relate` (Q-06) und die Rückfalloption (Q-07); die Entscheidungsgrundlagen dazu stehen an ihren Funktionsstellen in Kapitel 1 (Leseplan in `work-plan.md`).
+Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Am 2026-09-21 entschieden: die Platzierung des Markers im Satz und die Zurückstellung der Rückfalloption (vormals Q-03 und Q-07, siehe `status.md`). Offen sind das Graphenmodell (Q-20, gesondert zu besprechen), der Fingerabdruck (Q-04), die Suchschlüssel (Q-05) und die Zitatmarkerpflicht außerhalb `relate` (Q-06); die Entscheidungsgrundlagen dazu stehen an ihren Funktionsstellen in Kapitel 1 (Leseplan in `work-plan.md`).
 
 ### 3.2.1 Trennung von Prosa und Register
 
@@ -15,7 +15,7 @@ Zwei Formen, beide ASCII, beide ohne Leerzeichen, in Markdown als normaler Text 
 - **Definitionsmarker** `[D-0042]` — genau eine je Festlegung, am Satz, der sie ausspricht. Spannt sich eine Festlegung über mehrere Sätze, steht der Marker am Ende des letzten.
 - **Zitatmarker** `[>D-0042]` — an jeder weiteren Stelle, die die Festlegung heranzieht; das `>` liest sich als „siehe".
 
-Pflicht ist der Definitionsmarker immer, der Zitatmarker in Abschnitten mit der Funktion `relate` (Kapitel 1.3.3); sonst ist der Zitatmarker optional. Der Skill-Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Aufnahmetest, was überhaupt einen Definitionsmarker bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keinen.
+Pflicht ist der Definitionsmarker immer, der Zitatmarker in Abschnitten mit der Funktion `relate` (Kapitel 1.3.3); sonst ist der Zitatmarker optional. Der Skill-Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Diese Pflichten gelten innerhalb einer Doku, in der markiert wird; **ob** überhaupt markiert wird, entscheidet der Entwickler auf Vorschlag der Instanz (Kapitel 1.3.3). Aufnahmetest, was überhaupt einen Definitionsmarker bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keinen.
 
 Beispiel eines Absatzes mit drei Festlegungen (die IDs und Werte sind erfunden):
 
@@ -23,7 +23,7 @@ Beispiel eines Absatzes mit drei Festlegungen (die IDs und Werte sind erfunden):
 
 Der Grund und die verworfene Alternative stehen in der Prosa, wo sie gedacht wurden; das Register verweist mit `in prose` darauf.
 
-Ob der Marker vor oder nach dem Satzzeichen steht, ist noch offen (Q-03); das Beispiel zeigt die vorgeschlagene Form.
+Der Marker steht **vor** dem Satzzeichen, wie im Beispiel (entschieden am 2026-09-21): Er liest sich als Teil des Satzes, und ein Satz mit mehreren Festlegungen bleibt eindeutig zuordenbar. Für `grep` ist die Position gleichgültig.
 
 ### 3.2.3 ID
 
@@ -77,5 +77,5 @@ Ob ein Absatz eine Zeile ist oder nach einer festen Breite umbricht und Absätze
 
 ### 3.2.9 Rückfalloption ohne Marker
 
-Wo ein Entwickler keine Klammern im Text will, ankert das Register die Festlegung über Datei und Wortlaut eines Kernsatzes. Das ist fragiler — ein editierter Satz bricht den Anker, `check` meldet es — und lässt die Prosa unberührt. Die Wahl trifft der Skillstart; der Standard sind Marker.
+Wo ein Entwickler keine Klammern im Text will, ankert das Register die Festlegung über Datei und Wortlaut eines Kernsatzes. Das ist fragiler — ein editierter Satz bricht den Anker, `check` meldet es — und lässt die Prosa unberührt. **Zurückgestellt** (entschieden am 2026-09-21): Der Regelteil nennt diesen Weg als Möglichkeit, gebaut wird er erst, wenn ein Projekt ihn braucht. Bis dahin heißt der Verzicht auf Marker, dass die Doku unmarkiert bleibt und der Skill ohne Buchführung arbeitet (Kapitel 1.3.3). Der Standard sind Marker.
 
