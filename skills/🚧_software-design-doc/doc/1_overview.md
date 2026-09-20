@@ -89,9 +89,11 @@ Ihm gehört die Doku: Gliederung, Reihenfolge, Nummerierung, Sprache der Übersc
 
 Was er tut: Prosa schreiben, den Planabschnitt „Berührte Festlegungen" lesen und in Prosa antworten. Was er hinnimmt — das ist der ehrliche Preis: Klammern im Text, eine Registerdatei neben der Doku und einen Abschnitt in jedem Plan. Marker und Registerzeilen schreibt die Instanz mit der Ausführung eines freigegebenen Plans; schreibt der Entwickler selbst Prosa, findet der Lint unmarkierte Festlegungen, und die Instanz schlägt die Marker im nächsten Plan vor. Die Buchführung trägt die Instanz, die Kontrolle tragen Skript und Hooks — nie der Entwickler.
 
+**Und er wird nicht ausgefragt — Annahmen statt Fragen.** Fehlt zu einer Festlegung ein Attribut — ihre Art, ihr Grund, ihre Quelle —, bildet die Instanz aus der Prosa eine Annahme und legt sie im Planabschnitt sichtbar vor, statt eine Frage zu stellen; im Regelfall bestätigt die Freigabe des Plans die gelisteten Annahmen, soweit der Entwickler nichts anderes sagt (Skill-Parameter `assumptions_on_approval`). Gefragt wird nur, wo keine tragfähige Annahme möglich ist — und dann ohne das Vokabular des Skills, mit dem Wortlaut der Festlegung und dem Anlass. Eine Annahme bleibt als solche gekennzeichnet und macht eine Festlegung nie unantastbar (Vorgabe 2.11); die Regeln im Einzelnen stehen in Kapitel 3.1.3.
+
 ### 1.3.5 Was die Einhaltung sichert
 
-Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht Anweisungen, sondern **ein Skript und Hooks**, die nach jedem Doku-Edit und vor jedem Commit lesend prüfen (Kapitel 3.6 und 3.7). Anweisungen, die eine Haltung beschreiben, feuern nicht zuverlässig (1.2); ein Hook feuert immer.
+Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht Anweisungen, sondern **ein Skript und Hooks**, die nach jedem Doku-Edit und vor jedem Commit lesend prüfen (Kapitel 3.6 und 3.7). Anweisungen, die eine Haltung beschreiben, feuern nicht zuverlässig (1.2); ein Hook feuert immer. Diese Absicherung kommt mit dem Skill und wirkt in jedem Projekt, das ihn führt, ohne dass dort etwas einzurichten wäre; nur der Zustandsbericht am Sitzungsstart ist ein Angebot je Projekt (Kapitel 3.7).
 
 ### 1.3.6 Wozu das Skript da ist und wie es aufgerufen wird
 
@@ -160,7 +162,7 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 | **Umbauziel** (`target:`) | die Zeile, mit der ein Schritt sagt, was er umbauen will | IDs oder eine Kapiteldatei | 3.4.2 |
 | **Planabschnitt** | „Berührte Festlegungen" — der Abschnitt jedes Plans, in dem der Entwickler die Annahmen sieht | — | 3.1.6 |
 
-**Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
+**Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
 
 ## 1.5 Bild des fertigen Systems
 
@@ -430,7 +432,7 @@ Die Leistung, um derentwillen das Vorhaben begonnen wurde (1.2, Fehlbild Gesetz)
 
 ### 1.7.6 Prüfen und Aufräumen
 
-Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze (Kapitel 3.6 und 3.7).
+Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze — Letztere erkannt über einen gespeicherten Fingerabdruck je Definitionssatz (Kapitel 3.6 und 3.7).
 
 **Der Lebenszyklus einer Festlegung ist Teil dieser Leistung, und er hat einen eigenen Grund.** Eine Festlegung, die überholt ist, verschwindet nicht einfach. Bliebe ihr Satz unmarkiert in der Prosa stehen, läse die Instanz ihn beim nächsten Mal als gültig — und das Fehlbild Gesetz wäre an genau dieser Stelle zurück, mit einer Festlegung, die niemand mehr vertritt. Deshalb gilt: **Was überholt ist, darf nicht unmarkiert dastehen.** Es bekommt entweder eine Nachfolgerin (`superseded … by`) oder entfällt ersatzlos (`retired`); der Eintrag im Register bleibt in beiden Fällen mit Datum bestehen.
 
@@ -446,7 +448,7 @@ Ein Projekt kann den Skill abwählen (`mode: off`). Dann fordert er nichts, schl
 
 Abschnitt 1.7 sagt, **welche** Leistungen der Skill erbringt; dieser Abschnitt sagt, **an welchen Handlungen** sie ausgelöst werden. Der Skill greift nicht kontinuierlich ein, sondern an benannten Handlungen. Die Reihenfolge in einer Sitzung:
 
-1. **Skillstart.** Die Instanz liest die Skill-Parameterdatei oder erhebt aus dem Projekt, was sich ablesen lässt, und fragt nur, was sich nicht ablesen lässt (Kapitel 3.5). Ist der Skill für das Projekt abgewählt, endet er hier.
+1. **Skillstart.** Geladen wird der Skill durch den geankerten Trigger in der Anweisungsdatei — sobald eine Software-Änderung über eine lokal begrenzte Korrektur hinausgeht — oder durch Aufruf. Die Instanz liest die Skill-Parameterdatei oder erhebt aus dem Projekt, was sich ablesen lässt, und fragt nur, was sich nicht ablesen lässt (Kapitel 3.5). Ist der Skill für das Projekt abgewählt, endet er hier.
 2. **Bereich öffnen.** Für den anstehenden Schritt oder die besprochene Idee listet das Skript die Festlegungen des berührten Bereichs mit ihrer Härte und meldet Abweichungen zwischen Prosa und Register (Kapitel 3.6).
 3. **Lage bestimmen.** Aus dem Auftrag folgt, ob die Sitzung ausführt oder entwirft; im Zweifel eine Frage (Kapitel 3.1).
 4. **Plan schreiben.** Jeder Plan trägt den Abschnitt „Berührte Festlegungen": Welche Festlegungen der Schritt berührt, welche Attribute die Instanz annimmt, welche Härte folgt, welche Kollisionen geparkt werden. Das Skript liefert das Gerüst; die Auswirkungskandidaten kommen aus dem Graphen der Marker (Kapitel 3.6). Der Entwickler liest, korrigiert in Prosa oder gibt frei (Kapitel 3.1 und 3.4).
@@ -459,7 +461,7 @@ Ein Projekt, dessen Doku noch keinen Marker trägt, kommt am Berührungspunkt in
 
 Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Register und Marker, Planung und Skillstart; das Skript in zwei Stufen; die Hooks; das Zusammensetzen des Skills; die Probe; die Migration aus den bisherigen Anweisungsdateien.
 
-**Die Probe ist das Tor, und sie ist nötig, weil der Rest nicht zu erdenken ist.** Die logische und codetechnische Seite dieses Vorhabens lässt sich am Schreibtisch klären — ob die Härteliste widerspruchsfrei ist, ob die Grammatik parsbar bleibt, ob die Hooks feuern. Fünf Dinge lassen sich so nicht klären, weil sie vom Verhalten der Instanz und vom Zuschnitt einer echten Doku abhängen: ob die Instanz die Marker in der Praxis wirklich setzt; ob sie Kollisionen parkt statt sie abzuschießen; wie oft der Lint falschen Alarm schlägt; wie lang die Kandidatenlisten werden und wie viel davon brauchbar ist; und was der Skill an Kontext kostet. Über all das entscheidet eine Messung, nicht ein Argument.
+**Die Probe ist das Tor, und sie ist nötig, weil der Rest nicht zu erdenken ist.** Die logische und codetechnische Seite dieses Vorhabens lässt sich am Schreibtisch klären — ob die Härteliste widerspruchsfrei ist, ob die Grammatik parsbar bleibt, ob die Hooks feuern. Geklärt heißt dabei belegt, nicht behauptet: Das Skript trägt Prüffälle, deren Fixture auch absichtlich beschädigte Eingaben enthält — „keine Befunde" zählt erst, wenn die Beschädigungen gefunden werden (Kapitel 3.6.8). Fünf Dinge lassen sich so nicht klären, weil sie vom Verhalten der Instanz und vom Zuschnitt einer echten Doku abhängen: ob die Instanz die Marker in der Praxis wirklich setzt; ob sie Kollisionen parkt statt sie abzuschießen; wie oft der Lint falschen Alarm schlägt; wie lang die Kandidatenlisten werden und wie viel davon brauchbar ist; und was der Skill an Kontext kostet. Über all das entscheidet eine Messung, nicht ein Argument.
 
 **Die beiden ersten Punkte sind von anderer Art als die übrigen drei.** Setzt die Instanz die Marker nicht oder schießt sie Ideen weiterhin ab, ist nicht ein Wert falsch eingestellt, sondern das Design gescheitert — dann geht es zurück zu den Härteregeln und zum Register, nicht weiter zur Migration. Bleiben dagegen Kandidatenlisten zu lang oder meldet der Lint zu viel, sind Werte zu justieren und die Probe zu wiederholen. Erst wenn alle Schwellen erreicht sind, werden die globalen Anweisungen umgezogen und der Skill installiert (Kapitel 3.9). Der Aufbau der Probe, ihre Messgrößen und Schwellen stehen in Kapitel 3.8.
 
