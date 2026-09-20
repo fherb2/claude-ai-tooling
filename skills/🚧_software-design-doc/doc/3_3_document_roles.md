@@ -61,25 +61,25 @@ Das Schema ist in Anhang A beschrieben. Segment 1 „Zusammenhänge" entspricht 
 > Optionen: (a) alle zwölf plus die fünf Projektrollen; (b) ein Kern — `goals`, `constraints`, `context`, `strategy`, `building-blocks`, `runtime`, `crosscutting` — plus Projektrollen, der Rest wird bei Bedarf ergänzt; (c) nur die drei alten Segmente als Rollen (`relations`, `rules`, `units`) und die arc42-Namen als Empfehlung im Regeltext.
 > Vorschlag: (a) — die Tabelle kostet nichts, und ein Projekt benutzt, was es braucht; die Funktion jeder Rolle ist ohnehin einer von sechs Werten.
 > Gewicht: groß · Blockiert: Fahrplanschritt 1
-> Antwort:
+> Antwort: (a)
 
 > **[Q-09] Entscheidungsgrundlage — Rolle `decisions` neben dem Register**
 > Kontext: arc42 sieht in Abschnitt 9 Architekturentscheidungen vor, typisch als Architecture Decision Records. Unser Register hält die Attribute jeder Festlegung; die Prosa hält Grund und Alternative. Eine eigene Rolle `decisions` könnte doppeln.
 > Optionen: (a) Rolle behalten: sie hält die Begründungen großer, kapitelübergreifender Entscheidungen in Prosa, das Register die Attribute; (b) Rolle streichen — Begründungen stehen beim Kapitel, das die Festlegung definiert.
 > Vorschlag: (a) — für Entscheidungen, die kein einzelnes Kapitel „besitzt".
 > Gewicht: mittel · Blockiert: Fahrplanschritt 1
-> Antwort:
+> Antwort: (a)
 
 > **[Q-10] Entscheidungsgrundlage — Namen der Funktionen**
 > Kontext: `define`, `relate`, `global`, `nonbinding`, `plan`, `register` sind Skill-intern; der Entwickler sieht sie nicht, außer er liest den Regelteil.
 > Optionen: (a) so lassen; (b) andere Wörter — welche?
 > Vorschlag: (a).
 > Gewicht: klein · Blockiert: Fahrplanschritt 1
-> Antwort:
+> Antwort: (a)
 
 > **[Q-11] Entscheidungsgrundlage — Position des Rollenmarkers**
 > Kontext: `[DS:runtime]` am Ende der Überschrift wird beim Rendern Teil der Überschrift (sichtbar, `grep`-bar); als erste Zeile unter der Überschrift stört es die Überschrift nicht, ist aber leichter zu übersehen und beim Umsortieren von Abschnitten leichter zu trennen.
 > Optionen: (a) am Ende der Überschrift; (b) erste Zeile unter der Überschrift; (c) beides erlaubt.
 > Vorschlag: (a).
 > Gewicht: klein · Blockiert: Fahrplanschritt 1
-> Antwort:
+> Antwort: (a)

@@ -4,11 +4,29 @@ Stand (2026-09-17): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschla
 
 ### 3.6.1 Ort, Name, Laufzeit
 
-Ein Skript `files/design-doc.py` im Skill-Ordner, aufgerufen über `${CLAUDE_SKILL_DIR}/files/design-doc.py`, dazu das Modul `files/impact.py` für die Auswirkungsrechnung. Python ab 3.11, nur Standardbibliothek. Die Bibliothek networkx wird benutzt, wenn sie importierbar ist, und durch einen eingebauten Kürzeste-Wege-Algorithmus ersetzt, wenn nicht; kein Zielprojekt wird zu einer Installation gezwungen. Der Name `sdd` wurde verworfen, weil er in der Agentenwelt für Spec-Driven Development steht.
+Ein Skript `files/design-doc.py` im Skill-Ordner, aufgerufen über `${CLAUDE_SKILL_DIR}/files/design-doc.py`, dazu das Modul `files/impact.py` für die Auswirkungsrechnung. Python ab 3.11, sonst nur Standardbibliothek. Der Name `sdd` wurde verworfen, weil er in der Agentenwelt für Spec-Driven Development steht.
+
+**Die eine optionale Bibliothek.** `networkx` rechnet kürzeste Wege in gewichteten Graphen direkt und deckt damit eine der drei Kostenfunktionen (3.6.5) ohne eigenen Code ab. Sie ist **nie Voraussetzung**: Fehlt sie, rechnet ein eingebauter Algorithmus von etwa dreißig Zeilen. Ihre Anwesenheit ist auf einem Entwicklungsrechner Zufall, und was niemand kennt, installiert niemand — deshalb ist ihre Benutzung eine bewusste Wahl des Entwicklers (Kapitel 1.7.4), festgehalten im Skill-Parameter `impact_lib`:
+
+| Wert | Bedeutung | Was die Instanz tut |
+|---|---|---|
+| `unknown` | Anfangszustand: weder geprüft noch gefragt | Beim ersten Lauf der Auswirkungsrechnung prüfen, ob `networkx` importierbar ist. Gelingt es, auf `on` setzen und weiterarbeiten. Gelingt es nicht, dem Entwickler in zwei Sätzen erklären, was die Bibliothek besser macht, und fragen — installieren lassen, selbst installieren, oder ablehnen. Die Antwort wird geschrieben. |
+| `on` | benutzen | vorhanden oder vom Entwickler gewünscht; fehlt sie dennoch, fällt das Skript auf den eingebauten Weg zurück und meldet es einmal |
+| `off` | nicht benutzen | auch dann nicht, wenn sie installiert ist |
+
+Die Frage kommt genau einmal je Projekt. Solange sie unbeantwortet ist, arbeitet der Skill vollständig — mit dem eingebauten Weg und ohne Hinweis bei jedem Lauf.
 
 ### 3.6.2 Aufrufprinzip
 
-Ein Aufruf je Anker (Kapitel 3.1, Abschnitt 3.1.9), nicht mehrere. Jede Voraussetzung hat einen Default, wird gesucht, ihr Fehlen exakt gemeldet, und sie ist per Script-Argument überschreibbar (Vorgabe 2.4). Kein Kommando ändert Prosa. Das Register ändern nur `supersede`, `retire`, `fp --update` und das Schreiben von Registerzeilen, das die Instanz nach freigegebenem Plan über `add` auslöst.
+**Wozu das Skript da ist und nach welchem Prinzip seine Kommandos geschnitten sind, steht in Kapitel 1.3.6.** Für die Umsetzung folgt daraus:
+
+- **Ein Aufruf je Anker** (Kapitel 3.1, Abschnitt 3.1.9), nicht mehrere. Die Ankerkommandos sind `open`, `plan-section`, `apply`, `check` und `lint`.
+- **Jedes Kommando, das mehrere Festlegungen betreffen kann, nimmt eine Liste** — `--ids D-0042,D-0057` — und nie eine einzelne ID. Das gilt auch dann, wenn im Einzelfall nur eine übergeben wird.
+- **Auskunftskommandos** (`show`, `explain`, `next-id`) dürfen einstellig bleiben: Sie beantworten eine Nachfrage des Entwicklers und kommen im Ablauf nicht vor.
+- **Jede Voraussetzung hat einen Default**, wird gesucht, ihr Fehlen exakt gemeldet, und sie ist per Script-Argument überschreibbar (Vorgabe 2.4).
+- **Kein Kommando ändert Prosa des Entwicklers.** Geschrieben werden dürfen: das Register (`apply`, `supersede`, `retire`, `fp --update`) und Arbeitsdokumente, die der Ablauf ohnehin erzeugt (`plan-section --write`).
+
+**Die drei Rückgabewege** nach Kapitel 1.3.6 heißen im Skript: Standard ist inline. `--out DATEI` schreibt das volle Ergebnis in eine Datei und gibt inline nur Zahlen, die ersten Einträge und den Pfad zurück; die Instanz liest gezielt nach. `--write` lässt das Skript das Erzeugnis selbst an seinen Platz schreiben und gibt nur die Quittung zurück.
 
 ### 3.6.3 Ausgabevertrag
 
@@ -29,21 +47,36 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 
 ### 3.6.4 Kommandos
 
+**Ankerkommandos** — je einer Handlung des Ablaufs zugeordnet, bündeln alles, was dort anfällt:
+
+| Kommando | Anker | Liest | Gibt aus | Exit |
+|---|---|---|---|---|
+| `open --chapter DATEI…` | Bereich öffnen | Register, Marker, Doku | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness` mit Bedingung, `label`; dazu `FINDING` je Abweichung zwischen Prosa und Register | 0/1 |
+| `plan-section --ids … [--collide …] [--write DATEI]` | Plan schreiben | Register, Härte, geplante Schritte, Erwähnungen | den fertigen Abschnitt „Berührte Festlegungen": je Festlegung ID, Kapitel, `kind`, Grund, `status`, Härte mit Bedingung und **Umbaukosten als Zahl**; für die mit `--collide` genannten zusätzlich das Gerüst des geparkten Satzes | 0 |
+| `apply --from DATEI` | Plan ausführen | die im Plan beschlossenen Änderungen | schreibt **alle** Registerzeilen eines Plans in einem Zug — Kopfzeilen, Gründe, Suchschlüssel, Fingerabdrücke, Ereignis- und Lebenszykluszeilen; Quittung mit Zahlen | 0/2 |
+| `check [--summary]` | Commit, Sitzungsstart | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette, geänderter Definitionssatz; mit `--summary` nur Zahlen | 0 keine, 1 Befunde, 2 strukturell |
+| `lint --file DATEI --changed` | nach Doku-Edit | Git-Diff der Datei | `FINDING` je geänderter Zeile mit Normativsignal ohne Marker und je neuem Marker ohne Eintrag | 0/1 |
+
+**Arbeitskommandos** — nehmen immer Listen, auch wenn nur ein Element übergeben wird:
+
 | Kommando | Liest | Gibt aus | Exit |
 |---|---|---|---|
-| `list [--chapter DATEI]` | Register, Marker | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness`, `label` | 0 |
-| `show ID` | Register, Doku | alle Registerzeilen der ID, Definitionsort, Zitatorte | 0 |
-| `next-id` | Register | nächste freie ID | 0 |
-| `add ID …` | — | schreibt eine Registerzeile in der Grammatik von Kapitel 3.2; nur nach freigegebenem Plan aufgerufen | 0 |
-| `check [--summary]` | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette; mit `--summary` nur Zahlen | 0 keine, 1 Befunde, 2 strukturell |
-| `lint --file DATEI --changed` | Git-Diff der Datei | `FINDING` je geänderter Zeile mit Normativsignal ohne Marker und je neuem Marker ohne Eintrag | 0/1 |
-| `mentions ID [--code ORDNER]` | Doku, optional Code | `ITEM` je Vorkommen: Marker, Zitat, Suchschlüssel-Treffer, mit Datei und Zeile | 0 |
-| `hardness ID [--word fixed|open]` | Register, geplante Schritte, Skill-Parameter | `ITEM` mit Härte und zutreffender Bedingung in Prosa (R1–R7) | 0 |
 | `impact --chapter DATEI \| --ids …` | Graph aus Markern, Nähe, Suchschlüsseln | `ITEM` je Kandidat: `id`, `why` (Definition, Mitzitat, gleicher Absatz, Suchschlüssel), `distance` | 0 |
-| `plan-section --ids …` | Register, Härte | Gerüst des Planabschnitts „Berührte Festlegungen" | 0 |
+| `mentions --ids … [--code ORDNER] [--out DATEI]` | Doku, optional Code | je ID die Zahl der Fundorte und die Fundorte selbst; mit `--out` nur Zahlen und Pfad | 0 |
+| `hardness --ids … [--word fixed\|open]` | Register, geplante Schritte, Skill-Parameter | `ITEM` je ID mit Härte und zutreffender Bedingung in Prosa (R1–R7) | 0 |
+| `fp --ids … [--update]` | Doku | je ID Fingerabdruck und Vergleich mit dem Register | 0/1 |
+| `supersede --pairs ALT:NEU,…` · `retire --ids …` | Register | schreibt die Lebenszykluszeilen; listet je ID die verbleibenden Zitate | 0 |
+
+**Auskunftskommandos** — für die Nachfrage des Entwicklers; sie kommen im Ablauf nicht vor und dürfen deshalb einstellig bleiben:
+
+| Kommando | Liest | Gibt aus | Exit |
+|---|---|---|---|
+| `show ID` | Register, Doku | alle Registerzeilen der ID, Definitionsort, Zitatorte | 0 |
 | `explain ID` | wie `hardness` | ein Satz für den Entwickler, ohne Prüfungsnummer | 0 |
-| `fp ID [--update]` | Doku | Fingerabdruck des Definitionssatzes, Vergleich mit Register | 0/1 |
-| `supersede ALT NEU` · `retire ID` | Register | schreibt die Lebenszykluszeile; listet verbleibende Zitate | 0 |
+| `next-id` | Register | nächste freie ID | 0 |
+
+Was ein Kommando **nicht** hat, ist ebenso Festlegung: Es gibt kein `add` für eine einzelne Registerzeile. Registerzeilen entstehen ausschließlich über `apply` aus einem freigegebenen Plan — in einem Aufruf, nicht in zehn (Kapitel 1.3.6).
+
 
 ### 3.6.5 Das Auswirkungsmodul
 

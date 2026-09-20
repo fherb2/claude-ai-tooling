@@ -25,6 +25,7 @@ Standardname `.claude/software-design-doc.json`; jeder Skill-Parameter hat einen
 | `friction_threshold` | Zahl | 2 | Reibungsschwelle; Funktion `global` eine Stufe höher |
 | `assumptions_on_approval` | `accept`, `keep` | `accept` | Wirkung der Planfreigabe auf Annahmen (Kapitel 3.1) |
 | `impact_model` | `hops`, `weighted` | `hops` | Auswirkungsrechnung (Kapitel 3.6) |
+| `impact_lib` | `unknown`, `on`, `off` | `unknown` | ob die optionale Bibliothek `networkx` benutzt wird; der Entwickler wird einmal gefragt (Kapitel 1.7.4 und 3.6.1) |
 | `impact_cutoff` | Zahl | 1 bei `hops`, 0,40 bei `weighted` | Tiefe bzw. Abbruchschwelle |
 | `layout` | `one-line`, `wrapped` | abgelesen | wie die Instanz Prosa schreibt |
 | `lint_signals` | Liste | eingebaute Liste DE/EN | Signalwörter des Lints (Kapitel 3.6) |
@@ -37,7 +38,7 @@ Keine Struktur wird gefordert, die nichts zu halten hat. Die erste Festlegung, d
 
 ### 3.5.4 Repositories mit mehreren Vorhaben
 
-Die Skill-Parameterdatei ist der Standard des Repositories. Ein Vorhaben mit eigener Doku weicht ab, indem seine Dateien Rollenmarker und eine `[register: pfad]`-Zeile tragen; der Skill folgt dann dem Vorhaben, in dem die berührten Dateien liegen. Das entspricht der Regel dieses Repositories, dass jedes Vorhaben eigenständig aufgebaut ist.
+**Dass ein Repository mehrere Vorhaben mit eigener Doku tragen kann, steht in Kapitel 1.6.** Hier steht, wie der Skill das zugehörige Vorhaben findet. Die Skill-Parameterdatei ist der Standard des Repositories. Ein Vorhaben mit eigener Doku weicht ab, indem seine Dateien Rollenmarker und eine `[register: pfad]`-Zeile tragen; der Skill folgt dann dem Vorhaben, in dem die berührten Dateien liegen. Das entspricht der Regel dieses Repositories, dass jedes Vorhaben eigenständig aufgebaut ist.
 
 ### 3.5.5 Entscheidungsgrundlagen
 
