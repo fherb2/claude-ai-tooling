@@ -8,7 +8,7 @@ Der Rollenmarker steht in eckigen Klammern mit dem Präfix `DS` (document struct
 
 ### 3.3.2 Herkunft der Rollennamen
 
-Die Inhaltsrollen folgen dem arc42-Schema; warum diese Quelle und nicht eine der drei anderen erwogenen, steht in Anhang B, Abschnitt B.3. Die deutschen Entsprechungen sind bei der Umsetzung gegen die deutsche arc42-Vorlage zu prüfen. Die fünf Rollen der Projektarbeit (`plan`, `status`, `concept`, `appendix`, `register`) haben keine arc42-Herkunft.
+Die zwölf Rollen der Architekturbeschreibung folgen dem arc42-Schema; warum diese Quelle und nicht eine der drei anderen erwogenen, steht in Anhang B, Abschnitt B.3. Die deutschen Entsprechungen sind bei der Umsetzung gegen die deutsche arc42-Vorlage zu prüfen. Die fünf Rollen der Projektarbeit (`plan`, `status`, `concept`, `appendix`, `register`) haben keine arc42-Herkunft.
 
 | Rolle | arc42 | deutsch (zu prüfen) |
 |---|---|---|
