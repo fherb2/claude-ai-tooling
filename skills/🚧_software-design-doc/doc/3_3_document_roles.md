@@ -1,10 +1,10 @@
 ## 3.3 Dokumentrollen
 
-Stand (2026-09-20): Rollensatz, Rolle `decisions`, Funktionsnamen und Markerposition sind entschieden (vormals Q-08 bis Q-11, siehe `status.md`). Rollen, Funktionen und ihre Zuordnung stehen vollständig in Kapitel 1.3.3; hier stehen die Form des Markers, die Herkunft der Namen und das Dreiersschema als Rollensatz.
+Stand (2026-09-20): Rollensatz, Rolle `decisions`, Funktionsnamen und Markerposition sind entschieden (vormals Q-08 bis Q-11, siehe `status.md`); die Absatzrolle kam am 2026-09-21 hinzu. Rollen, Funktionen und ihre Zuordnung stehen vollständig in Kapitel 1.3.3; hier stehen die Form des Markers, die Herkunft der Namen und das Dreiersschema als Rollensatz.
 
 ### 3.3.1 Rollenmarker
 
-Der Rollenmarker steht am Ende der Überschrift (entschieden am 2026-09-20): in eckigen Klammern das Präfix `DS` (document structure) und das englische Schlüsselwort der Rolle — `## Laufzeitsicht [DS:runtime]`. So bleibt er beim Rendern sichtbar und `grep`-bar und wandert beim Umsortieren mit seinem Abschnitt. Nummern, Dateinamen und die Sprache der Überschriften sind frei; nichts, was der Skill liest, hängt an ihnen (Vorgabe 2.3). Die Funktionen eines Abschnitts folgen aus seiner Rolle über die Tabelle in Kapitel 1.3.3; der Regelteil ist erweiterbar, indem er eine neue Rolle mit ihrer Funktion definiert.
+Der Rollenmarker steht in eckigen Klammern mit dem Präfix `DS` (document structure) und dem englischen Schlüsselwort der Rolle. Für einen Abschnitt steht er am Ende der Überschrift — `## Laufzeitsicht [DS:runtime]` — und gilt bis zur nächsten Überschrift gleicher oder höherer Ordnung, Unterabschnitte ohne eigene Rolle eingeschlossen. Für einen Rollenwechsel innerhalb eines Abschnitts steht er am Ende des Absatzes und gilt für diesen Absatz; feiner wird nicht gewechselt, ein Definitionsmarker am Satz geht der Rolle vor (Kapitel 1.3.3). So bleibt er beim Rendern sichtbar und `grep`-bar und wandert beim Umsortieren mit seinem Text (Position an der Überschrift entschieden am 2026-09-20, Absatzrolle ergänzt am 2026-09-21). Nummern, Dateinamen und die Sprache der Überschriften sind frei; nichts, was der Skill liest, hängt an ihnen (Vorgabe 2.3). Die Funktionen eines Abschnitts folgen aus seiner Rolle über die Tabelle in Kapitel 1.3.3; der Regelteil ist erweiterbar, indem er eine neue Rolle mit ihrer Funktion definiert.
 
 ### 3.3.2 Herkunft der Rollennamen
 

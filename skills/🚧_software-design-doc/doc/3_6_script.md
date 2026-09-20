@@ -95,7 +95,7 @@ Der Skill-Parameter `impact_model: hops` ist der Sonderfall, in dem nur Kanten a
 
 ### 3.6.6 Der Lint
 
-Prüft nur geänderte Zeilen der übergebenen Datei (Git-Diff gegen den Index und gegen HEAD). Eine Zeile ist ein Befund, wenn sie ein Normativsignal trägt — Signalwörter aus `lint_signals` (Standard deutsch und englisch: muss, müssen, soll, sollen, immer, nie, niemals, darf nicht, genau, höchstens, mindestens, must, shall, always, never, at most, at least) oder einen Zahlenwert mit Einheit — und keinen Marker `[D-`. Ausgenommen sind Abschnitte mit Funktion `nonbinding` und `register`, Codeblöcke, Tabellen und Zitatblöcke. Ein neuer Marker ohne Registereintrag ist ebenfalls ein Befund. Der Lint schreibt nichts.
+Prüft nur geänderte Zeilen der übergebenen Datei (Git-Diff gegen den Index und gegen HEAD). Eine Zeile ist ein Befund, wenn sie ein Normativsignal trägt — Signalwörter aus `lint_signals` (Standard deutsch und englisch: muss, müssen, soll, sollen, immer, nie, niemals, darf nicht, genau, höchstens, mindestens, must, shall, always, never, at most, at least) oder einen Zahlenwert mit Einheit — und keinen Marker `[D-`. Ausgenommen sind Abschnitte und Absätze mit Funktion `nonbinding` und `register`, Codeblöcke, Tabellen und Zitatblöcke. Ein neuer Marker ohne Registereintrag ist ebenfalls ein Befund. Der Lint schreibt nichts.
 
 ### 3.6.7 Der Fingerabdruck
 
