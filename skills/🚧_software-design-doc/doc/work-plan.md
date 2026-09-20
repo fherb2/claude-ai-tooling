@@ -6,35 +6,35 @@ Dieser Fahrplan folgt dem bisherigen Schema (Kapitel 2.14 der Vorgaben). Sitzung
 
 ## Entscheidungsgrundlagen — Leseplan
 
-Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext steht: Kontext, Optionen, Vorschlag, Gewicht, blockierter Schritt und eine leere Zeile **Antwort:** für den Entwickler. Vorgehen: Der Entwickler geht die Dateien in Leseordnung durch, schreibt seine Antwort und weitere Gesichtspunkte unter **Antwort:** oder als neuen Block mit der nächsten freien Nummer; die Instanz liest die Antworten und führt die Restklärung im Gespräch. Ein geklärter Block wird durch den Entscheidungstext im Kapitel ersetzt und in `status.md` vermerkt; seine Nummer wird nicht neu vergeben.
+Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext steht: Kontext, Optionen, Vorschlag, Gewicht, blockierter Schritt und eine leere Zeile **Antwort:** für den Entwickler. Funktionale Entscheidungsgrundlagen stehen in Kapitel 1 an der Stelle der Funktionsbeschreibung, implementierungsgebundene in Kapitel 3; die Tabelle folgt der Leseordnung. Vorgehen: Der Entwickler geht die Dateien in Leseordnung durch, schreibt seine Antwort und weitere Gesichtspunkte unter **Antwort:** oder als neuen Block mit der nächsten freien Nummer; die Instanz liest die Antworten und führt die Restklärung im Gespräch. Ein geklärter Block wird durch den Entscheidungstext im Kapitel ersetzt und in `status.md` vermerkt; seine Nummer wird nicht neu vergeben.
 
 | Q | Thema | Ort | Gewicht | Blockiert |
 |---|---|---|---|---|
-| Q-02 | Ereigniszeile `upheld` | `3_1_hardness.md`, Anfang | klein | 1 |
-| Q-03 | Marker vor oder nach Satzzeichen | `3_2_register_marks.md`, 3.2.10 | klein | 1 |
-| Q-04 | Fingerabdruck: ob und wie | 3.2.10 | mittel | 5 |
-| Q-05 | Suchschlüssel | 3.2.10 | mittel | 1 |
-| Q-06 | Zitatmarker außerhalb `relate` | 3.2.10 | klein | — |
-| Q-07 | Rückfalloption Wortlaut-Anker | 3.2.10 | klein | 3 |
-| Q-12 | Inhalt geplanter Schritte, Ablageorte (früher T2) | `3_4_planned_steps.md`, 3.4.4 | groß | 2 |
-| Q-13 | Kapitelziel über Dateipfad | 3.4.4 | mittel | 2 |
+| Q-03 | Marker vor oder nach Satzzeichen | `1_overview.md`, 1.3.2 | klein | 1 |
+| Q-07 | Rückfalloption Wortlaut-Anker | 1.3.3 | klein | 3 |
+| Q-26 | H2 blockiert oder meldet | 1.3.5 | mittel | 6 |
+| Q-02 | Ereigniszeile `upheld` | 1.4 | klein | 1 |
+| Q-19 | Repositories mit mehreren Vorhaben | 1.5 | mittel | 3 |
+| Q-15 | Wann bei fehlender Doku gefragt wird | 1.7 | mittel | 3 |
+| Q-12 | Inhalt geplanter Schritte, Ablageorte (früher T2) | 1.7.3 | groß | 2 |
+| Q-05 | Suchschlüssel | 1.7.4 | mittel | 1 |
+| Q-06 | Zitatmarker außerhalb `relate` | 1.7.4 | klein | — |
+| Q-20 | Graphenmodell (gesondert) | 1.7.4 | groß | 5 |
+| Q-04 | Fingerabdruck: ob und wie | 1.7.6 | mittel | 5 |
+| Q-16 | Standardwert von `mode` | 1.7.7 | mittel | 3 |
+| Q-31 | Trigger-Anker nach `mode: off` | 1.7.7 | klein | 9 |
+| Q-28 | Messgrößen und Schwellen der Probe | 1.9 | mittel | 8 |
+| Q-13 | Kapitelziel über Dateipfad | `3_4_planned_steps.md`, 3.4.4 | mittel | 2 |
 | Q-14 | Kennungen für Schritte | 3.4.4 | klein | 2 |
-| Q-15 | Wann bei fehlender Doku gefragt wird | `3_5_startup_parameters.md`, 3.5.5 | mittel | 3 |
-| Q-16 | Standardwert von `mode` | 3.5.5 | mittel | 3 |
-| Q-17 | `layout` als Skill-Parameter | 3.5.5 | klein | 3 |
+| Q-17 | `layout` als Skill-Parameter | `3_5_startup_parameters.md`, 3.5.5 | klein | 3 |
 | Q-18 | `impact_cutoff` ein oder zwei Felder | 3.5.5 | klein | 3 |
-| Q-19 | Repositories mit mehreren Vorhaben | 3.5.5 | mittel | 3 |
-| Q-20 | Graphenmodell (gesondert) | `3_6_script.md`, 3.6.9 | groß | 5 |
-| Q-21 | Kostenfunktion | 3.6.9 | klein | 5 |
+| Q-21 | Kostenfunktion | `3_6_script.md`, 3.6.9 | klein | 5 |
 | Q-22 | Name `impact` | 3.6.9 | klein | 4 |
 | Q-23 | Standardausgabe Zeilen oder JSON | 3.6.9 | klein | 4 |
 | Q-24 | Dateiname des Skripts | 3.6.9 | klein | 4 |
-| Q-26 | H2 blockiert oder meldet | `3_7_hooks.md`, 3.7.5 | mittel | 6 |
-| Q-27 | H3 bauen oder zurückstellen | 3.7.5 | klein | 6 |
-| Q-28 | Messgrößen und Schwellen der Probe | `3_8_probe.md`, vor 3.8.5 | mittel | 8 |
+| Q-27 | H3 bauen oder zurückstellen | `3_7_hooks.md`, 3.7.5 | klein | 6 |
 | Q-29 | Verbleib der Werkzeug-Skills | `3_9_migration.md`, 3.9.5 | mittel | 9 |
 | Q-30 | Reihenfolge der Freigaben beim Umzug | 3.9.5 | klein | 9 |
-| Q-31 | Trigger-Anker nach `mode: off` | 3.9.5 | klein | 9 |
 
 Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01, Q-08 bis Q-11, Q-25 und Q-32. Vor Schritt 1 zu klären: Q-02, Q-03, Q-05. Vor Schritt 2: Q-12 bis Q-14. Vor Schritt 3: Q-07, Q-15 bis Q-19. Die übrigen blockieren spätere Schritte.
 

@@ -1,6 +1,6 @@
 ## 3.4 Geplante Schritte und Umbauziel
 
-Stand (2026-09-17): Entschieden sind der Begriff des geplanten Schritts und die Syntax des Umbauziels. Der Inhalt eines geplanten Schritts und die Ablageorte einer Planung (der frühere Punkt T2) sind ein Vorschlag, der noch nicht besprochen wurde; er steht in 3.4.3 und ist am Ende als offen geführt.
+Stand (2026-09-17): Entschieden sind der Begriff des geplanten Schritts und die Syntax des Umbauziels. Der Inhalt eines geplanten Schritts und die Ablageorte einer Planung (der frühere Punkt T2) sind ein Vorschlag, der noch nicht besprochen wurde; er steht in 3.4.3, seine Entscheidungsgrundlage (Q-12) in Kapitel 1.7.3.
 
 ### 3.4.1 Geplante Schritte
 
@@ -37,15 +37,6 @@ Die Regel des Kontext-Haushalts (Arbeitsanweisungen §1.9; sie stand nicht im Vo
 Die Statusdatei trägt ausschließlich abgearbeitete Schritte in der Reihenfolge des Abschlusses; Entscheidungen gehören sofort in das zuständige Kapitel.
 
 ### 3.4.4 Entscheidungsgrundlagen
-
-> **[Q-12] Entscheidungsgrundlage — Inhalt geplanter Schritte und Ablageorte einer Planung (3.4.3)**
-> Kontext: Am 22. August 2026 hast Du zurückgewiesen, dass eine ausdetaillierte Planung in den Fahrplan geschrieben wurde: Der Fahrplan hat keine Dokumentationsfunktion und ist keine Planungsablage. 3.4.3 ist der daraus abgeleitete Vorschlag und wurde noch nicht besprochen. Er enthält vier Festlegungen, die einzeln bewertet werden können: (1) ein Schritt beschreibt Ziel, Dringlichkeit, Umbauziel, Verweis — nicht den Weg; (2) drei Ablageorte nach Länge und Haltbarkeit mit der Grenze „etwa zehn Sätze"; (3) eine Planungsdatei wird nach Ausführung gelöscht, ihr beurteilungsrelevanter Rest wandert in die Doku, die Statusdatei nennt sie; (4) der Kontext-Haushalt lautet künftig „Planung an ihrem Ort vertiefen", nicht „Fahrplan detaillieren".
-> Bestehende Regeln (geprüft am 2026-09-19): Die globale Anweisungsdatei nennt unter „Planung" drei Ablageorte — Chat, Datei im Projekt, `~/.claude` — und schaltet sich selbst ab, sobald ein Skill den Ablageort regelt. Die Projekt-`CLAUDE.md` dieses Repositories erlaubt dagegen keine eigenen Plan-Dateien. Der Skill entscheidet die Frage künftig für alle Projekte; welche Regeln damit entfallen, steht in Kapitel 3.9.1.
-> Der Grundsatzteil dieser Frage steht seit dem 2026-09-20 in Kapitel 1.7.3: dass der Fahrplan keine Planungsablage ist, dass der Skill den Ablageort regeln muss und warum. Offen und hier zu entscheiden ist allein, nach welchem Maß sich der Ort bestimmt und welche Orte es gibt.
-> Optionen: je Punkt (a) übernehmen, (b) ändern — wie?, (c) streichen.
-> Vorschlag: alle vier übernehmen; die Zehn-Sätze-Grenze ist eine Schätzung beim Eintragen, kein Messwert.
-> Gewicht: groß · Blockiert: Fahrplanschritt 2
-> Antwort:
 
 > **[Q-13] Entscheidungsgrundlage — Kapitel als Umbauziel über den Dateipfad**
 > Kontext: `target: chapter docs/3_2_pipeline.md` ist das Einzige im Verfahren, das an einem Dateinamen hängt; Umnummerierung benennt Dateien um, `check` meldet das zerbrochene Ziel.

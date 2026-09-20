@@ -56,9 +56,3 @@ Die Datei `noch-geplant.md` des Skills ist am 2026-09-17 in diese Doku übergega
 > Gewicht: klein · Blockiert: Fahrplanschritt 9
 > Antwort:
 
-> **[Q-31] Entscheidungsgrundlage — Trigger-Anker nach Einführung von `mode: off`**
-> Kontext: Der Trigger „bevor du zum ersten Mal einen Lösungsweg vorschlägst oder eine Datei änderst … über eine lokale Korrektur hinaus" lädt den Skill in jedem Projekt. Mit `mode: off` endet er sofort wieder; das kostet einen Ladevorgang je Sitzung in Projekten, die ihn nicht wollen.
-> Optionen: (a) Anker unverändert lassen, `mode: off` erledigt den Rest; (b) den Anker in der `CLAUDE.md` des Projekts entfernen, wenn `mode: off` gesetzt wird; (c) Anker nur in die globale Datei, Abwahl über die Projekt-`CLAUDE.md`.
-> Vorschlag: (a) — ein Ladevorgang mit sofortigem Ende ist billiger als zwei Stellen, die zusammenpassen müssen.
-> Gewicht: klein · Blockiert: Fahrplanschritt 9
-> Antwort:
