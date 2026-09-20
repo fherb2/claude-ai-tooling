@@ -6,7 +6,7 @@ Stand (2026-09-17): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschla
 
 Ein Skript `files/design-doc.py` im Skill-Ordner, aufgerufen über `${CLAUDE_SKILL_DIR}/files/design-doc.py`, dazu das Modul `files/impact.py` für die Auswirkungsrechnung. Python ab 3.11, sonst nur Standardbibliothek. Der Name `sdd` wurde verworfen, weil er in der Agentenwelt für Spec-Driven Development steht.
 
-**Die eine optionale Bibliothek.** `networkx` rechnet kürzeste Wege in gewichteten Graphen direkt und deckt damit eine der drei Kostenfunktionen (3.6.5) ohne eigenen Code ab. Sie ist **nie Voraussetzung**: Fehlt sie, rechnet ein eingebauter Algorithmus von etwa dreißig Zeilen. Ihre Anwesenheit ist auf einem Entwicklungsrechner Zufall, und was niemand kennt, installiert niemand — deshalb ist ihre Benutzung eine bewusste Wahl des Entwicklers (Kapitel 1.7.4), festgehalten im Skill-Parameter `impact_lib`:
+**Die eine optionale Bibliothek** (entschieden am 2026-09-20, vormals Q-25). `networkx` rechnet kürzeste Wege in gewichteten Graphen direkt und deckt damit eine der drei Kostenfunktionen (3.6.5) ohne eigenen Code ab. Sie ist **nie Voraussetzung**: Fehlt sie, rechnet ein eingebauter Algorithmus von etwa dreißig Zeilen. Ihre Anwesenheit ist auf einem Entwicklungsrechner Zufall, und was niemand kennt, installiert niemand — deshalb ist ihre Benutzung eine bewusste Wahl des Entwicklers (Kapitel 1.7.4), festgehalten im Skill-Parameter `impact_lib`:
 
 | Wert | Bedeutung | Was die Instanz tut |
 |---|---|---|
@@ -141,11 +141,4 @@ Eine Fixture-Doku mit Register, geplanten Schritten und Code-Kommentaren (Kapite
 > Optionen: (a) `design-doc.py`; (b) `software-design-doc.py` wie der Skill; (c) anderer Name.
 > Vorschlag: (a).
 > Gewicht: klein · Blockiert: Fahrplanschritt 4
-> Antwort:
-
-> **[Q-25] Entscheidungsgrundlage — networkx optional oder Voraussetzung**
-> Kontext: networkx rechnet die additive Kostenfunktion direkt; ein eingebauter Kürzeste-Wege-Algorithmus ist etwa dreißig Zeilen. Optional heißt zwei Codepfade, Voraussetzung heißt eine Installation in jedem Zielprojekt.
-> Optionen: (a) optional — benutzen, wenn importierbar, sonst eingebaut; (b) Voraussetzung; (c) gar nicht, immer eingebaut.
-> Vorschlag: (c) — ein Codepfad, keine Abhängigkeit; networkx bleibt Referenz für die Prüffälle.
-> Gewicht: klein · Blockiert: Fahrplanschritt 5
 > Antwort:
