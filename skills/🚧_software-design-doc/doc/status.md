@@ -15,5 +15,5 @@ Die Nummern werden nicht neu vergeben.
 | Q-08 | Umfang des Rollensatzes | 2026-09-20 | Kapitel 1.3.3 — alle zwölf arc42-Rollen plus fünf Rollen der Projektarbeit |
 | Q-09 | Rolle `decisions` neben dem Register | 2026-09-20 | Kapitel 1.3.3 — Rolle bleibt; das Register hält Attribute, ein `decisions`-Abschnitt hält Begründungen kapitelübergreifender Entscheidungen in Prosa |
 | Q-10 | Namen der Funktionen | 2026-09-20 | Kapitel 1.3.3 — `define`, `relate`, `global`, `nonbinding`, `plan`, `register` bleiben |
-| Q-11 | Position des Rollenmarkers | 2026-09-20 | Kapitel 3.3.1 — am Ende der Überschrift |
+| Q-11 | Position des Rollenmarkers | 2026-09-20 | Kapitel 3.3.1 — am Ende der Überschrift; am 2026-09-21 auf Vorschlag des Entwicklers erweitert: ein Rollenwechsel ist auch am Ende eines Absatzes möglich (Kapitel 1.3.3) |
 | Q-25 | networkx optional oder Voraussetzung | 2026-09-20 | gegenstandslos — mit dem Skill-Parameter `impact_lib` bereits entschieden: optional, nie Voraussetzung, bewusste Wahl des Entwicklers; Ergebnis in Kapitel 1.7.4 und 3.6.1 |
