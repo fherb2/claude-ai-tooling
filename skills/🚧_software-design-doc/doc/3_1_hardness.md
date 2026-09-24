@@ -8,7 +8,7 @@ Daraus folgen drei Prüfungen für jeden Absatz hier: Steht hier eine **Absicht*
 
 ## 3.1 Härte einer Festlegung — Ableitung und Wirkung
 
-Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassungen aus Arbeitspunkt 2: Die Ereigniszeile „bestätigt" des Vorläufers (Anhang A) heißt `upheld` statt `confirmed`, weil `confirmed` zugleich ein Statuswert ist (Kapitel 3.2); und „Segment 2" ist ersetzt durch „Abschnitte mit der Funktion `global`" (Kapitel 1.3.3). Dieser Text wird später wörtlich der Regelteil `rules-hardness.md` des Skills; Adressat ist dort die Instanz („Du"), der Mensch heißt „der Entwickler".
+Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassungen aus Arbeitspunkt 2: Die Ereigniszeile „bestätigt" des Vorläufers (Anhang A) heißt `upheld` statt `confirmed`, weil `confirmed` zugleich ein Statuswert ist (Kapitel 3.2) — vom Entwickler am 2026-09-24 bestätigt (vormals Q-02); und „Segment 2" ist ersetzt durch „Abschnitte mit der Funktion `global`" (Kapitel 1.3.3). Dieser Text wird später wörtlich der Regelteil `rules-hardness.md` des Skills; Adressat ist dort die Instanz („Du"), der Mensch heißt „der Entwickler".
 
 ### 3.1.1 Zweck
 

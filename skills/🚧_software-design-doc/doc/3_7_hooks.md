@@ -17,7 +17,7 @@ Der Nachweis, dass ein Hook trägt, wo eine Anweisung nicht trägt, liegt in die
 | Filter | Pfad der Datei liegt im Doku-Ordner (über `if: Edit(<doc_dir>/*)` oder im Skript aus `tool_input.file_path`) | `if: Bash(git commit*)` | — |
 | Eingabe | Hook-JSON mit `tool_input.file_path` und `cwd` | Hook-JSON mit `cwd` | Hook-JSON mit `cwd` |
 | Kommando | `design-doc.py lint --file <pfad> --changed --json` | `design-doc.py check --json` | `design-doc.py check --summary` |
-| Ausgabe | Exit 0; JSON mit `additionalContext`: die Befunde — nicht blockierend | Exit 2 mit Begründung auf stderr bei struktureller Inkonsistenz → blockiert den Commit; sonst Exit 0, Befunde als `additionalContext` | Exit 0; Klartext auf stdout wird Kontext: Zahl Festlegungen, `assumed`, `pending`, unlesbare Zeilen, seit dem letzten Lauf geänderte Definitionssätze |
+| Ausgabe | Exit 0; JSON mit `additionalContext`: die Befunde — nicht blockierend | Exit 2 mit Begründung auf stderr bei struktureller Inkonsistenz → blockiert den Commit, es sei denn, der Entwickler hat die Blockade für diesen einen Commit ausdrücklich aufgehoben (entschieden am 2026-09-24, vormals Q-26); sonst Exit 0, Befunde als `additionalContext` | Exit 0; Klartext auf stdout wird Kontext: Zahl Festlegungen, `assumed`, `pending`, unlesbare Zeilen, seit dem letzten Lauf geänderte Definitionssätze |
 | Zeitlimit | 20 s | 30 s | 10 s |
 | Kosten | ein Skriptlauf je Doku-Edit, Ausgabe wenige Zeilen | ein Lauf je Commit | ein Lauf je Start; fängt menschliche Bearbeitungen zwischen Sitzungen und überlebt die Kompaktierung (Matcher `compact`) |
 | Bei `FAILED` des Skripts | Exit 1: nicht blockierend, Meldung als Kontext | Exit 1: nicht blockierend, der Commit läuft; nur Exit 2 blockiert | nicht blockierend |
@@ -31,7 +31,7 @@ H1 und H2 sind nur sinnvoll, wenn der Skill geladen ist, und sie sollen in jedem
 
 ### 3.7.4 Technisch offen (keine Entscheidung des Entwicklers)
 
-Pfadauflösung: ob `${CLAUDE_SKILL_DIR}` im Kommando eines Frontmatter-Hooks aufgelöst wird oder der Pfad anders zu ermitteln ist; die Doku nennt für Hooks `${CLAUDE_PROJECT_DIR}` und `${CLAUDE_PLUGIN_ROOT}`. Pfadfilter: ob `Edit(<doc_dir>/*)` den Doku-Ordner trifft oder der Filter ins Skript wandert. Zeitlimits nach den ersten Messungen.
+Pfadauflösung: ob `${CLAUDE_SKILL_DIR}` im Kommando eines Frontmatter-Hooks aufgelöst wird oder der Pfad anders zu ermitteln ist; die Doku nennt für Hooks `${CLAUDE_PROJECT_DIR}` und `${CLAUDE_PLUGIN_ROOT}`. Pfadfilter: ob `Edit(<doc_dir>/*)` den Doku-Ordner trifft oder der Filter ins Skript wandert. Zeitlimits nach den ersten Messungen. Aufhebung der H2-Blockade (Kapitel 1.3.5, entschieden am 2026-09-24): wie der Entwickler das Wort dafür je Commit ausspricht — Script-Argument, Umgebungsvariable oder eine Zeile in der Commit-Message.
 
 ### 3.7.5 Entscheidungsgrundlagen
 
