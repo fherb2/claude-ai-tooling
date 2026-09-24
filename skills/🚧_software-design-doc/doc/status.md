@@ -23,3 +23,7 @@ Die Nummern werden nicht neu vergeben.
 | Q-19 | Repositories mit mehreren Vorhaben | 2026-09-24 | Kapitel 3.5.4 — (a): keine zweite Skill-Parameterdatei je Vorhaben, die `[register: pfad]`-Zeile im Dokument reicht |
 | Q-02 | Umbenennung der Ereigniszeile in `upheld` | 2026-09-24 | Kapitel 3.1.1 — (a): `upheld` bestätigt |
 | Q-26 | H2 blockiert den Commit oder meldet nur | 2026-09-24 | Kapitel 1.3.5 und 3.7 — (a) mit (c), vom Entwickler kombiniert: H2 blockiert bei struktureller Inkonsistenz, der Entwickler kann das für einen einzelnen Commit ausdrücklich aufheben statt den Hook ganz abzuschalten; wie er das Wort dafür ausspricht, ist als technische Einzelheit in 3.7.4 offen |
+| Q-05 | Suchschlüssel | 2026-09-24 | Kapitel 1.7.4 — (a): die Instanz wählt sie beim Anlegen, sichtbar im Planabschnitt; Pflege nur bei Reibung oder verfehlten Erwähnungen |
+| Q-31 | Trigger-Anker nach `mode: off` | 2026-09-24 | Kapitel 1.7.7 — (a): Anker bleibt unverändert |
+| Q-04 | Fingerabdruck: ob und wie | 2026-09-24 | Kapitel 1.7.6 und 3.6.7 — (a), vom Entwickler ergänzt: vor der Meldung prüft das Skript mechanisch die Edit-Distanz; unterhalb einer noch offenen Schwelle nur stille Neuberechnung statt Meldung |
+| Q-16 | Standardwert von `mode` | 2026-09-24 | Kapitel 1.7.7 und 3.5.1/3.5.2 — (b): einmal je Sitzung fragen (wie `git-workbench`), Standard in der Tabelle jetzt „erfragt"; vom Entwickler ergänzt: bei Ablehnung zusätzlich fragen, ob `mode: off` festgehalten werden soll |

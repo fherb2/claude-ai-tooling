@@ -11,12 +11,8 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q | Thema | Ort | Gewicht | Blockiert |
 |---|---|---|---|---|
 | Q-12 | Inhalt geplanter Schritte, Ablageorte (früher T2) | 1.7.3 | groß | 2 |
-| Q-05 | Suchschlüssel | 1.7.4 | mittel | 1 |
 | Q-06 | Zitatmarker außerhalb `relate` | 1.7.4 | klein | — |
 | Q-20 | Graphenmodell (gesondert) | 1.7.4 | groß | 5 |
-| Q-04 | Fingerabdruck: ob und wie | 1.7.6 | mittel | 5 |
-| Q-16 | Standardwert von `mode` | 1.7.7 | mittel | 3 |
-| Q-31 | Trigger-Anker nach `mode: off` | 1.7.7 | klein | 9 |
 | Q-28 | Messgrößen und Schwellen der Probe | 1.9 | mittel | 8 |
 | Q-13 | Kapitelziel über Dateipfad | `3_4_planned_steps.md`, 3.4.4 | mittel | 2 |
 | Q-14 | Kennungen für Schritte | 3.4.4 | klein | 2 |
@@ -30,11 +26,11 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-29 | Verbleib der Werkzeug-Skills | `3_9_migration.md`, 3.9.5 | mittel | 9 |
 | Q-30 | Reihenfolge der Freigaben beim Umzug | 3.9.5 | klein | 9 |
 
-Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01, Q-02, Q-03, Q-07, Q-08 bis Q-11, Q-15, Q-19, Q-25, Q-26 und Q-32. Vor Schritt 1 zu klären: Q-05. Vor Schritt 2: Q-12 bis Q-14. Die übrigen blockieren spätere Schritte.
+Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01 bis Q-05, Q-07 bis Q-11, Q-15, Q-16, Q-19, Q-25, Q-26, Q-31 und Q-32. Vor Schritt 2: Q-12 bis Q-14. Die übrigen blockieren spätere Schritte.
 
 ## 1 Regelteil Marker und Register
 
-Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Ergebnis: Entwurf im Chat, danach Datei im Skill-Ordner. Hängt an: Q-05. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
+Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Ergebnis: Entwurf im Chat, danach Datei im Skill-Ordner. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
 
 ## 2 Regelteil Planung
 
@@ -42,7 +38,7 @@ Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schri
 
 ## 3 Regelteil Skillstart
 
-Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterdatei, `mode: off`, „Doku wächst an Festlegungen". Hängt an: Schritt 1; Q-16 bis Q-18. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
+Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterdatei, `mode: off`, „Doku wächst an Festlegungen". Hängt an: Schritt 1; Q-17, Q-18. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
 
 ## 4 Skript Stufe 1
 
@@ -50,7 +46,7 @@ Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterd
 
 ## 5 Skript Stufe 2
 
-`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4; Q-04, Q-20, Q-21. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
+`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4; Q-20, Q-21. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
 
 ## 6 Hooks
 
@@ -66,7 +62,7 @@ Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Ko
 
 ## 9 Migration und Installation
 
-Kapitel 3.9: Umzug aus der globalen Anweisungsdatei Passage für Passage, Bereinigung der Projekt-`CLAUDE.md`, Werkzeug-Skills, Baustellenschild, Installation, Verweise im Repository. Hängt an: Schritt 8 bestanden; Q-29 bis Q-31 (Q-32 geklärt, siehe status.md). Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Der Umzug berührt globale Anweisungen.
+Kapitel 3.9: Umzug aus der globalen Anweisungsdatei Passage für Passage, Bereinigung der Projekt-`CLAUDE.md`, Werkzeug-Skills, Baustellenschild, Installation, Verweise im Repository. Hängt an: Schritt 8 bestanden; Q-29, Q-30 (Q-31 und Q-32 geklärt, siehe status.md). Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Der Umzug berührt globale Anweisungen.
 
 ## Summe
 

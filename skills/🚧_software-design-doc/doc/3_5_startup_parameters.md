@@ -6,10 +6,12 @@ Stand (2026-09-17): Vorschlag; das Prinzip „ablesen statt fragen, Doku wächst
 
 Der Skill wird durch den geankerten Trigger aus `CLAUDE-snippet.md` geladen, sobald eine Software-Änderung über eine lokal begrenzte Korrektur hinausgeht, oder durch Aufruf. Dann in dieser Reihenfolge:
 
-1. **Skill-Parameterdatei lesen.** `.claude/software-design-doc.json`. Steht dort `mode: off`, endet der Skill: Er fordert nichts, schlägt nichts vor, zitiert keine Regel; vorhandene Doku in fremder Form wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt.
-2. **Ablesen, was ablesbar ist.** Fehlt die Datei oder ein Feld: Doku-Ordner (Rollenmarker, eine `decisions.md`, die üblichen Ordnernamen), Register, Dateien mit geplanten Schritten (Rolle `plan`, `work-plan.md`, `fahrplan.md`, Abschnitt „Offen" einer README), Layout der Prosa (Zeilenlängen: ein Absatz je Zeile oder Umbruch mit Leerzeilen), vorhandene Rollen.
-3. **Fragen, was nicht ablesbar ist** — einmal je Sitzung, knapp, ohne Skill-Vokabular. Typisch: „Das Projekt hat keine begleitende Doku; soll ich Festlegungen, die den Code überdauern, ab jetzt festhalten — und wo?" Die Antwort gilt für die Sitzung; das Anlegen der Skill-Parameterdatei wird angeboten, nie stillschweigend getan.
+1. **Skill-Parameterdatei lesen.** `.claude/software-design-doc.json`. Steht dort `mode: off`, endet der Skill: Er fordert nichts, schlägt nichts vor, zitiert keine Regel; vorhandene Doku in fremder Form wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt. Steht dort `mode: on`, weiter mit Schritt 2.
+2. **Fehlt die Datei oder das Feld `mode`, danach fragen** (entschieden am 2026-09-24, vormals Q-16): einmal je Sitzung, wie `git-workbench` es tut — „Soll ich das hier führen?" —, mit Angebot, die Skill-Parameterdatei anzulegen. Bei Ablehnung zusätzlich fragen, ob `mode: off` trotzdem festgehalten werden soll, damit die Frage nicht wiederkehrt. Erst nach Zustimmung (oder bei `mode: on`) weiter mit Schritt 3.
+3. **Ablesen, was ablesbar ist.** Doku-Ordner (Rollenmarker, eine `decisions.md`, die üblichen Ordnernamen), Register, Dateien mit geplanten Schritten (Rolle `plan`, `work-plan.md`, `fahrplan.md`, Abschnitt „Offen" einer README), Layout der Prosa (Zeilenlängen: ein Absatz je Zeile oder Umbruch mit Leerzeilen), vorhandene Rollen.
 4. **Lage bestimmen** (Kapitel 3.1) und die passenden Regelteile nachladen: `rules-hardness.md` und `rules-register.md` immer, `rules-planning.md` bei Planungsarbeit, `standard.md` bei Fragen zur Methodik.
+
+**Was hier nicht mehr gefragt wird** (Abgrenzung zu Q-15, entschieden am 2026-09-24): Ob eine konkrete Festlegung ab jetzt festgehalten werden soll, ist keine Frage des Skillstarts mehr — sie kommt erst, wenn im Plan eine Festlegung entsteht, die den Code überdauert (Kapitel 1.7). Schritt 2 fragt nur, ob der Skill hier grundsätzlich mitschreibt, nicht, was er im Einzelnen festhält.
 
 ### 3.5.2 Die Skill-Parameterdatei
 
@@ -17,7 +19,7 @@ Standardname `.claude/software-design-doc.json`; jeder Skill-Parameter hat einen
 
 | Skill-Parameter | Werte | Standard | Bedeutung |
 |---|---|---|---|
-| `mode` | `on`, `off` | `on` | Abwahl je Projekt |
+| `mode` | `on`, `off` | erfragt (Kapitel 3.5.1) | Abwahl je Projekt |
 | `doc_dir` | Pfad | abgelesen | Ordner der Doku |
 | `register` | Pfad | `<doc_dir>/decisions.md` | Register (Kapitel 3.2) |
 | `planned_steps` | Liste von Pfaden | abgelesen | Dateien mit geplanten Schritten (Kapitel 3.4) |
