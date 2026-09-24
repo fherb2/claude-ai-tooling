@@ -6,11 +6,15 @@ Die Segmente sind: dieses Kapitel 1 mit den Zusammenhängen, Kapitel 2 mit den p
 
 Noch nicht entschiedene Punkte stehen als Zitatblöcke `[Q-nn] Entscheidungsgrundlage` dort, wo ihr Kontext steht, mit Optionen, Vorschlag und einer Zeile **Antwort:** für den Entwickler; der Leseplan dazu steht am Anfang von `work-plan.md`. Was nicht so gekennzeichnet ist, gilt als geplant.
 
+> Geprüft: Ok
+
 ## 1.1 Name des Skills
 
 Der Skill hieß `software-dev-doc-fh`. Das Kürzel `-fh` bezeichnete die Arbeitsweise eines bestimmten Entwicklers; mit der Verallgemeinerung auf Rollen, Register und Härteregeln ist der Skill für jeden mit einem ähnlichen Ansatz nutzbar, und das Kürzel entfällt. Der neue Name ist `software-design-doc`: Was der Skill pflegt, ist im Fachjargon ein Design Doc — Kontext und Ziel, Randbedingungen, Entscheidungen mit Alternativen, Detail bis zur Ausführung. Das Präfix `software-` vermeidet die Verwechslung mit Produkt- oder Oberflächendesign, die `design-doc` allein hätte. Erwogen wurden außerdem `solution-design-doc` und `living-design-doc` (das die parallele Pflege zum Code betont, aber mit dem etablierten Begriff „Living Documentation" für generierte Doku kollidiert). Die Entscheidung ist bis zur Installation ohne Kosten umkehrbar; Skill-Parameterdatei und Skript folgen dem Namen (Kapitel 3.5 und 3.6).
 
 Der Skill ist auf Softwareentwicklung zugeschnitten, aber nicht durchgehend: Softwarespezifisch sind der Regeltext des Vorläufers als Regelteil (Phasen, Segmente, Arbeitsschleife; Anhang A), die Signalwörter des Lints und die Suche nach Erwähnungen im Code. Der Kern — Festlegungen mit Härte, Register, Rollen, geplante Schritte — kennt keinen Code und könnte andere Entwicklungsaufgaben ebenso tragen. **Entschieden am 2026-09-18:** Beim Zusammensetzen des Skills wird geprüft, ob die softwarespezifischen Teile in einem eigenen Regelteil isoliert sind. Sind sie es, wird der Skill vor der Installation in `solution-design-doc` umbenannt; die Prüfung kostet nichts, solange nicht installiert ist (Fahrplanschritt 9).
+
+> Geprüft: Ok
 
 ## 1.2 Ausgangslage: zwei Fehlbilder
 
@@ -21,6 +25,8 @@ Der Vorläufer beschreibt die entwicklungsbegleitende Doku als dreigeteiltes Dok
 **Fehlbild Gesetz.** Sobald eine Doku steht, liest die Instanz jede Festlegung darin als bindend. Will der Entwickler einen Bereich neu denken, stößt jede Idee an eine bestehende Festlegung und wird verworfen, statt zu Ende gedacht zu werden; mit wachsender Doku wird die Instanz unkreativ. Ursache: Der Standard kannte nur eine Lesart der Doku — Doku als Vorgabe — und keine Regel dafür, wann eine Festlegung bindet und wann sie zur Disposition steht.
 
 Hinter beiden liegt eine Eigenschaft der Instanz, die in diesem Repository gemessen wurde: Anweisungen, die eine Haltung beschreiben („behalte im Blick, ob …"), feuern nicht zuverlässig; Anweisungen, die an eine Handlung gebunden sind („bevor du zum ersten Mal …"), feuern. Und eine Instanz wägt mehrere Dimensionen nicht zuverlässig gegeneinander ab — sie läuft gegen Extrema. Jedes Verfahren, das von ihr Abwägung verlangt, scheitert an dieser Stelle.
+
+> Geprüft: Ok
 
 ## 1.3 Leitidee
 
@@ -34,9 +40,13 @@ Ob eine Festlegung in der aktuellen Arbeit bindet oder zur Disposition steht, er
 
 Die Felder **gehören** zur Festlegung, aber sie **stehen** nicht bei ihr im Text. Das ist der Punkt, an dem die folgenden Abschnitte ansetzen.
 
+> Geprüft: Ok
+
 ### 1.3.2 Der Mittelweg: normierte Felder, aber getrennt von der Prosa
 
 Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre die Doku unlesbar und der Entwickler in ein formales Konzept gezwungen, das ihn einschränkt und mit Zusatzaufgaben belastet — inakzeptabel. Stünde umgekehrt gar nichts Maschinenlesbares im Text, müsste die Instanz jede Aussage interpretieren, und das Fehlbild Gesetz wäre zurück. Der Mittelweg: **Die Felder sind normiert, aber sie liegen in einem Register neben der Doku; die Prosa trägt je Festlegung nur einen kurzen Marker — eine Adresse, nichts sonst** (Kapitel 3.2). So bleibt der rote Faden eines Absatzes für den Leser erhalten, ein Absatz mit drei Festlegungen bleibt ein Absatz, und `grep` findet trotzdem alles zu einer Festlegung.
+
+> Geprüft: Ok
 
 ### 1.3.3 Abschnitte haben eine Rolle — im Dokument steht ihr Name, im Skill ihre Wirkung
 
@@ -50,7 +60,6 @@ Stünden Art, Grund, Status und Ereignisse als Metainformation im Text, wäre di
 - **Das Register selbst**, das seiner eigenen Grammatik folgt (Kapitel 3.2).
 
 Diese sechs Verhaltensweisen heißen im Skill **Funktionen**, und sie tragen dort englische Namen — der Entwickler wird ihnen nie begegnen, sie stehen hier nur, damit Kapitel 3 sie benutzen kann (Namen entschieden am 2026-09-20):
-
 
 | Funktion     | Die Textart                                                  | Was der Skill dort tut                                                                                                           |
 | ------------ | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -96,6 +105,8 @@ Zwei Rollen verdienen einen eigenen Satz. **`decisions` bleibt neben dem Registe
 
 Damit steht im Dokument des Entwicklers genau zweierlei vom Skill: Marker an Festlegungen und Rollen an Überschriften oder Absätzen. Beides sind Adressen. Aus einem Marker folgt nichts, ohne das Register zu lesen; aus einer Rolle folgt nichts, ohne den Skill zu lesen. **Keine Skill-Logik, kein Attribut, kein Zustand steht im Dokument des Entwicklers.** Das ist der Grundsatz, der die Doku lesbar hält und den Entwickler frei lässt, und Kapitel 2 macht ihn zur Vorgabe.
 
+> Geprüft: Ok
+
 ### 1.3.4 Was dem Entwickler gehört und was er trägt
 
 Ihm gehört die Doku: Gliederung, Reihenfolge, Nummerierung, Sprache der Überschriften, Layout, ob Dreiersschema des Vorläufers (Anhang A) oder freiere Form, wo das Register liegt, wo geplante Schritte stehen. Der Skill bindet nichts an Nummern, Dateinamen oder Titel — nur an Rollen (1.3.3) —, und er fordert keine Struktur, die nichts zu halten hat; die Doku wächst an Festlegungen, nicht an Pflichten (Kapitel 3.5). Der Entwickler muss weder die Grammatik der Marker noch die des Registers noch die Namen der Härtewerte kennen.
@@ -104,16 +115,13 @@ Was er tut: Prosa schreiben, den Planabschnitt „Berührte Festlegungen" lesen 
 
 **Und er wird nicht ausgefragt — Annahmen statt Fragen.** Fehlt zu einer Festlegung ein Attribut — ihre Art, ihr Grund, ihre Quelle —, bildet die Instanz aus der Prosa eine Annahme und legt sie im Planabschnitt sichtbar vor, statt eine Frage zu stellen; im Regelfall bestätigt die Freigabe des Plans die gelisteten Annahmen, soweit der Entwickler nichts anderes sagt (Skill-Parameter `assumptions_on_approval`). Gefragt wird nur, wo keine tragfähige Annahme möglich ist — und dann ohne das Vokabular des Skills, mit dem Wortlaut der Festlegung und dem Anlass. Eine Annahme bleibt als solche gekennzeichnet und macht eine Festlegung nie unantastbar (Vorgabe 2.11); die Regeln im Einzelnen stehen in Kapitel 3.1.3.
 
+> Geprüft: Ok
+
 ### 1.3.5 Was die Einhaltung sichert
 
 Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht Anweisungen, sondern **ein Skript und Hooks**: Der Hook H1 prüft nach jedem Doku-Edit, der Hook H2 vor jedem Commit — beide lesend (Kapitel 3.6 und 3.7). Anweisungen, die eine Haltung beschreiben, feuern nicht zuverlässig (1.2); ein Hook feuert immer. Diese Absicherung kommt mit dem Skill und wirkt in jedem Projekt, das ihn führt, ohne dass dort etwas einzurichten wäre; nur der Zustandsbericht am Sitzungsstart (Hook H3) ist ein Angebot je Projekt (Kapitel 3.7).
 
-> **[Q-26] Entscheidungsgrundlage — H2 blockiert den Commit oder meldet nur**
-> Kontext: H2 blockiert bei struktureller Inkonsistenz (Dublette, Marker ohne Eintrag, `superseded` ohne Ziel). Das ist der einzige blockierende Eingriff des Skills. Eine Blockade ist wirksam, aber im falschen Moment lästig; ohne sie bleibt die Inkonsistenz im Repository.
-> Optionen: (a) blockieren bei struktureller Inkonsistenz, melden bei allem anderen; (b) nur melden, nie blockieren; (c) blockieren, aber per Wort des Entwicklers für einen Commit aufhebbar.
-> Vorschlag: (a) — (c) ist ohnehin gegeben, weil der Entwickler den Hook im Projekt abschalten kann.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 6
-> Antwort:
+**H2 blockiert, und der Entwickler kann das im Einzelfall aufheben** (entschieden am 2026-09-24, vormals Q-26): H2 blockiert den Commit bei struktureller Inkonsistenz — das ist der einzige blockierende Eingriff des Skills. Der Entwickler kann diese Blockade für einen einzelnen Commit ausdrücklich aufheben, statt den Hook im Projekt insgesamt abzuschalten; wie er das Wort dafür ausspricht, ist eine technische Einzelheit (Kapitel 3.7.4).
 
 ### 1.3.6 Wozu das Skript da ist und wie es aufgerufen wird
 
@@ -138,12 +146,13 @@ Der dritte Weg ist der wichtigste, weil er die teuerste Handlung überhaupt eins
 
 **Was daraus für die Ausgabeform folgt.** Weil die Instanz die Antwort deuten muss, ist jede Ausgabe eine Aussage und keine Rohdatenhalde: eine Zeile je Gegenstand, entscheidungsfertig, und im Fehlerfall Schritt, Ursache, Zustand und Abhilfe statt eines Protokolls. Die Vorgaben dazu stehen in Kapitel 2.5 bis 2.7, die Ausführung in Kapitel 3.6.
 
+> Geprüft: offen
+
 ## 1.4 Die Begriffe im Überblick
 
 Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollständig aufgezählt: Ein nicht aufgeführter Wert ist ein Fehler, den das Skript meldet (Vorgabe 2.1). Ausführlich beschrieben wird jeder Begriff dort, wo die letzte Spalte hinweist.
 
 **Was in der Prosa des Entwicklers steht**
-
 
 | Begriff        | Bedeutung                                                                                                                                                                                                                                                                        | Werte                                                                                                                                                                                                       | Ausführlich |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
@@ -154,7 +163,6 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 | **Funktion**   | was der Skill in einem Abschnitt mit dieser Rolle tut                                                                                                                                                                                                                            | `define`, `relate`, `global`, `nonbinding`, `plan`, `register`                                                                                                                                              | 1.3.3        |
 
 **Was im Register steht** — je Festlegung eine Gruppe von Zeilen
-
 
 | Begriff                                     | Bedeutung                                                                                                                                                                                     | Werte                                                                                                                                                                                                              | Ausführlich |
 | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ |
@@ -167,13 +175,6 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 | **Fingerabdruck** (`fp`)                    | Kurzhash des Definitionssatzes; erkennt, dass die Definition sich geändert hat                                                                                                               | Hexzeichen                                                                                                                                                                                                         | 3.6.7        |
 | **Ereigniszeile**                           | eine **datierte Zeile, die festhält, dass der Festlegung etwas widerfahren ist.** Sie ändert die Festlegung nicht, sondern sammelt Erfahrung mit ihr — und daraus folgt später ihre Härte | `friction` — Arbeit musste um die Festlegung herum gebaut werden · `upheld` — sie wurde gegen eine Idee oder einen Befund geprüft und hat standgehalten · `pending` — eine Frage an den Entwickler ist offen | 3.1.2, 3.2.5 |
 | **Lebenszyklus**                            | was am Ende mit ihr geschieht                                                                                                                                                                 | `superseded … by <ID>` — durch eine neue ersetzt · `retired` — entfällt ersatzlos                                                                                                                             | 3.2.6        |
-
-> **[Q-02] Entscheidungsgrundlage — Umbenennung der Ereigniszeile in `upheld`**
-> Kontext: Im finalen Text von Arbeitspunkt 1 hieß die Ereigniszeile „gegen eine Idee geprüft und bestätigt" `confirmed` — dasselbe Wort wie der Statuswert `confirmed` (vom Entwickler bestätigt). In einer Grammatik, in der beides in derselben Klammer stehen kann, ist das eine echte Mehrdeutigkeit für Leser und `grep`. Ich habe die Ereigniszeile in diesem Text bereits `upheld` genannt.
-> Optionen: (a) `upheld` beibehalten; (b) anderes Wort für die Ereigniszeile; (c) den Statuswert umbenennen und die Ereigniszeile `confirmed` lassen.
-> Vorschlag: (a) — „die Festlegung hat der Anfechtung standgehalten"; der Status behält das natürlichere Wort.
-> Gewicht: klein · Blockiert: Fahrplanschritt 1
-> Antwort:
 
 **Was die Sitzung bestimmt**
 
@@ -196,6 +197,8 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 
 **Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
 
+> Geprüft: offen
+
 ## 1.5 Bild des fertigen Systems
 
 Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreiersschema des Vorläufers (Anhang A) oder in freierer Form —, in der bindende Sätze einen Marker und Abschnitte ihre Rolle an der Überschrift tragen; je Doku eine Registerdatei mit Attributen, Ereignissen und Lebenszyklus je Festlegung; eine Skill-Parameterdatei in `.claude/`; geplante Schritte, wo immer sie stehen, die ihr Umbauziel nennen.
@@ -204,12 +207,7 @@ Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreierss
 
 **Der Skill selbst** besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
 
-> **[Q-19] Entscheidungsgrundlage — Repositories mit mehreren Vorhaben**
-> Kontext: 3.5.4 lässt ein Vorhaben über Rollenmarker und `[register: pfad]` vom Repo-Standard abweichen; der Skill folgt dem Vorhaben, in dem die berührten Dateien liegen. Das ist ein Vorschlag ohne Probe.
-> Optionen: (a) so; (b) je Vorhaben eine eigene Skill-Parameterdatei in seinem Ordner, die die Repo-Datei überlagert; (c) nur eine Doku je Repository.
-> Vorschlag: (a) — keine zweite Skill-Parameterdatei; die Zeile im Dokument reicht.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 3
-> Antwort:
+> Geprüft: Ok.
 
 ## 1.6 Ein Beispiel von Anfang bis Ende
 
@@ -371,19 +369,13 @@ In den ersten sieben Szenen hat er Prosa geschrieben, Pläne gelesen und **vierm
 
 Was er **nie** getan hat: einen Marker gesetzt, eine Registerzeile geschrieben, ein Schlüsselwort gelernt, eine Härte bestimmt, gezählt, wie oft etwas gerieben hat. Und was der Skill nie getan hat: seine Prosa umgeschrieben, ohne dass er es freigegeben hat.
 
+> 1.6 geprüft: Ok.
+
 ## 1.7 Welche Arten der Unterstützung es gibt
 
 Der Skill erbringt sieben unterscheidbare Leistungen. Sie sind nicht alle gleich häufig und nicht alle gleich eingreifend; was sie verbindet, ist die Rollenverteilung aus 1.3.4 — der Entwickler schreibt Prosa und entscheidet, die Instanz führt Buch, Skript und Hooks kontrollieren.
 
-**Über allen steht ein Grundsatz: Die Doku wächst an Festlegungen, nicht an Pflichten.** Keine Struktur wird gefordert, die nichts zu halten hat, und keine Leistung wird erbracht, für die es keinen Anlass gibt. Die Ausbaustufe eines Projekts ist, was es hat — nicht, was eine Einstellung behauptet. Daraus folgt die Zurückhaltung, die allen sieben Leistungen gemeinsam ist: Die Erstanlage geschieht nur auf Auftrag, der Einstieg nur am Berührungspunkt, die Prüfung nur an benannten Handlungen. Was daraus im Einzelnen folgt — wann die erste Datei, der erste Registereintrag, die erste Rolle entsteht —, steht in Kapitel 3.5.3.
-
-> **[Q-15] Entscheidungsgrundlage — Wann bei fehlender Doku gefragt wird**
-> Kontext: Ein Projekt ohne begleitende Doku und ohne Skill-Parameterdatei: Der Trigger feuert, sobald eine Änderung über eine lokale Korrektur hinausgeht. Fragt der Skill dann sofort („soll ich Festlegungen festhalten?"), nervt er bei jedem kleinen Vorhaben; fragt er nie, entsteht keine Doku.
-> Optionen: (a) erst fragen, wenn im Plan eine Festlegung entsteht, die den Code überdauert — der Aufnahmetest „kann Code das verletzen?" ist der Auslöser; (b) einmal beim ersten Feuern des Triggers; (c) nie fragen, nur auf Aufruf des Skills.
-> Vorschlag: (a) — das ist „Doku wächst an Festlegungen" konsequent zu Ende gedacht.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 3
-> Antwort:
-
+**Über allen steht ein Grundsatz: Die Doku wächst an Festlegungen, nicht an Pflichten.** Keine Struktur wird gefordert, die nichts zu halten hat, und keine Leistung wird erbracht, für die es keinen Anlass gibt. Die Ausbaustufe eines Projekts ist, was es hat — nicht, was eine Einstellung behauptet. Daraus folgt die Zurückhaltung, die allen sieben Leistungen gemeinsam ist: Die Erstanlage geschieht nur auf Auftrag, der Einstieg nur am Berührungspunkt, die Prüfung nur an benannten Handlungen. Was daraus im Einzelnen folgt — wann die erste Datei, der erste Registereintrag, die erste Rolle entsteht —, steht in Kapitel 3.5.3. Wann genau die erste Frage überhaupt kommt, ist damit ebenfalls entschieden (2026-09-24, vormals Q-15): erst, wenn im Plan eine Festlegung entsteht, die den Code überdauert — der Aufnahmetest „kann Code das verletzen?" ist der Auslöser.
 
 |   | Leistung                                       | Auslöser                              | Ergebnis                                                   |
 | - | ---------------------------------------------- | -------------------------------------- | ---------------------------------------------------------- |

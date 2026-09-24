@@ -19,3 +19,7 @@ Die Nummern werden nicht neu vergeben.
 | Q-03 | Platzierung des Markers im Satz | 2026-09-21 | Kapitel 3.2.2 — vor dem Satzzeichen |
 | Q-07 | Rückfalloption ohne Marker (Wortlaut-Anker) | 2026-09-21 | Kapitel 1.3.3 und 3.2.9 — zurückgestellt, im Regeltext als Möglichkeit genannt. Vom Entwickler ergänzt: Der Markereinbau wird immer mit Begründung vorgeschlagen, der Entwickler kann ihn abwählen; was eine Abwahl bedeutet, steht in 1.3.3 |
 | Q-25 | networkx optional oder Voraussetzung | 2026-09-20 | gegenstandslos — mit dem Skill-Parameter `impact_lib` bereits entschieden: optional, nie Voraussetzung, bewusste Wahl des Entwicklers; Ergebnis in Kapitel 1.7.4 und 3.6.1 |
+| Q-15 | Wann bei fehlender Doku gefragt wird | 2026-09-24 | Kapitel 1.7 und 3.5.3 — (a): erst fragen, wenn im Plan eine Festlegung entsteht, die den Code überdauert |
+| Q-19 | Repositories mit mehreren Vorhaben | 2026-09-24 | Kapitel 3.5.4 — (a): keine zweite Skill-Parameterdatei je Vorhaben, die `[register: pfad]`-Zeile im Dokument reicht |
+| Q-02 | Umbenennung der Ereigniszeile in `upheld` | 2026-09-24 | Kapitel 3.1.1 — (a): `upheld` bestätigt |
+| Q-26 | H2 blockiert den Commit oder meldet nur | 2026-09-24 | Kapitel 1.3.5 und 3.7 — (a) mit (c), vom Entwickler kombiniert: H2 blockiert bei struktureller Inkonsistenz, der Entwickler kann das für einen einzelnen Commit ausdrücklich aufheben statt den Hook ganz abzuschalten; wie er das Wort dafür ausspricht, ist als technische Einzelheit in 3.7.4 offen |
