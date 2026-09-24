@@ -215,7 +215,7 @@ Ein Projekt, das den Skill führt, hat seine Doku in Prosa — nach dem Dreierss
 
 **„Je Doku", nicht „je Projekt" — das ist Absicht.** Ein Repository kann mehrere Vorhaben tragen, jedes mit eigener Doku, eigener Gliederung und eigenem Register; in diesem Repository ist genau das der Fall. Der Skill darf deshalb nicht von einer Doku je Projekt ausgehen und keine über Ordnergrenzen hinweg vereinheitlichen. Er folgt dem Vorhaben, in dem die berührten Dateien liegen: Register, Rollen und geplante Schritte bestimmen sich aus dessen Umgebung, nicht aus einer Einstellung am Repository. Wie er das Vorhaben findet, steht in Kapitel 3.5.4.
 
-**Der Skill selbst** besteht aus einer dünnen `SKILL.md`, die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann.
+**Der Skill selbst** besteht aus einer dünnen `SKILL.md` (Kapitel 3.10), die Lage und die Skill-Parameter bestimmt und die passenden Regelteile nachlädt, aus dem angepassten Regeltext des Vorläufers als eigenem Regelteil (Anhang A, Anpassungen in 1.11), aus einem Skript mit einem Modul für die Auswirkungsrechnung, und aus zwei Hooks, die mit dem Skill kommen, sowie einem dritten, den das Projekt einrichten kann; geladen wird er über einen Trigger in der `CLAUDE.md` (Kapitel 3.11).
 
 > Geprüft: Ok.
 
@@ -526,7 +526,7 @@ Ein Projekt kann den Skill auch ausdrücklich abwählen (`mode: off`). Dann ford
 
 Abschnitt 1.7 sagt, **welche** Leistungen der Skill erbringt; dieser Abschnitt sagt, **an welchen Handlungen** sie ausgelöst werden. Der Skill greift nicht kontinuierlich ein, sondern an benannten Handlungen. Die Reihenfolge in einer Sitzung:
 
-1. **Skillstart.** Geladen wird der Skill durch den geankerten Trigger in der Anweisungsdatei — sobald eine Software-Änderung über eine lokal begrenzte Korrektur hinausgeht — oder durch Aufruf. Die Instanz liest die Skill-Parameterdatei oder erhebt aus dem Projekt, was sich ablesen lässt, und fragt nur, was sich nicht ablesen lässt (Kapitel 3.5). Ist der Skill für das Projekt abgewählt, endet er hier.
+1. **Skillstart.** Geladen wird der Skill durch den geankerten Trigger in der Anweisungsdatei (Kapitel 3.11) — sobald eine Software-Änderung über eine lokal begrenzte Korrektur hinausgeht — oder durch Aufruf. Die Instanz liest die Skill-Parameterdatei oder erhebt aus dem Projekt, was sich ablesen lässt, und fragt nur, was sich nicht ablesen lässt (Kapitel 3.5 und 3.10). Ist der Skill für das Projekt abgewählt, endet er hier.
 2. **Bereich öffnen.** Für den anstehenden Schritt oder die besprochene Idee listet das Skript die Festlegungen des berührten Bereichs mit ihrer Härte und meldet Abweichungen zwischen Prosa und Register (Kapitel 3.6).
 3. **Lage bestimmen.** Aus dem Auftrag folgt, ob die Sitzung ausführt oder entwirft; im Zweifel eine Frage (Kapitel 3.1).
 4. **Plan schreiben.** Jeder Plan trägt den Abschnitt „Berührte Festlegungen": Welche Festlegungen der Schritt berührt, welche Attribute die Instanz annimmt, welche Härte folgt, welche Kollisionen geparkt werden. Das Skript liefert das Gerüst; die Auswirkungskandidaten kommen aus dem Graphen der Marker (Kapitel 3.6). Der Entwickler liest, korrigiert in Prosa oder gibt frei (Kapitel 3.1 und 3.4).
