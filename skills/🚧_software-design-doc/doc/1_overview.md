@@ -459,17 +459,14 @@ Was der Vorläufer die Arbeitsschleife nannte (Anhang A, Abschnitt A.8), bleibt:
 
 Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anweisungen widersprechen sich. Die globale Regel nennt drei mögliche Orte und fragt, wenn keiner geregelt ist; die Projektregel dieses Repositories verbietet eigene Plan-Dateien. Solange beides nebeneinandersteht, hängt die Antwort davon ab, welche Datei zuerst gelesen wird. Der Skill entscheidet die Frage einmal für alle Projekte, und die globale Regel tritt dann von selbst zurück — sie gilt nur, „wenn der Ablageort nicht klar geregelt ist".
 
-**Was daraus folgt, ist noch nicht entschieden**: nach welchem Maß sich der Ort einer Planung bestimmt und welche Orte es gibt. Der ausgearbeitete Vorschlag steht in Kapitel 3.4.3; entschieden wird hier:
+**Wo eine Planung steht und was ein Schritt im Fahrplan davon zeigt, ist entschieden** (2026-09-24, vormals Q-12; Einzelheiten in Kapitel 3.4.3):
 
-> **[Q-12] Entscheidungsgrundlage — Inhalt geplanter Schritte und Ablageorte einer Planung (3.4.3)**
-> Kontext: Am 22. August 2026 hast Du zurückgewiesen, dass eine ausdetaillierte Planung in den Fahrplan geschrieben wurde: Der Fahrplan hat keine Dokumentationsfunktion und ist keine Planungsablage. Kapitel 3.4.3 ist der daraus abgeleitete Vorschlag und wurde noch nicht besprochen. Er enthält vier Festlegungen, die einzeln bewertet werden können: (1) ein Schritt beschreibt Ziel, Dringlichkeit, Umbauziel, Verweis — nicht den Weg; (2) drei Ablageorte nach Länge und Haltbarkeit mit der Grenze „etwa zehn Sätze"; (3) eine Planungsdatei wird nach Ausführung gelöscht, ihr beurteilungsrelevanter Rest wandert in die Doku, die Statusdatei nennt sie; (4) der Kontext-Haushalt lautet künftig „Planung an ihrem Ort vertiefen", nicht „Fahrplan detaillieren".
-> Bestehende Regeln (geprüft am 2026-09-19): Die globale Anweisungsdatei nennt unter „Planung" drei Ablageorte — Chat, Datei im Projekt, `~/.claude` — und schaltet sich selbst ab, sobald ein Skill den Ablageort regelt. Die Projekt-`CLAUDE.md` dieses Repositories erlaubt dagegen keine eigenen Plan-Dateien. Der Skill entscheidet die Frage künftig für alle Projekte; welche Regeln damit entfallen, steht in Kapitel 3.9.1.
-> Optionen: je Punkt (a) übernehmen, (b) ändern — wie?, (c) streichen.
-> Vorschlag: alle vier übernehmen; die Zehn-Sätze-Grenze ist eine Schätzung beim Eintragen, kein Messwert.
-> Gewicht: groß · Blockiert: Fahrplanschritt 2
-> Antwort: Ich weiß nicht, was die Frage eigentlich von mir will.
+1. Ein Schritt im Fahrplan beschreibt nur Ziel, Grund der Dringlichkeit, Umbauziel und — falls vorhanden — einen Verweis auf die Planung; nicht den Weg dorthin, außer der Entwickler fordert das für einen Schritt ausdrücklich ein (1.7.3 oben).
+2. Die eigentliche Planung steht an einem von drei Orten, je nach Länge und Haltbarkeit: bis etwa zehn Sätze direkt im Schritt; trägt sie Festlegungen über das System, die den Code überdauern, in der Doku beim zuständigen Kapitel; beschreibt sie nur den Arbeitsweg und ist danach wertlos, in einer eigenen Planungsdatei im Projekt.
+3. Nach der Ausführung wandert, was zur Beurteilung nötig bleibt, in die Doku; die Planungsdatei wird gelöscht, die Statusdatei nennt sie.
+4. Der Kontext-Haushalt heißt seitdem „Planung an ihrem Ort vertiefen", nicht „Fahrplan detaillieren".
 
-> Prüfung 1.7.3 allgemein: Die Punkte lesen sich, wie aus einem anderen Zusammenhang gerissen. Bitte prüfen!
+Damit tritt die bisherige globale Regel — drei mögliche Orte, Nachfrage wenn keiner geregelt ist — für dieses Vorhaben zurück; welche Anweisungen das im Einzelnen betrifft, steht in Kapitel 3.9.1.
 
 ### 1.7.4 Auswirkungen einer Änderung finden
 
@@ -495,22 +492,9 @@ Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anw
 
 > Prüfung: Im letzten Abschnitt wird von einer Wahl gesprochen, fremde Bibliotheken einzubinden, indem der Nutzer sie installiert. Warum wird nicht konkret die betreffende Bibliothek genannt, die dann auch im Script benutzt wird? Bitte prüfe das, wie wir das hier machen.
 
-> **[Q-06] Entscheidungsgrundlage — Zitatmarker außerhalb der Funktion `relate`**
-> Kontext: Pflicht sind Zitatmarker nur in Abschnitten mit Funktion `relate`; in Bausteinkapiteln untereinander sind sie optional. Ob `mentions` ohne sie zu viel übersieht, kann erst die Probe zeigen.
-> Optionen: (a) bei „optional" bleiben und die Probe entscheiden lassen; (b) von vornherein Pflicht überall (Skill-Parameter `marking: full` als Standard).
-> Vorschlag: (a).
-> Gewicht: klein · Blockiert: nichts vor der Probe
-> Antwort: Wie soll so eine Probe ablaufen? Hier in der Entwicklung des Skills? In den ersten Anwendungsfällen? Eine Probe-Funktion in allen Projekten, die den Skill nutzen (also als Teil des Skills selbst)?
+**Zitatmarker außerhalb der Funktion `relate` bleiben optional** (entschieden am 2026-09-24, vormals Q-06): Ob `mentions` ohne sie zu viel übersieht, entscheidet die Probe (Kapitel 1.9, 3.8) — ein einmaliger Test in der Entwicklung dieses Skills, nicht ein Mechanismus, der mit dem Skill ausgeliefert wird. Verfehlt die Kandidatenliste dort ihre Schwelle, wird `marking: full` zum Standard nachgezogen.
 
-> **[Q-20] Entscheidungsgrundlage — Das Graphenmodell (gesondert zu besprechen)**
-> Kontext: Du hast die Aussage „eine Kante entsteht, wenn zwei Festlegungen im selben Absatz genannt werden" als allgemeingültige Definition angezweifelt und eine gesonderte Besprechung gewünscht. 3.6.5 ist der Vorschlagsstand: Knoten sind Festlegungen; Kanten entstehen aus gemeinsamem Vorkommen (Absatz, Abschnitt, Nachbarabschnitt, Kapitel) mit abnehmenden Gewichten; Suchschlüssel-Treffer sind eine Quelle außerhalb des Graphen. Offen ist grundsätzlich: Was soll eine Kante bedeuten — „steht im Text nahe" oder „hängt inhaltlich zusammen"? Beides deckt sich nur teilweise, und nur das Erste ist mechanisch.
-> Optionen: hier nur Sammelstelle für Gesichtspunkte; die Besprechung führt zur Festlegung.
-> Vorschlag: keiner vorab.
-> Gewicht: groß · Blockiert: Fahrplanschritt 5
-> Antwort: 
-
-> 1) Was soll eine Kante bedeuten: „steht im Text nahe", wobei die Nähe nicht allein von der Anzahl der Wörter dazwischen umgekehrt proportional abhängt, sondern die Funktion auch ein schließt, ob im gleichen Abschnitt oder im gleichen Kapitel. -> Nur so etwas lässt sich mechanisch testen.
-> 2) „hängt inhaltlich zusammen" wäre natürlich das bessere Kriterium. Aber wie will man das in einer Größe ausdrücken? Das kann man eigentlich nur parallel zur mechanischen Bestimmung per Agent "beurteilen" lassen. Jedoch wäre das für jeden einzelnen Fakt sehr teuer. Kann das funktionieren?
+**Was eine Kante im Graphen bedeutet, ist entschieden** (2026-09-24, vormals Q-20): „Steht im Text nahe" — mechanisch, wie in Kapitel 3.6.5 beschrieben (gleicher Absatz, gleicher Abschnitt, Nachbarabschnitt, gleiches Kapitel, mit abnehmenden Gewichten). „Hängt inhaltlich zusammen" wäre das bessere Kriterium, aber unbezahlbar, wenn es für jede Festlegung im Dokument berechnet würde. Nötig ist das nicht: Der Graph liefert nur günstig eine kurze Kandidatenliste; die inhaltliche Beurteilung geschieht ohnehin nachgelagert, je Kandidat, durch die Instanz (Schritt 4 in Szene 8, Kapitel 1.6.8) — dort kostet sie nur einmal je Kandidat der Vorauswahl, nicht einmal je Fakt im Dokument.
 
 ### 1.7.5 Einen Bereich neu denken
 
@@ -561,12 +545,7 @@ Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Reg
 
 **Die beiden ersten Punkte sind von anderer Art als die übrigen drei.** Setzt die Instanz die Marker nicht oder schießt sie Ideen weiterhin ab, ist nicht ein Wert falsch eingestellt, sondern das Design gescheitert — dann geht es zurück zu den Härteregeln und zum Register, nicht weiter zur Migration. Bleiben dagegen Kandidatenlisten zu lang oder meldet der Lint zu viel, sind Werte zu justieren und die Probe zu wiederholen. Erst wenn alle Schwellen erreicht sind, werden die globalen Anweisungen umgezogen und der Skill installiert (Kapitel 3.9). Der Aufbau der Probe, ihre Messgrößen und Schwellen stehen in Kapitel 3.8.
 
-> **[Q-28] Entscheidungsgrundlage — Messgrößen und Schwellen der Probe**
-> Kontext: Die Tabelle in 3.8.4 ist mein Vorschlag. Die Schwellen entscheiden, ob das Vorhaben in die Migration geht oder zurück ins Design. Zu streng heißt Stillstand; zu locker heißt, dass die zwei Fehlbilder zurückkommen.
-> Optionen: je Zeile (a) übernehmen, (b) Schwelle ändern, (c) Messgröße streichen oder ergänzen.
-> Vorschlag: übernehmen; die Zeile „Kontext-Mehraufwand" ist die unsicherste, weil grob messbar.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 8
-> Antwort: Bitte im Chat mit Kontext nochmal die Frage stellen.
+**Die Messgrößen und Schwellen der Probe sind bestätigt** (entschieden am 2026-09-24, vormals Q-28, Tabelle in Kapitel 3.8.4): Verfehlt „Marker gesetzt" oder „Parken statt Abschuss" ihre Schwelle, ist das Design gescheitert — zurück zu Kapitel 3.1/3.2. Verfehlen Kandidatenliste oder Fehlalarme ihre Schwelle, werden nur Werte nachjustiert und die Probe wiederholt (Kapitel 3.8.5). Am unsichersten bleibt „Kontext-Mehraufwand", weil nur grob messbar.
 
 > Geprüft: Ok.
 

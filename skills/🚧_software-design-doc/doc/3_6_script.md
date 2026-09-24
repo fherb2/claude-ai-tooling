@@ -1,6 +1,6 @@
 ## 3.6 Das Skript
 
-Stand (2026-09-17): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschlag mit weitgehender Zustimmung; das Auswirkungsmodul ist in seinem Graphenmodell noch gesondert zu besprechen (Q-20, Kapitel 1.7.4).
+Stand (2026-09-24): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschlag mit weitgehender Zustimmung; das Graphenmodell des Auswirkungsmoduls ist entschieden (vormals Q-20, Kapitel 1.7.4).
 
 ### 3.6.1 Ort, Name, Laufzeit
 

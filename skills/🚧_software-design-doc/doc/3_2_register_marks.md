@@ -1,6 +1,6 @@
 ## 3.2 Marker und Register
 
-Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Am 2026-09-21 entschieden: die Platzierung des Markers im Satz und die Zurückstellung der Rückfalloption (vormals Q-03 und Q-07, siehe `status.md`). Offen sind das Graphenmodell (Q-20, gesondert zu besprechen), der Fingerabdruck (Q-04), die Suchschlüssel (Q-05) und die Zitatmarkerpflicht außerhalb `relate` (Q-06); die Entscheidungsgrundlagen dazu stehen an ihren Funktionsstellen in Kapitel 1 (Leseplan in `work-plan.md`).
+Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Am 2026-09-21 entschieden: die Platzierung des Markers im Satz und die Zurückstellung der Rückfalloption (vormals Q-03 und Q-07). Am 2026-09-24 entschieden: der Fingerabdruck (vormals Q-04), die Suchschlüssel (vormals Q-05), die Zitatmarkerpflicht außerhalb `relate` (vormals Q-06) und das Graphenmodell (vormals Q-20) — siehe `status.md`; die Entscheidungen stehen an ihren Funktionsstellen in Kapitel 1.
 
 ### 3.2.1 Trennung von Prosa und Register
 

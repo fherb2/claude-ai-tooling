@@ -1,6 +1,6 @@
 ## 3.4 Geplante Schritte und Umbauziel
 
-Stand (2026-09-17): Entschieden sind der Begriff des geplanten Schritts und die Syntax des Umbauziels. Der Inhalt eines geplanten Schritts und die Ablageorte einer Planung (der frühere Punkt T2) sind ein Vorschlag, der noch nicht besprochen wurde; er steht in 3.4.3, seine Entscheidungsgrundlage (Q-12) in Kapitel 1.7.3.
+Stand (2026-09-24): Entschieden sind der Begriff des geplanten Schritts, die Syntax des Umbauziels, und — vormals Q-12 — der Inhalt eines geplanten Schritts sowie die Ablageorte einer Planung (der frühere Punkt T2); die Entscheidung steht in Kapitel 1.7.3, die Einzelheiten hier in 3.4.3.
 
 ### 3.4.1 Geplante Schritte
 
@@ -20,7 +20,7 @@ Der Qualifier ist das Register, nicht die Kapiteldatei, weil IDs je Register glo
 
 Fehlt in einem bestehenden Fahrplan jedes Umbauziel — der Normalfall bei Einführung —, fragt die Instanz einmal, wenn ein Schritt erkennbar den berührten Bereich betrifft, ob er als Umbau gemeint ist, und trägt das Ziel nach. Der Fahrplan kommt so am Berührungspunkt ins Schema, wie die Doku selbst.
 
-### 3.4.3 Inhalt eines geplanten Schritts und Ablageorte einer Planung — Vorschlag
+### 3.4.3 Inhalt eines geplanten Schritts und Ablageorte einer Planung
 
 Ein geplanter Schritt beschreibt das Ziel, den Grund seiner Dringlichkeit, sein Umbauziel und, wo vorhanden, den Verweis auf die Planung. Er beschreibt nicht den Weg — außer der Entwickler fordert das für einen Schritt ausdrücklich ein (entschieden am 2026-09-24, Kapitel 1.7.3). Die frühere Formulierung „in aufgabenangemessener Detaillierung" war die Wurzel eines Missverständnisses: Gemeint war die Präzision des Ziels, gelesen wurde die Ausbreitung des Weges.
 
