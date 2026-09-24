@@ -36,6 +36,8 @@ Die Skill-Parameter wohnen bewusst in einer Datei mit dem Namen des Skills unter
 
 Keine Struktur wird gefordert, die nichts zu halten hat. Die erste Festlegung, die den Code überdauert, braucht ein Zuhause — eine Datei, die der Skill vorschlägt; der erste Marker legt das Register an; der erste Text, der Festlegungen aus verschiedenen Orten in Beziehung setzt, bekommt die Rolle `relate` vorgeschlagen; der erste Fall von mehr als einem nächsten Schritt bekommt einen Ort für geplante Schritte vorgeschlagen. Die Ausbaustufe eines Projekts ist, was es hat — nicht, was ein Skill-Parameter sagt. Die Dreiteilung des Vorläufers (Anhang A) bleibt die Empfehlung für Projekte, die groß werden (Kapitel 3.3).
 
+**Ebenso schrumpft sie wieder.** Wird eine Festlegung aus Kapitel 1 oder 2 durch eine aktuelle Anwender- oder Programmdokumentation redundant und verliert dabei jede Funktion für die weitere Implementierung, darf sie entfallen — über den Lebenszyklus (`retired`), nie stillschweigend (Kapitel 1.3.7).
+
 ### 3.5.4 Repositories mit mehreren Vorhaben
 
 **Dass ein Repository mehrere Vorhaben mit eigener Doku tragen kann, steht in Kapitel 1.5.** Hier steht, wie der Skill das zugehörige Vorhaben findet. Die Skill-Parameterdatei ist der Standard des Repositories. Ein Vorhaben mit eigener Doku weicht ab, indem seine Dateien Rollenmarker und eine `[register: pfad]`-Zeile tragen; der Skill folgt dann dem Vorhaben, in dem die berührten Dateien liegen — keine zweite Skill-Parameterdatei je Vorhaben, die Zeile im Dokument reicht (entschieden am 2026-09-24, vormals Q-19). Das entspricht der Regel dieses Repositories, dass jedes Vorhaben eigenständig aufgebaut ist.
