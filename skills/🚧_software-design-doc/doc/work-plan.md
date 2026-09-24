@@ -32,9 +32,9 @@ Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerf
 
 Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: Q-13, Q-14. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
 
-## 3 Regelteil Skillstart
+## 3 Regelteil Skill-Parameter
 
-Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterdatei, `mode: off`, „Doku wächst an Festlegungen". Hängt an: Schritt 1; Q-17, Q-18. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
+Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Skill-Parameterdatei, „Doku wächst an Festlegungen", mehrere Vorhaben je Repository. Die Mode-Frage und der Skillstart-Ablauf selbst sind Teil der `SKILL.md` (Kapitel 3.10), nicht dieses Regelteils. Hängt an: Schritt 1; Q-17, Q-18. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
 
 ## 4 Skript Stufe 1
 

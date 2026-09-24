@@ -514,9 +514,9 @@ Ob ein überholter Absatz in der Prosa stehen bleibt, entscheidet der Entwickler
 
 ### 1.7.7 Keine Unterstützung
 
-**Fehlt die Skill-Parameterdatei oder das Feld `mode`, wird nicht stillschweigend `on` angenommen** (entschieden am 2026-09-24, vormals Q-16): Die Instanz fragt einmal je Sitzung, ob der Skill hier geführt werden soll — wie `git-workbench` es tut —, und bietet an, die Skill-Parameterdatei anzulegen. Lehnt der Entwickler ab, fragt sie zusätzlich, ob `mode: off` trotzdem in einer Skill-Parameterdatei festgehalten werden soll, damit die Frage nicht wiederkehrt. Sagt er zu, folgt danach — nicht gleichzeitig — die eigentliche Erstanlage- oder Einstiegsfrage (Kapitel 1.7.1/1.7.2, Kapitel 3.5.1).
+**Fehlt die Skill-Parameterdatei oder das Feld `mode`, wird nicht stillschweigend `on` angenommen** (entschieden am 2026-09-24, vormals Q-16): Die Instanz fragt einmal je Sitzung, ob der Skill hier geführt werden soll — wie `git-workbench` es tut —, und bietet an, die Skill-Parameterdatei anzulegen. Lehnt der Entwickler ab, fragt sie zusätzlich, ob `mode: off` trotzdem in einer Skill-Parameterdatei festgehalten werden soll, damit die Frage nicht wiederkehrt. Sagt er zu, folgt danach — nicht gleichzeitig — die eigentliche Erstanlage- oder Einstiegsfrage (Kapitel 1.7.1/1.7.2, Kapitel 3.10.2).
 
-Ein Projekt kann den Skill auch ausdrücklich abwählen (`mode: off`). Dann fordert er nichts, schlägt nichts vor und zitiert keine Regel; vorhandene Doku wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt (Kapitel 3.5.1). Das ist eine gültige Betriebsart, keine Nachlässigkeit.
+Ein Projekt kann den Skill auch ausdrücklich abwählen (`mode: off`). Dann fordert er nichts, schlägt nichts vor und zitiert keine Regel; vorhandene Doku wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt (Kapitel 3.10.2). Das ist eine gültige Betriebsart, keine Nachlässigkeit.
 
 **Der Trigger, der den Skill überhaupt lädt, bleibt davon unberührt** (entschieden am 2026-09-24, vormals Q-31): Ein Ladevorgang mit sofortigem Ende — der Skill endet bei `mode: off` sofort wieder — ist billiger als zwei Stellen, die zusammenpassen müssten.
 

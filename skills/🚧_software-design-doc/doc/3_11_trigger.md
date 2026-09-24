@@ -1,6 +1,6 @@
 ## 3.11 Der stille Trigger in `CLAUDE.md`
 
-Stand (2026-09-24): neu angelegt. Wortlaut nach dem Vorbild des Vorläufers (Anhang A.11), an diesen Skill angepasst; konsolidiert aus Kapitel 1.3.5, 1.8, 3.5.1, 3.9.1 und 3.9.4.
+Stand (2026-09-24): neu angelegt. Wortlaut nach dem Vorbild des Vorläufers (Anhang A.11), an diesen Skill angepasst; konsolidiert aus Kapitel 1.3.5, 1.8, 3.9.1 und 3.9.4.
 
 ### 3.11.1 Zweck
 

@@ -10,10 +10,13 @@ Stand (2026-09-24): neu angelegt, konsolidiert aus Kapitel 1.5/1.6 und Fahrplans
 
 > Geladen wirst Du durch den geankerten Trigger aus der `CLAUDE.md` (Kapitel 3.11) oder durch ausdrücklichen Aufruf. Dann in dieser Reihenfolge:
 >
-> 1. Lies die Skill-Parameterdatei und bestimme `mode` — wie in Kapitel 3.5.1 beschrieben, einschließlich der Frage, wenn Datei oder Feld fehlen. Bei `mode: off` endest Du hier: Du forderst nichts, schlägst nichts vor, zitierst keine Regel.
-> 2. Bestimme die Lage — `execute` oder `design` — nach der Härteliste in Kapitel 3.1; lade dafür `rules-hardness.md`.
-> 3. Lade außerdem `rules-register.md` immer; `rules-planning.md`, wenn ein geplanter Schritt oder sein Umbauziel betroffen ist; `standard.md`, wenn eine Frage zur Methodik ansteht, die nicht die Härte- oder Registerregeln selbst betrifft.
-> 4. Fehlt die Skill-Parameterdatei ganz, oder braucht es die volle Erhebung — Doku-Ordner, Register, geplante Schritte, Layout, Rollen —, lies zusätzlich `rules-startup.md`: Die Einzelheiten der Erhebung und der vollständige Skill-Parameter stehen dort.
+> 1. **Skill-Parameterdatei lesen.** `.claude/software-design-doc.json`. Steht dort `mode: off`, endest Du hier: Du forderst nichts, schlägst nichts vor, zitierst keine Regel; vorhandene Doku in fremder Form wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt. Steht dort `mode: on`, weiter mit Schritt 3.
+> 2. **Fehlt die Datei oder das Feld `mode`, danach fragen:** einmal je Sitzung, wie `git-workbench` es tut — „Soll ich das hier führen?" —, mit Angebot, die Skill-Parameterdatei anzulegen. Bei Ablehnung zusätzlich fragen, ob `mode: off` trotzdem festgehalten werden soll, damit die Frage nicht wiederkehrt. Erst nach Zustimmung (oder bei `mode: on`) weiter mit Schritt 3.
+> 3. **Lage bestimmen** — `execute` oder `design` — nach der Härteliste in Kapitel 3.1; lade dafür `rules-hardness.md`.
+> 4. **Regelteile laden:** `rules-register.md` immer; `rules-planning.md`, wenn ein geplanter Schritt oder sein Umbauziel betroffen ist; `standard.md`, wenn eine Frage zur Methodik ansteht, die nicht die Härte- oder Registerregeln selbst betrifft.
+> 5. **Ablesen, was ablesbar ist**, oder — fehlt die Skill-Parameterdatei ganz, oder braucht es die volle Erhebung — `rules-startup.md` zusätzlich laden: Doku-Ordner (Rollenmarker, eine `decisions.md`, die üblichen Ordnernamen), Register, Dateien mit geplanten Schritten (Rolle `plan`, `work-plan.md`, `fahrplan.md`, Abschnitt „Offen" einer README), Layout der Prosa, vorhandene Rollen. Die Einzelheiten der Erhebung und der vollständige Skill-Parameter stehen dort (Kapitel 3.5).
+>
+> **Was hier nicht gefragt wird:** Ob eine konkrete Festlegung ab jetzt festgehalten werden soll, ist keine Frage dieses Ablaufs — sie kommt erst, wenn im Plan eine Festlegung entsteht, die den Code überdauert (Kapitel 1.7). Schritt 2 fragt nur, ob Du hier grundsätzlich mitschreibst, nicht, was Du im Einzelnen festhältst.
 
 ### 3.10.3 Was hier bewusst nicht steht
 
