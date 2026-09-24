@@ -123,6 +123,8 @@ Dass die Instanz Marker und Registerzeilen tatsächlich schreibt, sichern nicht 
 
 **H2 blockiert, und der Entwickler kann das im Einzelfall aufheben** (entschieden am 2026-09-24, vormals Q-26): H2 blockiert den Commit bei struktureller Inkonsistenz — das ist der einzige blockierende Eingriff des Skills. Der Entwickler kann diese Blockade für einen einzelnen Commit ausdrücklich aufheben, statt den Hook im Projekt insgesamt abzuschalten; wie er das Wort dafür ausspricht, ist eine technische Einzelheit (Kapitel 3.7.4).
 
+> Geprüft: Ok.
+
 ### 1.3.6 Wozu das Skript da ist und wie es aufgerufen wird
 
 **Was es übernimmt.** Vier Arbeiten, die eine Instanz zwar ausführen könnte, bei denen sie aber Urteil vortäuschen würde, wo Mechanik gefragt ist: **zählen** — wie viele Reibungszeilen seit der letzten Bestätigung; **ableiten** — welche Prüfung der Härteliste als erste zutrifft; **einsammeln** — welche Festlegungen als von einer Änderung berührt in Frage kommen; **abgleichen** — wo Prosa und Register auseinanderlaufen. Alle vier sind aus den Feldern eindeutig bestimmt. Was eindeutig bestimmt ist, gehört nicht ins Modell, sondern in ein Programm; eine Instanz, die es „im Kopf" täte, käme manchmal zum richtigen Ergebnis und niemand wüsste, wann.
@@ -153,6 +155,8 @@ Der dritte Weg ist der wichtigste, weil er die teuerste Handlung überhaupt eins
 **Ergänzt am 2026-09-24** (Anstoß aus einem Parallelprojekt): Kann Code eine Aussage verletzen, ist sie eine Festlegung — aber nicht jede Festlegung braucht deshalb einen Platz in der Prosa des Entwicklers. Eine vollständige Programmdokumentation besteht aus mehreren, sich ergänzenden Teilen: der begleitenden Doku, den Docstrings von Modulen, Klassen und Funktionen, den Kommentaren an den Parametrierungsstellen im Code, und dem Code selbst. Die begleitende Doku trägt nur, was die anderen Teile nicht tragen. Aufzunehmen ist der Grund einer wesentlichen Detailentscheidung, wo das Ergebnis ihn nicht zeigt; die Prinzipbeschreibung einer Logik, die sich aus Code und Kommentaren nicht erschließt — einschließlich dessen, was ein Abschnitt ausdrücklich nicht leistet; und die Begründung, warum eine Vorgabe aus Kapitel 1 oder 2 gerade durch diese Umsetzung erfüllt wird und nicht durch eine naheliegende andere. Nicht aufzunehmen ist, was der Docstring einer Klasse, Methode oder eines Moduls ohnehin sagt — Schnittstelle, Parameter, Grundfunktion —, was sich beim Lesen von selbst ergibt, und eine Aufzählung dessen, was ins Programm eingetragen wurde: Die begleitende Doku ist kein Änderungsspeicher — anders als ihre Ereigniszeilen (3.1.2), die nicht festhalten, *was* geändert wurde, sondern *ob sich eine Festlegung bewährt hat*. Maßstab: so viel, dass sich im Nachhinein aus Code und Doku alles erarbeiten lässt, was an echtem Wissen in den Entwurf eingegangen ist — und nicht mehr.
 
 **Neben Code, Docstrings und Kommentaren kann es weitere, unabhängige Dokumentation geben — und die zählt mit.** Ein fortgeschrittenes Projekt führt oft schon eine Anwenderdokumentation (und sei es nur eine README) oder eine zentrale, eigenständige Programmdokumentation. Beide haben mit der laufenden, projektbegleitenden Doku dieses Skills zunächst nichts zu tun — sie entstehen unabhängig und für ein anderes Publikum. Existiert eine solche Dokumentation aber bereits und ist sie aktuell genug, gehört sie zur gesamten Dokumentationslage dazu, und die begleitende Doku darf sich daran messen: Was dort bereits vollständig und aktuell steht, muss die begleitende Doku nicht doppelt tragen. Das erlaubt, Inhalte zu entfernen, sobald sie dort nur noch redundant sind und für die weitere Implementierung keine Funktion mehr haben — vorzugsweise aus Kapitel 1, seltener aus Kapitel 2; solange eine Festlegung noch eine solche Funktion trägt, bleibt sie, auch wenn dieselbe Aussage anderswo ebenfalls steht. **Kapitel 3 ist davon ausgenommen.** Ob sein Detailwissen adäquat in eine finale Projektdokumentation übernommen wurde, lässt sich von hier aus nie sicher beurteilen — und fehlt es dort, fehlt es im Servicefall ganz. Entfernt wird eine so redundant gewordene Festlegung nie stillschweigend, sondern über den Lebenszyklus wie jede andere auch: mit einer `retired`-Zeile, die den Grund nennt (Kapitel 1.7.6).
+
+> Geprüft: Ok.
 
 ## 1.4 Die Begriffe im Überblick
 
@@ -203,7 +207,7 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 
 **Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
 
-> Geprüft: offen
+> Geprüft: ok.
 
 ## 1.5 Bild des fertigen Systems
 
@@ -439,15 +443,19 @@ Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, waru
 
 **Umkehrbarkeit.** Alles, was die Erstanlage erzeugt, ist gewöhnlicher Text und eine Konfigurationsdatei. Die Form ist keine Festlegung auf Dauer: Wer später von der Einstiegsform zur Dreiteilung wechselt, verschiebt Prosa und ändert Rollenmarker; IDs, Register und Ereigniszeilen bleiben davon unberührt, weil keine von ihnen an einer Datei oder einem Kapitel hängt (Bedingung 2 in Kapitel 2.2).
 
+> Geprüft: Ok.
+
 ### 1.7.2 Einstieg in eine vorhandene Doku
 
-Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration**: Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1 und 3.2.7). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.7.5).
+Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration** — außer der Entwickler fordert eine ausdrücklich; abgefragt wird das nie (Kapitel 3.2.7, die Fähigkeit dazu trägt der Skill `konzept-segmentierung`): Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.7.5).
+
+> Geprüft: kleiner Ergänzung -> bitte gegenprüfen. Sonst ok.
 
 ### 1.7.3 Laufende Pflege während der Implementierung
 
 Was der Vorläufer die Arbeitsschleife nannte (Anhang A, Abschnitt A.8), bleibt: Doku und Code entstehen im Wechsel, nicht nacheinander. Neu ist die Buchführung, die dabei mitläuft — Marker und Registerzeilen werden mit der Ausführung eines freigegebenen Plans geschrieben, Reibung wird vermerkt, wenn ein Sonderfall nur wegen einer Festlegung existiert, und eine verworfene Idee hinterlässt eine Bestätigungszeile. Der Entwickler sieht davon den Planabschnitt „Berührte Festlegungen" und sonst nichts. Was dabei überhaupt in die Prosa aufgenommen wird, statt dem Code oder einer anderen Dokumentation überlassen zu bleiben, steht in Kapitel 1.3.7.
 
-**Dazu gehört eine Festlegung darüber, wo eine Planung liegt — und die muss der Skill treffen.** Der Vorläufer verlangte, jede Planung in den Fahrplan zu schreiben, beim betreffenden Schritt ausdetailliert. Das hat sich als falsch erwiesen: Der Fahrplan trägt, **was** zu tun ist und in welcher Dringlichkeit, nicht **wie** — er ist keine Dokumentation und keine Planungsablage. Die Formulierung „in aufgabenangemessener Detaillierung" meinte die Präzision des Ziels und wurde als Ausbreitung des Weges gelesen.
+**Dazu gehört eine Festlegung darüber, wo eine Planung liegt — und die muss der Skill treffen.** Der Vorläufer verlangte, jede Planung in den Fahrplan zu schreiben, beim betreffenden Schritt ausdetailliert. Das hat sich für viele Fälle als ungünstig erwiesen: Der Fahrplan trägt, **was** zu tun ist und in welcher Dringlichkeit, nicht **wie** — er ist keine Dokumentation und keine Planungsablage, sofern der Nutzer das nicht explizit einfordert (entschieden am 2026-09-24). Warum das so ist und woran es sich zeigte, steht in Kapitel 3.4.3.
 
 Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anweisungen widersprechen sich. Die globale Regel nennt drei mögliche Orte und fragt, wenn keiner geregelt ist; die Projektregel dieses Repositories verbietet eigene Plan-Dateien. Solange beides nebeneinandersteht, hängt die Antwort davon ab, welche Datei zuerst gelesen wird. Der Skill entscheidet die Frage einmal für alle Projekte, und die globale Regel tritt dann von selbst zurück — sie gilt nur, „wenn der Ablageort nicht klar geregelt ist".
 
@@ -459,7 +467,9 @@ Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anw
 > Optionen: je Punkt (a) übernehmen, (b) ändern — wie?, (c) streichen.
 > Vorschlag: alle vier übernehmen; die Zehn-Sätze-Grenze ist eine Schätzung beim Eintragen, kein Messwert.
 > Gewicht: groß · Blockiert: Fahrplanschritt 2
-> Antwort:
+> Antwort: Ich weiß nicht, was die Frage eigentlich von mir will.
+
+> Prüfung 1.7.3 allgemein: Die Punkte lesen sich, wie aus einem anderen Zusammenhang gerissen. Bitte prüfen!
 
 ### 1.7.4 Auswirkungen einer Änderung finden
 
@@ -471,6 +481,8 @@ Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anw
 
 **Was der Skill stattdessen tut.** Aus dem Text lässt sich ablesen, welche Festlegungen miteinander in Beziehung stehen: Sie werden im selben Absatz genannt, im selben Abschnitt, oder sie werden in einem Text mit der Funktion `relate` gemeinsam zitiert. Daraus entsteht ein Geflecht, über das sich von einer geänderten Festlegung aus **Kandidaten** einsammeln lassen — dazu Treffer der Suchschlüssel als eigene Quelle. Das Skript liefert diese Kandidaten mit der Angabe, **warum** jeder einer ist. Die Instanz entscheidet je Kandidat, ob er wirklich betroffen ist, und nennt bei den bestätigten die gemessenen Umbaukosten. Die Entscheidung bleibt also beim Urteil, die Vollständigkeit der Vorlage bei der Mechanik.
 
+**Wer die Suchschlüssel wählt und pflegt** (entschieden am 2026-09-24, vormals Q-05): die Instanz, beim Anlegen der Festlegung — sichtbar im Planabschnitt, damit der Entwickler sie korrigieren kann, ohne dass sie eine eigene Frage kosten. Gepflegt werden sie nur bei Reibung oder wenn `mentions` sichtbar Erwähnungen verfehlt.
+
 **Die Spannung, die das Verfahren aushalten muss.** Zwei Anforderungen ziehen gegeneinander. Die Liste soll **kurz** sein, denn jeder Kandidat kostet eine Entscheidung der Instanz, und eine lange Liste bei jedem Schritt macht den Skill teuer. Die Liste soll **vollständig** sein, denn ein übersehener Kandidat ist genau der Fehler, den das Verfahren verhindern soll. Aufgelöst wird das durch einen Abbruchwert: Wie weit die Suche reicht, ist einstellbar — eng in der Lage `execute`, weiter in der Lage `design`. Wo die richtige Weite liegt, ist nicht auszurechnen, sondern zu messen; deshalb prüft die Probe beides, die Länge der Liste **und** wie viel davon die Instanz nicht als unerheblich verwirft (Kapitel 3.8).
 
 **Woran sich das Verfahren rechtfertigt.** Für Festlegungen, die den geänderten Gegenstand nennen, genügen die Suchschlüssel. Das Geflecht verdient sich allein an den anderen. Stellt die Probe fest, dass es keine solchen Funde gibt, ist die Rechnung überflüssig und der Skill behält nur die Erwähnungssuche. Diese eine Zahl entscheidet über den Bestand des ganzen Teils.
@@ -481,34 +493,34 @@ Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anw
 
 **Eine Wahl, die der Entwickler bewusst treffen können muss.** Die Rechnung läuft ohne jede fremde Bibliothek; sie kann aber eine benutzen, wenn eine vorhanden ist, und rechnet dann schneller und in mehr Varianten. Vorhanden ist so etwas auf einem Entwicklungsrechner meist nur zufällig — und **was niemand kennt, installiert niemand.** Deshalb gilt: Braucht der Skill die Rechnung zum ersten Mal und die Bibliothek fehlt, erklärt die Instanz dem Entwickler in zwei Sätzen, was sie besser machen würde, und fragt. Er kann sie installieren lassen, selbst installieren oder ablehnen — und **seine Antwort wird festgehalten**, damit die Frage nie zweimal kommt. Drei Zustände sind zu unterscheiden: noch nicht geprüft und nicht gefragt (der Anfangszustand), benutzen, nicht benutzen. Ohne die Bibliothek arbeitet der Skill vollständig weiter; sie ist Beschleunigung, nicht Voraussetzung. Die Einzelheiten stehen in Kapitel 3.5.2 und 3.6.1.
 
-> **[Q-05] Entscheidungsgrundlage — Suchschlüssel**
-> Kontext: Zwei bis vier markante Begriffe je Festlegung im Register finden unmarkierte Erwähnungen (`mentions`) und liefern Kandidaten außerhalb des Graphen (`impact`). Wer sie wählt und pflegt, entscheidet über ihre Qualität.
-> Optionen: (a) die Instanz wählt sie beim Anlegen der Festlegung, Pflege nur bei Reibung oder wenn `mentions` sichtbar Erwähnungen verfehlt; (b) der Entwickler bestätigt sie im Planabschnitt wie die übrigen Attribute; (c) ohne Suchschlüssel, nur Marker.
-> Vorschlag: (a), mit Anzeige im Planabschnitt, damit Du sie korrigieren kannst, ohne dass sie eine eigene Frage kosten.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 1
-> Antwort:
+> Prüfung: Im letzten Abschnitt wird von einer Wahl gesprochen, fremde Bibliotheken einzubinden, indem der Nutzer sie installiert. Warum wird nicht konkret die betreffende Bibliothek genannt, die dann auch im Script benutzt wird? Bitte prüfe das, wie wir das hier machen.
 
 > **[Q-06] Entscheidungsgrundlage — Zitatmarker außerhalb der Funktion `relate`**
 > Kontext: Pflicht sind Zitatmarker nur in Abschnitten mit Funktion `relate`; in Bausteinkapiteln untereinander sind sie optional. Ob `mentions` ohne sie zu viel übersieht, kann erst die Probe zeigen.
 > Optionen: (a) bei „optional" bleiben und die Probe entscheiden lassen; (b) von vornherein Pflicht überall (Skill-Parameter `marking: full` als Standard).
 > Vorschlag: (a).
 > Gewicht: klein · Blockiert: nichts vor der Probe
-> Antwort:
+> Antwort: Wie soll so eine Probe ablaufen? Hier in der Entwicklung des Skills? In den ersten Anwendungsfällen? Eine Probe-Funktion in allen Projekten, die den Skill nutzen (also als Teil des Skills selbst)?
 
 > **[Q-20] Entscheidungsgrundlage — Das Graphenmodell (gesondert zu besprechen)**
 > Kontext: Du hast die Aussage „eine Kante entsteht, wenn zwei Festlegungen im selben Absatz genannt werden" als allgemeingültige Definition angezweifelt und eine gesonderte Besprechung gewünscht. 3.6.5 ist der Vorschlagsstand: Knoten sind Festlegungen; Kanten entstehen aus gemeinsamem Vorkommen (Absatz, Abschnitt, Nachbarabschnitt, Kapitel) mit abnehmenden Gewichten; Suchschlüssel-Treffer sind eine Quelle außerhalb des Graphen. Offen ist grundsätzlich: Was soll eine Kante bedeuten — „steht im Text nahe" oder „hängt inhaltlich zusammen"? Beides deckt sich nur teilweise, und nur das Erste ist mechanisch.
 > Optionen: hier nur Sammelstelle für Gesichtspunkte; die Besprechung führt zur Festlegung.
 > Vorschlag: keiner vorab.
 > Gewicht: groß · Blockiert: Fahrplanschritt 5
-> Antwort:
+> Antwort: 
+
+> 1) Was soll eine Kante bedeuten: „steht im Text nahe", wobei die Nähe nicht allein von der Anzahl der Wörter dazwischen umgekehrt proportional abhängt, sondern die Funktion auch ein schließt, ob im gleichen Abschnitt oder im gleichen Kapitel. -> Nur so etwas lässt sich mechanisch testen.
+> 2) „hängt inhaltlich zusammen" wäre natürlich das bessere Kriterium. Aber wie will man das in einer Größe ausdrücken? Das kann man eigentlich nur parallel zur mechanischen Bestimmung per Agent "beurteilen" lassen. Jedoch wäre das für jeden einzelnen Fakt sehr teuer. Kann das funktionieren?
 
 ### 1.7.5 Einen Bereich neu denken
 
 Die Leistung, um derentwillen das Vorhaben begonnen wurde (1.2, Fehlbild Gesetz). Bittet der Entwickler um Alternativen oder bringt eine Idee, liest die Instanz die Doku als **Stand, nicht als Vorgabe**, führt den Gedanken zu Ende und parkt jede Kollision in einem Satz, statt sie als Ablehnung zu formulieren. Welche Festlegung dabei wie schwer wiegt, sagt ihre Härte (Kapitel 3.1).
 
+> Geprüft: Ok.
+
 ### 1.7.6 Prüfen und Aufräumen
 
-Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze — Letztere erkannt über einen gespeicherten Fingerabdruck je Definitionssatz (Kapitel 3.6 und 3.7).
+Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze — Letztere erkannt über einen gespeicherten Fingerabdruck je Definitionssatz (entschieden am 2026-09-24, vormals Q-04). Bevor eine Abweichung der Instanz gemeldet wird, prüft das Skript rein mechanisch, ob nur wenige Einzelzeichen abweichen — ein Hinweis auf reine Formatierung oder Rechtschreibung: Dann ist das keine Entscheidungsgrundlage, sondern löst nur eine stille Neuberechnung des Fingerabdrucks aus (Kapitel 3.6 und 3.7).
 
 **Der Lebenszyklus einer Festlegung ist Teil dieser Leistung, und er hat einen eigenen Grund.** Eine Festlegung, die überholt ist, verschwindet nicht einfach. Bliebe ihr Satz unmarkiert in der Prosa stehen, läse die Instanz ihn beim nächsten Mal als gültig — und das Fehlbild Gesetz wäre an genau dieser Stelle zurück, mit einer Festlegung, die niemand mehr vertritt. Deshalb gilt: **Was überholt ist, darf nicht unmarkiert dastehen.** Es bekommt entweder eine Nachfolgerin (`superseded … by`) oder entfällt ersatzlos (`retired`); der Eintrag im Register bleibt in beiden Fällen mit Datum bestehen.
 
@@ -516,30 +528,15 @@ Das hat einen zweiten Nutzen, der im Alltag mehr wiegt als der erste: **Alte Ver
 
 Ob ein überholter Absatz in der Prosa stehen bleibt, entscheidet der Entwickler im Einzelfall — weil er als Begründung der Änderung noch wirkt, weil er Kontext verwässert, oder weil gerade keine Zeit ist. Der Mechanismus verlangt nur den Marker. Die drei Fälle und ihre Behandlung stehen in Kapitel 3.2.6.
 
-> **[Q-04] Entscheidungsgrundlage — Fingerabdruck: ob und wie**
-> Kontext: Der Fingerabdruck erkennt, dass ein Definitionssatz geändert wurde, und löst die Meldung „Zitatstellen prüfen" aus (Idee aus Doorstops „suspect links"). Er kostet je Festlegung eine Registerzeile und erzeugt bei kosmetischen Edits Rauschen, das nur die Normalisierung dämpft (U+00A0, Leerraum, Satzzeichen am Ende, Kleinschreibung).
-> Optionen: (a) in Stufe 2 des Skripts bauen und in der Probe messen; (b) weglassen, Änderungspropagation nur über Marker und Suchschlüssel; (c) erst nach der Probe entscheiden.
-> Vorschlag: (a); die Probe misst das Rauschen (Kapitel 3.8).
-> Gewicht: mittel · Blockiert: Fahrplanschritt 5
-> Antwort:
-
 ### 1.7.7 Keine Unterstützung
 
-Ein Projekt kann den Skill abwählen (`mode: off`). Dann fordert er nichts, schlägt nichts vor und zitiert keine Regel; vorhandene Doku wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt (Kapitel 3.5.1). Das ist eine gültige Betriebsart, keine Nachlässigkeit.
+**Fehlt die Skill-Parameterdatei oder das Feld `mode`, wird nicht stillschweigend `on` angenommen** (entschieden am 2026-09-24, vormals Q-16): Die Instanz fragt einmal je Sitzung, ob der Skill hier geführt werden soll — wie `git-workbench` es tut —, und bietet an, die Skill-Parameterdatei anzulegen. Lehnt der Entwickler ab, fragt sie zusätzlich, ob `mode: off` trotzdem in einer Skill-Parameterdatei festgehalten werden soll, damit die Frage nicht wiederkehrt. Sagt er zu, folgt danach — nicht gleichzeitig — die eigentliche Erstanlage- oder Einstiegsfrage (Kapitel 1.7.1/1.7.2, Kapitel 3.5.1).
 
-> **[Q-16] Entscheidungsgrundlage — Standardwert von `mode`**
-> Kontext: Fehlt die Skill-Parameterdatei, gilt der Standard. `on` heißt: Der Skill führt das Projekt, sobald der Trigger feuert (mit der Bremse aus Q-15). `ask` hieße: einmal je Sitzung fragen, wie `git-workbench` es tut.
-> Optionen: (a) `on`; (b) `ask`, mit Angebot, die Skill-Parameterdatei anzulegen; (c) `off` — nur Projekte mit Skill-Parameterdatei führen den Skill.
-> Vorschlag: (a) mit Q-15 (a): Der Skill wird erst spürbar, wenn er etwas zu tun hat.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 3
-> Antwort:
+Ein Projekt kann den Skill auch ausdrücklich abwählen (`mode: off`). Dann fordert er nichts, schlägt nichts vor und zitiert keine Regel; vorhandene Doku wird vor Änderungen gelesen und dort gepflegt, wo das Projekt sie selbst pflegt (Kapitel 3.5.1). Das ist eine gültige Betriebsart, keine Nachlässigkeit.
 
-> **[Q-31] Entscheidungsgrundlage — Trigger-Anker nach Einführung von `mode: off`**
-> Kontext: Der Trigger „bevor du zum ersten Mal einen Lösungsweg vorschlägst oder eine Datei änderst … über eine lokale Korrektur hinaus" lädt den Skill in jedem Projekt. Mit `mode: off` endet er sofort wieder; das kostet einen Ladevorgang je Sitzung in Projekten, die ihn nicht wollen.
-> Optionen: (a) Anker unverändert lassen, `mode: off` erledigt den Rest; (b) den Anker in der `CLAUDE.md` des Projekts entfernen, wenn `mode: off` gesetzt wird; (c) Anker nur in die globale Datei, Abwahl über die Projekt-`CLAUDE.md`.
-> Vorschlag: (a) — ein Ladevorgang mit sofortigem Ende ist billiger als zwei Stellen, die zusammenpassen müssen.
-> Gewicht: klein · Blockiert: Fahrplanschritt 9
-> Antwort:
+**Der Trigger, der den Skill überhaupt lädt, bleibt davon unberührt** (entschieden am 2026-09-24, vormals Q-31): Ein Ladevorgang mit sofortigem Ende — der Skill endet bei `mode: off` sofort wieder — ist billiger als zwei Stellen, die zusammenpassen müssten.
+
+> Geprüft: Ok.
 
 ## 1.8 Der Arbeitsablauf entlang der Anker
 
@@ -554,6 +551,8 @@ Abschnitt 1.7 sagt, **welche** Leistungen der Skill erbringt; dieser Abschnitt s
 
 Ein Projekt, dessen Doku noch keinen Marker trägt, kommt am Berührungspunkt in das Schema: Nur die Festlegungen, die ein Schritt tatsächlich berührt, werden markiert — über den Plan, nie als Gesamtmigration. Eine völlig unmarkierte Doku erhält den wichtigsten Gewinn sofort, weil das Auffangergebnis der Härteliste zusammen mit der Lage „entwerfend" das Parken von Kollisionen statt ihres Abschusses bedeutet.
 
+> Geprüft: Ok.
+
 ## 1.9 Der Weg zur Fertigstellung
 
 Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Register und Marker, Planung und Skillstart; das Skript in zwei Stufen; die Hooks; das Zusammensetzen des Skills; die Probe; die Migration aus den bisherigen Anweisungsdateien.
@@ -567,11 +566,15 @@ Der Fahrplan (`work-plan.md`) führt neun Arbeitspakete: die Regelteile für Reg
 > Optionen: je Zeile (a) übernehmen, (b) Schwelle ändern, (c) Messgröße streichen oder ergänzen.
 > Vorschlag: übernehmen; die Zeile „Kontext-Mehraufwand" ist die unsicherste, weil grob messbar.
 > Gewicht: mittel · Blockiert: Fahrplanschritt 8
-> Antwort:
+> Antwort: Bitte im Chat mit Kontext nochmal die Frage stellen.
+
+> Geprüft: Ok.
 
 ## 1.10 Was dieses Vorhaben nicht ist
 
 Keine Oberfläche, keine Editor-Erweiterung. Keine Einbettung fremder Werkzeuge (Anforderungs-Tracing, Entscheidungsverwaltung); ihre Ideen — Fingerabdruck, kaskadierende Meldung bei Änderung, Lebenszyklus mit Nachfolger — werden übernommen, nicht ihre Programme. Keine semantische Suche; Zusammenhänge kommen aus Markern, Nähe im Text und Suchschlüsseln. Kein automatisches Umschreiben von Prosa; das Skript listet, die Instanz schlägt im Plan vor, der Entwickler gibt frei. Kein Lesen fremder ID-Systeme; das ist eine spätere Ausbaustufe.
+
+> Geprüft: Ok.
 
 ## 1.11 Verhältnis zum Vorläufer
 
@@ -580,3 +583,5 @@ Keine Oberfläche, keine Editor-Erweiterung. Keine Einbettung fremder Werkzeuge 
 Sein Regeltext bleibt der Sache nach erhalten und wird zum Regelteil `standard.md`, mit drei Anpassungen: Die drei Segmente werden zu empfohlenen Rollen (Kapitel 3.3), nicht zu verlangter Struktur. Die Phasen gelten je Bereich, nicht je Projekt — ein Bereich kann in die Findung zurück, während der Rest in der Implementierung bleibt; die Lage „entwerfend" ist die Findungs- und Fixierungsphase für diesen Bereich. Und die Regel, wo ein Plan steht, wird durch Kapitel 3.4 ersetzt.
 
 Was der Vorläufer nicht leisten konnte und was dieses Vorhaben deshalb hinzufügt: Abweichungen und Vereinfachungen der Struktur mussten bei kleineren Projekten immer wieder neu ausgehandelt und zusätzlich in Anweisungen gebacken werden; Umstrukturierungen und Kapitelneunummerierungen waren aufwändig und fehleranfällig. An die Stelle beider Mühen treten Rollen statt Nummern, Marker statt Struktur und das Register.
+
+> Geprüft: Ok.

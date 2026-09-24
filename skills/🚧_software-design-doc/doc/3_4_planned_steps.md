@@ -22,7 +22,7 @@ Fehlt in einem bestehenden Fahrplan jedes Umbauziel — der Normalfall bei Einf�
 
 ### 3.4.3 Inhalt eines geplanten Schritts und Ablageorte einer Planung — Vorschlag
 
-Ein geplanter Schritt beschreibt das Ziel, den Grund seiner Dringlichkeit, sein Umbauziel und, wo vorhanden, den Verweis auf die Planung. Er beschreibt nicht den Weg. Die frühere Formulierung „in aufgabenangemessener Detaillierung" war die Wurzel eines Missverständnisses: Gemeint war die Präzision des Ziels, gelesen wurde die Ausbreitung des Weges.
+Ein geplanter Schritt beschreibt das Ziel, den Grund seiner Dringlichkeit, sein Umbauziel und, wo vorhanden, den Verweis auf die Planung. Er beschreibt nicht den Weg — außer der Entwickler fordert das für einen Schritt ausdrücklich ein (entschieden am 2026-09-24, Kapitel 1.7.3). Die frühere Formulierung „in aufgabenangemessener Detaillierung" war die Wurzel eines Missverständnisses: Gemeint war die Präzision des Ziels, gelesen wurde die Ausbreitung des Weges.
 
 Wo eine Planung steht, entscheidet sich bei jeder Planung einzeln nach Länge und Haltbarkeit, nicht einmal je Projekt:
 

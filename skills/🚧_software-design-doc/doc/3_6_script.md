@@ -101,6 +101,8 @@ Prüft nur geänderte Zeilen der übergebenen Datei (Git-Diff gegen den Index un
 
 Kurzhash (acht Hexzeichen aus SHA-256) des Definitionssatzes nach Normalisierung: U+00A0 zu Leerzeichen, Leerraum zusammengezogen, Satzzeichen am Ende entfernt, Kleinschreibung. `fp ID` vergleicht mit dem Register und meldet „Definition geändert"; `check` tut es für alle. Nur Meldung, nie Blockade — die Idee stammt aus Doorstops „suspect links" (Anhang B).
 
+**Mechanische Vorprüfung vor der Meldung** (entschieden am 2026-09-24, vormals Q-04): Weicht der Fingerabdruck ab, vergleicht das Skript zusätzlich den alten mit dem neuen Definitionssatz (nach derselben Normalisierung) über eine Edit-Distanz. Liegt sie unterhalb einer Schwelle, gilt das als reine Formatierungs- oder Rechtschreibkorrektur: keine Meldung, das Skript berechnet den Fingerabdruck still neu. Erst oberhalb der Schwelle meldet `fp`/`check` „Definition geändert". Die genaue Schwelle — wie viele Einzelzeichen als „wenige" gelten — ist noch offen und wird bei der Umsetzung in der Probe gemessen (Kapitel 3.8).
+
 ### 3.6.8 Prüffälle
 
 Eine Fixture-Doku mit Register, geplanten Schritten und Code-Kommentaren (Kapitel 3.8) und dazu absichtlich beschädigte Varianten. Für jedes Kommando: erwartete `ITEM`-Zeilen auf der guten Fixture, erwartete `FINDING`- oder `FAILED`-Zeilen auf den beschädigten. „Keine Befunde" gilt erst als belegt, wenn die beschädigten Varianten gefunden werden.
