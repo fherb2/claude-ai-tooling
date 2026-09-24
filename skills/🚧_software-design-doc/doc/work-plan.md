@@ -10,10 +10,6 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 
 | Q | Thema | Ort | Gewicht | Blockiert |
 |---|---|---|---|---|
-| Q-12 | Inhalt geplanter Schritte, Ablageorte (früher T2) | 1.7.3 | groß | 2 |
-| Q-06 | Zitatmarker außerhalb `relate` | 1.7.4 | klein | — |
-| Q-20 | Graphenmodell (gesondert) | 1.7.4 | groß | 5 |
-| Q-28 | Messgrößen und Schwellen der Probe | 1.9 | mittel | 8 |
 | Q-13 | Kapitelziel über Dateipfad | `3_4_planned_steps.md`, 3.4.4 | mittel | 2 |
 | Q-14 | Kennungen für Schritte | 3.4.4 | klein | 2 |
 | Q-17 | `layout` als Skill-Parameter | `3_5_startup_parameters.md`, 3.5.5 | klein | 3 |
@@ -26,7 +22,7 @@ Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext 
 | Q-29 | Verbleib der Werkzeug-Skills | `3_9_migration.md`, 3.9.5 | mittel | 9 |
 | Q-30 | Reihenfolge der Freigaben beim Umzug | 3.9.5 | klein | 9 |
 
-Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01 bis Q-05, Q-07 bis Q-11, Q-15, Q-16, Q-19, Q-25, Q-26, Q-31 und Q-32. Vor Schritt 2: Q-12 bis Q-14. Die übrigen blockieren spätere Schritte.
+Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01 bis Q-12, Q-15, Q-16, Q-19, Q-20, Q-25, Q-26, Q-28, Q-31 und Q-32. Vor Schritt 2: Q-13, Q-14. Die übrigen blockieren spätere Schritte.
 
 ## 1 Regelteil Marker und Register
 
@@ -34,7 +30,7 @@ Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerf
 
 ## 2 Regelteil Planung
 
-Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: Q-12 bis Q-14. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
+Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: Q-13, Q-14. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
 
 ## 3 Regelteil Skillstart
 
@@ -46,7 +42,7 @@ Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Fragen, Skill-Parameterd
 
 ## 5 Skript Stufe 2
 
-`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4; Q-20, Q-21. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
+`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4; Q-21. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
 
 ## 6 Hooks
 
@@ -58,7 +54,7 @@ Dünne `SKILL.md` (Lage, Skill-Parameter, Nachladen, Frontmatter-Hooks), `standa
 
 ## 8 Probe
 
-Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Kostenfunktion, Fingerabdruck, H3, Zitatmarker außerhalb `relate`); zweiter Durchlauf an einer echten Doku empfohlen. Hängt an: Schritt 4 bis 7; Q-28. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Die Fixture ist nicht die Doku des Entwicklers.
+Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Kostenfunktion, Fingerabdruck, H3, Zitatmarker außerhalb `relate`); zweiter Durchlauf an einer echten Doku empfohlen. Hängt an: Schritt 4 bis 7. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Die Fixture ist nicht die Doku des Entwicklers.
 
 ## 9 Migration und Installation
 

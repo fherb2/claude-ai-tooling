@@ -1,6 +1,6 @@
 ## 3.8 Die Probe
 
-Stand (2026-09-17): Vorschlag; die Messgrößen und Schwellen sind vom Entwickler noch nicht bestätigt (Q-28, Kapitel 1.9).
+Stand (2026-09-24): Vorschlag; die Messgrößen und Schwellen sind vom Entwickler bestätigt (vormals Q-28, Kapitel 1.9).
 
 ### 3.8.1 Gegenstand
 
