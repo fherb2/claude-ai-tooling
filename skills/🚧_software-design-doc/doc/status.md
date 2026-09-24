@@ -26,7 +26,7 @@ Die Nummern werden nicht neu vergeben.
 | Q-05 | Suchschlüssel | 2026-09-24 | Kapitel 1.7.4 — (a): die Instanz wählt sie beim Anlegen, sichtbar im Planabschnitt; Pflege nur bei Reibung oder verfehlten Erwähnungen |
 | Q-31 | Trigger-Anker nach `mode: off` | 2026-09-24 | Kapitel 1.7.7 — (a): Anker bleibt unverändert |
 | Q-04 | Fingerabdruck: ob und wie | 2026-09-24 | Kapitel 1.7.6 und 3.6.7 — (a), vom Entwickler ergänzt: vor der Meldung prüft das Skript mechanisch die Edit-Distanz; unterhalb einer noch offenen Schwelle nur stille Neuberechnung statt Meldung |
-| Q-16 | Standardwert von `mode` | 2026-09-24 | Kapitel 1.7.7 und 3.5.1/3.5.2 — (b): einmal je Sitzung fragen (wie `git-workbench`), Standard in der Tabelle jetzt „erfragt"; vom Entwickler ergänzt: bei Ablehnung zusätzlich fragen, ob `mode: off` festgehalten werden soll |
+| Q-16 | Standardwert von `mode` | 2026-09-24 | Kapitel 1.7.7 und 3.10.2/3.5.2 — (b): einmal je Sitzung fragen (wie `git-workbench`), Standard in der Tabelle jetzt „erfragt"; vom Entwickler ergänzt: bei Ablehnung zusätzlich fragen, ob `mode: off` festgehalten werden soll |
 | Q-12 | Inhalt geplanter Schritte, Ablageorte einer Planung | 2026-09-24 | Kapitel 1.7.3 und 3.4.3 — alle vier Punkte übernommen, nach Rückfrage des Entwicklers selbständig verständlich neu formuliert |
 | Q-06 | Zitatmarker außerhalb der Funktion `relate` | 2026-09-24 | Kapitel 1.7.4 — (a): optional, die Probe entscheidet |
 | Q-20 | Das Graphenmodell | 2026-09-24 | Kapitel 1.7.4 und 3.6.5 — mechanische Nähe (Absatz/Abschnitt/Nachbarabschnitt/Kapitel); „hängt inhaltlich zusammen" bleibt der Instanz vorbehalten, nachgelagert je Kandidat der Vorauswahl, nicht als eigene Berechnung im Graphen |
