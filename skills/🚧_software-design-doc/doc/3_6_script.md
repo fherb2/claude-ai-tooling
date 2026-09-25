@@ -67,6 +67,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 | `mentions --ids … [--code ORDNER] [--out DATEI]` | Doku, optional Code | je ID die Zahl der Fundorte und die Fundorte selbst; mit `--out` nur Zahlen und Pfad | 0 |
 | `hardness --ids … [--word fixed\|open]` | Register, geplante Schritte, Skill-Parameter | `ITEM` je ID mit Härte und zutreffender Bedingung in Prosa (R1–R7) | 0 |
 | `fp --ids … [--update]` | Doku | je ID Fingerabdruck und Vergleich mit dem Register | 0/1 |
+| `notes [--class open] [--chapter DATEI] [--ids …] [--since COMMIT] [--out DATEI]` | Commit-Verlauf | `ITEM` je Notiz: Klasse, Art, Ort, Wiederfindehinweis, Grund, Commit, Datum | 0 |
 | `supersede --pairs ALT:NEU,…` · `retire --ids …` | Register | schreibt die Lebenszykluszeilen; listet je ID die verbleibenden Zitate | 0 |
 
 **Auskunftskommandos** — für die Nachfrage des Entwicklers; sie kommen im Ablauf nicht vor und dürfen deshalb einstellig bleiben:
@@ -78,6 +79,16 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 | `next-id` | Register | nächste freie ID | 0 |
 
 Was ein Kommando **nicht** hat, ist ebenso Festlegung: Es gibt kein `add` für eine einzelne Registerzeile. Registerzeilen entstehen ausschließlich über `apply` aus einem freigegebenen Plan — in einem Aufruf, nicht in zehn (Kapitel 1.3.6).
+
+**Das Kommando `notes` liest die Notizen aus dem Commit-Verlauf** (entschieden am 2026-09-25). Wozu sie da sind, steht in Kapitel 1.3.5, ihre Form in 3.2.9. Für die Umsetzung gilt dreierlei.
+
+Es ist **allgemein gehalten**: Ohne Argumente liefert es alles, was der Trailer-Vorlage entspricht — jede `ADoc-`-Klasse, nicht nur die heute einzige. Der Filter `--class` grenzt auf eine Klasse ein, `--chapter` und `--ids` auf einen Bereich. So muss die Instanz nicht wissen, wo sie suchen soll: Sie fragt einmal quer über alles und entscheidet dann selbst, was zur aktuellen Frage gehört. Kommen später weitere Klassen dazu, erscheinen sie ohne Änderung am Kommando.
+
+Es sucht **immer über den vollständigen Verlauf**, sofern nicht `--since` etwas anderes sagt. Die Messung (3.2.9) macht jede Begrenzung überflüssig, und eine Begrenzung wäre die häufigste Ursache dafür, dass ein alter Faden nicht mehr gefunden wird.
+
+**Die Ausgabe ist zum Durchsuchen gebaut, nicht zum Lesen.** Sie folgt dem zweiten Rückgabeweg aus Kapitel 1.3.6: Bei mehr als einer Handvoll Einträgen schreibt das Skript das volle Ergebnis in eine Datei und gibt inline nur die Zahlen, die ersten Einträge und den Pfad zurück; die Instanz sucht dann in der Datei mit `grep` oder liest gezielt nach, statt alles in den Kontext zu kopieren. Die Datei trägt eine Zeile je Notiz mit denselben Feldern wie der Trailer, ergänzt um Commit und Datum — durchsuchbar nach Datei, nach ID und nach Art.
+
+**Wann es läuft:** beim Öffnen eines Bereichs zusammen mit dem Abgleich, der dort ohnehin stattfindet — bei diesen Laufzeiten gibt es keinen Grund, daraus einen zweiten Aufruf zu machen (Vorgabe 2.7) —, und auf Nachfrage, wenn jemand wissen will, was insgesamt offen ist.
 
 ### 3.6.5 Das Auswirkungsmodul
 
