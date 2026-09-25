@@ -45,6 +45,8 @@ Exit-Codes: 0 bei `OK` ohne Befunde, 1 bei Befunden oder Entscheidungsvorlagen, 
 
 Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` oder `OK` aus; `DECIDE` ist die Ausnahme für das, was sich nicht kodieren lässt (Vorgabe 2.6). Die Trennung ist sichtbar: Ein `ITEM` ist Fakt, ein `DECIDE` ist Vorlage.
 
+**Befund B-07 (2026-09-25): Ein Absturz des Skripts würde den Commit blockieren.** Oben steht Exit-Code 2 für zwei verschiedene Dinge: für `FAILED`, also den Abbruch des Skripts selbst, und für strukturelle Inkonsistenz zwischen Prosa und Register. Der Hook vor dem Commit wertet genau diesen Code als Blockade — das ist die Mechanik von Claude Code, kein Entwurf von uns (Kapitel 3.7.2). Dieselbe Tabelle dort erwartet zugleich, dass ein `FAILED` mit Exit 1 zurückkommt und den Commit durchlaufen lässt. Beides zusammen geht nicht. Sachlich ist die Richtung klar, denn Kapitel 1.3.5 nennt genau einen blockierenden Eingriff des Skills, und das ist die strukturelle Inkonsistenz; ein Defekt des Skripts gehört nicht dazu, sonst hält ein Programmierfehler die Arbeit an. Zu entscheiden ist die Umsetzung: entweder zwei getrennte Codes — 2 nur für die Inkonsistenz, ein anderer für `FAILED` — oder ein eigener Hook-Modus, in dem das Skript den Unterschied selbst macht. Die Folge trifft auch die Tabelle in 3.7.2.
+
 ### 3.6.4 Kommandos
 
 **Ankerkommandos** — je einer Handlung des Ablaufs zugeordnet, bündeln alles, was dort anfällt:

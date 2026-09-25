@@ -101,11 +101,13 @@ Zwei Rollen verdienen einen eigenen Satz. **`decisions` bleibt neben dem Registe
 
 **Marker werden vorgeschlagen, nicht verfügt** (entschieden am 2026-09-21). Bevor in einer Doku zum ersten Mal Marker entstehen, legt die Instanz vor, was sie einbauen will und wozu — was die Klammern leisten und was ohne sie nicht geht —, und der Entwickler entscheidet daraufhin. Er kann sie abwählen: Seine Doku bleibt dann unmarkiert, und das ist kein Fehlerzustand, sondern der Anfangszustand jedes Projekts (1.7.2). Der Skill arbeitet weiter — er liest die Doku, bestimmt die Lage und parkt Kollisionen, statt sie abzuschießen; das ist der wichtigste Gewinn, und den gibt es ohne jeden Marker (1.8). Was entfällt, ist die Buchführung: ohne Adresse kein Registereintrag zu einer Festlegung, keine Ereigniszeilen, keine Auswirkungsrechnung. Das ist etwas anderes als die Abwahl des Skills insgesamt (`mode: off`, 1.7.7) — dort tut er nichts, hier tut er, was ohne Adressen geht.
 
+**Befund B-02 (2026-09-25): Die Abwahl hat bisher keinen Ort und keine Reichweite.** Der Absatz oben sagt, dass der Entwickler die Marker abwählen kann, und zählt auf, was dann entfällt. Zwei Dinge fehlen. Erstens: Wo die Abwahl festgehalten wird. Bleibt sie ungeschrieben, legt die Instanz bei jedem neuen Berührungspunkt erneut vor, was sie einbauen will — und die Frage, die einmal beantwortet war, kehrt in jeder Sitzung wieder. Der naheliegende Ort ist die Skill-Parameterdatei, in der `marking` bereits steht (Kapitel 3.5.2); dort gibt es heute die Werte `define+relate`, `define` und `full`, aber keinen für „keine Marker". Zweitens: Wie weit die Abwahl reicht. Nach dem Wortlaut oben arbeitet der Skill weiter und liest, bestimmt die Lage und parkt Kollisionen — der Planabschnitt „Berührte Festlegungen" mit seinen Annahmen wäre dann weiterhin da, nur ohne Markervorschläge. Gemeint sein könnte aber auch, dass der Entwickler den Mechanismus insgesamt nicht will. Zu entscheiden: ob die Abwahl persistiert wird, und was in einer unmarkierten Doku vom Plan übrig bleibt.
+
 **Ein dritter Weg ist erwogen und zurückgestellt** (entschieden am 2026-09-21): Das Register könnte eine Festlegung statt über einen Marker über Datei und Wortlaut eines Kernsatzes ansprechen und die Prosa ganz unberührt lassen. Er ist fragiler — ein umformulierter Satz bricht die Adresse, und das Verfahren muss es melden, statt es zu bemerken —, und er kostet einen zweiten Ankermechanismus im Skript. Der Regeltext nennt ihn als Möglichkeit; gebaut wird er erst, wenn ein Projekt ihn braucht (Kapitel 3.2.9).
 
 Damit steht im Dokument des Entwicklers genau zweierlei vom Skill: Marker an Festlegungen und Rollen an Überschriften oder Absätzen. Beides sind Adressen. Aus einem Marker folgt nichts, ohne das Register zu lesen; aus einer Rolle folgt nichts, ohne den Skill zu lesen. **Keine Skill-Logik, kein Attribut, kein Zustand steht im Dokument des Entwicklers.** Das ist der Grundsatz, der die Doku lesbar hält und den Entwickler frei lässt, und Kapitel 2 macht ihn zur Vorgabe.
 
-> Geprüft: Ok
+> Geprüft: offen
 
 ### 1.3.4 Was dem Entwickler gehört und was er trägt
 
@@ -403,6 +405,8 @@ Das ist der Fall, in dem ein Projekt noch keine begleitende Doku hat und der Ent
 
 **Auslöser.** Nur ein ausdrücklicher Auftrag des Entwicklers. Der Skill bietet die Erstanlage **nie von sich aus an** — von selbst wächst die Doku an Festlegungen und nicht an Pflichten (Leistung 2 und 3). Ein Projekt, das nur einen Schritt zu erledigen hat, bekommt kein Gerüst, sondern eine Festlegung mit einem Zuhause.
 
+**Befund B-10 (2026-09-25): „nie von sich aus" und „der Skill schlägt vor" stehen unvermittelt nebeneinander.** Der Satz oben sagt, die Erstanlage werde nie angeboten. An anderer Stelle heißt es, die erste Festlegung, die den Code überdauert, brauche ein Zuhause — „eine Datei, die der Skill vorschlägt" (Kapitel 3.5.3, wortgleich in 1.7 als Grundsatz). Gemeint ist vermutlich ein Unterschied in der Größe: Angeboten wird nie ein **Gerüst** aus mehreren Dateien, Rollen und leerem Register; vorgeschlagen wird sehr wohl **eine einzelne Datei** in dem Moment, in dem es etwas zu verwahren gibt. Im Wortlaut ist dieser Unterschied nicht zu erkennen, und für die Instanz, die beides als Anweisung liest, sind es zwei gegenläufige Sätze. Zu entscheiden: ob die Deutung stimmt, und an welcher der beiden Stellen die Abgrenzung ausgesprochen wird.
+
 **Klärung im Gespräch, kein Formular.** Die Erstanlage folgt derselben Regel wie alles andere: Die Instanz bildet Annahmen, legt sie im Plan vor, der Entwickler korrigiert in Prosa (1.3.4). Sie arbeitet also keine Fragenliste ab, sondern liest zuerst das Projekt und legt dann **einen vollständigen Vorschlag** vor, in dem jede Annahme sichtbar ist und die verworfenen Alternativen benannt sind.
 
 Ganz ohne Klärung geht es dennoch nicht: Was sich aus dem Projekt nicht ablesen lässt und wofür es keine tragfähige Annahme gibt, wird besprochen — so wenige Punkte wie möglich, jeder mit einem Vorschlag, und die Antworten wandern in die Skill-Parameterdatei, damit sie nie zweimal erfragt werden. Dazu gehört regelmäßig die Frage, ob die Einstiegsform einen eigenen Ordner bekommt oder ihre eine Datei ohne Ordner im Projekt liegt.
@@ -443,7 +447,7 @@ Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, waru
 
 **Umkehrbarkeit.** Alles, was die Erstanlage erzeugt, ist gewöhnlicher Text und eine Konfigurationsdatei. Die Form ist keine Festlegung auf Dauer: Wer später von der Einstiegsform zur Dreiteilung wechselt, verschiebt Prosa und ändert Rollenmarker; IDs, Register und Ereigniszeilen bleiben davon unberührt, weil keine von ihnen an einer Datei oder einem Kapitel hängt (Bedingung 2 in Kapitel 2.2).
 
-> Geprüft: Ok.
+> Geprüft: offen
 
 ### 1.7.2 Einstieg in eine vorhandene Doku
 
@@ -526,7 +530,9 @@ Ein Projekt kann den Skill auch ausdrücklich abwählen (`mode: off`). Dann ford
 
 **Der Trigger, der den Skill überhaupt lädt, bleibt davon unberührt** (entschieden am 2026-09-24, vormals Q-31): Ein Ladevorgang mit sofortigem Ende — der Skill endet bei `mode: off` sofort wieder — ist billiger als zwei Stellen, die zusammenpassen müssten.
 
-> Geprüft: Ok.
+**Befund B-01 (2026-09-25): Der Skill endet, seine Hooks aber bleiben.** Zwei der drei Hooks — der Lint nach jedem Doku-Edit und der Abgleich vor jedem Commit — wohnen im Skill selbst und werden mit seinem Aufruf für den Rest der Sitzung scharfgeschaltet; das ist eine Eigenschaft der Engine und keine Wahl (Kapitel 3.7.2). Der Entscheidung oben zufolge wird der Skill auch in einem abgewählten Projekt geladen und endet dann sofort. Zwischen Laden und Enden sind die beiden Hooks jedoch bereits registriert. Ein Projekt mit `mode: off` bekäme also weiterhin Lint-Meldungen zu unmarkierten Sätzen und eine Commit-Prüfung — genau das, was „er fordert nichts, schlägt nichts vor und zitiert keine Regel" ausschließt. Wo das aufgefangen wird, steht nirgends. Der naheliegende Ort ist das Skript: Jedes Kommando liest ohnehin die Skill-Parameterdatei und könnte bei `mode: off` ohne Befund enden — dann leistet die Stille das Skript und nicht die Hook-Konfiguration. Zu entscheiden: ob das so gelöst wird und ob die Vorgaben es aussprechen müssen.
+
+> Geprüft: offen
 
 ## 1.8 Der Arbeitsablauf entlang der Anker
 

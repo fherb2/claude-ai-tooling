@@ -17,6 +17,28 @@ Vorgehen seitdem: Der Entwickler geht die Kapitel in Leseordnung durch und antwo
 | Welche Ausgabeform der Standard ist (vormals Q-23) | `2_rules.md`, 2.5 — messbar in der Probe | 4 |
 | Zuschnitt des Kapitels Migration und Installation | `3_9_migration.md`, Kopf | 9 |
 
+### Befunde der Durchsicht vom 2026-09-25
+
+Fünfzehn Befunde stehen an der Stelle, an der sie zu klären sind, als Absatz beginnend mit **Befund B-nn**. Jeder bringt seinen Kontext selbst mit. Sie werden einzeln besprochen; ein erledigter Befund wird durch den Entscheidungstext ersetzt, seine Nummer nicht neu vergeben. Auffindbar mit `grep -rn "Befund B-" doc/`.
+
+| Befund | Gegenstand | Wo |
+|---|---|---|
+| B-01 | Hooks bleiben registriert, obwohl der Skill bei `mode: off` sofort endet | 1.7.7 |
+| B-02 | Abwahl der Marker: kein Ort, keine festgelegte Reichweite | 1.3.3 |
+| B-10 | „Erstanlage nie von sich aus" gegen „eine Datei, die der Skill vorschlägt" | 1.7.1 |
+| B-04 | Aufhebbarkeit der Commit-Blockade fehlt in der Vorgabe | 2.8 |
+| B-05 | `mode` hat keinen Standardwert, die Vorgabe verlangt einen | 2.9 |
+| B-06 | Vier Aussageklassen und `FINDINGS` gegen sechs Klassen und `FINDING` | 2.5 |
+| B-08 | Stille Neuberechnung des Fingerabdrucks gegen „Kein Hook ändert eine Datei" | 2.8 |
+| B-03 | Suchschlüssel fehlen im Planabschnitt | 3.1.6, Folge in 3.6.4 |
+| B-07 | Exit-Code bei `FAILED` würde den Commit blockieren | 3.6.3, Folge in 3.7.2 |
+| B-09 | Zieltext nennt „Kapitel 1 oder 2", die es im Skill nicht gibt | 3.5.3 |
+| B-11 | Die Rollentabelle hat im ausgelieferten Skill kein Zuhause | 3.3 |
+| B-12 | 3.5.1 ist ein Stub, auf den 3.10.2 für die Erhebung verweist | 3.5.1 |
+| B-13 | Zitat-Konvention hat keine Form für Beispiele im Zieltext | Kopf von Kapitel 3 |
+| B-15 | Liste der Verzweigungen nach der Probe ist überholt | 3.8.5 |
+| B-14 | Kommandoliste dieses Fahrplans passt nicht zu Kapitel 3.6.4 | Schritt 4 unten |
+
 Keine Entscheidungen des Entwicklers, sondern technische Wahlen bei der Umsetzung sind seit dem 2026-09-25: die Kodierung des Abbruchwerts (vormals Q-18, Kapitel 3.5.2), die Kostenfunktion der Auswirkungsrechnung (vormals Q-21, Kapitel 3.6.5) und die offenen Punkte der Pfadauflösung (Kapitel 3.7.4). Sie blockieren keinen Schritt als Entscheidung, sondern nur als Arbeit.
 
 Geklärte Punkte stehen in `status.md`: Q-01 bis Q-12, Q-14 bis Q-17, Q-19, Q-20, Q-22, Q-24 bis Q-26, Q-28, Q-31 und Q-32. Gestrichen, weil sie nicht in diese Doku gehören: Q-29 und Q-30.
@@ -36,6 +58,8 @@ Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Skill-Parameterdatei, �
 ## 4 Skript Stufe 1
 
 `files/software-design-doc.py` mit `list`, `show`, `next-id`, `add`, `check`, `mentions`, `hardness`, `impact --hops`, `plan-section`, `explain`; Ausgabevertrag nach Kapitel 3.6; Prüffälle mit Fixture und beschädigten Varianten. Hängt an: Schritt 1 und 2 (für `target:`). Aufwand: 3 bis 4 Sitzungen. Fehleranfälligkeit hoch: Parsing-Ränder (U+00A0, Klammern in Prosa, umbrochenes Layout), Kapitelableitung bei verschobenen Markern. Vor dem ersten Code den Skill `common-code-generation` laden.
+
+**Befund B-14 (2026-09-25): Die Kommandoliste dieses Schritts passt nicht zur Spezifikation.** Sie nennt `list` und `add`; beide gibt es in Kapitel 3.6.4 nicht, und für `add` steht dort ausdrücklich, dass es keines gibt — Registerzeilen entstehen ausschließlich über `apply` aus einem freigegebenen Plan, in einem Aufruf statt in zehn, weil jeder Skriptaufruf die Instanz Geld kostet (Vorgabe 2.7). Umgekehrt fehlen hier die beiden Ankerkommandos `open` (Bereich öffnen) und `apply` (Plan ausführen). Die Liste stammt aus der Zeit vor dem Schnitt entlang der Anker (Kapitel 1.3.6) und wurde beim Umbau nicht nachgezogen. Vermutlich ist schlicht diese Liste nachzuführen — aber das ist zu prüfen und nicht vorauszusetzen: Ein `list` für die Nachfrage des Entwicklers wäre denkbar, auch wenn es im Ablauf nicht vorkommt.
 
 ## 5 Skript Stufe 2
 
