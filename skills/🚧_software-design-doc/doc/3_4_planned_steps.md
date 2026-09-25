@@ -1,10 +1,12 @@
 ## 3.4 Geplante Schritte und Umbauziel
 
-Stand (2026-09-24): Entschieden sind der Begriff des geplanten Schritts, die Syntax des Umbauziels, und — vormals Q-12 — der Inhalt eines geplanten Schritts sowie die Ablageorte einer Planung (der frühere Punkt T2); die Entscheidung steht in Kapitel 1.7.3, die Einzelheiten hier in 3.4.3.
+Stand (2026-09-25): Entschieden sind der Begriff des geplanten Schritts, die Adressierung einzelner Festlegungen über ihre ID, der Verzicht auf eigene Schrittkennungen (vormals Q-14) und — vormals Q-12 — der Inhalt eines geplanten Schritts sowie die Ablageorte einer Planung (der frühere Punkt T2); die Entscheidungen stehen in Kapitel 1.7.3, die Einzelheiten hier in 3.4.3. **Offen ist, wie ein Schritt einen ganzen Bereich als Umbauziel benennt**; die Entscheidungsgrundlage dazu steht in Kapitel 1.7.3 und ihre Folge für die Vorgaben in Vorgabe 2.3. Solange sie aussteht, ist die dritte Zeile der Tabelle in 3.4.2 ein Vorschlag und kein Zieltext.
 
 ### 3.4.1 Geplante Schritte
 
 > Ein geplanter Schritt ist ein noch offener Schritt der Projektplanung — wo immer er steht: in einer Fahrplandatei, im Abschnitt „Offen" einer README, in einer Notiz. Der Skill setzt keine Fahrplandatei voraus. Er liest geplante Schritte aus Abschnitten mit der Rolle `plan` (Kapitel 1.3.3) und aus den Dateien, die der Skill-Parameter `planned_steps` nennt (Kapitel 3.5). Ein Schritt ist der Text unter einer Überschrift bis zur nächsten Überschrift gleicher oder höherer Ordnung. Erledigte Schritte verlassen die Planung; die Nummern der übrigen werden nicht neu vergeben, neue zählen hoch — ein Rückblick auf „Schritt n" bleibt so eindeutig.
+>
+> Ein Schritt trägt keine eigene Kennung. Wo eine Registerzeile auf ihn verweisen soll — etwa eine Bestätigungszeile auf den Schritt, in dem eine Idee verworfen wurde —, genügen Nummer und Datei im Freitext der Zeile. Das reicht, weil die Nummer stabil ist und ein erledigter Schritt über die Statusdatei auffindbar bleibt; eine zweite Art von Kennung neben den IDs entsteht so nicht.
 
 ### 3.4.2 Umbauziel
 
@@ -39,19 +41,3 @@ Die frühere Formulierung „in aufgabenangemessener Detaillierung" (Anhang A) w
 > Die Statusdatei trägt ausschließlich abgearbeitete Schritte in der Reihenfolge des Abschlusses; Entscheidungen gehören sofort in das zuständige Kapitel.
 
 Die Kontext-Haushalt-Regel oben ersetzt für dieses Vorhaben die gleichnamige Regel der globalen Anweisungsdatei (Arbeitsanweisungen §1.9), die dort nicht aus dem Vorläufer stammte, sondern eigens für Softwareprojekte galt.
-
-### 3.4.4 Entscheidungsgrundlagen
-
-> **[Q-13] Entscheidungsgrundlage — Kapitel als Umbauziel über den Dateipfad**
-> Kontext: `target: chapter docs/3_2_pipeline.md` ist das Einzige im Verfahren, das an einem Dateinamen hängt; Umnummerierung benennt Dateien um, `check` meldet das zerbrochene Ziel.
-> Optionen: (a) Dateipfad, Bruch wird gemeldet und über den Plan repariert; (b) Kapitel bekommen eine eigene stabile Kennung, etwa im Rollenmarker `[DS:runtime C-03]`; (c) kein Kapitelziel — nur IDs, ein Umbau nennt die betroffenen Festlegungen einzeln.
-> Vorschlag: (a) — selten, billig zu reparieren; (b) führt eine zweite Kennungsart ein.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 2
-> Antwort:
-
-> **[Q-14] Entscheidungsgrundlage — Eigene Kennungen für geplante Schritte**
-> Kontext: `upheld`-Zeilen und Registerzeilen könnten auf den Schritt verweisen, in dem eine Idee verworfen wurde. Dafür bräuchten Schritte eine stabile Kennung über die Nummer hinaus, die je Planungsdatei gilt.
-> Optionen: (a) nein — Schrittnummer und Dateiname genügen im Freitext der Zeile; (b) ja — Schritte tragen `S-0007` nach demselben Zählerprinzip.
-> Vorschlag: (a).
-> Gewicht: klein · Blockiert: Fahrplanschritt 2
-> Antwort:

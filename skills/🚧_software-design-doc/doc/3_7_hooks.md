@@ -1,6 +1,8 @@
 ## 3.7 Hooks
 
-Stand (2026-09-17): Die drei Hooks sind spezifiziert; die Hook-Dokumentation von Claude Code wurde am selben Tag gegen die hier genutzten Ereignisse, Matcher, Filter, Exit-Codes und JSON-Felder geprüft. Einzelheiten der Pfadauflösung sind offen und am Ende benannt.
+Stand (2026-09-25): Die drei Hooks sind spezifiziert; die Hook-Dokumentation von Claude Code wurde am 2026-09-17 gegen die hier genutzten Ereignisse, Matcher, Filter, Exit-Codes und JSON-Felder geprüft. Einzelheiten der Pfadauflösung sind offen und am Ende benannt.
+
+**Ob H3 überhaupt gebaut wird, ist hier nicht zu entscheiden** (seit 2026-09-25, vormals Q-27). Er ist der einzige Hook, der je Projekt eingerichtet werden muss, und damit eine Ausnahme von einer Zusage, die Kapitel 1.3.5 gibt; die Entscheidungsgrundlage steht deshalb bei der Leistung, die er erbringt (Kapitel 1.7.6). Solange sie aussteht, beschreibt dieses Kapitel ihn vollständig, ohne seinen Bestand zu behaupten — und der Fahrplan enthält an zwei Stellen Widersprüchliches: Schritt 6 baut ihn, das Entscheidungstor der Probe führt ihn unter dem, was erst danach entschieden wird (Kapitel 3.8.5). Das wird mit der Antwort aufgelöst, nicht vorher.
 
 ### 3.7.1 Gegenstand
 
@@ -16,7 +18,7 @@ Der Nachweis, dass ein Hook trägt, wo eine Anweisung nicht trägt, liegt in die
 | Matcher | `Edit\|Write\|MultiEdit` | `Bash` | `startup\|resume\|compact` |
 | Filter | Pfad der Datei liegt im Doku-Ordner (über `if: Edit(<doc_dir>/*)` oder im Skript aus `tool_input.file_path`) | `if: Bash(git commit*)` | — |
 | Eingabe | Hook-JSON mit `tool_input.file_path` und `cwd` | Hook-JSON mit `cwd` | Hook-JSON mit `cwd` |
-| Kommando | `design-doc.py lint --file <pfad> --changed --json` | `design-doc.py check --json` | `design-doc.py check --summary` |
+| Kommando | `software-design-doc.py lint --file <pfad> --changed --json` | `software-design-doc.py check --json` | `software-design-doc.py check --summary` |
 | Ausgabe | Exit 0; JSON mit `additionalContext`: die Befunde — nicht blockierend | Exit 2 mit Begründung auf stderr bei struktureller Inkonsistenz → blockiert den Commit, es sei denn, der Entwickler hat die Blockade für diesen einen Commit ausdrücklich aufgehoben (entschieden am 2026-09-24, vormals Q-26); sonst Exit 0, Befunde als `additionalContext` | Exit 0; Klartext auf stdout wird Kontext: Zahl Festlegungen, `assumed`, `pending`, unlesbare Zeilen, seit dem letzten Lauf geänderte Definitionssätze |
 | Zeitlimit | 20 s | 30 s | 10 s |
 | Kosten | ein Skriptlauf je Doku-Edit, Ausgabe wenige Zeilen | ein Lauf je Commit | ein Lauf je Start; fängt menschliche Bearbeitungen zwischen Sitzungen und überlebt die Kompaktierung (Matcher `compact`) |
@@ -32,12 +34,3 @@ H1 und H2 sind nur sinnvoll, wenn der Skill geladen ist, und sie sollen in jedem
 ### 3.7.4 Technisch offen (keine Entscheidung des Entwicklers)
 
 Pfadauflösung: ob `${CLAUDE_SKILL_DIR}` im Kommando eines Frontmatter-Hooks aufgelöst wird oder der Pfad anders zu ermitteln ist; die Doku nennt für Hooks `${CLAUDE_PROJECT_DIR}` und `${CLAUDE_PLUGIN_ROOT}`. Pfadfilter: ob `Edit(<doc_dir>/*)` den Doku-Ordner trifft oder der Filter ins Skript wandert. Zeitlimits nach den ersten Messungen. Aufhebung der H2-Blockade (Kapitel 1.3.5, entschieden am 2026-09-24): wie der Entwickler das Wort dafür je Commit ausspricht — Script-Argument, Umgebungsvariable oder eine Zeile in der Commit-Message.
-
-### 3.7.5 Entscheidungsgrundlagen
-
-> **[Q-27] Entscheidungsgrundlage — H3 bauen oder bis zur Probe zurückstellen**
-> Kontext: H3 (Sitzungsstart) fängt menschliche Bearbeitungen zwischen Sitzungen und überlebt die Kompaktierung. Er ist der einzige Hook, der eine Projektkonfiguration braucht. Ob menschliche Bearbeitungen zwischen Sitzungen vorkommen, weißt Du aus Deiner Praxis.
-> Optionen: (a) bauen und am Skillstart anbieten; (b) zurückstellen, bis die Probe zeigt, dass er fehlt; (c) ersetzen durch die Regel „beim Öffnen eines Bereichs läuft `check`" ohne Hook.
-> Vorschlag: (a) — die Kosten sind eine Zeile Konfiguration, und der Kompaktierungsfall allein rechtfertigt ihn.
-> Gewicht: klein · Blockiert: Fahrplanschritt 6
-> Antwort:

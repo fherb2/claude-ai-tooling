@@ -4,9 +4,9 @@ Dieses Dokument ist die Implementierungsdoku des Vorhabens `software-design-doc`
 
 Die Segmente sind: dieses Kapitel 1 mit den Zusammenhängen, Kapitel 2 mit den projektweiten Vorgaben, Kapitel 3 mit den Einheiten. Daneben `work-plan.md` (Fahrplan) und `status.md`. Zwei Anhänge: **Anhang A** archiviert den Vorläufer — das Dokumentationsschema, auf dessen Erfahrungen dieses Vorhaben aufbaut und auf das die Kapitel mehrfach verweisen; **Anhang B** trägt den Verlauf der Recherchen und das Rechenmodell.
 
-Noch nicht entschiedene Punkte stehen als Zitatblöcke `[Q-nn] Entscheidungsgrundlage` dort, wo ihr Kontext steht, mit Optionen, Vorschlag und einer Zeile **Antwort:** für den Entwickler; der Leseplan dazu steht am Anfang von `work-plan.md`. Was nicht so gekennzeichnet ist, gilt als geplant.
+Noch nicht entschiedene Punkte stehen dort, wo die Entscheidung hingehört, und sind in den laufenden Text eingearbeitet: Der Gedankengang führt bis zu der Stelle, an der es mehrere Wege gibt, nennt sie mit ihren Kosten und sagt, dass die Wahl aussteht. Eine offene Frage in Kapitel 3 wäre fast immer ein Zeichen dafür, dass etwas Funktionales oder eine Vorgabe noch nicht entschieden ist — sie gehört dann nach Kapitel 1 oder 2 (Festlegung des Entwicklers vom 2026-09-25). Welche Punkte offen sind und welchen Fahrplanschritt sie blockieren, sagt `work-plan.md`. Was nicht als offen gekennzeichnet ist, gilt als geplant.
 
-> Geprüft: Ok
+> Geprüft: offen
 
 ## 1.1 Name des Skills
 
@@ -205,9 +205,9 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 | **Umbauziel** (`target:`) | die Zeile, mit der ein Schritt sagt, was er umbauen will                                         | IDs oder eine Kapiteldatei | 3.4.2        |
 | **Planabschnitt**         | „Berührte Festlegungen" — der Abschnitt jedes Plans, in dem der Entwickler die Annahmen sieht | —                         | 3.1.6        |
 
-**Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `layout`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5).
+**Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5). Kein Skill-Parameter ist das Absatzlayout der Prosa: Es wird aus der vorhandenen Doku abgelesen, und nur wenn es keine gibt oder sie uneindeutig ist, wird einmal gefragt (entschieden am 2026-09-25, vormals Q-17; Kapitel 3.2.8).
 
-> Geprüft: ok.
+> Geprüft: offen
 
 ## 1.5 Bild des fertigen Systems
 
@@ -371,7 +371,7 @@ Die sieben Szenen zeigen alles außer einem: Wozu die Kantenrechnung über den G
 
 **8. Abrechnen.** Nach dem Umbau lässt sich sagen, was die Rechnung geleistet hat: wie viele Kandidaten sie vorgelegt hat, wie viele davon wirklich betroffen waren, und — die einzige Zahl, auf die es ankommt — wie viele der bestätigten eine Textsuche über die Suchschlüssel **nicht** gefunden hätte. Wäre diese Zahl null, wäre das Geflecht überflüssig und der Skill behielte die Erwähnungssuche (1.7.4). Sie zu messen ist Gegenstand der Probe (Kapitel 3.8).
 
-**Noch nicht entschieden** ist, was genau eine Kante ist und wie sie gewichtet wird; deshalb nennt diese Szene keine Zahlen (Q-20 in Kapitel 1.7.4, Q-21 in Kapitel 3.6.9).
+**Keine Zahlen in dieser Szene**, weil die Gewichte der Kanten nicht zu ihrem Gegenstand gehören: Was eine Kante ist, steht seit dem 2026-09-24 fest (1.7.4), wie schwer sie wiegt und nach welcher Formel gerechnet wird, ist eine Sache der Messung und nicht der Erzählung (Kapitel 3.6.5 und 3.8).
 
 ### 1.6.9 Was der Entwickler in diesen Szenen getan hat
 
@@ -468,6 +468,10 @@ Dass der Skill das regeln **muss**, hat einen zweiten Grund: Die bestehenden Anw
 
 Damit tritt die bisherige globale Regel — drei mögliche Orte, Nachfrage wenn keiner geregelt ist — für dieses Vorhaben zurück; welche Anweisungen das im Einzelnen betrifft, steht in Kapitel 3.9.1.
 
+**Wie genau ein Schritt sein Umbauziel benennt, ist noch offen.** Das Umbauziel ist der einzige Weg, auf dem eine Planung eine Festlegung öffnet: Ohne es bindet alles, was einmal entschieden wurde, und der Skill wäre an dieser Stelle wieder das Fehlbild Gesetz aus 1.2. Ein Schritt, der etwas umbauen will, muss also sagen können, was — und dafür gibt es zwei Größenordnungen. Die eine ist die einzelne Festlegung: Sie hat eine ID, die nie neu vergeben wird und kein Kapitel trägt, also eine Adresse, die jede Umsortierung überlebt. Die andere ist der ganze Bereich — „die Pipeline-Sektion wird ersetzt" —, und für den gibt es keine solche Adresse. Ein Bereich ist nur über seinen Ort greifbar, über Datei und Überschrift; Gliederung, Reihenfolge und Nummerierung aber gehören ausdrücklich dem Entwickler (1.3.4). Wer einen Bereich benennt, adressiert damit über etwas, das sich jederzeit ändern darf.
+
+Die Entscheidung steht deshalb noch aus, und jeder der drei Wege verlangt dem Entwickler etwas anderes ab. **Den Bruch hinnehmen:** Der Schritt nennt Datei und Kapitel; wird die Datei umbenannt, meldet die Prüfung das zerbrochene Ziel, und repariert wird es über den nächsten Plan. Das ist billig und selten, steht aber gegen die Vorgabe, dass nichts an einem Dateinamen hängt (Vorgabe 2.3). **Dem Bereich eine eigene Kennung geben:** Ein Kapitel trüge neben seiner Rolle eine stabile Kennung, die das Umbauziel nennt; das überlebt jede Umbenennung, führt aber eine zweite Art von Kennung neben den IDs ein, die der Entwickler im Text mitführt. **Auf Bereichsziele verzichten:** Wer einen Bereich umbaut, zählt die betroffenen Festlegungen einzeln auf; keine neue Kennung und keine Ausnahme, dafür bei einem großen Umbau eine lange Aufzählung, die nachgeführt werden muss, sobald eine Festlegung hinzukommt. Was die Antwort für die Vorgaben bedeutet, steht in Vorgabe 2.3; die Schreibweise, die daraus folgt, in Kapitel 3.4.2.
+
 ### 1.7.4 Auswirkungen einer Änderung finden
 
 **Das Bedürfnis.** Soll eine Festlegung geändert werden oder entfallen, muss vorher feststehen, welche anderen Festlegungen davon berührt sind. Wer das übersieht, merkt es erst, wenn etwas nicht mehr zusammenpasst — und dann ist die Ursache schwer zu finden, weil ein Übersehen keine Spur hinterlässt.
@@ -488,9 +492,7 @@ Damit tritt die bisherige globale Regel — drei mögliche Orte, Nachfrage wenn 
 
 **Was ausgeschlossen bleibt.** Keine semantische Suche, keine Einbettungen, kein Index — das wäre eine eigene Infrastruktur je Projekt und damit das große Softwareprojekt, das dieses Vorhaben nicht sein will (Bedingung 3 in Kapitel 2.2). Alles, was der Skill über Zusammenhänge weiß, steht sichtbar im Text des Entwicklers.
 
-**Eine Wahl, die der Entwickler bewusst treffen können muss.** Die Rechnung läuft ohne jede fremde Bibliothek; sie kann aber eine benutzen, wenn eine vorhanden ist, und rechnet dann schneller und in mehr Varianten. Vorhanden ist so etwas auf einem Entwicklungsrechner meist nur zufällig — und **was niemand kennt, installiert niemand.** Deshalb gilt: Braucht der Skill die Rechnung zum ersten Mal und die Bibliothek fehlt, erklärt die Instanz dem Entwickler in zwei Sätzen, was sie besser machen würde, und fragt. Er kann sie installieren lassen, selbst installieren oder ablehnen — und **seine Antwort wird festgehalten**, damit die Frage nie zweimal kommt. Drei Zustände sind zu unterscheiden: noch nicht geprüft und nicht gefragt (der Anfangszustand), benutzen, nicht benutzen. Ohne die Bibliothek arbeitet der Skill vollständig weiter; sie ist Beschleunigung, nicht Voraussetzung. Die Einzelheiten stehen in Kapitel 3.5.2 und 3.6.1.
-
-> Prüfung: Im letzten Abschnitt wird von einer Wahl gesprochen, fremde Bibliotheken einzubinden, indem der Nutzer sie installiert. Warum wird nicht konkret die betreffende Bibliothek genannt, die dann auch im Script benutzt wird? Bitte prüfe das, wie wir das hier machen.
+**Eine Wahl, die der Entwickler bewusst treffen können muss.** Die Rechnung läuft ohne jede fremde Bibliothek; sie kann aber eine benutzen, wenn eine vorhanden ist, und rechnet dann schneller und in mehr Varianten. Es ist genau eine, und sie heißt `networkx` — eine Graphenbibliothek, die kürzeste Wege in gewichteten Graphen fertig mitbringt; was der Skill ohne sie leistet, rechnet ein eingebauter Weg von etwa dreißig Zeilen (Kapitel 3.6.1). Der Name steht hier und nicht erst in Kapitel 3, weil die Entscheidung dem Entwickler gehört: Wer gefragt wird, ob etwas auf seinem Rechner installiert werden soll, muss wissen, worum es geht. Vorhanden ist so etwas auf einem Entwicklungsrechner meist nur zufällig — und **was niemand kennt, installiert niemand.** Deshalb gilt: Braucht der Skill die Rechnung zum ersten Mal und die Bibliothek fehlt, erklärt die Instanz dem Entwickler in zwei Sätzen, was sie besser machen würde, und fragt. Er kann sie installieren lassen, selbst installieren oder ablehnen — und **seine Antwort wird festgehalten**, damit die Frage nie zweimal kommt. Drei Zustände sind zu unterscheiden: noch nicht geprüft und nicht gefragt (der Anfangszustand), benutzen, nicht benutzen. Ohne die Bibliothek arbeitet der Skill vollständig weiter; sie ist Beschleunigung, nicht Voraussetzung. Die Einzelheiten stehen in Kapitel 3.5.2 und 3.6.1.
 
 **Zitatmarker außerhalb der Funktion `relate` bleiben optional** (entschieden am 2026-09-24, vormals Q-06): Ob `mentions` ohne sie zu viel übersieht, entscheidet die Probe (Kapitel 1.9, 3.8) — ein einmaliger Test in der Entwicklung dieses Skills, nicht ein Mechanismus, der mit dem Skill ausgeliefert wird. Verfehlt die Kandidatenliste dort ihre Schwelle, wird `marking: full` zum Standard nachgezogen.
 
@@ -505,6 +507,10 @@ Die Leistung, um derentwillen das Vorhaben begonnen wurde (1.2, Fehlbild Gesetz)
 ### 1.7.6 Prüfen und Aufräumen
 
 Beim Öffnen eines Bereichs, vor jedem Commit und am Sitzungsstart läuft eine nur lesende Prüfung: Marker ohne Registereintrag, Einträge ohne Marker, unlesbare Zeilen, zerbrochene Umbauziele, geänderte Definitionssätze — Letztere erkannt über einen gespeicherten Fingerabdruck je Definitionssatz (entschieden am 2026-09-24, vormals Q-04). Bevor eine Abweichung der Instanz gemeldet wird, prüft das Skript rein mechanisch, ob nur wenige Einzelzeichen abweichen — ein Hinweis auf reine Formatierung oder Rechtschreibung: Dann ist das keine Entscheidungsgrundlage, sondern löst nur eine stille Neuberechnung des Fingerabdrucks aus (Kapitel 3.6 und 3.7).
+
+**Die drei Anlässe reichen verschieden weit — und ob der dritte bleibt, ist offen.** Die Prüfung beim Öffnen eines Bereichs sieht diesen Bereich; die Prüfung vor dem Commit sieht, was zum Commit ansteht. Zwei Lücken bleiben. Die eine: Der Entwickler bearbeitet seine Doku zwischen zwei Sitzungen selbst — kein Edit der Instanz, kein Commit, also kein Anlass, der davon etwas bemerkte. Die andere: Nach einer Verdichtung des Kontextes hat die Instanz ihren Stand verloren, ohne dass sich eine Datei geändert hätte. Der Sitzungsstart ist der einzige Anlass, der beides auffängt.
+
+Er kostet dafür etwas, das keine andere Leistung des Skills kostet: **Er muss je Projekt eingerichtet werden.** Das steht gegen die Zusage aus 1.3.5 — die Absicherung kommt mit dem Skill und wirkt in jedem Projekt, das ihn führt, ohne dass dort etwas einzurichten wäre. Zu entscheiden ist deshalb zweierlei: ob die beiden Lücken diese eine Ausnahme wert sind, und ob man das jetzt entscheidet oder erst, wenn die Probe zeigt, wie oft sie in der Praxis auftreten (1.9). Wie der Hook gebaut wäre, steht in Kapitel 3.7.
 
 **Der Lebenszyklus einer Festlegung ist Teil dieser Leistung, und er hat einen eigenen Grund.** Eine Festlegung, die überholt ist, verschwindet nicht einfach. Bliebe ihr Satz unmarkiert in der Prosa stehen, läse die Instanz ihn beim nächsten Mal als gültig — und das Fehlbild Gesetz wäre an genau dieser Stelle zurück, mit einer Festlegung, die niemand mehr vertritt. Deshalb gilt: **Was überholt ist, darf nicht unmarkiert dastehen.** Es bekommt entweder eine Nachfolgerin (`superseded … by`) oder entfällt ersatzlos (`retired`); der Eintrag im Register bleibt in beiden Fällen mit Datum bestehen.
 
