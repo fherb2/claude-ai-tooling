@@ -1,10 +1,10 @@
 ## 3.6 Das Skript
 
-Stand (2026-09-24): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschlag mit weitgehender Zustimmung; das Graphenmodell des Auswirkungsmoduls ist entschieden (vormals Q-20, Kapitel 1.7.4).
+Stand (2026-09-25): Kommandosatz, Ausgabevertrag und Aufrufprinzip sind Vorschlag mit weitgehender Zustimmung; das Graphenmodell des Auswirkungsmoduls ist entschieden (vormals Q-20, Kapitel 1.7.4), ebenso der Dateiname des Skripts (vormals Q-24) und der Name des Auswirkungskommandos (vormals Q-22).
 
 ### 3.6.1 Ort, Name, Laufzeit
 
-Ein Skript `files/design-doc.py` im Skill-Ordner, aufgerufen über `${CLAUDE_SKILL_DIR}/files/design-doc.py`, dazu das Modul `files/impact.py` für die Auswirkungsrechnung. Python ab 3.11, sonst nur Standardbibliothek. Der Name `sdd` wurde verworfen, weil er in der Agentenwelt für Spec-Driven Development steht.
+Ein Skript `files/software-design-doc.py` im Skill-Ordner, aufgerufen über `${CLAUDE_SKILL_DIR}/files/software-design-doc.py`, dazu das Modul `files/impact.py` für die Auswirkungsrechnung. Python ab 3.11, sonst nur Standardbibliothek. Das Skript trägt den Namen des Skills (entschieden am 2026-09-25, vormals Q-24); `sdd` wurde verworfen, weil das Kürzel in der Agentenwelt für Spec-Driven Development steht. Folgt aus der Prüfung bei Fahrplanschritt 9 eine Umbenennung des Skills, wandert der Skriptname mit (Kapitel 1.1).
 
 **Die eine optionale Bibliothek** (entschieden am 2026-09-20, vormals Q-25). `networkx` rechnet kürzeste Wege in gewichteten Graphen direkt und deckt damit eine der drei Kostenfunktionen (3.6.5) ohne eigenen Code ab. Sie ist **nie Voraussetzung**: Fehlt sie, rechnet ein eingebauter Algorithmus von etwa dreißig Zeilen. Ihre Anwesenheit ist auf einem Entwicklungsrechner Zufall, und was niemand kennt, installiert niemand — deshalb ist ihre Benutzung eine bewusste Wahl des Entwicklers (Kapitel 1.7.4), festgehalten im Skill-Parameter `impact_lib`:
 
@@ -41,7 +41,7 @@ Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. 
 | `FAILED` | Abbruch | `step`, `cause`, `state`, `remedy` — die Abhilfe nennt das exakte Script-Argument |
 | `SUMMARY` | letzte Zeile jeder Ausgabe | `items`, `findings`, `decide` als Zahlen |
 
-Exit-Codes: 0 bei `OK` ohne Befunde, 1 bei Befunden oder Entscheidungsvorlagen, 2 bei `FAILED` und bei struktureller Inkonsistenz — der Code, mit dem der Commit-Hook blockiert (Kapitel 3.7). Mit `--json` erscheint dieselbe Information als JSON-Array; die Hooks nutzen es, um `additionalContext` zu füllen. Eine unbehandelte Ausnahme ist ein Defekt; die Prüffälle enthalten absichtlich kaputte Eingaben (fehlende Klammern, falsche Schlüsselwörter, U+00A0, Dubletten), für die eine `FAILED`- oder `FINDING`-Zeile erwartet wird.
+Exit-Codes: 0 bei `OK` ohne Befunde, 1 bei Befunden oder Entscheidungsvorlagen, 2 bei `FAILED` und bei struktureller Inkonsistenz — der Code, mit dem der Commit-Hook blockiert (Kapitel 3.7). Mit `--json` erscheint dieselbe Information als JSON-Array; die Hooks nutzen es, um `additionalContext` zu füllen. **Welche der beiden Formen der Standard ist, steht noch nicht fest** — die Entscheidungsgrundlage dazu gehört zur Vorgabe über den Ausgabevertrag und steht deshalb in Vorgabe 2.5 (seit 2026-09-25, vormals Q-23); die Beschreibung hier geht vom zeilenförmigen Standard aus. Eine unbehandelte Ausnahme ist ein Defekt; die Prüffälle enthalten absichtlich kaputte Eingaben (fehlende Klammern, falsche Schlüsselwörter, U+00A0, Dubletten), für die eine `FAILED`- oder `FINDING`-Zeile erwartet wird.
 
 Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` oder `OK` aus; `DECIDE` ist die Ausnahme für das, was sich nicht kodieren lässt (Vorgabe 2.6). Die Trennung ist sichtbar: Ein `ITEM` ist Fakt, ein `DECIDE` ist Vorlage.
 
@@ -85,7 +85,7 @@ Was ein Kommando **nicht** hat, ist ebenso Festlegung: Es gibt kein `add` für e
 
 Diese Gewichte und die Dämpfung heißen **Graphenparameter**: Sie parametrisieren den funktionalen Zusammenhang der Auswirkungsrechnung. Sie sind **keine Skill-Parameter** — sie stehen im Skill, entweder direkt im Modul oder in einer Datei des Skill-Ordners, nie in der Projektkonfiguration. Grund: Der Entwickler kann sie nicht beurteilen; ob eine Kante „gleicher Abschnitt" 0,4 oder 0,35 wiegt, ist keine Eigenschaft seines Projekts, sondern des Verfahrens. Sie ändern sich nach einer Messung (Kapitel 3.8) und dann für alle Projekte. Was ein Projekt davon einstellt, sind allein die zwei groben Griffe `impact_model` und sein Abbruchwert — eng oder weit, nicht einzelne Gewichte (Entscheidung des Entwicklers vom 2026-09-18).
 
-**Drei Kostenfunktionen**, austauschbar, damit die Probe sie vergleicht:
+**Drei Kostenfunktionen**, austauschbar, damit die Probe sie vergleicht. Welche am Ende bleibt, ist keine Entscheidungsgrundlage für den Entwickler, sondern ein Messergebnis (seit 2026-09-25, vormals Q-21): Keine der drei ist erkennbar richtig, und was zählt, ist allein die Brauchbarkeit der Kandidatenliste — nicht so kurz, dass Betroffenes fehlt, nicht so lang, dass die Instanz die Hälfte verwirft. Deshalb werden alle drei gebaut; der Mehraufwand sind drei kurze Funktionen in einem Modul, dessen Umgebung ohnehin dieselbe ist. Der Vergleich gehört zum Ablauf der Probe (Kapitel 3.8.3), die Entscheidung zu ihrem Entscheidungstor (3.8.5).
 
 1. **Additiv**: Kosten je Kante 1/w, Weglänge Σ Kosten, Abbruch bei `impact_cutoff` — ein Kürzeste-Wege-Problem; networkx rechnet es direkt mit `single_source_dijkstra_path_length(G, source, cutoff, weight=funktion)` (belegt, Doku 3.6.1).
 2. **Multiplikativ nach dem Vorschlag des Entwicklers**: Weglänge Σ(Hops) / Π(Gewichte); eine schwache Kante irgendwo im Pfad verunsichert die ganze Kette. Pfadabhängig, braucht eine eigene Suche; bei Graphen mit Hunderten Knoten unproblematisch.
@@ -106,33 +106,3 @@ Kurzhash (acht Hexzeichen aus SHA-256) des Definitionssatzes nach Normalisierung
 ### 3.6.8 Prüffälle
 
 Eine Fixture-Doku mit Register, geplanten Schritten und Code-Kommentaren (Kapitel 3.8) und dazu absichtlich beschädigte Varianten. Für jedes Kommando: erwartete `ITEM`-Zeilen auf der guten Fixture, erwartete `FINDING`- oder `FAILED`-Zeilen auf den beschädigten. „Keine Befunde" gilt erst als belegt, wenn die beschädigten Varianten gefunden werden.
-
-### 3.6.9 Entscheidungsgrundlagen
-
-> **[Q-21] Entscheidungsgrundlage — Kostenfunktion der Auswirkungsrechnung**
-> Kontext: Drei Kostenfunktionen sind vorgesehen (additiv 1/w; Deine Σ Hops / Π Gewichte; Produkt mit Dämpfung). Die Probe soll sie vergleichen; eine Vorabpräferenz würde die Reihenfolge der Umsetzung bestimmen.
-> Optionen: (a) alle drei bauen, Probe entscheidet; (b) nur additiv (Bibliotheksunterstützung) und Deine Formel; (c) nur eine, Deine.
-> Vorschlag: (a); der Mehraufwand ist ein Modul mit drei kurzen Funktionen.
-> Gewicht: klein · Blockiert: Fahrplanschritt 5
-> Antwort:
-
-> **[Q-22] Entscheidungsgrundlage — Name `impact` statt „Kontakt"**
-> Kontext: Im Gespräch hieß der Vorgang „Kontakt"; Du wolltest etwas mit Bezug zu Graph oder Semantik. `impact` folgt der Auswirkungsanalyse des Vorläufers (Anhang A). Alternativen: `neighborhood`, `related`, `reach`.
-> Optionen: (a) `impact`; (b) eine der Alternativen; (c) ein anderes Wort.
-> Vorschlag: (a).
-> Gewicht: klein · Blockiert: Fahrplanschritt 4
-> Antwort:
-
-> **[Q-23] Entscheidungsgrundlage — Standardausgabe Zeilen oder JSON**
-> Kontext: 3.6.3 macht die Zeilenform zum Standard und JSON zur Option für Hooks. Für die Instanz ist die Zeilenform bei kurzen Listen billiger zu lesen; JSON ist eindeutiger, aber länger.
-> Optionen: (a) Zeilen als Standard, `--json` auf Anforderung; (b) JSON als Standard, Zeilen auf Anforderung.
-> Vorschlag: (a).
-> Gewicht: klein · Blockiert: Fahrplanschritt 4
-> Antwort:
-
-> **[Q-24] Entscheidungsgrundlage — Dateiname des Skripts**
-> Kontext: `design-doc.py` und `impact.py` im Ordner `files/` des Skills. `sdd.py` wurde verworfen (Spec-Driven Development).
-> Optionen: (a) `design-doc.py`; (b) `software-design-doc.py` wie der Skill; (c) anderer Name.
-> Vorschlag: (a).
-> Gewicht: klein · Blockiert: Fahrplanschritt 4
-> Antwort:

@@ -1,6 +1,8 @@
 ## 3.9 Migration und Installation
 
-Stand (2026-09-17): Vorschlag; jede Passage der Anweisungsdateien wird beim Umzug einzeln freigegeben.
+Stand (2026-09-25): Vorschlag; jede Passage der Anweisungsdateien wird beim Umzug einzeln freigegeben.
+
+**Zum Zuschnitt dieses Kapitels steht eine Frage offen.** Am 2026-09-25 wurden zwei Entscheidungsgrundlagen hier gestrichen, weil sie nicht zur Entwicklung des Skills gehören: die Reihenfolge der Freigaben beim Umzug (vormals Q-30) — das Anpassen der eigenen Installation ist Sache des Entwicklers und kein Bestandteil des Produkts —, und der künftige Ort der beiden Werkzeug-Skills (vormals Q-29), der die Organisation des Repositories betrifft und in dessen eigenen Fahrplan gehört. Damit stellt sich dieselbe Frage für das Kapitel als Ganzes: Was hier steht, hat keine Quelle in Kapitel 1 und beschreibt überwiegend Handlungen am System des Entwicklers statt einer Einheit des Skills. Zur Entwicklung gehört unbestritten, dass der Inhalt von Abschnitt 2 der globalen Anweisungsdatei die Quelle des Regelteils `standard` ist (Fahrplanschritt 7); der Rest — insbesondere die Gegenüberstellung unten, welche Anweisungen entfallen und welche bleiben — ist getane Arbeit, die eher in einen Anhang gehört. Entschieden ist das nicht, und es hat bis Fahrplanschritt 9 Zeit.
 
 ### 3.9.1 Umzug aus der globalen Anweisungsdatei (früher T1)
 
@@ -39,20 +41,3 @@ Die Datei `noch-geplant.md` des Skills ist am 2026-09-17 in diese Doku übergega
 3. Inhalt der `CLAUDE-snippet.md` unterhalb der Trennlinie in die `CLAUDE.md` des Zielorts übernehmen; die Snippet-Datei bleibt am Zielort liegen.
 4. Je Projekt: Skill-Parameterdatei anlegen lassen, wenn gewünscht; H3 anbieten.
 5. Verweise im Repository nachziehen: Zeile in `skills/README.md` und `skills/README.en.md`, Fahrplanschritte 5 und 6 des Repositories, `skill-dev-doc.md`, wo der alte Name steht.
-
-### 3.9.5 Entscheidungsgrundlagen
-
-> **[Q-29] Entscheidungsgrundlage — Verbleib der Werkzeug-Skills**
-> Kontext: `konzept-segmentierung` und `konsistenzpruefung` sind Werkzeuge innerhalb dieses Standards, liegen nur unter `~/.claude/skills/` und definieren heute Eigenschaften des Fahrplans mit. Der Fahrplanschritt 5 des Repositories stellt die Frage seit August.
-> Optionen: (a) in `skills/` dieses Repositories überführen, umbenennen nach dem Namensschema, Fahrplansätze zu Verweisen machen; (b) draußen lassen, nur die Fahrplansätze anpassen; (c) in diesen Skill als nachgeladene Regelteile aufnehmen.
-> Vorschlag: (a) — sie gehören zum Produkt und sollten mit ihm versioniert sein; (c) macht diesen Skill schwer.
-> Gewicht: mittel · Blockiert: Fahrplanschritt 9
-> Antwort:
-
-> **[Q-30] Entscheidungsgrundlage — Reihenfolge der Freigaben beim Umzug**
-> Kontext: Abschnitt 2 der globalen Anweisungsdatei umfasst sechs Unterabschnitte; jeder Umzug einer Passage ist eine Änderung an Deinen globalen Anweisungen.
-> Optionen: (a) Passage für Passage, je eine Freigabe; (b) Abschnitt 2 als Ganzes in einem Zug, mit vorheriger Gegenüberstellung alt/neu; (c) erst `standard.md` fertigstellen, dann den Abschnitt in einem Zug ersetzen.
-> Vorschlag: (c) — die Gegenüberstellung ist dann vollständig, und die globale Datei ist nie in einem Zwischenzustand.
-> Gewicht: klein · Blockiert: Fahrplanschritt 9
-> Antwort:
-

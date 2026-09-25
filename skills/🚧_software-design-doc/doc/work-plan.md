@@ -4,25 +4,22 @@ Die anstehenden Schritte. Erledigte Schritte fliegen raus; die Nummern der übri
 
 Dieser Fahrplan folgt dem bisherigen Schema (Kapitel 2.14 der Vorgaben). Sitzungsschätzungen sind grob; eine Sitzung ist ein zusammenhängender Arbeitsblock mit Freigaben. Vor Schritt 1 sind die Punkte unter „Klärungsbedarf" zu entscheiden oder bewusst offen zu lassen.
 
-## Entscheidungsgrundlagen — Leseplan
+## Offene Entscheidungen
 
-Die offenen Punkte stehen als Blöcke `[Q-nn]` dort in der Doku, wo ihr Kontext steht: Kontext, Optionen, Vorschlag, Gewicht, blockierter Schritt und eine leere Zeile **Antwort:** für den Entwickler. Funktionale Entscheidungsgrundlagen stehen in Kapitel 1 an der Stelle der Funktionsbeschreibung, implementierungsgebundene in Kapitel 3; die Tabelle folgt der Leseordnung. Vorgehen: Der Entwickler geht die Dateien in Leseordnung durch, schreibt seine Antwort und weitere Gesichtspunkte unter **Antwort:** oder als neuen Block mit der nächsten freien Nummer; die Instanz liest die Antworten und führt die Restklärung im Gespräch. Ein geklärter Block wird durch den Entscheidungstext im Kapitel ersetzt und in `status.md` vermerkt; seine Nummer wird nicht neu vergeben.
+**Es gibt keine `[Q-nn]`-Blöcke mehr** (umgestellt am 2026-09-25). Bis dahin standen offene Punkte als eigene Blöcke am Ende der Kapitel von Segment 3 — mit Kontext, Optionen, Vorschlag und einer leeren Zeile **Antwort:**. Das erwies sich als falscher Ort: Segment 3 trägt die Umsetzungsbeschreibung, und eine dort auftauchende Frage bedeutet fast immer, dass etwas Funktionales oder eine Vorgabe noch nicht entschieden ist. Alle verbliebenen Punkte sind deshalb an die Stelle gewandert, an der die Entscheidung hingehört, und dort so in den Text eingearbeitet, dass sich die Frage aus dem Gedankengang selbst ergibt (Festlegung des Entwicklers vom 2026-09-25).
 
-| Q | Thema | Ort | Gewicht | Blockiert |
-|---|---|---|---|---|
-| Q-13 | Kapitelziel über Dateipfad | `3_4_planned_steps.md`, 3.4.4 | mittel | 2 |
-| Q-14 | Kennungen für Schritte | 3.4.4 | klein | 2 |
-| Q-17 | `layout` als Skill-Parameter | `3_5_startup_parameters.md`, 3.5.5 | klein | 3 |
-| Q-18 | `impact_cutoff` ein oder zwei Felder | 3.5.5 | klein | 3 |
-| Q-21 | Kostenfunktion | `3_6_script.md`, 3.6.9 | klein | 5 |
-| Q-22 | Name `impact` | 3.6.9 | klein | 4 |
-| Q-23 | Standardausgabe Zeilen oder JSON | 3.6.9 | klein | 4 |
-| Q-24 | Dateiname des Skripts | 3.6.9 | klein | 4 |
-| Q-27 | H3 bauen oder zurückstellen | `3_7_hooks.md`, 3.7.5 | klein | 6 |
-| Q-29 | Verbleib der Werkzeug-Skills | `3_9_migration.md`, 3.9.5 | mittel | 9 |
-| Q-30 | Reihenfolge der Freigaben beim Umzug | 3.9.5 | klein | 9 |
+Vorgehen seitdem: Der Entwickler geht die Kapitel in Leseordnung durch und antwortet dort, wo die Frage steht. Eine beantwortete Entscheidung wird zum Entscheidungstext an derselben Stelle und in `status.md` vermerkt; die Nummern der früheren Blöcke werden nicht neu vergeben.
 
-Geklärte Blöcke werden aus dieser Tabelle entfernt und in `status.md` vermerkt; bisher sind es Q-01 bis Q-12, Q-15, Q-16, Q-19, Q-20, Q-25, Q-26, Q-28, Q-31 und Q-32. Vor Schritt 2: Q-13, Q-14. Die übrigen blockieren spätere Schritte.
+| Offener Punkt | Wo er steht | Blockiert |
+|---|---|---|
+| Wie ein Schritt einen ganzen Bereich als Umbauziel benennt (vormals Q-13) | `1_overview.md`, 1.7.3 — Folge für die Vorgaben in `2_rules.md`, 2.3 | 2 |
+| Ob der Zustandsbericht am Sitzungsstart gebaut wird (vormals Q-27) | `1_overview.md`, 1.7.6 — Bauweise in `3_7_hooks.md` | 6 |
+| Welche Ausgabeform der Standard ist (vormals Q-23) | `2_rules.md`, 2.5 — messbar in der Probe | 4 |
+| Zuschnitt des Kapitels Migration und Installation | `3_9_migration.md`, Kopf | 9 |
+
+Keine Entscheidungen des Entwicklers, sondern technische Wahlen bei der Umsetzung sind seit dem 2026-09-25: die Kodierung des Abbruchwerts (vormals Q-18, Kapitel 3.5.2), die Kostenfunktion der Auswirkungsrechnung (vormals Q-21, Kapitel 3.6.5) und die offenen Punkte der Pfadauflösung (Kapitel 3.7.4). Sie blockieren keinen Schritt als Entscheidung, sondern nur als Arbeit.
+
+Geklärte Punkte stehen in `status.md`: Q-01 bis Q-12, Q-14 bis Q-17, Q-19, Q-20, Q-22, Q-24 bis Q-26, Q-28, Q-31 und Q-32. Gestrichen, weil sie nicht in diese Doku gehören: Q-29 und Q-30.
 
 ## 1 Regelteil Marker und Register
 
@@ -30,23 +27,23 @@ Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerf
 
 ## 2 Regelteil Planung
 
-Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: Q-13, Q-14. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
+Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: der offenen Entscheidung über das Bereichsziel (Kapitel 1.7.3 und Vorgabe 2.3). Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
 
 ## 3 Regelteil Skill-Parameter
 
-Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Skill-Parameterdatei, „Doku wächst an Festlegungen", mehrere Vorhaben je Repository. Die Mode-Frage und der Skillstart-Ablauf selbst sind Teil der `SKILL.md` (Kapitel 3.10), nicht dieses Regelteils. Hängt an: Schritt 1; Q-17, Q-18. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
+Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Skill-Parameterdatei, „Doku wächst an Festlegungen", mehrere Vorhaben je Repository. Die Mode-Frage und der Skillstart-Ablauf selbst sind Teil der `SKILL.md` (Kapitel 3.10), nicht dieses Regelteils. Hängt an: Schritt 1. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
 
 ## 4 Skript Stufe 1
 
-`files/design-doc.py` mit `list`, `show`, `next-id`, `add`, `check`, `mentions`, `hardness`, `impact --hops`, `plan-section`, `explain`; Ausgabevertrag nach Kapitel 3.6; Prüffälle mit Fixture und beschädigten Varianten. Hängt an: Schritt 1 und 2 (für `target:`). Aufwand: 3 bis 4 Sitzungen. Fehleranfälligkeit hoch: Parsing-Ränder (U+00A0, Klammern in Prosa, umbrochenes Layout), Kapitelableitung bei verschobenen Markern. Vor dem ersten Code den Skill `common-code-generation` laden.
+`files/software-design-doc.py` mit `list`, `show`, `next-id`, `add`, `check`, `mentions`, `hardness`, `impact --hops`, `plan-section`, `explain`; Ausgabevertrag nach Kapitel 3.6; Prüffälle mit Fixture und beschädigten Varianten. Hängt an: Schritt 1 und 2 (für `target:`). Aufwand: 3 bis 4 Sitzungen. Fehleranfälligkeit hoch: Parsing-Ränder (U+00A0, Klammern in Prosa, umbrochenes Layout), Kapitelableitung bei verschobenen Markern. Vor dem ersten Code den Skill `common-code-generation` laden.
 
 ## 5 Skript Stufe 2
 
-`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4; Q-21. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
+`lint` auf dem Diff, Fingerabdruck (`fp`, Abgleich in `check`), `supersede` und `retire`, `impact --weighted` mit den drei Kostenfunktionen in `impact.py`, networkx optional. Hängt an: Schritt 4. Die drei Kostenfunktionen werden alle gebaut; welche bleibt, entscheidet die Probe (Kapitel 3.6.5). Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit hoch: Fehlalarmquote des Lints, Fingerabdruck-Rauschen.
 
 ## 6 Hooks
 
-H1 bis H3 nach Kapitel 3.7: Frontmatter-Einbindung, Pfadauflösung prüfen, Zeitlimits messen, H3 als Angebot des Skillstarts. Hängt an: Schritt 4 und 5. Aufwand: 1 Sitzung. Fehleranfälligkeit mittel: Pfadauflösung aus dem Skill-Ordner im Hook-Kontext.
+H1 bis H3 nach Kapitel 3.7: Frontmatter-Einbindung, Pfadauflösung prüfen, Zeitlimits messen, H3 als Angebot des Skillstarts. Hängt an: Schritt 4 und 5 sowie an der offenen Entscheidung, ob H3 gebaut wird (Kapitel 1.7.6); dieser Schritt und das Entscheidungstor der Probe (Kapitel 3.8.5) widersprechen sich darin bisher. Aufwand: 1 Sitzung. Fehleranfälligkeit mittel: Pfadauflösung aus dem Skill-Ordner im Hook-Kontext.
 
 ## 7 Skill zusammensetzen
 
@@ -58,7 +55,7 @@ Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Ko
 
 ## 9 Migration und Installation
 
-Kapitel 3.9: Umzug aus der globalen Anweisungsdatei Passage für Passage, Bereinigung der Projekt-`CLAUDE.md`, Werkzeug-Skills, Baustellenschild, Installation, Verweise im Repository. Hängt an: Schritt 8 bestanden; Q-29, Q-30 (Q-31 und Q-32 geklärt, siehe status.md). Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Der Umzug berührt globale Anweisungen.
+Kapitel 3.9: Umzug aus der globalen Anweisungsdatei Passage für Passage, Bereinigung der Projekt-`CLAUDE.md`, Werkzeug-Skills, Baustellenschild, Installation, Verweise im Repository. Hängt an: Schritt 8 bestanden und an der offenen Frage, was von Kapitel 3.9 überhaupt zur Entwicklung gehört (Kopf des Kapitels). Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Der Umzug berührt globale Anweisungen.
 
 ## Summe
 
