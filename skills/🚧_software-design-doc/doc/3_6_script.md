@@ -114,7 +114,21 @@ Prüft nur geänderte Zeilen der übergebenen Datei (Git-Diff gegen den Index un
 
 Kurzhash (acht Hexzeichen aus SHA-256) des Definitionssatzes nach Normalisierung: U+00A0 zu Leerzeichen, Leerraum zusammengezogen, Satzzeichen am Ende entfernt, Kleinschreibung. `fp ID` vergleicht mit dem Register und meldet „Definition geändert"; `check` tut es für alle. Nur Meldung, nie Blockade — die Idee stammt aus Doorstops „suspect links" (Anhang B).
 
-**Mechanische Vorprüfung vor der Meldung** (entschieden am 2026-09-24, vormals Q-04): Weicht der Fingerabdruck ab, vergleicht das Skript zusätzlich den alten mit dem neuen Definitionssatz (nach derselben Normalisierung) über eine Edit-Distanz. Liegt sie unterhalb einer Schwelle, gilt das als reine Formatierungs- oder Rechtschreibkorrektur: keine Meldung, das Skript berechnet den Fingerabdruck still neu. Erst oberhalb der Schwelle meldet `fp`/`check` „Definition geändert". Die genaue Schwelle — wie viele Einzelzeichen als „wenige" gelten — ist noch offen und wird bei der Umsetzung in der Probe gemessen (Kapitel 3.8).
+**Die Normalisierung nimmt auch Markdown-Auszeichnung heraus** (`*`, `_`, Backticks). Ohne das gilt `**64**` gegenüber `64` als Änderung, obwohl sich nur die Hervorhebung geändert hat — im Prototyp der erste Fehlalarm.
+
+**Was die Meldung enthält** (entschieden am 2026-09-25, vormals Q-04; die Edit-Distanz-Vorprüfung eines früheren Entwurfs ist damit verworfen). Weicht der Fingerabdruck ab, meldet das Skript — immer, ohne Schwelle und ohne Unterdrückung. Warum nicht unterdrückt wird, steht in Kapitel 1.7.6. Die Meldung wird stattdessen entscheidungsfertig gemacht und trägt dreierlei:
+
+- **Den Wortdiff.** `difflib.SequenceMatcher` über die wortweise zerlegten, normalisierten Sätze liefert die unterscheidenden Stellen; ausgegeben wird je Stelle `alt → neu`, bei Einfügung oder Streichung mit einem Zeichen für die leere Seite. Aus „Definition geändert" wird damit „64 → 128".
+- **Das Kennzeichen „Zahlen betroffen".** Wahr, wenn ein geändertes Wort eine Ziffer enthält — **oder wenn unmittelbar vor der geänderten Stelle eine Zahl steht**. Die zweite Bedingung ist nicht verzichtbar: Ohne sie rutscht `5 ms → 5 s` durch, weil das geänderte Wort selbst keine Ziffer trägt. Mit ihr erkennt dieselbe Regel auch `64 Einträge → 64 Blöcke`, wo die Zahl bleibt und ihr Bezug sich ändert.
+- **Das Kennzeichen „Normativsignal betroffen".** Wahr, wenn ein geändertes Wort in der Signalliste steht, die der Lint ohnehin führt (`lint_signals`), oder wenn sich das Vorkommen einer der zweiteiligen Wendungen ändert — „darf nicht", „at most", „at least".
+
+Beides ist mit der Standardbibliothek zu bauen; `re`, `difflib` und `unicodedata` genügen, der Kern sind etwa fünfunddreißig Zeilen. Eine Fremdbibliothek ist nicht nötig, und der Kandidat aus Abschnitt 3.6.1 hat damit nichts zu tun.
+
+**Was die Kennzeichen nicht leisten.** Sie sind Lesehilfe, keine Entscheidung. Eine ausgeschriebene Zahl wird nur erfasst, solange die Ziffernform an der Änderung beteiligt ist; die Signalliste ist nie vollständig; und eine Präzisierung wie `queue → eingangsqueue` erscheint ohne Kennzeichen, obwohl sie Bedeutung tragen kann. Das ist hinnehmbar, weil die Meldung in allen drei Fällen trotzdem kommt — die Instanz sieht den Diff und urteilt.
+
+**Geschrieben wird erst nach dem Urteil.** `fp --update` und `apply` schreiben den neuen Wert; der Abgleich selbst schreibt nie, auch nicht, wenn er in einem Hook läuft (Vorgabe 2.8). Damit endet das Wiederholen derselben Meldung nach einer Beurteilung, ohne dass ein Hook eine Datei anfasst.
+
+**Belegt am Prototyp** (2026-09-25, elf Fälle): richtig gemeldet wurden Zahländerung, Einheitenwechsel, Bezugswechsel, Signalwortwechsel, weggefallene Verneinung und ausgeschriebene Zahl; ohne Kennzeichen blieben Tippfehlerkorrektur, Satzumstellung, Wortpräzisierung und entferntes Komma; eine reine Auszeichnungsänderung erzeugte gar keine Meldung. Die beiden Fehler, die der erste Entwurf hatte — fehlende Markdown-Normalisierung und fehlende Zahl-Nachbarschaft —, sind dabei aufgefallen und oben eingearbeitet.
 
 ### 3.6.8 Prüffälle
 
