@@ -1,6 +1,6 @@
 ## 3.2 Marker und Register
 
-Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Am 2026-09-21 entschieden: die Platzierung des Markers im Satz und die Zurückstellung der Rückfalloption (vormals Q-03 und Q-07). Am 2026-09-24 entschieden: der Fingerabdruck (vormals Q-04), die Suchschlüssel (vormals Q-05), die Zitatmarkerpflicht außerhalb `relate` (vormals Q-06) und das Graphenmodell (vormals Q-20) — siehe `status.md`; die Entscheidungen stehen an ihren Funktionsstellen in Kapitel 1.
+Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Am 2026-09-21 entschieden: die Platzierung des Markers im Satz (vormals Q-03). Am 2026-09-25 entschieden: Der zweite Ankermechanismus über Datei und Wortlaut eines Kernsatzes — 2026-09-21 als Rückfalloption zurückgestellt (vormals Q-07) — ist verworfen, weil er die Adresse einer Festlegung an einen Dateinamen bindet (Vorgabe 2.3); der frühere Abschnitt 3.2.9 entfällt damit, die Begründung steht in Kapitel 1.3.3. Am 2026-09-24 entschieden: der Fingerabdruck (vormals Q-04), die Suchschlüssel (vormals Q-05), die Zitatmarkerpflicht außerhalb `relate` (vormals Q-06) und das Graphenmodell (vormals Q-20) — siehe `status.md`; die Entscheidungen stehen an ihren Funktionsstellen in Kapitel 1.
 
 ### 3.2.1 Trennung von Prosa und Register
 
@@ -15,7 +15,7 @@ Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, 
 > - **Definitionsmarker** `[D-0042]` — genau eine je Festlegung, am Satz, der sie ausspricht. Spannt sich eine Festlegung über mehrere Sätze, steht der Marker am Ende des letzten.
 > - **Zitatmarker** `[>D-0042]` — an jeder weiteren Stelle, die die Festlegung heranzieht; das `>` liest sich als „siehe".
 >
-> Pflicht ist der Definitionsmarker immer, der Zitatmarker in Abschnitten mit der Funktion `relate` (Kapitel 1.3.3); sonst ist der Zitatmarker optional. Der Skill-Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Diese Pflichten gelten innerhalb einer Doku, in der markiert wird; **ob** überhaupt markiert wird, entscheidet der Entwickler auf Vorschlag der Instanz (Kapitel 1.3.3). Aufnahmetest, was überhaupt einen Definitionsmarker bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keinen.
+> Pflicht ist der Definitionsmarker immer, der Zitatmarker in Abschnitten mit der Funktion `relate` (Kapitel 1.3.3); sonst ist der Zitatmarker optional. Der Skill-Parameter `marking` kann die Pflicht ausweiten (Kapitel 3.5). Jeder einzelne Marker steht dabei als Vorschlag im Plan und kann abgelehnt werden; die Pflicht sagt, wo ein Marker vorzuschlagen ist, nicht dass er gegen den Willen des Entwicklers entsteht (Kapitel 1.3.3). Aufnahmetest, was überhaupt einen Definitionsmarker bekommt: Kann Code das verletzen? Erläuterungen, Beispiele, Herleitungen bekommen keinen.
 >
 > Beispiel eines Absatzes mit drei Festlegungen (die IDs und Werte sind erfunden):
 
@@ -72,9 +72,5 @@ Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, 
 ### 3.2.8 Layout der Prosa
 
 > Ob ein Absatz eine Zeile ist oder nach einer festen Breite umbricht und Absätze durch Leerzeilen getrennt sind, berührt den Mechanismus nicht: Marker sind Inline-Text, das Register ist eine eigene Datei. Das Layout wird beim Skillstart aus der vorhandenen Doku abgelesen oder erfragt (Kapitel 3.5) und bestimmt nur, wie die Instanz Prosa schreibt.
-
-### 3.2.9 Rückfalloption ohne Marker
-
-> Wo ein Entwickler keine Klammern im Text will, ankert das Register die Festlegung über Datei und Wortlaut eines Kernsatzes. Das ist fragiler — ein editierter Satz bricht den Anker, `check` meldet es — und lässt die Prosa unberührt. **Zurückgestellt:** Der Regelteil nennt diesen Weg als Möglichkeit, gebaut wird er erst, wenn ein Projekt ihn braucht. Bis dahin heißt der Verzicht auf Marker, dass die Doku unmarkiert bleibt und der Skill ohne Buchführung arbeitet (Kapitel 1.3.3). Der Standard sind Marker.
 
 Die Grenze zwischen Kapiteln und Anhang aus dem Vorläufer (Anhang A, Abschnitt A.9) bleibt für 3.2.6 unberührt — dort nachzulesen, wo diese Doku selbst die Grenze noch nach altem Schema führt.
