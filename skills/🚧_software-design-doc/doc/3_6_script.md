@@ -67,7 +67,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 | `mentions --ids … [--code ORDNER] [--out DATEI]` | Doku, optional Code | je ID die Zahl der Fundorte und die Fundorte selbst; mit `--out` nur Zahlen und Pfad | 0 |
 | `hardness --ids … [--word fixed\|open]` | Register, geplante Schritte, Skill-Parameter | `ITEM` je ID mit Härte und zutreffender Bedingung in Prosa (R1–R7) | 0 |
 | `fp --ids … [--update]` | Doku | je ID Fingerabdruck und Vergleich mit dem Register | 0/1 |
-| `notes [--class open] [--chapter DATEI] [--ids …] [--since COMMIT] [--out DATEI]` | Commit-Verlauf | `ITEM` je Notiz: Klasse, Art, Ort, Wiederfindehinweis, Grund, Commit, Datum | 0 |
+| `notes [--class open] [--chapter DATEI] [--ids …] [--since COMMIT] [--out DATEI]` | Commit-Verlauf | `ITEM` je Notiz: Klasse, Art, Ort, Wiederfindehinweis, Grund, Sitzung, Commit, Datum | 0 |
 | `supersede --pairs ALT:NEU,…` · `retire --ids …` | Register | schreibt die Lebenszykluszeilen; listet je ID die verbleibenden Zitate | 0 |
 
 **Auskunftskommandos** — für die Nachfrage des Entwicklers; sie kommen im Ablauf nicht vor und dürfen deshalb einstellig bleiben:
