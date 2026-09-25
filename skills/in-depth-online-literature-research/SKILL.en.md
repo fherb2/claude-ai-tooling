@@ -32,6 +32,12 @@ Mark every finding in your answer with its status: **verified** (checked against
 
 **Self-test before delivery, mandatory:** Immediately before delivering, go through every finding you have marked as **verified** and check: did you actually fetch the source that is supposed to carry it during this run, and did you see the statement there? If not: fetch it now, or downgrade the finding to **unconfirmed**. With collection lists holding many entries in particular, labelling discipline otherwise slips unnoticed — a search-hit snippet feels like evidence but is not.
 
+## The PDF as primary source: search instead of paging through
+
+A PDF you cannot take into context in full is not checked by reading individual pages — a sample of pages is not a check. Instead, extract the full text into a file, search it for the claim (including variant spellings), and read only the passages that turn up in context. If the extraction yields no usable text, for instance with a scanned document, that is not evidence that the claim is absent: the finding stays **unconfirmed**, with the reason stated.
+
+This requires a text-extraction tool, such as `pdftotext` or a Python library like `pypdf`, in the active environment. Before the first such check, establish whether one is available to you. If none is available, pause the research and ask the user to install one; tell them what otherwise holds: without full-text search, only what you actually saw on a page you read counts as **verified** from a longer PDF — everything else stays **unconfirmed**. Resume the research only once the tool is available, or once the user explicitly says they accept this limitation.
+
 ## The switching signal: read the shape of the failure
 
 After every search, judge *how* it failed — the next move follows from that:

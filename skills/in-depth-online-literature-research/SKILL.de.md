@@ -32,6 +32,12 @@ Kennzeichne in Deiner Antwort jeden Fund mit seinem Status: **belegt** (am Prim�
 
 **Selbsttest vor der Abgabe, verpflichtend:** Gehe unmittelbar vor der Abgabe jeden Fund durch, den Du als **belegt** gekennzeichnet hast, und prüfe: Hast Du die Quelle, die ihn tragen soll, in diesem Lauf tatsächlich abgerufen und die Aussage dort gesehen? Wenn nein: Hole den Abruf nach oder stufe den Fund auf **unbestätigt** herab. Gerade bei Sammellisten mit vielen Einträgen lässt die Kennzeichnungsdisziplin sonst unbemerkt nach — ein Suchtreffer-Schnipsel fühlt sich nach Beleg an, ist aber keiner.
 
+## Das PDF als Primärquelle: suchen statt blättern
+
+Ein PDF, das Du nicht vollständig in den Kontext nehmen kannst, prüfst Du nicht durch Lesen einzelner Seiten — eine Stichprobe von Seiten ist keine Prüfung. Extrahiere stattdessen den gesamten Text in eine Datei, suche darin nach der Behauptung (auch in abweichender Schreibweise) und lies nur die Fundstellen im Zusammenhang. Liefert die Extraktion keinen brauchbaren Text, etwa bei einem gescannten Dokument, ist das kein Beleg dafür, dass die Behauptung fehlt: Der Fund bleibt **unbestätigt**, mit Nennung des Grundes.
+
+Das setzt ein Werkzeug zur Textextraktion voraus, etwa `pdftotext` oder eine Python-Bibliothek wie `pypdf` in der aktiven Umgebung. Stelle vor der ersten solchen Prüfung fest, ob Dir eines zur Verfügung steht. Steht keines zur Verfügung, unterbrich die Recherche und bitte den Nutzer um die Installation; sage ihm dabei, was sonst gilt: Ohne Volltextsuche ist aus einem längeren PDF nur **belegt**, was Du auf einer tatsächlich gelesenen Seite gesehen hast — alles Übrige bleibt **unbestätigt**. Setze die Recherche erst fort, wenn das Werkzeug verfügbar ist oder der Nutzer ausdrücklich sagt, dass er diese Einschränkung in Kauf nimmt.
+
 ## Das Umschaltsignal: die Form des Fehlschlags lesen
 
 Beurteile nach jeder Suche, *wie* sie gescheitert ist — daraus folgt der nächste Zug:
