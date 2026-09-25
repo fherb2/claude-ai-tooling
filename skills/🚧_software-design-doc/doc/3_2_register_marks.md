@@ -1,6 +1,6 @@
 ## 3.2 Marker und Register
 
-Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Am 2026-09-21 entschieden: die Platzierung des Markers im Satz (vormals Q-03). Am 2026-09-25 entschieden: Der zweite Ankermechanismus über Datei und Wortlaut eines Kernsatzes — 2026-09-21 als Rückfalloption zurückgestellt (vormals Q-07) — ist verworfen, weil er die Adresse einer Festlegung an einen Dateinamen bindet (Vorgabe 2.3); der frühere Abschnitt 3.2.9 entfällt damit, die Begründung steht in Kapitel 1.3.3. Am 2026-09-24 entschieden: der Fingerabdruck (vormals Q-04), die Suchschlüssel (vormals Q-05), die Zitatmarkerpflicht außerhalb `relate` (vormals Q-06) und das Graphenmodell (vormals Q-20) — siehe `status.md`; die Entscheidungen stehen an ihren Funktionsstellen in Kapitel 1.
+Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, Registerort und -grammatik, die Regel für Altes und das Prinzip der Nachmarkierung. Am 2026-09-21 entschieden: die Platzierung des Markers im Satz (vormals Q-03). Am 2026-09-25 entschieden: Der zweite Ankermechanismus über Datei und Wortlaut eines Kernsatzes — 2026-09-21 als Rückfalloption zurückgestellt (vormals Q-07) — ist verworfen, weil er die Adresse einer Festlegung an einen Dateinamen bindet (Vorgabe 2.3); die Begründung steht in Kapitel 1.3.3. Der Abschnitt, der ihn beschrieb, ist entfallen; unter 3.2.9 stehen jetzt die Notizen im Commit, ebenfalls am 2026-09-25 entschieden. Am 2026-09-24 entschieden: der Fingerabdruck (vormals Q-04), die Suchschlüssel (vormals Q-05), die Zitatmarkerpflicht außerhalb `relate` (vormals Q-06) und das Graphenmodell (vormals Q-20) — siehe `status.md`; die Entscheidungen stehen an ihren Funktionsstellen in Kapitel 1.
 
 ### 3.2.1 Trennung von Prosa und Register
 
@@ -72,5 +72,30 @@ Stand von Arbeitspunkt 2 (2026-09-17). Entschieden sind Trennung, Markerformen, 
 ### 3.2.8 Layout der Prosa
 
 > Ob ein Absatz eine Zeile ist oder nach einer festen Breite umbricht und Absätze durch Leerzeilen getrennt sind, berührt den Mechanismus nicht: Marker sind Inline-Text, das Register ist eine eigene Datei. Das Layout wird beim Skillstart aus der vorhandenen Doku abgelesen oder erfragt (Kapitel 3.5) und bestimmt nur, wie die Instanz Prosa schreibt.
+
+### 3.2.9 Notizen im Commit
+
+Warum es diese Notizen gibt und welche zwei Regeln für sie gelten, steht in Kapitel 1.3.5. Hier steht ihre Form. Die Grammatik folgt dem Git-Trailer, weil Git Trailer selbst zerlegt (`%(trailers:key=…)`) und dafür kein eigener Parser für Commit-Texte nötig ist; gemessen am Repository dieses Vorhabens dauert ein Lauf über den vollständigen Verlauf von knapp fünfhundert Commits zwischen acht und siebzehn Millisekunden, der Aufwand wächst linear. Eine Begrenzung der Suchtiefe ist deshalb nirgends nötig.
+
+> Bleibt beim Committen etwas offen, trägt die Commit-Nachricht am Ende eine Trailer-Zeile. Ihr Schlüssel beginnt mit `ADoc-` — für die projektbegleitende Doku —, danach folgt die Klasse der Notiz. Bisher gibt es eine Klasse: `ADoc-open` für ein offenes Ende. Weitere Klassen bekommen einen eigenen Schlüssel und brechen die vorhandenen nicht.
+>
+>> `ADoc-open: marker | dev-doc/pipeline.md | Eingangsqueue 64 Einträge | vom Entwickler abgelehnt`
+>>
+>> `ADoc-open: register | dev-doc/pipeline.md | D-0043 | Sitzung abgebrochen, Registerzeile fehlt`
+>
+> Nach dem Schlüssel stehen vier Felder in fester Reihenfolge, getrennt durch ` | `:
+>
+> | Feld | Inhalt |
+> |---|---|
+> | Art | `marker` — ein bindender Satz trägt keinen Definitionsmarker · `register` — Marker gesetzt, Registerzeile fehlt · `succession` — abgelöste Festlegung ohne Nachfolger im Register · `inconsistent` — trotz Blockade committet |
+> | Ort | die Datei, in der es steht |
+> | Wiederfindehinweis | die ID, wo es eine gibt; sonst wenige Worte aus dem betroffenen Satz |
+> | Grund | ein Halbsatz für den Menschen: abgelehnt, abgebrochen, bewusst mitgenommen |
+>
+> Mehrere offene Punkte eines Commits ergeben mehrere Zeilen. Schreibe eine Notiz nur, wenn tatsächlich etwas offenbleibt — nicht vorsorglich.
+
+**Zur Abgrenzung von Vorgabe 2.3.** Die Notiz nennt einen Dateinamen und einen Textausschnitt, also das, was der verworfene zweite Ankermechanismus getan hätte (Kapitel 1.3.3). Der Unterschied ist, dass hier nichts daran hängt: Bricht die Adresse, weil die Datei umbenannt oder der Satz umformuliert wurde, findet die Suche nichts und die Instanz arbeitet weiter wie ohne Notiz. Ein Anker hätte die Identität einer Festlegung getragen; dieser Hinweis trägt nichts. Deshalb ist er kein Verstoß.
+
+**Committet der Entwickler selbst**, ohne die Instanz, entsteht keine Notiz. Das ist hinzunehmen — solange die Information noch im Kontext der Instanz steht, trägt sie sie beim nächsten Commit nach. Wer die Zusammenarbeit mit der Instanz so knapp hält, dass das regelmäßig danebengeht, ist mit diesem Skill nicht gut bedient (Festlegung des Entwicklers vom 2026-09-25). Auf Lückenlosigkeit der Notizen darf sich deshalb nichts verlassen; sie sind Hilfe, nicht Quelle.
 
 Die Grenze zwischen Kapiteln und Anhang aus dem Vorläufer (Anhang A, Abschnitt A.9) bleibt für 3.2.6 unberührt — dort nachzulesen, wo diese Doku selbst die Grenze noch nach altem Schema führt.
