@@ -79,11 +79,11 @@ Warum es diese Notizen gibt und welche zwei Regeln für sie gelten, steht in Kap
 
 > Bleibt beim Committen etwas offen, trägt die Commit-Nachricht am Ende eine Trailer-Zeile. Ihr Schlüssel beginnt mit `ADoc-` — für die projektbegleitende Doku —, danach folgt die Klasse der Notiz. Bisher gibt es eine Klasse: `ADoc-open` für ein offenes Ende. Weitere Klassen bekommen einen eigenen Schlüssel und brechen die vorhandenen nicht.
 >
->> `ADoc-open: marker | dev-doc/pipeline.md | Eingangsqueue 64 Einträge | vom Entwickler abgelehnt`
+>> `ADoc-open: marker | dev-doc/pipeline.md | Eingangsqueue 64 Einträge | vom Entwickler abgelehnt | 9d95e659`
 >>
->> `ADoc-open: register | dev-doc/pipeline.md | D-0043 | Sitzung abgebrochen, Registerzeile fehlt`
+>> `ADoc-open: register | dev-doc/pipeline.md | D-0043 | Sitzung abgebrochen, Registerzeile fehlt | 9d95e659`
 >
-> Nach dem Schlüssel stehen vier Felder in fester Reihenfolge, getrennt durch ` | `:
+> Nach dem Schlüssel stehen fünf Felder in fester Reihenfolge, getrennt durch ` | `:
 >
 > | Feld | Inhalt |
 > |---|---|
@@ -91,8 +91,11 @@ Warum es diese Notizen gibt und welche zwei Regeln für sie gelten, steht in Kap
 > | Ort | die Datei, in der es steht |
 > | Wiederfindehinweis | die ID, wo es eine gibt; sonst wenige Worte aus dem betroffenen Satz |
 > | Grund | ein Halbsatz für den Menschen: abgelehnt, abgebrochen, bewusst mitgenommen |
+> | Sitzung | Kennung der Sitzung, in der es geschah, oder `-`, wenn nicht ermittelbar |
 >
-> Mehrere offene Punkte eines Commits ergeben mehrere Zeilen. Schreibe eine Notiz nur, wenn tatsächlich etwas offenbleibt — nicht vorsorglich.
+> Mehrere offene Punkte eines Commits ergeben mehrere Zeilen. Schreibe eine Notiz nur, wenn tatsächlich ein Eingriff in die Doku ausgeblieben ist — nicht vorsorglich und nicht als Arbeitsbericht. Halte sie knapp: Was zum Verstehen nötig ist, steht ohnehin im Commit selbst und in der Sitzung, auf die das letzte Feld zeigt.
+
+**Die Sitzungskennung ist der Zugang zum Kontext, den die Notiz selbst nicht trägt.** Wird die Entwicklung im Gespräch geführt, liegt dort der Gedankengang, der zum Abbruch oder zur Ablehnung führte — ausführlicher, als eine Trailer-Zeile ihn je fassen könnte. In Claude Code liegen die Protokolle je Projekt als eine Datei je Sitzung; ihr Name ist die Kennung (am 2026-09-25 am laufenden System beobachtet, nicht gegen die Dokumentation geprüft). Wie die Instanz die Kennung der eigenen Sitzung zur Laufzeit erfährt, ist bei der Umsetzung zu klären: Der Pfad des Arbeitsverzeichnisses, das ihr zugewiesen wird, enthält sie (ebenfalls beobachtet), und die Eingabe eines Hooks trägt sie mit — beides ist vor dem Bauen gegen die Dokumentation zu prüfen. Gelingt es nicht, steht `-` im Feld und die Notiz bleibt trotzdem brauchbar; der Zugang über den Commit selbst bleibt in jedem Fall.
 
 **Zur Abgrenzung von Vorgabe 2.3.** Die Notiz nennt einen Dateinamen und einen Textausschnitt, also das, was der verworfene zweite Ankermechanismus getan hätte (Kapitel 1.3.3). Der Unterschied ist, dass hier nichts daran hängt: Bricht die Adresse, weil die Datei umbenannt oder der Satz umformuliert wurde, findet die Suche nichts und die Instanz arbeitet weiter wie ohne Notiz. Ein Anker hätte die Identität einer Festlegung getragen; dieser Hinweis trägt nichts. Deshalb ist er kein Verstoß.
 
