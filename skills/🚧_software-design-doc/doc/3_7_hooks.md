@@ -8,6 +8,10 @@ Stand (2026-09-25): Die drei Hooks sind spezifiziert; die Hook-Dokumentation von
 
 **Warum die Einhaltung an Hooks hängt und nicht am Regeltext, steht in Kapitel 1.3.5.** Hier steht, welche drei es gibt und wie sie gebaut sind. Zwei Eigenschaften gelten für alle: Sie sind nur lesend (Vorgabe 2.8) — sie prüfen, melden, und genau einer blockiert. Und sie fällen kein Urteil darüber, ob ein Satz eine Festlegung ist; sie erzwingen nur, dass das Urteil gefällt und aufgeschrieben wird.
 
+**In einem abgewählten Projekt sind alle drei stumm — das leistet aber das Skript, nicht die Hook-Konfiguration** (entschieden am 2026-10-02, funktionale Begründung in Kapitel 1.7.7). Die Dokumentation von Claude Code ist an diesem Punkt eindeutig, geprüft am 2026-10-02: Ein Hook aus dem Frontmatter eines Skills wird registriert, sobald der Skill aufgerufen wird, und läuft für den Rest der Sitzung weiter, auch in Zügen nach dem des Skills — ausdrücklich unabhängig davon, ob die Instanz dem Skill gerade folgt. Es gibt weder eine bedingte Registrierung noch ein Entfernen zur Laufzeit; `disableAllHooks` schaltet alle Hooks eines Projekts ab, auch fremde, und ist damit kein Mittel für uns. Das Feld `if` filtert nur nach Werkzeugnamen und deren Argumenten in der Syntax der Berechtigungsregeln und kann keine Dateiinhalte lesen. Die Dokumentation nennt für genau diesen Fall selbst den Weg, den wir gehen: ein Skript, das seine Bedingung selbst prüft, bevor es etwas ausgibt. Jedes Kommando endet deshalb bei `mode: off` ohne Befund (Kapitel 3.6.2) und sagt einmal je Sitzung, dass hier abgewählt ist.
+
+**Daraus folgt zugleich, wo der Pfadfilter des Lints wohnt.** Er kann nicht im Frontmatter stehen: Dort ist er statisch, der Doku-Ordner aber ist projektabhängig. Der Filter wandert also ins Skript und steht dort neben der Mode-Prüfung, die es ohnehin geben muss (vormals offen in 3.7.4).
+
 Der Nachweis, dass ein Hook trägt, wo eine Anweisung nicht trägt, liegt in diesem Repository vor: Der Hook des Skills `git-branch-model` schloss eine Lücke, die keine Formulierung schloss.
 
 ### 3.7.2 Die drei Hooks
@@ -16,7 +20,7 @@ Der Nachweis, dass ein Hook trägt, wo eine Anweisung nicht trägt, liegt in die
 |---|---|---|---|
 | Ereignis | `PostToolUse` | `PreToolUse` | `SessionStart` |
 | Matcher | `Edit\|Write\|MultiEdit` | `Bash` | `startup\|resume\|compact` |
-| Filter | Pfad der Datei liegt im Doku-Ordner (über `if: Edit(<doc_dir>/*)` oder im Skript aus `tool_input.file_path`) | `if: Bash(git commit*)` | — |
+| Filter | im Skript aus `tool_input.file_path`, weil der Doku-Ordner projektabhängig und das Frontmatter statisch ist | `if: Bash(git commit*)` | — |
 | Eingabe | Hook-JSON mit `tool_input.file_path` und `cwd` | Hook-JSON mit `cwd` | Hook-JSON mit `cwd` |
 | Kommando | `software-design-doc.py lint --file <pfad> --changed --json` | `software-design-doc.py check --json` | `software-design-doc.py check --summary` |
 | Ausgabe | Exit 0; JSON mit `additionalContext`: die Befunde — nicht blockierend | Exit 2 mit Begründung auf stderr bei struktureller Inkonsistenz → blockiert den Commit, es sei denn, der Entwickler hat die Blockade für diesen einen Commit ausdrücklich aufgehoben; dann trägt der Commit eine Notiz (Kapitel 3.2.9). Sonst Exit 0, Befunde als `additionalContext` | Exit 0; Klartext auf stdout wird Kontext: Zahl Festlegungen, `assumed`, `pending`, unlesbare Zeilen, seit dem letzten Lauf geänderte Definitionssätze |
@@ -33,4 +37,4 @@ H1 und H2 sind nur sinnvoll, wenn der Skill geladen ist, und sie sollen in jedem
 
 ### 3.7.4 Technisch offen (keine Entscheidung des Entwicklers)
 
-Pfadauflösung: ob `${CLAUDE_SKILL_DIR}` im Kommando eines Frontmatter-Hooks aufgelöst wird oder der Pfad anders zu ermitteln ist; die Doku nennt für Hooks `${CLAUDE_PROJECT_DIR}` und `${CLAUDE_PLUGIN_ROOT}`. Pfadfilter: ob `Edit(<doc_dir>/*)` den Doku-Ordner trifft oder der Filter ins Skript wandert. Zeitlimits nach den ersten Messungen. Aufhebung der H2-Blockade (Kapitel 1.3.5): wie das Wort des Entwicklers beim Hook ankommt — Script-Argument, Umgebungsvariable oder eine erkennbare Zeile in der Commit-Nachricht. Die dritte Form hätte den Vorteil, die nach Vorgabe 2.8 ohnehin fällige Notiz gleich mitzuliefern.
+Pfadauflösung: ob `${CLAUDE_SKILL_DIR}` im Kommando eines Frontmatter-Hooks aufgelöst wird oder der Pfad anders zu ermitteln ist; die Doku nennt für Hooks `${CLAUDE_PROJECT_DIR}` und `${CLAUDE_PLUGIN_ROOT}`. Zeitlimits nach den ersten Messungen. Aufhebung der H2-Blockade (Kapitel 1.3.5): wie das Wort des Entwicklers beim Hook ankommt — Script-Argument, Umgebungsvariable oder eine erkennbare Zeile in der Commit-Nachricht. Die dritte Form hätte den Vorteil, die nach Vorgabe 2.8 ohnehin fällige Notiz gleich mitzuliefern.

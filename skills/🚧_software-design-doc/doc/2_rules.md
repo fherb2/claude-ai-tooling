@@ -52,7 +52,7 @@ Noch allgemeiner formuliert: Das, was sich mechanisch-logisch an Arbeit bündeln
 
 ## 2.8 Hooks sind nur lesend
 
-Kein Hook ändert eine Datei. Hooks prüfen, melden und blockieren; das Ändern bleibt bei der Instanz nach Freigabe. Die einzige Blockade ist der Commit bei struktureller Inkonsistenz von Prosa und Register.
+Kein Hook ändert eine Datei des Projekts — nicht die Doku, nicht das Register, nicht den Code. Hooks prüfen, melden und blockieren; das Ändern bleibt bei der Instanz nach Freigabe. Was ein Hook außerhalb des Projekts für die Dauer der Sitzung notiert, um sich einen eigenen Lauf zu merken, fällt nicht darunter (Kapitel 3.6.2); es trägt keinen Inhalt und überlebt die Sitzung nicht. Die einzige Blockade ist der Commit bei struktureller Inkonsistenz von Prosa und Register.
 
 **Die Blockade ist je Commit aufhebbar, und die Aufhebung hinterlässt eine Notiz** (entschieden am 2026-09-25). Aufheben kann sie nur der Entwickler durch eine ausdrückliche Äußerung; die Instanz setzt sie nie aus eigenem Antrieb, sondern legt dar, was gefunden wurde, und fragt. Der Commit trägt dann eine Notiz nach Kapitel 3.2.9, die benennt, was offenblieb. Prüfbar: Ein Commit, der eine strukturelle Inkonsistenz mitnimmt und keine Notiz trägt, ist ein Verstoß; ebenso eine Aufhebung, für die es keine Äußerung des Entwicklers gibt. Die Begründung — dass diese Blockade die Instanz diszipliniert und nicht den Entwickler — steht in Kapitel 1.3.5.
 
