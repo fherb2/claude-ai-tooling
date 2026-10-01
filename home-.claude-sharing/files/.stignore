@@ -15,11 +15,31 @@
 // carried out on one machine from resurfacing on another as an open task.
 // Reasoning per pattern in 3.9 of the doc
 /cache
+/plugins/cache
 /debug
 /downloads
 /image-cache
 /plans
 /telemetry
+/plugins/marketplaces
+/plugins/installed_plugins.set-aside.*.json
+/plugins/installed_plugins.unreadable.*.kept
+
+// Download cache of the claude.ai account sync. The server side of your
+// account is the source of truth; every signed-in machine fetches these
+// trees for itself at start-up and re-checks them every ten minutes. Claude
+// Code never uploads from here, and edits made here are overwritten by the
+// next round -- so there is nothing to carry between machines. The round
+// marker ".last-complete-round" inside each tree holds a locally generated
+// round id plus the client name, so two machines can never agree on its
+// content: it conflicted three times within four seconds on 2026-10-01.
+/plugins/synced
+/skills/synced
+
+// Where the same sync parks what it removed. Machine-bound, swept by
+// cleanupPeriodDays, and recoverable only on the machine that lost the file.
+/plugins/.trash
+/skills/.trash
 
 // Machine-bound: backup copies, session markers, environment, shell captures,
 // IDE connection
