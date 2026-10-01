@@ -1,6 +1,6 @@
 ## 3.4 Geplante Schritte und Umbauziel
 
-Stand (2026-09-25): Entschieden sind der Begriff des geplanten Schritts, die Adressierung einzelner Festlegungen über ihre ID, der Verzicht auf eigene Schrittkennungen (vormals Q-14) und — vormals Q-12 — der Inhalt eines geplanten Schritts sowie die Ablageorte einer Planung (der frühere Punkt T2); die Entscheidungen stehen in Kapitel 1.7.3, die Einzelheiten hier in 3.4.3. **Offen ist, wie ein Schritt einen ganzen Bereich als Umbauziel benennt**; die Entscheidungsgrundlage dazu steht in Kapitel 1.7.3 und ihre Folge für die Vorgaben in Vorgabe 2.3. Solange sie aussteht, ist die dritte Zeile der Tabelle in 3.4.2 ein Vorschlag und kein Zieltext.
+Stand (2026-09-25): Entschieden sind der Begriff des geplanten Schritts, die Adressierung einzelner Festlegungen über ihre ID, der Verzicht auf eigene Schrittkennungen (vormals Q-14) und — vormals Q-12 — der Inhalt eines geplanten Schritts sowie die Ablageorte einer Planung (der frühere Punkt T2); die Entscheidungen stehen in Kapitel 1.7.3, die Einzelheiten hier in 3.4.3. Am 2026-10-02 entschieden: Ein Bereich wird als Umbauziel über eine stabile Kennung genannt, nicht über Datei und Überschrift (Kapitel 1.7.3 und 3.3.2).
 
 ### 3.4.1 Geplante Schritte
 
@@ -16,9 +16,9 @@ Stand (2026-09-25): Entschieden sind der Begriff des geplanten Schritts, die Adr
 > |---|---|
 > | ein Register im Spiel | `target: D-0042, D-0057` |
 > | mehrere Register | `target: docs/pipeline/decisions.md:D-0042, :D-0057` — der Qualifier vor dem Doppelpunkt ist der Registerpfad; ein führender Doppelpunkt heißt „gleiches Register wie zuvor" |
-> | ein Kapitel als Ziel | `target: chapter docs/3_2_pipeline.md` |
+> | ein Bereich als Ziel | `target: section S-03` — die Kennung aus dem Rollenmarker des Abschnitts (Kapitel 3.3.2) |
 >
-> Der Qualifier ist das Register, nicht die Kapiteldatei, weil IDs je Register global sind und Kapiteldateien sich umbenennen. Das Kapitelziel ist das Einzige, was an einem Dateinamen hängt; wird die Datei umbenannt, meldet `check` das zerbrochene Ziel. Mehrere `target:`-Zeilen je Schritt sind erlaubt.
+> Der Qualifier ist das Register, nicht die Kapiteldatei, weil IDs je Register global sind und Kapiteldateien sich umbenennen. Kein Ziel adressiert über einen Ort: Eine Festlegung nennt ihre ID, ein Bereich seine Kennung (entschieden am 2026-10-02, Begründung in Kapitel 1.7.3). Mehrere `target:`-Zeilen je Schritt sind erlaubt.
 >
 > Fehlt in einem bestehenden Fahrplan jedes Umbauziel — der Normalfall bei Einführung —, fragt die Instanz einmal, wenn ein Schritt erkennbar den berührten Bereich betrifft, ob er als Umbau gemeint ist, und trägt das Ziel nach. Der Fahrplan kommt so am Berührungspunkt ins Schema, wie die Doku selbst.
 
