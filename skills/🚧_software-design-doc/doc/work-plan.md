@@ -12,7 +12,6 @@ Vorgehen seitdem: Der Entwickler geht die Kapitel in Leseordnung durch und antwo
 
 | Offener Punkt | Wo er steht | Blockiert |
 |---|---|---|
-| Wie ein Schritt einen ganzen Bereich als Umbauziel benennt (vormals Q-13) | `1_overview.md`, 1.7.3 — Folge für die Vorgaben in `2_rules.md`, 2.3 | 2 |
 | Ob der Zustandsbericht am Sitzungsstart gebaut wird (vormals Q-27) | `1_overview.md`, 1.7.6 — Bauweise in `3_7_hooks.md` | 6 |
 | Welche Ausgabeform der Standard ist (vormals Q-23) | `2_rules.md`, 2.5 — messbar in der Probe | 4 |
 | Zuschnitt des Kapitels Migration und Installation | `3_9_migration.md`, Kopf | 9 |
@@ -27,7 +26,7 @@ Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerf
 
 ## 2 Regelteil Planung
 
-Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: der offenen Entscheidung über das Bereichsziel (Kapitel 1.7.3 und Vorgabe 2.3). Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
+Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: nichts Offenem mehr; das Bereichsziel ist am 2026-10-02 entschieden (Kapitel 1.7.3, 3.3.2). Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
 
 ## 3 Regelteil Skill-Parameter
 

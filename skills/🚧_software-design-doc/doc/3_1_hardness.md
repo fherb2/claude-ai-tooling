@@ -30,7 +30,7 @@ Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassun
 > | `pinned` | ausdrückliche Entscheidung des Entwicklers, eine `chosen`-Festlegung nicht wieder aufzumachen; das Einzige, was an Härte gespeichert wird | ja/nein |
 > | `status` | wie die Attribute zustande kamen (Fußabdruck) | `assumed` — Lesart der Instanz, vom Entwickler nicht bestätigt · `accepted` — stand in einem freigegebenen Plan, nicht einzeln angesprochen · `confirmed` — vom Entwickler selbst bestätigt oder korrigiert |
 > | Ereigniszeile | datierte Zeile im Register zur Festlegung | `friction` — Arbeit musste um die Festlegung herum gebaut werden · `upheld` — gegen eine Idee oder einen Befund geprüft und bestätigt · `pending` — eine Frage an den Entwickler ist offen |
-> | geplanter Schritt | noch offener Schritt der Projektplanung, wo immer er steht (Fahrplandatei, Abschnitt „Offen" einer README, Notiz); eine Fahrplandatei wird nicht vorausgesetzt | nennt sein Umbauziel: IDs oder ein Kapitel (Kapitel 3.4) |
+> | geplanter Schritt | noch offener Schritt der Projektplanung, wo immer er steht (Fahrplandatei, Abschnitt „Offen" einer README, Notiz); eine Fahrplandatei wird nicht vorausgesetzt | nennt sein Umbauziel: IDs oder die Kennung eines Bereichs (Kapitel 3.4) |
 > | `mode` | wie die Sitzung die Doku liest | `execute` — Beschlossenes umsetzen · `design` — etwas neu denken, Alternativen suchen |
 > | `friction_threshold` | Zahl der `friction`-Zeilen, ab der eine Festlegung `open` wird | Skill-Parameter, Standard 2; für Festlegungen aus Abschnitten mit der Funktion `global` gilt eine Stufe höher (Standard 3) |
 > | `assumptions_on_approval` | was die Freigabe eines Plans mit den darin gelisteten Annahmen tut | `accept` (Standard) — sie werden `accepted` · `keep` — sie bleiben `assumed` |
@@ -62,7 +62,7 @@ Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassun
 > | R2 | Ein geplanter Schritt nennt diese ID als Umbauziel. | `open` | Jüngste Entscheidung des Entwicklers; öffnet auch Gegebenes und Festgeschriebenes. |
 > | R3 | `kind` ist `given` und `status` ist `accepted` oder `confirmed`. | `fixed` | Stehen dennoch mindestens `friction_threshold` `friction`-Zeilen da, bleibt sie `fixed`; Du sagst einen Satz nach den Regeln aus 3.1.3: Quelle noch aktuell? |
 > | R4 | `pinned` und `status` ist `accepted` oder `confirmed`. | `fixed` | |
-> | R5 | Ein geplanter Schritt nennt ihr Kapitel als Umbauziel. | `open` | Gröber als R2; öffnet nicht, was R3 oder R4 gebunden haben. |
+> | R5 | Ein geplanter Schritt nennt den Bereich, in dem sie steht, als Umbauziel. | `open` | Gröber als R2; öffnet nicht, was R3 oder R4 gebunden haben. |
 > | R6 | Seit der jüngsten `upheld`-Zeile stehen mindestens `friction_threshold` `friction`-Zeilen (Funktion `global`: eine Stufe höher). Fehlt eine `upheld`-Zeile, zählen alle. | `open` | Zählung per Kommando, nie per Blick. |
 > | R7 | — | `decided` | Der Normalfall. |
 >
