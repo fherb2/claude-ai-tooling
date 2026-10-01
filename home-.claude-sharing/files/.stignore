@@ -24,6 +24,7 @@
 /plugins/marketplaces
 /plugins/installed_plugins.set-aside.*.json
 /plugins/installed_plugins.unreadable.*.kept
+/policy-limits.*
 
 // Download cache of the claude.ai account sync. The server side of your
 // account is the source of truth; every signed-in machine fetches these
