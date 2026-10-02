@@ -47,3 +47,23 @@ Die Dreiteilung des Vorläufers (Anhang A) bleibt die Empfehlung für Projekte, 
 > Ein Repository kann mehrere Vorhaben mit eigener Doku tragen (Kapitel 1.5). Die Skill-Parameterdatei ist der Standard des Repositories. Ein Vorhaben mit eigener Doku weicht ab, indem seine Dateien Rollenmarker und eine `[register: pfad]`-Zeile tragen; der Skill folgt dann dem Vorhaben, in dem die berührten Dateien liegen — keine zweite Skill-Parameterdatei je Vorhaben, die Zeile im Dokument reicht.
 
 Das entspricht der Regel dieses Repositories, dass jedes Vorhaben eigenständig aufgebaut ist — hier nur als Beleg dafür genannt, dass die Festlegung sich in der Praxis bewährt, nicht als Teil der Regel selbst.
+
+### 3.5.5 Erkennung der Projektart
+
+Warum der Skill zuerst klärt, ob hier überhaupt Software entsteht, und warum die Prüfung nur das klare Nein erkennen muss, steht in Kapitel 1.7.7. Hier steht, woran sie es erkennt.
+
+> Geprüft wird rein mechanisch, ohne Rückfrage, an zwei Signalen. Ein **Projektmanifest** im Baum: `pyproject.toml`, `setup.py`, `package.json`, `Cargo.toml`, `go.mod`, `pom.xml`, `build.gradle`, `CMakeLists.txt`, `Makefile`, `composer.json`, `Gemfile`, `pubspec.yaml`, `mix.exs`, eine `*.csproj`, `Dockerfile`, `docker-compose.yml`. Oder **Quelldateien** an ihrer Endung: `.py` `.js` `.ts` `.tsx` `.jsx` `.c` `.h` `.cpp` `.hpp` `.cs` `.java` `.kt` `.rs` `.go` `.rb` `.php` `.swift` `.scala` `.ex` `.lua` `.sh` `.ps1` `.sql` `.vue` `.dart` `.cu` `.f90` `.jl` `.r`. Übersprungen werden die üblichen Werkzeug- und Fremdordner (`.git`, `.venv`, `node_modules`, `__pycache__`, Editor- und Werkzeugordner).
+>
+> | Befund | Folge |
+> |---|---|
+> | Manifest oder Quelldateien vorhanden | Softwareentwicklung; der Ablauf geht weiter |
+> | weder noch, aber substantieller anderer Inhalt | kein Softwareprojekt; Du endest hier und sagst es einmal je Sitzung |
+> | weder noch, und kaum Inhalt | unentschieden; Du läufst still weiter, bis es etwas vorzuschlagen gibt |
+>
+> Das Ergebnis wird nicht festgehalten: Ein Vorhaben ohne Code heute kann morgen welchen haben, und die Prüfung ist billiger als die Folgen einer veralteten Antwort.
+
+**Die Listen altern — das ist ihr eingebauter Mangel**, und deshalb stehen sie hier im Regelteil und nicht als Konstante im Skript: So lassen sie sich erweitern, ohne Code anzufassen. Trifft die Erkennung daneben, ist die Folge mild. Im einen Fall läuft der Skill still mit, obwohl er nicht gebraucht wird; im anderen schweigt er, und der Entwickler ruft ihn bei Bedarf ausdrücklich auf.
+
+**Zur Schwelle zwischen „substantieller Inhalt" und „kaum Inhalt"** steht hier bewusst keine Zahl. Gemeint ist: mehr als eine Handvoll inhaltlicher Dateien, die erkennbar ein anderes Vorhaben tragen — Texte, Abbildungen, Daten. Der genaue Wert wird in der Probe kalibriert (Kapitel 3.8), wie die Normalisierung des Fingerabdrucks auch.
+
+**Gemessen am 2026-10-02** an sechs konstruierten Vorhaben und an diesem Repository: Ein Python-Projekt mit Manifest, ein Infrastruktur-Repository und ein Paper mit einem Auswertungsskript wurden als Software erkannt; ein reines Doku-Repository, ein LaTeX-Paper und ein neues Projekt mit nur einer README blieben unentschieden. Der vollständige Durchlauf dieses Repositories mit rund fünfhundert Dateien dauerte 24 Millisekunden, die konstruierten Fälle jeweils unter einer.
