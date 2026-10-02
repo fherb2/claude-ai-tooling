@@ -52,7 +52,7 @@ Die Zieltexte liegen seit dem 2026-10-02 als eigene Dateien im Skill-Ordner; die
 
 ## 8 Probe
 
-Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der Verzweigungen (Kostenfunktion, Fingerabdruck, H3, Zitatmarker außerhalb `relate`); zweiter Durchlauf an einer echten Doku empfohlen. Hängt an: Schritt 4 bis 7. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Die Fixture ist nicht die Doku des Entwicklers.
+Fixture, Ablauf und Messung nach Kapitel 3.8; Entscheidung der verbliebenen Verzweigungen (Kostenfunktion, Zitatmarker außerhalb `relate`; der Fingerabdruck ist seit dem 2026-09-25 entschieden, über H3 wird vorher entschieden); zweiter Durchlauf an einer echten Doku empfohlen. Hängt an: Schritt 4 bis 7. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Die Fixture ist nicht die Doku des Entwicklers.
 
 ## 9 Migration und Installation
 
