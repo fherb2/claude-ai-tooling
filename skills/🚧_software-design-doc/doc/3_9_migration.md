@@ -6,7 +6,7 @@ Stand (2026-09-25): Vorschlag; jede Passage der Anweisungsdateien wird beim Umzu
 
 ### 3.9.1 Umzug aus der globalen Anweisungsdatei (früher T1)
 
-Abschnitt 2 der globalen `~/.claude/CLAUDE.md` (2.1 Phasen bis 2.6 Fahrplan und Status) ist der Sache nach dieser Skill; sein Inhalt ist der des Vorläufers (Anhang A). Er wandert in den Regelteil `standard.md`, angepasst nach Kapitel 1.11: Segmente als empfohlene Rollen, Phasen je Bereich, Planungsort nach Kapitel 3.4. In der Anweisungsdatei bleiben der geankerte Trigger aus `CLAUDE-snippet.md` und die Abgrenzung der Präambel, wann der Abschnitt überhaupt gilt. Anzupassen ist außerdem 1.9 Kontext-Haushalt: „Detaillierung des Fahrplans vor der Komprimierung" wird zu „Planung an ihrem Ort vertiefen und im Schritt darauf verweisen".
+Abschnitt 2 der globalen `~/.claude/CLAUDE.md` (2.1 Phasen bis 2.6 Fahrplan und Status) ist der Sache nach dieser Skill; sein Inhalt ist der des Vorläufers (Anhang A). Er wandert in den Regelteil `standard.de.md`, angepasst nach Kapitel 1.11: Segmente als empfohlene Rollen, Phasen je Bereich, Planungsort nach Kapitel 3.4. In der Anweisungsdatei bleiben der geankerte Trigger aus `CLAUDE-snippet.de.md` und die Abgrenzung der Präambel, wann der Abschnitt überhaupt gilt. Anzupassen ist außerdem 1.9 Kontext-Haushalt: „Detaillierung des Fahrplans vor der Komprimierung" wird zu „Planung an ihrem Ort vertiefen und im Schritt darauf verweisen".
 
 Die Doppelungen in der Projekt-`CLAUDE.md` dieses Repositories — „Wo ein Plan steht", „Fahrplan-Nummerierung", „`work-plan.md`, `status.md` und die Implementierungsdoku sind entwicklungszeitlich" — werden auf das reduziert, was repositoryspezifisch ist. Für jede Fundstelle gilt danach die Probe: Sie nennt den Fahrplan, oder sie beschreibt ihn — beides zugleich darf keine mehr.
 
@@ -17,7 +17,7 @@ Die Doppelungen in der Projekt-`CLAUDE.md` dieses Repositories — „Wo ein Pla
 | global, Abschnitt „Planung" (Ablageort erfragen: Chat, File im Projekt, `~/.claude`) | **bleibt unverändert.** Sie trägt den Vorbehalt „und der Ablageort der Planung nicht klar geregelt ist" und schaltet sich damit selbst ab, sobald der Skill ihn regelt. Für Vorhaben ohne Quellcode bleibt sie nötig. |
 | global §1.3 Plan vor Ausführung, §1.4 Abweichung heißt anhalten, §1.5 Rückfragen | **bleiben.** Sie regeln, *ob* und *wie vollständig* geplant wird, nicht *wo*. |
 | global §1.9 Kontext-Haushalt | **muss geändert werden**, nicht nur entfallen: „Detaillierung des Fahrplans" widerspricht dem Skill unmittelbar. |
-| global §2.1 bis §2.6 | **entfallen** vollständig; ihr Inhalt wird zum Regelteil `standard.md`. |
+| global §2.1 bis §2.6 | **entfallen** vollständig; ihr Inhalt wird zum Regelteil `standard.de.md`. |
 | Projekt, „Wo ein Plan steht" (zwei Orte, keine eigenen Plan-Dateien) | **entfällt.** Der Skill kennt mehr Ablageorte; die Regel wäre danach falsch. |
 | Projekt, „Fahrplan-Nummerierung" | **entfällt** als Doppelung; der Skill sagt dasselbe (Kapitel 3.4.1). |
 | Projekt, „entwicklungszeitliche Dateien" | überwiegend **Doppelung** zu „Doku wächst an Festlegungen"; der repositoryspezifische Rest bleibt. |
@@ -38,6 +38,6 @@ Die Datei `noch-geplant.md` des Skills ist am 2026-09-17 in diese Doku übergega
 
 1. Baustellenschild vom Ordnernamen entfernen: `skills/software-design-doc/`.
 2. Ordner nach `~/.claude/skills/software-design-doc/` kopieren; das Frontmatter der `SKILL.md` trägt H1 und H2.
-3. Inhalt der `CLAUDE-snippet.md` unterhalb der Trennlinie in die `CLAUDE.md` des Zielorts übernehmen; die Snippet-Datei bleibt am Zielort liegen.
+3. Inhalt der `CLAUDE-snippet.de.md` unterhalb der Trennlinie in die `CLAUDE.md` des Zielorts übernehmen; die Snippet-Datei bleibt am Zielort liegen.
 4. Je Projekt: Skill-Parameterdatei anlegen lassen, wenn gewünscht; H3 anbieten.
 5. Verweise im Repository nachziehen: Zeile in `skills/README.md` und `skills/README.en.md`, Fahrplanschritte 5 und 6 des Repositories, `skill-dev-doc.md`, wo der alte Name steht.
