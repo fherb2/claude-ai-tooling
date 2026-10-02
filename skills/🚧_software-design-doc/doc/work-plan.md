@@ -32,6 +32,18 @@ Geklärte Punkte stehen in `status.md`: Q-01 bis Q-12, Q-14 bis Q-17, Q-19, Q-20
 
 `rules-startup.de.md` fertigstellen: Erhebung, Skill-Parameterdatei, „Doku wächst an Festlegungen", mehrere Vorhaben je Repository, Erkennung der Projektart. Der Skillstart-Ablauf selbst steht in `SKILL.de.md` (Kapitel 3.10), nicht in diesem Regelteil. Stand wie in Schritt 1; dazu Befund B-12, die fehlende Erhebung. Hängt an: Schritt 1. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
 
+## 10 Regelteile von Mechanik entlasten und neu schneiden
+
+**Steht vor Schritt 4**, weil er bestimmt, was das Skript ausgeben muss. Drei Arbeiten, die zusammengehören:
+
+**Erstens die Entlastung.** Jeden Regelteil daraufhin durchgehen, ob er eine Mechanik nacherzählt, die ein Kommando ausführt (Vorgabe 2.6). Wo ja, tritt an die Stelle der Beschreibung ein Satz darüber, was die Ausgabe des Kommandos sagt — und die Rechenvorschrift wandert in die Doku, wo sie als Spezifikation gebraucht wird. Erkannte Kandidaten mit geschätztem Umfang: die Entscheidungsliste R1–R7 (728 Token), die Registergrammatik (667), die Trailer-Grammatik der Commit-Notizen (rund 300 von 538), Teile der Feldtabelle (rund 300 von 787), der Aufbau des Planabschnitts (rund 300 von 637), Registerort und ID-Vergabe (rund 350). Zusammen etwa 2 600 von 7 900 Token der beiden heute immer geladenen Teile. Die Abgrenzung ist im Einzelfall zu prüfen und nicht am Thema abzulesen: Was rechnet, gehört ins Skript; was Verhalten regelt, bleibt.
+
+**Zweitens der Schnitt.** `rules-hardness.de.md` und `rules-register.de.md` werden heute beide immer und gemeinsam geladen — die Trennung spart nichts (Vorgabe 2.15). Zu entscheiden: zusammenlegen, oder die Registergrammatik an den Anlass „ein freigegebener Plan wird ausgeführt" binden. Das zweite spart mehr und hängt daran, ob der Anlass trennscharf bleibt.
+
+**Drittens die Wurzel.** Die beiden mechanischen Vorentscheidungen des Ablaufs — Projektart und `mode` — werden ein Kommandoaufruf statt zweier beschriebener Prüfverfahren. Damit sinkt, was ein abgewähltes Projekt zahlt.
+
+Dazu die Adressierung nach Vorgabe 2.16: durchlaufende Nummern in den Zieltexten, benannte Überschriften für Tabellen, auf die verwiesen wird. Hängt an: nichts. Aufwand: 2 bis 3 Sitzungen. Fehleranfälligkeit mittel: Die Grenze zwischen Rechenvorschrift und Verhaltensregel verläuft nicht am Thema.
+
 ## 4 Skript Stufe 1
 
 `files/software-design-doc.py` mit `list`, `show`, `next-id`, `add`, `check`, `mentions`, `hardness`, `impact --hops`, `plan-section`, `explain`, `notes` (Kapitel 3.6.4); Ausgabevertrag nach Kapitel 3.6; Prüffälle mit Fixture und beschädigten Varianten. Hängt an: Schritt 1 und 2 (für `target:`). Aufwand: 3 bis 4 Sitzungen. Fehleranfälligkeit hoch: Parsing-Ränder (U+00A0, Klammern in Prosa, umbrochenes Layout), Kapitelableitung bei verschobenen Markern. Vor dem ersten Code den Skill `common-code-generation` laden.
