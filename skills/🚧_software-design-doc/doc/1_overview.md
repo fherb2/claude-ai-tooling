@@ -555,6 +555,16 @@ Ob ein überholter Absatz in der Prosa stehen bleibt, entscheidet der Entwickler
 
 ### 1.7.7 Keine Unterstützung
 
+**Vor allem anderen steht die Frage, ob hier überhaupt Software entwickelt wird** (entschieden am 2026-10-02). Der Skill begleitet die Entwicklung von Software; für ein Buch, ein Paper oder eine Dokumentsammlung ist er nicht gemacht. Das klärt er selbst und ohne Zutun des Entwicklers, noch bevor er einen Regelteil nachlädt — ein Vorhaben, in dem er nichts zu suchen hat, soll ihn auch nicht kosten.
+
+Geprüft wird mechanisch an zwei Signalen: einem Projektmanifest und Quelldateien an ihrer Endung (Kapitel 3.5.5). **Die Prüfung ist dabei bewusst asymmetrisch — sie muss nur das klare Nein erkennen.** Findet sie Manifest oder Quelldateien, geht es weiter. Findet sie substantiellen Inhalt, aber weder das eine noch das andere — Texte, Abbildungen, Daten, die erkennbar ein anderes Vorhaben tragen —, endet der Skill hier. Findet sie fast nichts, entscheidet sie nicht, sondern lässt weiterlaufen.
+
+Der letzte Fall ist der wichtige, und er ist der Grund für die Asymmetrie: **Ein neues Projekt hat noch keinen Code, und gerade dort ist die begleitende Doku am wertvollsten** — die ersten Festlegungen fallen, bevor die erste Zeile geschrieben ist. Eine Prüfung, die „kein Code" mit „kein Softwareprojekt" gleichsetzte, stellte den Skill im Augenblick seines größten Nutzens still. Entscheiden muss sie dort aber auch gar nichts: Der Skill ist ohnehin still, bis er zum ersten Mal etwas vorschlagen will (1.7), und dann liegt der Anlass auf dem Tisch.
+
+Dieselbe Zurückhaltung entschärft den Grenzfall in der anderen Richtung. Ein Paper mit einem einzigen Auswertungsskript gilt formal als Software — das ist nicht falsch, bleibt aber folgenlos, weil der Skill erst bei einer Festlegung anschlägt, die den Code überdauert. Bei einem Plot-Skript geschieht das selten.
+
+**Endet der Skill hier, sagt er es einmal je Sitzung** — ein Satz, dass dieses Vorhaben keine Softwareentwicklung ist und er deshalb nichts tut. Aus demselben Grund wie bei der Abwahl: Die Antwort steht dann schon da, bevor sich jemand wundert.
+
 **Fehlt die Skill-Parameterdatei oder das Feld `mode`, wird nicht stillschweigend `on` angenommen** (entschieden am 2026-09-24, Zeitpunkt der Frage korrigiert am 2026-10-02): Die Instanz fragt einmal je Sitzung, ob der Skill hier geführt werden soll, und bietet an, die Skill-Parameterdatei anzulegen. Lehnt der Entwickler ab, fragt sie zusätzlich, ob `mode: off` trotzdem festgehalten werden soll, damit die Frage nicht wiederkehrt.
 
 **Gefragt wird aber nicht beim Laden, sondern am ersten Anlass** — in dem Moment, in dem der Skill zum ersten Mal etwas vorschlagen oder schreiben würde (1.7). Bis dahin liest er still mit. Damit ist es dieselbe Frage wie die nach der Erstanlage oder dem Einstieg und nicht eine zweite davor; sie trägt den konkreten Anlass bei sich, und der Entwickler entscheidet an einem Beispiel statt an einer Methodikfrage.
