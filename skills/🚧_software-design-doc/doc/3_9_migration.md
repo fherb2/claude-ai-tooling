@@ -19,7 +19,7 @@ Die Doppelungen in der Projekt-`CLAUDE.md` dieses Repositories — „Wo ein Pla
 | global §1.9 Kontext-Haushalt | **muss geändert werden**, nicht nur entfallen: „Detaillierung des Fahrplans" widerspricht dem Skill unmittelbar. |
 | global §2.1 bis §2.6 | **entfallen** vollständig; ihr Inhalt wird zum Regelteil `standard.de.md`. |
 | Projekt, „Wo ein Plan steht" (zwei Orte, keine eigenen Plan-Dateien) | **entfällt.** Der Skill kennt mehr Ablageorte; die Regel wäre danach falsch. |
-| Projekt, „Fahrplan-Nummerierung" | **entfällt** als Doppelung; der Skill sagt dasselbe (Kapitel 3.4.1). |
+| Projekt, „Fahrplan-Nummerierung" | **entfällt** als Doppelung; der Skill sagt dasselbe (`rules-planning.de.md`). |
 | Projekt, „entwicklungszeitliche Dateien" | überwiegend **Doppelung** zu „Doku wächst an Festlegungen"; der repositoryspezifische Rest bleibt. |
 | Projekt, „Pläne aus dem Planmodus" (`~/.claude/plans/`) | **bleibt.** Anderer Gegenstand: der Planmodus von Claude Code. |
 | Projekt, Dateiname `work-plan.md` statt `fahrplan.md` | **bleibt.** Repositoryspezifische Festlegung. |

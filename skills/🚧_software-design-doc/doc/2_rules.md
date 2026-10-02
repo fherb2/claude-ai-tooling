@@ -26,7 +26,7 @@ Im Dokument des Entwicklers stehen vom Skill nur Adressen: Marker an Festlegunge
 
 **Die Vorgabe bleibt ausnahmslos** (entschieden am 2026-10-02). Der einzige Gegenstand, der über einen Dateinamen adressieren wollte, war das Umbauziel eines geplanten Schritts, wenn es einen ganzen Bereich nennt. Er tut es nicht mehr: Ein Bereich bekommt eine stabile Kennung in seinem Rollenmarker, und das Ziel nennt diese Kennung (Kapitel 1.7.3 und 3.3.2). Damit hängt nichts Maschinenlesbares mehr an Gliederung, Nummerierung oder Dateinamen — dieselbe Antwort wie beim verworfenen zweiten Ankermechanismus (Kapitel 1.3.3).
 
-**Eine benannte Ausnahme gibt es doch, und sie steht hier, damit sie nicht stillschweigend bleibt:** Sind in einem Projekt mehrere Register im Spiel, trägt ein Umbauziel den Pfad des Registers als Qualifier (Kapitel 3.4.2). Das ist ein Dateiname. Er ist hinnehmbar, weil ein Register selten umbenannt wird, sein Pfad ohnehin in der Skill-Parameterdatei steht und ein Bruch nur die Zuordnung einer ID trifft, die das Skript dann exakt meldet — nicht die Identität einer Festlegung. Eine dritte Kennungsart dafür zu erfinden wäre teurer als der Fall wert ist.
+**Eine benannte Ausnahme gibt es doch, und sie steht hier, damit sie nicht stillschweigend bleibt:** Sind in einem Projekt mehrere Register im Spiel, trägt ein Umbauziel den Pfad des Registers als Qualifier (`rules-planning.de.md`). Das ist ein Dateiname. Er ist hinnehmbar, weil ein Register selten umbenannt wird, sein Pfad ohnehin in der Skill-Parameterdatei steht und ein Bruch nur die Zuordnung einer ID trifft, die das Skript dann exakt meldet — nicht die Identität einer Festlegung. Eine dritte Kennungsart dafür zu erfinden wäre teurer als der Fall wert ist.
 
 ## 2.4 Default, Meldung, Script-Argument
 
@@ -81,7 +81,7 @@ Jeder Skill-Parameter kostet dreifach: eine Entscheidung des Entwicklers, eine Z
 | **Skill-Parameter** | Projektkonfiguration | Skill-Parameterdatei (2.9) |
 | **Ausgabefeld** | `subject`, `issue`, `proposal`, … | Ausgabe des Skripts (3.6.3) |
 
-Dazu das **Umbauziel** `target:` als Feld eines geplanten Schritts (3.4.2).
+Dazu das **Umbauziel** `target:` als Feld eines geplanten Schritts (`rules-planning.de.md`).
 
 **Fehlende Felder blockieren nie.** Ein fehlendes Feld macht die Prüfung stumm, die es bräuchte; die Härteliste endet dann beim Auffangwert. Eine Doku ohne Marker ist kein Fehlerzustand, sondern der Anfangszustand jedes Projekts.
 
