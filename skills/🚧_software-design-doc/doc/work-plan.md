@@ -22,15 +22,15 @@ Geklärte Punkte stehen in `status.md`: Q-01 bis Q-12, Q-14 bis Q-17, Q-19, Q-20
 
 ## 1 Regelteil Marker und Register
 
-Kapitel 3.2 zum Regelteil `rules-register.md` ausformulieren: Grammatik, Markerformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Ergebnis: Entwurf im Chat, danach Datei im Skill-Ordner. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
+`rules-register.de.md` fertigstellen: Grammatik, Markerformen, Registerort, Regel für Altes, Nachmarkierung, Robustheit. Die Datei liegt seit dem 2026-10-02 im Skill-Ordner und trägt den Text bereits; zu tun bleiben die Befunde, die Kapitel 3.2 dazu nennt, und das Ersetzen der Verweise auf die Entwicklungsdoku. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit gering; die Grammatik ist entschieden.
 
 ## 2 Regelteil Planung
 
-Kapitel 3.4 zum Regelteil `rules-planning.md`: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage. Hängt an: nichts Offenem mehr; das Bereichsziel ist am 2026-10-02 entschieden (Kapitel 1.7.3, 3.3.2). Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
+`rules-planning.de.md` fertigstellen: Umbauziel, Inhalt geplanter Schritte, Ablageorte, Wiedervorlage; Stand wie in Schritt 1. Hängt an: nichts Offenem mehr; das Bereichsziel ist am 2026-10-02 entschieden (Kapitel 1.7.3, 3.3.2). Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Der frühere Punkt T2 war inhaltlich strittig.
 
 ## 3 Regelteil Skill-Parameter
 
-Kapitel 3.5 zum Regelteil `rules-startup.md`: Erhebung, Skill-Parameterdatei, „Doku wächst an Festlegungen", mehrere Vorhaben je Repository. Die Mode-Frage und der Skillstart-Ablauf selbst sind Teil der `SKILL.md` (Kapitel 3.10), nicht dieses Regelteils. Hängt an: Schritt 1. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
+`rules-startup.de.md` fertigstellen: Erhebung, Skill-Parameterdatei, „Doku wächst an Festlegungen", mehrere Vorhaben je Repository, Erkennung der Projektart. Der Skillstart-Ablauf selbst steht in `SKILL.de.md` (Kapitel 3.10), nicht in diesem Regelteil. Stand wie in Schritt 1; dazu Befund B-12, die fehlende Erhebung. Hängt an: Schritt 1. Aufwand: 1 bis 2 Sitzungen. Fehleranfälligkeit mittel: Zu viele Startfragen machen den Skill lästig.
 
 ## 4 Skript Stufe 1
 
@@ -48,7 +48,7 @@ H1 bis H3 nach Kapitel 3.7: Frontmatter-Einbindung, Pfadauflösung prüfen, Zeit
 
 ## 7 Skill zusammensetzen
 
-Dünne `SKILL.md` aus Kapitel 3.10 (Lage, Skill-Parameter, Nachladen) plus Frontmatter (Name nach Q-32, Hook-Einträge nach Kapitel 3.7), `standard.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.11, Regelteile aus Schritt 1 bis 3, `rules-hardness.md` aus Kapitel 3.1, `CLAUDE-snippet.md` aus Kapitel 3.11, README in beiden Sprachen, Datumszeilen. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
+Die Zieltexte liegen seit dem 2026-10-02 als eigene Dateien im Skill-Ordner; dieser Schritt macht aus ihnen ein auslieferbares Ganzes. Zu tun: Frontmatter der `SKILL.de.md` (Name nach Q-32, Hook-Einträge nach Kapitel 3.7), `standard.de.md` aus dem bisherigen Text mit den Anpassungen aus Kapitel 1.11, in jeder Datei die Verweise auf Kapitelnummern und auf Anhang A durch die Zielstruktur ersetzen, die Anrede vereinheitlichen, den Hinweisblock „In Arbeit" entfernen, Datumszeilen setzen, README in beiden Sprachen und die englischen Fassungen aller Regelteile. Auflösung des Abschnitts „Zusammenspiel mit anderen Skills". Hängt an: Schritt 1 bis 6. Aufwand: 2 Sitzungen. Fehleranfälligkeit gering.
 
 ## 8 Probe
 
