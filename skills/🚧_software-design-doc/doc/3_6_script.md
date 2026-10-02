@@ -33,14 +33,41 @@ Die Frage kommt genau einmal je Projekt. Solange sie unbeantwortet ist, arbeitet
 
 Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. Sie ist zeilenorientiert, jede Zeile beginnt mit einer Klasse in Großbuchstaben, danach Ausgabefelder in fester Reihenfolge, getrennt durch ` | `, jedes Feld als `key: value`; Werte enthalten keinen senkrechten Strich. Schlüssel sind englisch; Werte dürfen deutsche Prosa sein. Keine Erzählung, keine Farben, keine Symbole, kein Fortschrittslog. Zahlen sind Zahlen, nicht Wörter. Eine Ausgabe hat höchstens etwa vierzig Zeilen; wird gekürzt, sagt die letzte Zeile, wie viele fehlen und mit welchem Script-Argument sie erscheinen.
 
+So sieht das beim Öffnen eines Bereichs aus — Kopfzeile, dann die Einzelheiten:
+
+```
+FINDINGS | items: 2 | findings: 1 | decide: 0
+ITEM | id: D-0042 | chapter: pipeline | kind: chosen | status: assumed | hardness: decided (Normalfall) | label: Eingangsqueue 64 Einträge
+ITEM | id: D-0043 | chapter: pipeline | kind: given | status: confirmed | hardness: fixed (von außen vorgegeben und bestätigt) | label: Starter reserviert die Queue
+FINDING | subject: D-0044 | issue: Marker in der Prosa, kein Registereintrag | proposal: Eintrag im Plan anlegen
+```
+
+Und so ein Abgleich ohne Beanstandung, der mit einer Zeile auskommt:
+
+```
+OK | items: 0 | findings: 0 | decide: 0 | msg: Register und Prosa stimmen überein; 47 Festlegungen geprüft
+```
+
+**Die erste Zeile ist die Kopfzeile und nennt den Ausgang des Laufs** (umgestellt am 2026-10-03, vormals Q-23-Umfeld und Befund B-06). Sie steht vorn, damit die Instanz nach einer Zeile weiß, ob sie weiterlesen muss; die Begründung steht in Vorgabe 2.5.
+
+**Tabelle 1 — Kopfzeilen**
+
+| Klasse | Wann | Ausgabefelder |
+|---|---|---|
+| `OK` | nichts zu tun | `items`, `findings`, `decide` als Zahlen · `msg` mit einem Satz |
+| `FINDINGS` | mindestens eine Beanstandung | `items`, `findings`, `decide` |
+| `DECIDE` | keine Beanstandung, aber mindestens eine Vorlage | `items`, `findings`, `decide` |
+| `FAILED` | Abbruch | `step`, `cause`, `state`, `remedy` — die Abhilfe nennt das exakte Script-Argument |
+
+**Tabelle 2 — Zeilenarten darunter**
+
 | Klasse | Bedeutung | Ausgabefelder |
 |---|---|---|
-| `OK` | Lauf erfolgreich, ein Satz — auch wenn nichts zu berichten ist | `msg` |
 | `ITEM` | ein Gegenstand einer Liste | kommandoabhängig, feste Reihenfolge |
-| `FINDING` | ein Befund | `subject`, `issue`, `proposal` |
+| `FINDING` | eine Beanstandung | `subject`, `issue`, `proposal` |
 | `DECIDE` | eine Entscheidungsvorlage, die das Skript nicht mechanisch lösen kann | `subject`, `question`, `options`, `proposal` |
-| `FAILED` | Abbruch | `step`, `cause`, `state`, `remedy` — die Abhilfe nennt das exakte Script-Argument |
-| `SUMMARY` | letzte Zeile jeder Ausgabe | `items`, `findings`, `decide` als Zahlen |
+
+Die Kopfzeile `OK` steht allein: Folgt nichts, braucht es auch keine Zahlen zu lesen — sie stehen trotzdem dort, damit jede Kopfzeile gleich gebaut ist. Ein Lauf endet nie ohne Kopfzeile, auch die kürzeste Auskunft nicht.
 
 Exit-Codes: 0 bei `OK` ohne Befunde, 1 bei Befunden oder Entscheidungsvorlagen, 2 bei `FAILED` und bei struktureller Inkonsistenz — der Code, mit dem der Commit-Hook blockiert (Kapitel 3.7). Mit `--json` erscheint dieselbe Information als JSON-Array; die Hooks nutzen es, um `additionalContext` zu füllen. **Welche der beiden Formen der Standard ist, steht noch nicht fest** — die Entscheidungsgrundlage dazu gehört zur Vorgabe über den Ausgabevertrag und steht deshalb in Vorgabe 2.5 (seit 2026-09-25, vormals Q-23); die Beschreibung hier geht vom zeilenförmigen Standard aus. Eine unbehandelte Ausnahme ist ein Defekt; die Prüffälle enthalten absichtlich kaputte Eingaben (fehlende Klammern, falsche Schlüsselwörter, U+00A0, Dubletten), für die eine `FAILED`- oder `FINDING`-Zeile erwartet wird.
 
@@ -57,7 +84,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 | `open --chapter DATEI…` | Bereich öffnen | Register, Marker, Doku | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness` mit Bedingung, `label`; dazu `FINDING` je Abweichung zwischen Prosa und Register | 0/1 |
 | `plan-section --ids … [--collide …] [--write DATEI]` | Plan schreiben | Register, Härte, geplante Schritte, Erwähnungen | den fertigen Abschnitt „Berührte Festlegungen": je Festlegung ID, Kapitel, `kind`, Grund, `status`, Härte mit Bedingung und **Umbaukosten als Zahl**; für die mit `--collide` genannten zusätzlich das Gerüst des geparkten Satzes | 0 |
 | `apply --from DATEI` | Plan ausführen | die im Plan beschlossenen Änderungen | schreibt **alle** Registerzeilen eines Plans in einem Zug — Kopfzeilen, Gründe, Suchschlüssel, Fingerabdrücke, Ereignis- und Lebenszykluszeilen; Quittung mit Zahlen | 0/2 |
-| `check [--summary]` | Commit, Sitzungsstart | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette, geänderter Definitionssatz; mit `--summary` nur Zahlen | 0 keine, 1 Befunde, 2 strukturell |
+| `check [--summary]` | Commit, Sitzungsstart | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette, geänderter Definitionssatz; mit `--summary` nur die Kopfzeile | 0 keine, 1 Befunde, 2 strukturell |
 | `lint --file DATEI --changed` | nach Doku-Edit | Git-Diff der Datei | `FINDING` je geänderter Zeile mit Normativsignal ohne Marker und je neuem Marker ohne Eintrag | 0/1 |
 
 **Arbeitskommandos** — nehmen immer Listen, auch wenn nur ein Element übergeben wird:
