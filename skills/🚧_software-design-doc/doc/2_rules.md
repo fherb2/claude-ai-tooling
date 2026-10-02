@@ -46,6 +46,12 @@ Ein Skript endet immer mit einer von vier Aussageklassen, an den Exit-Codes fest
 
 Was sich aus den Feldern und Dateien mechanisch ableiten lässt — die Härte, die nächste freie ID, ein Abgleich, eine Zählung —, entscheidet das Skript und gibt das Ergebnis als Fakt aus. Nur was sich nicht kodieren lässt, geht als `DECIDE` an die Instanz, und die Ausgabe trennt sichtbar, was Fakt ist und was Entscheidungsvorlage. Eine Vorlage nennt den Gegenstand, die Frage, die Optionen und den Vorschlag des Skripts.
 
+**Daraus folgt, was im Skilltext nicht stehen darf** (entschieden am 2026-10-03): **Kein Regelteil erzählt eine Mechanik nach, die ein Kommando ausführt.** Wo das Skript rechnet, liefert es den fertigen Satz, und der Regeltext sagt nur, was die Instanz mit der Antwort tut. Die Rechenvorschrift selbst gehört in die Doku — sie ist die Spezifikation des Kommandos und wird dort gebraucht, um es zu bauen und seine Richtigkeit zu prüfen, aber nicht zur Laufzeit.
+
+Der Grund ist nicht nur der Kontext, den eine Nacherzählung kostet. Sie schafft **eine zweite Autorität für eine Frage, die bereits einen Zuständigen hat.** Rechnet das Skript nach der einen Fassung und liest die Instanz die andere, bekommt sie zwei Antworten auf dieselbe Frage und keine Regel, welcher sie glauben soll — sie wird eine wählen, stillschweigend, und niemand erfährt davon. Ein solcher Zustand entsteht nicht durch Nachlässigkeit, sondern durch jede Änderung, die nur eine der beiden Stellen erreicht.
+
+Prüfbar: Auf jeden Abschnitt eines Regelteils, der eine Berechnung, eine Suchreihenfolge, eine Vergaberegel oder ein Dateiformat beschreibt, das ein Kommando erzeugt, lässt sich zeigen — das ist der Verstoß. Die Abgrenzung verläuft nicht am Thema, sondern an der Frage, wer rechnet: „Die erste zutreffende Prüfung bestimmt die Härte" ist Rechenvorschrift und gehört ins Skript; „fehlende Felder blockieren nie" ist eine Verhaltensregel für den Fall, dass das Skript nichts liefert, und bleibt im Regelteil.
+
 ## 2.7 Was kostet, sind Entscheidungen und Edits
 
 Rechenzeit von Skripten und Hooks ist vernachlässigbar. Kosten entstehen, wenn die Instanz ein Skript starten und überwachen, eine Ausgabe zu einer Entscheidung verarbeiten, etwas formulieren oder eine Datei ändern muss — der Dateiedit ist der teuerste Vorgang. Daraus: ein Skriptaufruf je Anker, nicht mehrere; Ausgaben sind **entscheidungsfertig** — eine Zeile je Gegenstand mit der Stelle, an der die Instanz nur noch ja/nein oder einen Wert einträgt; das Gerüst des Planabschnitts liefert das Skript, nicht Rohdaten, aus denen die Instanz es baut.
@@ -100,3 +106,29 @@ Alles, was der Entwickler über das Schreiben von Prosa, das Lesen von Plänen u
 ## 2.14 Diese Doku wendet das Vorhaben nicht auf sich an
 
 Bis zum Abschluss der Probe trägt diese Doku keine Marker, kein Register und keine Rollen; sie folgt dem bisherigen Schema. Wird das Vorhaben danach auf sich selbst angewendet, geschieht das als eigener Fahrplanschritt.
+
+## 2.15 Der Ladebaum des Skills
+
+Der Skilltext liegt in mehreren Dateien, und der einzige Grund dafür ist der Kontext: Was in einer Sitzung nicht gebraucht wird, soll ihn nicht kosten und nicht stören. Daraus folgen vier Festlegungen (2026-10-03).
+
+**Der Baum verzweigt von der Wurzel.** Die `SKILL`-Datei lädt die Zweige; **kein Zweig lädt einen anderen**. Quer über die Dateien zu laden macht unvorhersehbar, was im Kontext steht, und erzeugt denselben Inhalt mehrfach.
+
+**Die Wurzel bleibt dünn, weil jedes Projekt sie zahlt** — auch das, in dem der Skill nach dem ersten Satz endet, und auch das, in dem gar keine Software entsteht. Was dort steht, ist der Ablauf und sonst nichts; jede Regel, jede Liste, jede Tabelle gehört in einen Zweig. Die Entscheidungen des Ablaufs selbst, soweit sie mechanisch sind, trifft ein Kommando und nicht ein beschriebenes Prüfverfahren.
+
+**Die Reihenfolge der Abbrüche ist die der Kosten.** Was ohne Rückfrage entschieden werden kann, wird zuerst entschieden; alles, wofür der Entwickler gefragt werden muss, kommt danach. So endet ein Projekt, das den Skill nicht braucht, bevor irgendjemand etwas beantworten muss.
+
+**Ein Zweig lohnt sich nur, wenn seine Ladebedingung an einem benennbaren Anlass hängt**, nicht an einer Einschätzung. Eine weiche Bedingung — „wenn eine Frage zur Methodik ansteht" — führt dazu, dass im Zweifel geladen wird und die Ersparnis entfällt, oder dass nicht geladen wird und eine Regel fehlt. Trennscharf sind Anlässe wie „die Parameterdatei fehlt" oder „ein freigegebener Plan wird ausgeführt".
+
+**Laden und Verweisen sind zweierlei.** Ein Ladebefehl steht nur an der Stelle, die ihn auslöst, und er lädt nur, was noch nicht geladen ist. Jede weitere Regel, die denselben Inhalt braucht, **verweist** darauf, statt ihn erneut zu holen — sonst steht dieselbe Tabelle mehrfach im Kontext, teurer als gar keine Aufteilung und für die Instanz verwirrend, weil sie zwei Fundstellen sieht und nicht weiß, ob sie übereinstimmen.
+
+Prüfbar: Auf jeden Zweig, der einen anderen lädt, auf jede Regel in der Wurzel, auf jede Ladebedingung, die ein Urteil statt eines Anlasses nennt, und auf jeden zweiten Ladebefehl für denselben Inhalt lässt sich zeigen — das sind die Verstöße.
+
+## 2.16 Adressierung im Zieltext
+
+Damit eine Regel auf eine andere Stelle des Skilltextes zeigen kann, braucht diese Stelle eine Adresse (2026-10-03).
+
+**Abschnitte des Zieltextes tragen durchlaufende Nummern.** Eine nummerierte Überschrift ist die robusteste Adresse, die Markdown hergibt: Sie bezeichnet nicht nur den Anfang, sondern auch das Ende — die nächste Überschrift gleicher oder höherer Ordnung —, sie ist für Mensch und Maschine gleich lesbar, und sie wandert beim Verschieben mit ihrem Text.
+
+**Eine Tabelle, auf die verwiesen wird, trägt eine eigene Überschriftszeile mit Namen**, weil die Abschnittsüberschrift sie nicht genau genug trifft, wenn im Abschnitt auch anderes steht.
+
+Diese Nummerierung gehört dem Zieltext und ist von der Nummerierung dieser Doku unabhängig; die beiden werden nie gegeneinander verwiesen. Ein Verweis aus einem Zieltext auf diese Doku ist ohnehin ausgeschlossen — beim Nutzer existiert sie nicht.
