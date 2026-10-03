@@ -82,6 +82,8 @@ Jeder Plan trägt diesen Abschnitt. Er ist der Zwischenspeicher aller Annahmen b
 
 **Je Eintrag:** ID (oder Wortlaut, wenn noch keine ID existiert), Kapitel, `kind`, `reason` oder Quelle, `status`, abgeleitete Härte mit der zutreffenden Bedingung in Prosa, und — bei Kollision — der geparkte Satz. Bei `pending` die Frage in Prosa.
 
+**Suchschlüssel unter der Tabelle.** Unmittelbar unter den Einträgen steht ein Block mit je einer Zeile — `D-0042: Eingangsqueue; Blockgröße; 64` —, und zwar nur für Festlegungen, die dieser Plan **neu anlegt** oder deren Schlüssel er ändert. Für die übrigen sind sie längst gewählt; sie erneut zu zeigen wäre Lärm. Der Block steht dort, damit Du den Entwickler die Begriffe korrigieren lassen kannst, ohne ihn zu fragen: Er überfliegt sie und sagt etwas, oder er sagt nichts und die Freigabe nimmt sie mit. Eigene Spalte und Anhang an den Grund sind dafür verworfen — Schlüssel beurteilt man als Menge, nicht einzeln, und nur im Block fällt auf, wenn zwei Festlegungen dieselben tragen oder keine den eigentlichen Gegenstand nennt.
+
 **Freigabesatz.** Bei `assumptions_on_approval: accept` steht im Abschnitt: „Die Freigabe dieses Plans bestätigt die hier gelisteten Annahmen, soweit der Entwickler nichts anderes sagt." Bei `keep` fehlt der Satz. Das Wort des Entwicklers je Plan schlägt den Skill-Parameter: „nur ablegen" → dieser Plan wie `keep`; „gilt als bestätigt" → wie `accept`.
 
 **Korrektur in Prosa.** Sagt der Entwickler etwas zu einem Eintrag („das ist eine Hardwaregrenze", „das haben wir wegen der Latenz so entschieden"), übersetzst Du das in die Attribute und zeigst die Zuordnung, bevor Du schreibst.

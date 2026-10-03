@@ -270,6 +270,11 @@ Der Hook H1 läuft nach dem Edit und meldet in den Kontext: drei Sätze mit Norm
 > | „blockweise zu je 1000 Werten" | `chosen` | steht in der Prosa: Schreibzugriff je Einzelwert bremst das Dateisystem | `assumed` | `decided` |
 > | „Das Format ist CSV"           | `chosen` | kein Grund genannt —`pending`: Warum CSV?                              | `assumed` | `decided` |
 >
+> Suchschlüssel, neu vergeben:
+> „liefert Messwerte mit 100 Hz": Abtastrate; 100 Hz; Sensor
+> „blockweise zu je 1000 Werten": Blockgröße; blockweise; 1000
+> „Das Format ist CSV": CSV; Dateiformat
+>
 > Rolle für „Erfassung": `building-blocks`.
 > Die Freigabe dieses Plans bestätigt die gelisteten Annahmen, soweit Du nichts anderes sagst.
 
@@ -281,7 +286,7 @@ Die Instanz zeigt, wie sie das einträgt, und schreibt nach der Freigabe. Die Pr
 >
 > Der Sensor liefert Messwerte mit 100 Hz [D-0001]; schneller kann er nicht. Das Werkzeug liest sie in einer eigenen Schleife und schreibt sie blockweise zu je 1000 Werten [D-0002], weil ein Schreibzugriff je Einzelwert das Dateisystem ausbremst. Das Format ist CSV [D-0003], weil der Auswerter es direkt liest.
 
-Und `dev-doc/decisions.md` bekommt seine ersten Einträge:
+Und `dev-doc/decisions.md` bekommt seine ersten Einträge. Die Suchschlüssel sind die aus dem Plan — beim dritten Eintrag um „Auswerter" erweitert, weil die Antwort des Entwicklers den Begriff überhaupt erst eingeführt hat:
 
 ```
 [D-0001 given confirmed] Abtastrate des Sensors
