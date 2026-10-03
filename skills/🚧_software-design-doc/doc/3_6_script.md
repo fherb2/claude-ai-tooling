@@ -89,7 +89,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 
 | Kommando | Anker | Liest | Gibt aus | Exit |
 |---|---|---|---|---|
-| `open --chapter DATEI…` | Bereich öffnen | Register, Marker, Doku | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness` mit Bedingung, `label`; dazu `FINDING` je Abweichung zwischen Prosa und Register | 0/1 |
+| `open [--chapter DATEI…]` | Bereich öffnen | Register, Marker, Doku; ohne `--chapter` den gesamten Doku-Ordner | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness` mit Bedingung, `label`; dazu `FINDING` je Abweichung zwischen Prosa und Register | 0/1 |
 | `plan-section --ids … [--collide …] [--write DATEI]` | Plan schreiben | Register, Härte, geplante Schritte, Erwähnungen | den fertigen Abschnitt „Berührte Festlegungen": je Festlegung ID, Kapitel, `kind`, Grund, `status`, Härte mit Bedingung und **Umbaukosten als Zahl**; für die mit `--collide` genannten zusätzlich das Gerüst des geparkten Satzes | 0 |
 | `apply --from DATEI` | Plan ausführen | die im Plan beschlossenen Änderungen | schreibt **alle** Registerzeilen eines Plans in einem Zug — Kopfzeilen, Gründe, Suchschlüssel, Fingerabdrücke, Ereignis- und Lebenszykluszeilen; Quittung mit Zahlen | 0/2 |
 | `check [--summary]` | Commit, Sitzungsstart | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette, geänderter Definitionssatz; mit `--summary` nur die Kopfzeile | 0 keine, 1 Befunde |
@@ -114,7 +114,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 | `explain ID` | wie `hardness` | ein Satz für den Entwickler, ohne Prüfungsnummer | 0 |
 | `next-id` | Register | nächste freie ID | 0 |
 
-Was ein Kommando **nicht** hat, ist ebenso Festlegung: Es gibt kein `add` für eine einzelne Registerzeile. Registerzeilen entstehen ausschließlich über `apply` aus einem freigegebenen Plan — in einem Aufruf, nicht in zehn (Kapitel 1.3.6).
+Was ein Kommando **nicht** hat, ist ebenso Festlegung: Es gibt kein `add` für eine einzelne Registerzeile. Registerzeilen entstehen ausschließlich über `apply` aus einem freigegebenen Plan — in einem Aufruf, nicht in zehn (Kapitel 1.3.6). Es gibt ebenso kein `list`, das die Festlegungen eines Projekts aufzählt (abgelehnt am 2026-10-03, vormals Befund B-14): `open` gibt dieselben `ITEM`-Zeilen aus und liest ohne `--chapter` den ganzen Doku-Ordner; der Abgleich, den es dabei mitmacht, ist lesend.
 
 **Das Kommando `notes` liest die Notizen aus dem Commit-Verlauf** (entschieden am 2026-09-25). Wozu sie da sind, steht in Kapitel 1.3.5, ihre Form in 3.2.9. Für die Umsetzung gilt dreierlei.
 
