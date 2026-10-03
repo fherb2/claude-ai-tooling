@@ -116,7 +116,7 @@ Ihm gehört die Doku: Gliederung, Reihenfolge, Nummerierung, Sprache der Übersc
 
 Was er tut: Prosa schreiben, den Planabschnitt „Berührte Festlegungen" lesen und in Prosa antworten. Was er hinnimmt — das ist der ehrliche Preis: Klammern im Text, eine Registerdatei neben der Doku und einen Abschnitt in jedem Plan. Marker und Registerzeilen schreibt die Instanz mit der Ausführung eines freigegebenen Plans; schreibt der Entwickler selbst Prosa, findet der Lint unmarkierte Festlegungen, und die Instanz schlägt die Marker im nächsten Plan vor. Die Buchführung trägt die Instanz, die Kontrolle tragen Skript und Hooks — nie der Entwickler.
 
-**Und er wird nicht ausgefragt — Annahmen statt Fragen.** Fehlt zu einer Festlegung ein Attribut — ihre Art, ihr Grund, ihre Quelle —, bildet die Instanz aus der Prosa eine Annahme und legt sie im Planabschnitt sichtbar vor, statt eine Frage zu stellen; im Regelfall bestätigt die Freigabe des Plans die gelisteten Annahmen, soweit der Entwickler nichts anderes sagt (Skill-Parameter `assumptions_on_approval`). Gefragt wird nur, wo keine tragfähige Annahme möglich ist — und dann ohne das Vokabular des Skills, mit dem Wortlaut der Festlegung und dem Anlass. Eine Annahme bleibt als solche gekennzeichnet und macht eine Festlegung nie unantastbar (Vorgabe 2.11); die Regeln im Einzelnen stehen in `rules-hardness.de.md`.
+**Und er wird nicht ausgefragt — Annahmen statt Fragen.** Fehlt zu einer Festlegung ein Attribut — ihre Art, ihr Grund, ihre Quelle —, bildet die Instanz aus der Prosa eine Annahme und legt sie im Planabschnitt sichtbar vor, statt eine Frage zu stellen; im Regelfall bestätigt die Freigabe des Plans die gelisteten Annahmen, soweit der Entwickler nichts anderes sagt (Skill-Parameter `assumptions_on_approval`). Gefragt wird nur, wo keine tragfähige Annahme möglich ist — und dann ohne das Vokabular des Skills, mit dem Wortlaut der Festlegung und dem Anlass. Eine Annahme bleibt als solche gekennzeichnet und macht eine Festlegung nie unantastbar (Vorgabe 2.11); die Regeln im Einzelnen stehen in `rules-core.de.md`.
 
 > Geprüft: Ok
 
@@ -223,7 +223,7 @@ Alles, was der Skill kennt, steht hier auf einer Seite. Die Werte sind vollstän
 | **Umbauziel** (`target:`) | die Zeile, mit der ein Schritt sagt, was er umbauen will                                         | IDs oder eine Kapiteldatei | 3.4.2        |
 | **Planabschnitt**         | „Berührte Festlegungen" — der Abschnitt jedes Plans, in dem der Entwickler die Annahmen sieht | —                         | 3.1.6        |
 
-**Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5). Kein Skill-Parameter ist das Absatzlayout der Prosa: Es wird aus der vorhandenen Doku abgelesen, und nur wenn es keine gibt oder sie uneindeutig ist, wird einmal gefragt (entschieden am 2026-09-25, vormals Q-17; `rules-register.de.md`).
+**Was das Projekt einstellt** — Skill-Parameter in der Skill-Parameterdatei, jeder mit Standardwert (2.9): `mode`, `doc_dir`, `register`, `planned_steps`, `marking`, `friction_threshold`, `assumptions_on_approval`, `impact_model`, `impact_lib`, `impact_cutoff`, `lint_signals` (3.5.2). Davon zu unterscheiden sind die **Script-Argumente** je Aufruf (2.4) und die **Graphenparameter** der Auswirkungsrechnung, die im Skill stehen und nicht projektkonfigurierbar sind (3.6.5). Kein Skill-Parameter ist das Absatzlayout der Prosa: Es wird aus der vorhandenen Doku abgelesen, und nur wenn es keine gibt oder sie uneindeutig ist, wird einmal gefragt (entschieden am 2026-09-25, vormals Q-17; `rules-core.de.md`).
 
 > Geprüft: vermutlich ok.
 
@@ -475,7 +475,7 @@ Der Vorschlag wählt eine Form und nennt die anderen beiden mit einem Satz, waru
 
 ### 1.7.2 Einstieg in eine vorhandene Doku
 
-Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration** — außer der Entwickler fordert eine ausdrücklich; abgefragt wird das nie (`rules-register.de.md`, die Fähigkeit dazu trägt der Skill `konzept-segmentierung`): Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.7.5).
+Ein typischer Fall, denn die meisten Projekte haben schon etwas Text. Der Einstieg geschieht **am Berührungspunkt und nie als Gesamtmigration** — außer der Entwickler fordert eine ausdrücklich; abgefragt wird das nie (`rules-core.de.md`, die Fähigkeit dazu trägt der Skill `konzept-segmentierung`): Nur die Festlegungen, die ein Schritt tatsächlich berührt, bekommen Marker und Registerzeilen — über den Plan, mit Annahmen, die der Entwickler korrigieren kann (Kapitel 3.1). Rollen bekommen die Abschnitte ebenso: vorgeschlagen, wenn ein Abschnitt berührt wird, nicht vorab für das ganze Dokument. Eine Doku ohne einen einzigen Marker ist deshalb kein Fehlerzustand; sie ist der Anfangszustand, und der Skill liefert in ihr bereits das Wichtigste — Kollisionen werden geparkt statt abgeschossen (1.7.5).
 
 > Geprüft: kleiner Ergänzung -> bitte gegenprüfen. Sonst ok.
 
@@ -556,7 +556,7 @@ Er kostet dafür etwas, das keine andere Leistung des Skills kostet: **Er muss j
 
 Das hat einen zweiten Nutzen, der im Alltag mehr wiegt als der erste: **Alte Verweise lösen weiter auf.** Ein Commit-Text, ein älterer Absatz, ein Code-Kommentar, der eine abgelöste ID nennt, führt nicht ins Leere — das Register kennt die Nachfolgerin. Niemand muss vor dem Weiterarbeiten das Projekt nach alten Verweisen absuchen und sie geradeziehen.
 
-Ob ein überholter Absatz in der Prosa stehen bleibt, entscheidet der Entwickler im Einzelfall — weil er als Begründung der Änderung noch wirkt, weil er Kontext verwässert, oder weil gerade keine Zeit ist. Der Mechanismus verlangt nur den Marker. Die drei Fälle und ihre Behandlung stehen in `rules-register.de.md`.
+Ob ein überholter Absatz in der Prosa stehen bleibt, entscheidet der Entwickler im Einzelfall — weil er als Begründung der Änderung noch wirkt, weil er Kontext verwässert, oder weil gerade keine Zeit ist. Der Mechanismus verlangt nur den Marker. Die drei Fälle und ihre Behandlung stehen in `rules-core.de.md`.
 
 ### 1.7.7 Keine Unterstützung
 

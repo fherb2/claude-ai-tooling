@@ -6,7 +6,7 @@ Daraus folgen drei Prüfungen für jeden Absatz hier: Steht hier eine **Absicht*
 
 **Der Text des Skills steht nicht mehr hier** (Festlegung des Entwicklers vom 2026-10-02). Bis dahin trugen sechs Kapitel dieses Segments den ausformulierten Skilltext als Zitat, umgeben von Entwicklungstext. Das war ein Behelf aus der Zeit, als beides noch gemeinsam wuchs, und es weichte eine Regel auf, die sonst überall gilt: Eine Implementierungsdoku enthält nicht die Implementierung. Für dieses Vorhaben **ist** der Skilltext die Implementierung — er ist das, was in einem gewöhnlichen Projekt der Quellcode wäre.
 
-Seither liegen die Zieltexte als eigene Dateien im Ordner des Skills, eine Ebene über dieser Doku: `SKILL.de.md`, `rules-hardness.de.md`, `rules-register.de.md`, `rules-planning.de.md`, `rules-startup.de.md`, `CLAUDE-snippet.de.md`. Hinzu kommen später `standard.de.md` aus dem bisherigen Standard und, falls so entschieden, eine Datei für die Rollenzuordnung. Beim Installieren entstehen daraus die Dateien ohne Sprachkürzel; die englischen Fassungen werden am Schluss hergestellt.
+Seither liegen die Zieltexte als eigene Dateien im Ordner des Skills, eine Ebene über dieser Doku: `SKILL.de.md`, `rules-core.de.md`, `rules-planning.de.md`, `rules-startup.de.md`, `CLAUDE-snippet.de.md`. Hinzu kommt später `standard.de.md` aus dem bisherigen Standard. Härte- und Registerregeln lagen bis zum 2026-10-04 in zwei Dateien; sie sind zu `rules-core.de.md` zusammengelegt, weil beide ohnehin immer gemeinsam geladen wurden (Fahrplanschritt 10). Beim Installieren entstehen daraus die Dateien ohne Sprachkürzel; die englischen Fassungen werden am Schluss hergestellt.
 
 **Was damit in Segment 3 bleibt**, ist dasjenige Wissen über die Skilltexte, das aus ihnen selbst nicht hervorgeht: warum eine Formulierung so und nicht anders gewählt wurde, welcher Weg verworfen wurde und woran er scheiterte, welche Messung eine Festlegung stützt, wo die Entscheidung in Kapitel 1 oder 2 steht, auf der ein Textstück beruht. Was der Text schon sagt, wird hier nicht wiederholt. Ein Kapitel, das danach dünn aussieht, ist nicht unfertig, sondern ehrlich: Dann gab es zu diesem Textstück nichts hinzuzufügen.
 
@@ -18,7 +18,7 @@ Seither liegen die Zieltexte als eigene Dateien im Ordner des Skills, eine Ebene
 
 Finaler Stand von Arbeitspunkt 1 (2026-09-17), mit zwei nachträglichen Anpassungen aus Arbeitspunkt 2: Die Ereigniszeile „bestätigt" des Vorläufers (Anhang A) heißt `upheld` statt `confirmed`, weil `confirmed` zugleich ein Statuswert ist (Kapitel 3.2) — vom Entwickler am 2026-10-03 bestätigt (vormals Q-02); und „Segment 2" ist ersetzt durch „Abschnitte mit der Funktion `global`" (Kapitel 1.3.3). Adressat des Regelteils ist die Instanz („Du"), der Mensch heißt „der Entwickler".
 
-**Dieses Kapitel begleitet `rules-hardness.de.md`.** Dort steht der Text selbst; hier steht, was bei seiner Ausarbeitung angefallen ist und nicht aus ihm hervorgeht. Der Zieltext verweist nie hierher zurück.
+**Dieses Kapitel begleitet die Abschnitte 1 bis 10 von `rules-core.de.md`.** Dort steht der Text selbst; hier steht, was bei seiner Ausarbeitung angefallen ist und nicht aus ihm hervorgeht. Der Zieltext verweist nie hierher zurück.
 
 ### 3.1.6 Der Planabschnitt „Berührte Festlegungen"
 
