@@ -137,4 +137,6 @@ Damit eine Regel auf eine andere Stelle des Skilltextes zeigen kann, braucht die
 
 **Eine Tabelle, auf die verwiesen wird, trägt eine eigene Überschriftszeile mit Namen**, weil die Abschnittsüberschrift sie nicht genau genug trifft, wenn im Abschnitt auch anderes steht.
 
-Diese Nummerierung gehört dem Zieltext und ist von der Nummerierung dieser Doku unabhängig; die beiden werden nie gegeneinander verwiesen. Ein Verweis aus einem Zieltext auf diese Doku ist ohnehin ausgeschlossen — beim Nutzer existiert sie nicht.
+**Die beiden Nummernkreise bleiben getrennt** (präzisiert am 2026-10-04). Diese Nummerierung gehört dem Zieltext und ist von der Nummerierung dieser Doku unabhängig: Keine Abschnittsnummer des einen wird je mit einer des anderen gleichgesetzt oder aus ihr abgeleitet, auch nicht stillschweigend durch gleiche Reihenfolge. Ein Verweis aus einem Zieltext auf diese Doku ist ausgeschlossen — beim Nutzer existiert sie nicht.
+
+**In der Gegenrichtung ist der Verweis erlaubt und erwünscht**, denn die Doku darf den Zieltext kennen. Sie zeigt damit, wo eine Vorgabe aus Segment 1 oder 2 ihre Umsetzung gefunden hat. Genauer als auf einen Abschnitt kann sie derzeit nicht zielen — auf einen einzelnen Absatz oder eine einzelne Regel innerhalb eines Abschnitts gibt es keine Adresse, weil der Zieltext keine Anker trägt. Das bleibt so bis zum Abschluss der Skill-Entwicklung; danach lässt sich die Adresse um eine Zeilennummer ergänzen, die während der Entwicklung nichts taugt, weil jede Änderung sie verschiebt (Festlegung des Entwicklers vom 2026-10-04).
