@@ -36,7 +36,7 @@ Die Ausgabe ist für die Instanz gebaut, nicht für einen Menschen am Terminal. 
 So sieht das beim Öffnen eines Bereichs aus — Kopfzeile, dann die Einzelheiten:
 
 ```
-FINDINGS | items: 2 | findings: 1 | decide: 0
+FINDINGS | items: 2 | findings: 1 | blocking: 0 | decide: 0
 ITEM | id: D-0042 | chapter: pipeline | kind: chosen | status: assumed | hardness: decided (Normalfall) | label: Eingangsqueue 64 Einträge
 ITEM | id: D-0043 | chapter: pipeline | kind: given | status: confirmed | hardness: fixed (von außen vorgegeben und bestätigt) | label: Starter reserviert die Queue
 FINDING | subject: D-0044 | issue: Marker in der Prosa, kein Registereintrag | proposal: Eintrag im Plan anlegen
@@ -45,7 +45,7 @@ FINDING | subject: D-0044 | issue: Marker in der Prosa, kein Registereintrag | p
 Und so ein Abgleich ohne Beanstandung, der mit einer Zeile auskommt:
 
 ```
-OK | items: 0 | findings: 0 | decide: 0 | msg: Register und Prosa stimmen überein; 47 Festlegungen geprüft
+OK | items: 0 | findings: 0 | blocking: 0 | decide: 0 | msg: Register und Prosa stimmen überein; 47 Festlegungen geprüft
 ```
 
 **Die erste Zeile ist die Kopfzeile und nennt den Ausgang des Laufs** (umgestellt am 2026-10-03, vormals Q-23-Umfeld und Befund B-06). Sie steht vorn, damit die Instanz nach einer Zeile weiß, ob sie weiterlesen muss; die Begründung steht in Vorgabe 2.5.
@@ -54,9 +54,9 @@ OK | items: 0 | findings: 0 | decide: 0 | msg: Register und Prosa stimmen übere
 
 | Klasse | Wann | Ausgabefelder |
 |---|---|---|
-| `OK` | nichts zu tun | `items`, `findings`, `decide` als Zahlen · `msg` mit einem Satz |
-| `FINDINGS` | mindestens eine Beanstandung | `items`, `findings`, `decide` |
-| `DECIDE` | keine Beanstandung, aber mindestens eine Vorlage | `items`, `findings`, `decide` |
+| `OK` | nichts zu tun | `items`, `findings`, `blocking`, `decide` als Zahlen · `msg` mit einem Satz |
+| `FINDINGS` | mindestens eine Beanstandung | `items`, `findings`, `blocking`, `decide` — `blocking` zählt die Befunde, die einen Commit anhalten |
+| `DECIDE` | keine Beanstandung, aber mindestens eine Vorlage | `items`, `findings`, `blocking`, `decide` |
 | `FAILED` | Abbruch | `step`, `cause`, `state`, `remedy` — die Abhilfe nennt das exakte Script-Argument |
 
 **Tabelle 2 — Zeilenarten darunter**
@@ -69,11 +69,19 @@ OK | items: 0 | findings: 0 | decide: 0 | msg: Register und Prosa stimmen übere
 
 Die Kopfzeile `OK` steht allein: Folgt nichts, braucht es auch keine Zahlen zu lesen — sie stehen trotzdem dort, damit jede Kopfzeile gleich gebaut ist. Ein Lauf endet nie ohne Kopfzeile, auch die kürzeste Auskunft nicht.
 
-Exit-Codes: 0 bei `OK` ohne Befunde, 1 bei Befunden oder Entscheidungsvorlagen, 2 bei `FAILED` und bei struktureller Inkonsistenz — der Code, mit dem der Commit-Hook blockiert (Kapitel 3.7). Mit `--json` erscheint dieselbe Information als JSON-Array; die Hooks nutzen es, um `additionalContext` zu füllen. **Welche der beiden Formen der Standard ist, steht noch nicht fest** — die Entscheidungsgrundlage dazu gehört zur Vorgabe über den Ausgabevertrag und steht deshalb in Vorgabe 2.5 (seit 2026-09-25, vormals Q-23); die Beschreibung hier geht vom zeilenförmigen Standard aus. Eine unbehandelte Ausnahme ist ein Defekt; die Prüffälle enthalten absichtlich kaputte Eingaben (fehlende Klammern, falsche Schlüsselwörter, U+00A0, Dubletten), für die eine `FAILED`- oder `FINDING`-Zeile erwartet wird.
+**Exit-Codes: 0 bei `OK`, 1 bei `FINDINGS` oder `DECIDE`, 2 bei `FAILED`** — eine Klasse, ein Code, keine Doppelbelegung (entschieden am 2026-10-03, vormals Befund B-07). Vorher stand die 2 zugleich für den Abbruch des Skripts und für strukturelle Inkonsistenz; weil der Commit-Hook genau diesen Code als Blockade wertet, hätte ein Programmierfehler im Skript den Commit angehalten.
+
+**Eine strukturelle Inkonsistenz ist jetzt ein Befund wie jeder andere** — sie erscheint als `FINDING` und führt zu Exit 1. Damit sie trotzdem auf einen Blick erkennbar ist, zählt die Kopfzeile sie eigens: Das Feld `blocking` sagt, wie viele der Befunde den Commit anhalten würden.
+
+```
+FINDINGS | items: 0 | findings: 3 | blocking: 1 | decide: 0
+```
+
+**Ob blockiert wird, entscheidet im Hook nicht der Exit-Code, sondern das JSON.** Mit `--json` erscheint dieselbe Information als JSON-Array; die Hooks nutzen es, um `additionalContext` zu füllen, und der Commit-Hook setzt bei mindestens einem blockierenden Befund zusätzlich `permissionDecision: "deny"` samt Begründung. Die Hook-Dokumentation von Claude Code rät für diesen Fall ausdrücklich dazu: „For PreToolUse, rely on JSON output for granular control, not exit codes" — ein `deny` wirkt unabhängig vom Exit-Code, während Exit 2 unbedingt blockiert und sich durch nichts mehr überstimmen lässt (nachgelesen am 2026-10-03). Exit 2 bleibt deshalb dem vorbehalten, wofür die Dokumentation ihn vorsieht: dem Notfall, in dem nicht einmal ein gültiges JSON zustande kommt.
+
+**Das verlagert ein Risiko, und das gehört in die Prüffälle.** Die Blockade hängt nun an einem JSON-Feld statt an einem Rückgabewert. Ein Fehler im Aufbau dieses JSON führt nicht zu einer Fehlermeldung, sondern dazu, dass **nicht** blockiert wird — lautlos. Die Prüffälle aus Fahrplanschritt 4 decken deshalb ausdrücklich ab, dass bei struktureller Inkonsistenz ein gültiges `deny`-JSON entsteht. **Welche der beiden Formen der Standard ist, steht noch nicht fest** — die Entscheidungsgrundlage dazu gehört zur Vorgabe über den Ausgabevertrag und steht deshalb in Vorgabe 2.5 (seit 2026-09-25, vormals Q-23); die Beschreibung hier geht vom zeilenförmigen Standard aus. Eine unbehandelte Ausnahme ist ein Defekt; die Prüffälle enthalten absichtlich kaputte Eingaben (fehlende Klammern, falsche Schlüsselwörter, U+00A0, Dubletten), für die eine `FAILED`- oder `FINDING`-Zeile erwartet wird.
 
 Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` oder `OK` aus; `DECIDE` ist die Ausnahme für das, was sich nicht kodieren lässt (Vorgabe 2.6). Die Trennung ist sichtbar: Ein `ITEM` ist Fakt, ein `DECIDE` ist Vorlage.
-
-**Befund B-07 (2026-09-25): Ein Absturz des Skripts würde den Commit blockieren.** Oben steht Exit-Code 2 für zwei verschiedene Dinge: für `FAILED`, also den Abbruch des Skripts selbst, und für strukturelle Inkonsistenz zwischen Prosa und Register. Der Hook vor dem Commit wertet genau diesen Code als Blockade — das ist die Mechanik von Claude Code, kein Entwurf von uns (Kapitel 3.7.2). Dieselbe Tabelle dort erwartet zugleich, dass ein `FAILED` mit Exit 1 zurückkommt und den Commit durchlaufen lässt. Beides zusammen geht nicht. Sachlich ist die Richtung klar, denn Kapitel 1.3.5 nennt genau einen blockierenden Eingriff des Skills, und das ist die strukturelle Inkonsistenz; ein Defekt des Skripts gehört nicht dazu, sonst hält ein Programmierfehler die Arbeit an. Zu entscheiden ist die Umsetzung: entweder zwei getrennte Codes — 2 nur für die Inkonsistenz, ein anderer für `FAILED` — oder ein eigener Hook-Modus, in dem das Skript den Unterschied selbst macht. Die Folge trifft auch die Tabelle in 3.7.2.
 
 ### 3.6.4 Kommandos
 
@@ -84,7 +92,7 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 | `open --chapter DATEI…` | Bereich öffnen | Register, Marker, Doku | `ITEM` je Festlegung: `id`, `chapter` (abgeleitet), `kind`, `status`, `hardness` mit Bedingung, `label`; dazu `FINDING` je Abweichung zwischen Prosa und Register | 0/1 |
 | `plan-section --ids … [--collide …] [--write DATEI]` | Plan schreiben | Register, Härte, geplante Schritte, Erwähnungen | den fertigen Abschnitt „Berührte Festlegungen": je Festlegung ID, Kapitel, `kind`, Grund, `status`, Härte mit Bedingung und **Umbaukosten als Zahl**; für die mit `--collide` genannten zusätzlich das Gerüst des geparkten Satzes | 0 |
 | `apply --from DATEI` | Plan ausführen | die im Plan beschlossenen Änderungen | schreibt **alle** Registerzeilen eines Plans in einem Zug — Kopfzeilen, Gründe, Suchschlüssel, Fingerabdrücke, Ereignis- und Lebenszykluszeilen; Quittung mit Zahlen | 0/2 |
-| `check [--summary]` | Commit, Sitzungsstart | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette, geänderter Definitionssatz; mit `--summary` nur die Kopfzeile | 0 keine, 1 Befunde, 2 strukturell |
+| `check [--summary]` | Commit, Sitzungsstart | Register, Doku, geplante Schritte | `FINDING` je Abweichung: Marker ohne Eintrag, Eintrag ohne Definitionsmarker, mehrere Definitionsmarker, unlesbare Zeile, `target:` auf unbekannte ID oder Datei, `superseded` ohne Ziel, Dublette, geänderter Definitionssatz; mit `--summary` nur die Kopfzeile | 0 keine, 1 Befunde |
 | `lint --file DATEI --changed` | nach Doku-Edit | Git-Diff der Datei | `FINDING` je geänderter Zeile mit Normativsignal ohne Marker und je neuem Marker ohne Eintrag | 0/1 |
 
 **Arbeitskommandos** — nehmen immer Listen, auch wenn nur ein Element übergeben wird:
