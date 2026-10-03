@@ -20,14 +20,14 @@ Die entwicklungsbegleitende Doku hält Festlegungen fest. Ob eine Festlegung in 
 | Ereigniszeile | datierte Zeile im Register zur Festlegung | `friction` — Arbeit musste um die Festlegung herum gebaut werden · `upheld` — gegen eine Idee oder einen Befund geprüft und bestätigt · `pending` — eine Frage an den Entwickler ist offen |
 | geplanter Schritt | noch offener Schritt der Projektplanung, wo immer er steht (Fahrplandatei, Abschnitt „Offen" einer README, Notiz); eine Fahrplandatei wird nicht vorausgesetzt | nennt sein Umbauziel: IDs oder die Kennung eines Bereichs (Kapitel 3.4) |
 | `mode` | wie die Sitzung die Doku liest | `execute` — Beschlossenes umsetzen · `design` — etwas neu denken, Alternativen suchen |
-| `friction_threshold` | Zahl der `friction`-Zeilen, ab der eine Festlegung `open` wird | Skill-Parameter, Standard 2; für Festlegungen aus Abschnitten mit der Funktion `global` gilt eine Stufe höher (Standard 3) |
+| `friction_threshold` | Zahl der `friction`-Zeilen, ab der eine Festlegung `open` wird; zählt das Kommando | Skill-Parameter |
 | `assumptions_on_approval` | was die Freigabe eines Plans mit den darin gelisteten Annahmen tut | `accept` (Standard) — sie werden `accepted` · `keep` — sie bleiben `assumed` |
 
 Beide sind Skill-Parameter und wohnen in der Skill-Parameterdatei (Kapitel 3.5). Fehlen sie, gilt der Standard.
 
 ## 3 Rollen und ihre Funktionen
 
-Jeder Abschnitt einer Doku trägt an seiner Überschrift eine **Rolle**, die benennt, worum es in ihm geht. Der Skill ordnet jeder Rolle intern eine oder zwei **Funktionen** zu, und an diesen Funktionen — nicht an der Rolle selbst — hängen die Regeln dieses Textes: die Pflicht zum Zitatmarker an `relate` (Abschnitt 12), die erhöhte Reibungsschwelle an `global` (Abschnitt 2), und von der Markerprüfung ausgenommen sind `nonbinding` und `register`.
+Jeder Abschnitt einer Doku trägt an seiner Überschrift eine **Rolle**, die benennt, worum es in ihm geht. Der Skill ordnet jeder Rolle intern eine oder zwei **Funktionen** zu, und an diesen Funktionen — nicht an der Rolle selbst — hängen die Regeln dieses Textes: die Pflicht zum Zitatmarker an `relate` (Abschnitt 12), die Kennzeichnung als projektweit an `global` (Abschnitt 6), und von der Markerprüfung ausgenommen sind `nonbinding` und `register`.
 
 **Tabelle: Rollen und ihre Funktionen**
 
@@ -61,32 +61,22 @@ Ein Projekt benutzt, was es braucht; keine Rolle ist Pflicht. Was ein Abschnitt 
 
 **Annahmen statt Fragen.** Fehlt der Marker oder der Grund, bildest Du aus der Prosa selbst eine Annahme über `kind` und `reason` oder Quelle und trägst sie mit `status: assumed` in den Plan ein. Du fragst den Entwickler nur, wo Du keine Annahme bilden kannst; dann steht im Plan eine `pending`-Zeile mit der Frage. Bis zur Antwort gilt vorläufig `decided`.
 
-**Fragen an den Entwickler** — für die Vollständigkeitsfrage und für den Satz aus Prüfung R3 gelten vier Regeln:
+**Fragen an den Entwickler** — für die Vollständigkeitsfrage und für den Satz bei einer `fixed`-Festlegung mit Reibung (Abschnitt 5) gelten vier Regeln:
 
 1. Ohne Skill-Vokabular. Nicht `given`/`chosen`, nicht „Härte", nicht „Marker". Sondern: „Ist das eine Vorgabe von außen — Hardware, Norm, Fremdschnittstelle — oder haben wir das so entschieden? Falls entschieden: Was war der Grund, und was wäre die Alternative gewesen?"
 2. Mit Anlass. Nenne die Festlegung im Wortlaut, wo sie steht, und in einem Satz, was jetzt von der Antwort abhängt.
 3. Nichtwissen ist zulässig. Drei Antwortformen: Antwort → Attribute werden `confirmed`. „Später" → `pending` bleibt, `decided` gilt vorläufig, Du arbeitest unter dieser Annahme weiter und sagst das; in dieser Sitzung fragst Du nicht erneut, in einer späteren nur beim nächsten Kontakt; „Was ist offen?" listet alle `pending`-Zeilen. „Lass uns das durchgehen" → Gespräch über so viele Turns wie nötig; am Ende fasst Du zusammen, was Du festhalten würdest, und schreibst erst nach Bestätigung.
 4. „Grund nicht mehr bekannt" ist eine Antwort → `reason: unknown`, keine weitere Frage; in `design` sagt der geparkte Satz „Grund nicht überliefert".
 
-## 5 Härte ableiten: die Entscheidungsliste
+## 5 Härte ableiten
 
-Die Prüfungen R1 bis R7 stellst Du Dir selbst und beantwortest sie durch Nachschlagen in Register, Ereigniszeilen und geplanten Schritten — das Skript tut es für Dich (`hardness`, Kapitel 3.6). Keine davon wird dem Entwickler gestellt. Von oben nach unten; die erste zutreffende Prüfung bestimmt die Härte, danach wird nicht weitergelesen. Jede Prüfung ist eine einzelne Prüfung; nichts wird kombiniert oder gewichtet.
+Die Härte rechnet das Kommando `hardness` aus Register, Ereigniszeilen und geplanten Schritten aus und gibt sie mit der zutreffenden Bedingung in Prosa zurück. Du leitest sie nicht selbst ab und zählst nicht per Blick. Keine der Prüfungen, aus denen sie folgt, wird dem Entwickler gestellt.
 
-| | Prüfung | Härte | Anmerkung |
-|---|---|---|---|
-| R1 | Der Entwickler hat in dieser Sitzung zu dieser ID oder ihrem Bereich „hart" oder „offen" gesagt. | `fixed` bzw. `open` | Gilt für die Sitzung. Soll es bleiben: „offen" → ein geplanter Schritt (dann greift R2); „hart" → `pinned` (dann greift R4); beides über einen Plan. |
-| R2 | Ein geplanter Schritt nennt diese ID als Umbauziel. | `open` | Jüngste Entscheidung des Entwicklers; öffnet auch Gegebenes und Festgeschriebenes. |
-| R3 | `kind` ist `given` und `status` ist `accepted` oder `confirmed`. | `fixed` | Stehen dennoch mindestens `friction_threshold` `friction`-Zeilen da, bleibt sie `fixed`; Du sagst einen Satz nach den Regeln aus 3.1.3: Quelle noch aktuell? |
-| R4 | `pinned` und `status` ist `accepted` oder `confirmed`. | `fixed` | |
-| R5 | Ein geplanter Schritt nennt den Bereich, in dem sie steht, als Umbauziel. | `open` | Gröber als R2; öffnet nicht, was R3 oder R4 gebunden haben. |
-| R6 | Seit der jüngsten `upheld`-Zeile stehen mindestens `friction_threshold` `friction`-Zeilen (Funktion `global`: eine Stufe höher). Fehlt eine `upheld`-Zeile, zählen alle. | `open` | Zählung per Kommando, nie per Blick. |
-| R7 | — | `decided` | Der Normalfall. |
+**Was Du beisteuerst, ist das Wort des Entwicklers.** Sagt er in dieser Sitzung zu einer Festlegung oder zu einem ganzen Bereich „hart" oder „offen", weiß das Register nichts davon — Du gibst es mit `--word fixed|open` an das Kommando weiter. Es gilt dann für diese Sitzung. Soll es bleiben, gehört es in einen Plan: „offen" wird zu einem geplanten Schritt mit dieser ID als Umbauziel, „hart" zu `pinned`.
 
-Reihenfolge: oben die Entscheidung des Entwicklers (R1, R2), dann das von Natur aus Gebundene (R3, R4), dann was die Planung grob öffnet (R5), dann was die Erfahrung öffnet (R6), unten der Normalfall.
+**Eine angenommene Festlegung wird nie `fixed`.** Kommt sie als `decided` zurück, obwohl sie von außen vorgegeben scheint, liegt es daran, dass niemand sie bestätigt hat; in `design` sagt der geparkte Satz „vermutlich von außen vorgegeben — stimmt das?".
 
-Annahmen machen nie `fixed`: R3 und R4 verlangen `accepted` oder `confirmed`. Eine angenommene `given`-Festlegung bleibt `decided`; in `design` sagt der geparkte Satz „vermutlich von außen vorgegeben — stimmt das?".
-
-Fehlende Felder blockieren nie — sie machen die Prüfung stumm, die sie bräuchte; die Liste endet dann bei R7 (3.1.7).
+**Trägt eine `fixed`-Festlegung dennoch Reibung,** meldet das Kommando das mit. Sie bleibt `fixed`, aber Du sagst einen Satz dazu nach den Regeln aus Abschnitt 4: Ist die Quelle noch aktuell?
 
 ## 6 Verhalten: Härte × Lage
 
@@ -108,9 +98,9 @@ Fehlende Felder blockieren nie — sie machen die Prüfung stumm, die sie bräuc
 
 Jeder Plan trägt diesen Abschnitt. Er ist der Zwischenspeicher aller Annahmen bis zur Freigabe und der Ort, an dem der Entwickler sie sieht. Das Skript liefert sein Gerüst (`plan-section`, Kapitel 3.6).
 
-**Je Eintrag:** ID (oder Wortlaut, wenn noch keine ID existiert), Kapitel, `kind`, `reason` oder Quelle, `status`, abgeleitete Härte mit der zutreffenden Bedingung in Prosa, und — bei Kollision — der geparkte Satz. Bei `pending` die Frage in Prosa.
+**Was Du selbst eintragen musst**, weil das Kommando es nicht kennen kann: den **Wortlaut** einer Festlegung, die noch keine ID hat — beim Erstkontakt mit unmarkierter Prosa ist das der Normalfall —, bei einer offenen Frage die **Frage in Prosa**, und bei einer Kollision den **geparkten Satz** nach Abschnitt 6.
 
-**Suchschlüssel unter der Tabelle.** Unmittelbar unter den Einträgen steht ein Block mit je einer Zeile — `D-0042: Eingangsqueue; Blockgröße; 64` —, und zwar nur für Festlegungen, die dieser Plan **neu anlegt** oder deren Schlüssel er ändert. Für die übrigen sind sie längst gewählt; sie erneut zu zeigen wäre Lärm. Der Block steht dort, damit Du den Entwickler die Begriffe korrigieren lassen kannst, ohne ihn zu fragen: Er überfliegt sie und sagt etwas, oder er sagt nichts und die Freigabe nimmt sie mit. Eigene Spalte und Anhang an den Grund sind dafür verworfen — Schlüssel beurteilt man als Menge, nicht einzeln, und nur im Block fällt auf, wenn zwei Festlegungen dieselben tragen oder keine den eigentlichen Gegenstand nennt.
+**Der Suchschlüsselblock unter der Tabelle ist eine Korrekturgelegenheit.** Er zeigt die Begriffe, die dieser Plan neu vergibt, damit der Entwickler sie überfliegen und etwas dazu sagen kann — ohne dass Du ihn fragst. Sagt er nichts, nimmt die Freigabe sie mit.
 
 **Freigabesatz.** Bei `assumptions_on_approval: accept` steht im Abschnitt: „Die Freigabe dieses Plans bestätigt die hier gelisteten Annahmen, soweit der Entwickler nichts anderes sagt." Bei `keep` fehlt der Satz. Das Wort des Entwicklers je Plan schlägt den Skill-Parameter: „nur ablegen" → dieser Plan wie `keep`; „gilt als bestätigt" → wie `accept`.
 
@@ -124,14 +114,16 @@ Die Länge des Abschnitts ist ein Maß für die Schrittgröße: Nennt ein Plan m
 
 ## 8 Fehlende und unlesbare Felder
 
-| Was fehlt | Stumm | Ergebnis | Auffangnetz |
-|---|---|---|---|
-| kein Marker | R3, R4, R6 | `decided` | 3.1.3 bildet beim Kontakt die Annahme; der Plan zeigt sie |
-| Marker ohne Grund | — | `decided`, in `design` mit Vermerk „Grund fehlt" | Annahme oder `pending`; `unknown` beendet das Fragen |
-| keine Ereigniszeilen | R6 | nichts durch Erfahrung geöffnet | Zählung beginnt mit der ersten `friction`-Zeile |
-| geplante Schritte ohne Umbauziel | R2, R5 | nichts durch Planung geöffnet; nur R1 öffnet | berührt ein Schritt erkennbar den Bereich, fragst Du einmal, ob er als Umbau gemeint ist, und trägst das Ziel nach (Kapitel 3.4) |
-| Registerzeile unlesbar (Schlüsselwort falsch, Datum fehlt) | die jeweilige Prüfung | wie „fehlt" | `check` meldet die Zahl nicht lesbarer Zeilen (Kapitel 3.6) |
-| Doku schweigt zum Bereich | alle | nichts bindet | Du erfindest keine Festlegung; entsteht eine, hältst Du sie fest (Kapitel 3.5) |
+**Fehlendes blockiert nie.** Es macht die Prüfung stumm, die es bräuchte; das Ergebnis ist dann der Normalfall `decided` und nie ein Abbruch.
+
+| Was fehlt | Ergebnis | Was Du tust |
+|---|---|---|
+| kein Marker | `decided` | beim Kontakt die Annahme bilden (Abschnitt 4); der Plan zeigt sie |
+| Marker ohne Grund | `decided`, in `design` mit Vermerk „Grund fehlt" | Annahme oder `pending`; `unknown` beendet das Fragen |
+| keine Ereigniszeilen | nichts durch Erfahrung geöffnet | nichts; die Zählung beginnt mit der ersten `friction`-Zeile |
+| geplante Schritte ohne Umbauziel | nichts durch Planung geöffnet | berührt ein Schritt erkennbar den Bereich, fragst Du einmal, ob er als Umbau gemeint ist, und trägst das Ziel nach (Kapitel 3.4) |
+| Registerzeile unlesbar (Schlüsselwort falsch, Datum fehlt) | wie „fehlt" | `check` meldet die Zahl nicht lesbarer Zeilen (Kapitel 3.6) |
+| Doku schweigt zum Bereich | nichts bindet | Du erfindest keine Festlegung; entsteht eine, hältst Du sie fest (Kapitel 3.5) |
 
 ## 9 Was der Entwickler sieht
 
@@ -169,33 +161,21 @@ Der Grund und die verworfene Alternative stehen in der Prosa, wo sie gedacht wur
 
 ## 13 ID
 
-`D-0042`: ein globaler Zähler je Register, mindestens vier Stellen, nie neu vergeben, vom Skript vergeben (`next-id`). Die ID trägt kein Kapitel und keinen Ort; das Kapitel leitet das Skript aus dem Ort des Definitionsmarkers ab. Dass sie keins tragen darf, ist Bedingung 2 in Kapitel 2.2 — Kapitel werden umnummeriert, und eine Adresse, die dabei lügt, ist schlechter als keine. Das `D` steht für decision.
+`D-0042`: der stabile Schlüssel einer Festlegung. Vergeben wird er vom Skript (`next-id`), nie von Dir, und **nie neu** — auch nicht, nachdem eine Festlegung entfallen ist. Darauf stützt sich, dass ein alter Verweis sich immer noch auflöst; niemand muss quer durchs Projekt suchen, bevor er weiterarbeiten darf.
 
-Wird eine Festlegung inhaltlich zu einer anderen — etwa von einer Kapitelfestlegung zu einer projektweiten Vorgabe —, ist das eine neue Festlegung mit neuer ID; die alte wird abgelöst (Abschnitt 16).
+Die ID trägt kein Kapitel und keinen Ort. Das Kapitel leitet das Skript aus dem Ort des Definitionsmarkers ab — Kapitel werden umnummeriert, und eine Adresse, die dabei lügt, ist schlechter als keine.
+
+**Dein Urteil ist nur an einer Stelle gefragt:** Wird eine Festlegung inhaltlich zu einer anderen — etwa von einer Kapitelfestlegung zu einer projektweiten Vorgabe —, ist das eine neue Festlegung mit neuer ID; die alte wird abgelöst (Abschnitt 16). Das erkennt kein Skript.
 
 ## 14 Register — Ort
 
-Eine Datei je Doku, Standardname `decisions.md` im Ordner der Doku. Das Skript findet sie in dieser Reihenfolge: Script-Argument `--register` → Skill-Parameterdatei → eine Zeile `[register: pfad]` in der Dokudatei → Standard im Ordner der Datei. Findet es nichts, meldet es, wo es gesucht hat und mit welchem Script-Argument der Aufrufer es hinführt (Vorgabe 2.4). Damit darf eine Doku ihr Register in einem anderen Ordner führen und aus jeder Dokudatei darauf verweisen.
+Eine Datei je Doku, Standardname `decisions.md` im Ordner der Doku; sie darf auch anderswo liegen, dann führt eine Zeile `[register: pfad]` in der Dokudatei dorthin. Das Skript sucht sie selbst und meldet, wenn es nichts findet, wo es gesucht hat und mit welchem Script-Argument Du es hinführst (Vorgabe 2.4).
 
-## 15 Register — Grammatik
+## 15 Register — wer es schreibt
 
-Jede Zeile, die zu einer Festlegung gehört, beginnt mit eckigen Klammern, darin zuerst die ID, dann Schlüsselwörter; nach der Klammer folgt Prosa. Jede Zeile wiederholt die ID, damit `grep` alles zu einer Festlegung liefert, egal wo die Zeile steht, und das Skript keine Nachbarschaft erkennen muss.
+**Das Register gehört dem Skript.** Du schreibst keine Registerzeile von Hand und liest keine im Rohtext: Alle Zeilen einer Festlegung entstehen in einem Zug über `apply` aus einem freigegebenen Plan, und `open` und `show` geben Dir ihren Inhalt aufbereitet zurück. Welche Felder eine Festlegung trägt, steht in Abschnitt 2; welche Form ihre Zeilen haben, musst Du nicht wissen.
 
-| Zeile | Form | Inhalt nach der Klammer |
-|---|---|---|
-| Kopf | `[ID kind status]` oder `[ID kind status pinned]` | Kurzlabel, nicht normativ |
-| Grund | `[ID reason]` · `[ID reason unknown]` | Grund einer `chosen`-Festlegung, oder `in prose` |
-| Quelle | `[ID source]` | Quelle einer `given`-Festlegung, oder `in prose` |
-| Alternative | `[ID instead]` | eine Alternative, ein Grund der Ablehnung — eine Zeile; oder `in prose` |
-| Suchschlüssel | `[ID keys]` | zwei bis vier markante Begriffe, durch Semikolon getrennt; finden unmarkierte Erwähnungen |
-| Fingerabdruck | `[ID fp]` | Kurzhash des normalisierten Definitionssatzes; erkennt, dass die Definition sich geändert hat |
-| Reibung | `[ID friction JJJJ-MM-TT]` | was sich gerieben hat, ein Halbsatz |
-| Bestätigung | `[ID upheld JJJJ-MM-TT]` | gegen welche Idee oder welchen Befund geprüft |
-| offene Frage | `[ID pending JJJJ-MM-TT]` | die Frage in Prosa; wird nach Beantwortung gelöscht |
-| Ablösung | `[ID superseded JJJJ-MM-TT by ID2]` | optional ein Halbsatz |
-| Stilllegung | `[ID retired JJJJ-MM-TT]` | warum die Festlegung entfällt |
-
-Regeln: Schlüsselwörter in der Kopfzeile in fester Reihenfolge beim Schreiben (ID, `kind`, `status`, `pinned`), beim Lesen ist die Reihenfolge gleichgültig. Die Zeilen einer Festlegung stehen direkt untereinander in der Reihenfolge der Tabelle — Konvention für den Leser, der Parser hängt nicht daran. Keine Backticks, kein Fettdruck in Registerzeilen; genau dort frisst der WYSIWYG-Editor Leerzeichen. Das Skript normalisiert U+00A0 zu Leerzeichen, bevor es die Klammer zerlegt. Datum immer `JJJJ-MM-TT`. Die Kennzeichnung eines Registerabschnitts trägt die Rolle `[DS:register]` (Abschnitt 3).
+Was Du über das Register hinaus beiträgst, ist die Kennzeichnung seines Abschnitts in der Doku: Er trägt die Rolle `[DS:register]` (Abschnitt 3).
 
 ## 16 Altes: drei Fälle, eine Regel
 

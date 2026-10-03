@@ -116,6 +116,26 @@ Was mechanisch entscheidbar ist, entscheidet das Skript und gibt es als `ITEM` o
 
 Was ein Kommando **nicht** hat, ist ebenso Festlegung: Es gibt kein `add` für eine einzelne Registerzeile. Registerzeilen entstehen ausschließlich über `apply` aus einem freigegebenen Plan — in einem Aufruf, nicht in zehn (Kapitel 1.3.6). Es gibt ebenso kein `list`, das die Festlegungen eines Projekts aufzählt (abgelehnt am 2026-10-03, vormals Befund B-14): `open` gibt dieselben `ITEM`-Zeilen aus und liest ohne `--chapter` den ganzen Doku-Ordner; der Abgleich, den es dabei mitmacht, ist lesend.
 
+**Die Form der Registerzeilen, die `apply` schreibt und `check` liest** (seit dem 2026-10-04 hier; bis dahin stand sie im Regelteil, bis Vorgabe 2.6 sie als Spezifikation eines Kommandos hierher verwies). Welche Felder eine Festlegung trägt und was sie bedeuten, steht in Kapitel 1.4; hier steht nur, wie sie auf Papier aussehen.
+
+Jede Zeile beginnt mit eckigen Klammern, darin zuerst die ID, dann Schlüsselwörter; nach der Klammer folgt Prosa. Jede Zeile wiederholt die ID, damit `grep` alles zu einer Festlegung liefert, egal wo die Zeile steht, und das Skript keine Nachbarschaft erkennen muss.
+
+| Zeile | Form |
+|---|---|
+| Kopf | `[ID kind status]` oder `[ID kind status pinned]` |
+| Grund | `[ID reason]` · `[ID reason unknown]` |
+| Quelle | `[ID source]` |
+| Alternative | `[ID instead]` |
+| Suchschlüssel | `[ID keys]` |
+| Fingerabdruck | `[ID fp]` |
+| Reibung | `[ID friction JJJJ-MM-TT]` |
+| Bestätigung | `[ID upheld JJJJ-MM-TT]` |
+| offene Frage | `[ID pending JJJJ-MM-TT]` |
+| Ablösung | `[ID superseded JJJJ-MM-TT by ID2]` |
+| Stilllegung | `[ID retired JJJJ-MM-TT]` |
+
+Beim Schreiben stehen die Schlüsselwörter der Kopfzeile in fester Reihenfolge (ID, `kind`, `status`, `pinned`); beim Lesen ist die Reihenfolge gleichgültig. Die Zeilen einer Festlegung schreibt `apply` direkt untereinander in der Reihenfolge der Tabelle — Konvention für den Leser, der Parser hängt nicht daran. Datum immer `JJJJ-MM-TT`. Keine Backticks, kein Fettdruck in Registerzeilen: genau dort frisst der WYSIWYG-Editor Leerzeichen. Vor dem Zerlegen der Klammer normalisiert das Skript U+00A0 zu Leerzeichen.
+
 **Das Kommando `notes` liest die Notizen aus dem Commit-Verlauf** (entschieden am 2026-09-25). Wozu sie da sind, steht in Kapitel 1.3.5, ihre Form in 3.2.9. Für die Umsetzung gilt dreierlei.
 
 Es ist **allgemein gehalten**: Ohne Argumente liefert es alles, was der Trailer-Vorlage entspricht — jede `ADoc-`-Klasse, nicht nur die heute einzige. Der Filter `--class` grenzt auf eine Klasse ein, `--chapter` und `--ids` auf einen Bereich. So muss die Instanz nicht wissen, wo sie suchen soll: Sie fragt einmal quer über alles und entscheidet dann selbst, was zur aktuellen Frage gehört. Kommen später weitere Klassen dazu, erscheinen sie ohne Änderung am Kommando.
