@@ -565,7 +565,7 @@ Dieselbe Zurückhaltung entschärft den Grenzfall in der anderen Richtung. Ein P
 
 **Endet der Skill hier, sagt er es einmal je Sitzung** — ein Satz, dass dieses Vorhaben keine Softwareentwicklung ist und er deshalb nichts tut. Aus demselben Grund wie bei der Abwahl: Die Antwort steht dann schon da, bevor sich jemand wundert.
 
-**Fehlt die Skill-Parameterdatei oder das Feld `mode`, wird nicht stillschweigend `on` angenommen** (entschieden am 2026-09-24, Zeitpunkt der Frage korrigiert am 2026-10-02): Die Instanz fragt einmal je Sitzung, ob der Skill hier geführt werden soll, und bietet an, die Skill-Parameterdatei anzulegen. Lehnt der Entwickler ab, fragt sie zusätzlich, ob `mode: off` trotzdem festgehalten werden soll, damit die Frage nicht wiederkehrt.
+**Fehlt die Skill-Parameterdatei oder das Feld `mode`, oder steht dort sein Standardwert `null`, wird nicht stillschweigend `on` angenommen** (entschieden am 2026-09-24, Zeitpunkt der Frage korrigiert am 2026-10-02): Die Instanz fragt einmal je Sitzung — am ersten Anlass, siehe den folgenden Absatz —, ob der Skill hier geführt werden soll, und bietet an, die Skill-Parameterdatei anzulegen. Lehnt der Entwickler ab, fragt sie zusätzlich, ob `mode: off` trotzdem festgehalten werden soll, damit die Frage nicht wiederkehrt.
 
 **Gefragt wird aber nicht beim Laden, sondern am ersten Anlass** — in dem Moment, in dem der Skill zum ersten Mal etwas vorschlagen oder schreiben würde (1.7). Bis dahin liest er still mit. Damit ist es dieselbe Frage wie die nach der Erstanlage oder dem Einstieg und nicht eine zweite davor; sie trägt den konkreten Anlass bei sich, und der Entwickler entscheidet an einem Beispiel statt an einer Methodikfrage.
 

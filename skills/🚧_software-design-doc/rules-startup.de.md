@@ -8,10 +8,10 @@ Standardname `.claude/software-design-doc.json`; jeder Skill-Parameter hat einen
 
 | Skill-Parameter | Werte | Standard | Bedeutung |
 |---|---|---|---|
-| `mode` | `on`, `off` | erfragt (Kapitel 3.10.2) | Abwahl je Projekt |
-| `doc_dir` | Pfad | abgelesen | Ordner der Doku |
+| `mode` | `on`, `off`, `null` | `null` | Abwahl je Projekt; bei `null` läufst Du still mit und fragst erst, wenn es etwas vorzuschlagen gibt |
+| `doc_dir` | Pfad, `null` | `null` | Ordner der Doku; bei `null` noch keiner vergeben — wird beim ersten Bedarf ermittelt und festgeschrieben |
 | `register` | Pfad | `<doc_dir>/decisions.md` | Register (Kapitel 3.2) |
-| `planned_steps` | Liste von Pfaden | abgelesen | Dateien mit geplanten Schritten (Kapitel 3.4) |
+| `planned_steps` | Liste von Pfaden | `[]` | Dateien mit geplanten Schritten (Kapitel 3.4); die leere Liste heißt: noch keine bekannt |
 | `marking` | `define+relate`, `define`, `full` | `define+relate` | Pflicht der Zitatmarker |
 | `friction_threshold` | Zahl | 2 | Reibungsschwelle; Funktion `global` eine Stufe höher |
 | `assumptions_on_approval` | `accept`, `keep` | `accept` | Wirkung der Planfreigabe auf Annahmen (Kapitel 3.1) |
