@@ -36,6 +36,24 @@ Drei Sätze tragen das Vorhaben. Die Instanz wägt nicht, sie schlägt nach. All
 
 Ob eine Festlegung in der aktuellen Arbeit bindet oder zur Disposition steht, ergibt sich aus wenigen Feldern, die zu ihr gehören — Art (von außen gegeben oder von uns gewählt), Grund, Status, Ereigniszeilen —, und aus den Umbauzielen der geplanten Schritte des Projekts. Eine geordnete Liste einzelner Prüfungen macht daraus die **Härte** der Festlegung; aus Härte und **Lage** der Sitzung (Beschlossenes umsetzen oder etwas neu denken) folgt das Verhalten — sechs Zellen, eine Handlung je Zelle (Kapitel 3.1). Nichts davon wird kombiniert oder gewichtet; die Instanz führt Prüfungen aus, sie bildet kein Urteil.
 
+**Die Liste selbst** (seit dem 2026-10-04 hier; bis dahin stand sie im Regelteil, bis Vorgabe 2.6 sie als Rechenvorschrift dorthin verwies, wo das Kommando gebaut wird). Gelesen wird von oben nach unten; die erste zutreffende Prüfung bestimmt die Härte, danach wird nicht weitergelesen. Das Kommando `hardness` führt sie aus und gibt neben dem Ergebnis die zutreffende Bedingung in Prosa aus (Kapitel 3.6.4).
+
+| | Prüfung | Härte |
+|---|---|---|
+| R1 | Der Entwickler hat in dieser Sitzung zu dieser ID oder ihrem Bereich „hart" oder „offen" gesagt. | `fixed` bzw. `open` |
+| R2 | Ein geplanter Schritt nennt diese ID als Umbauziel. | `open` |
+| R3 | `kind` ist `given` und `status` ist `accepted` oder `confirmed`. | `fixed` |
+| R4 | `pinned` und `status` ist `accepted` oder `confirmed`. | `fixed` |
+| R5 | Ein geplanter Schritt nennt den Bereich, in dem sie steht, als Umbauziel. | `open` |
+| R6 | Seit der jüngsten `upheld`-Zeile stehen mindestens `friction_threshold` `friction`-Zeilen (Funktion `global`: eine Stufe höher). Fehlt eine `upheld`-Zeile, zählen alle. | `open` |
+| R7 | — | `decided` |
+
+**Die Reihenfolge ist selbst eine Festlegung:** oben die Entscheidung des Entwicklers (R1, R2), dann das von Natur aus Gebundene (R3, R4), dann was die Planung grob öffnet (R5), dann was die Erfahrung öffnet (R6), unten der Normalfall. R2 öffnet auch Gegebenes und Festgeschriebenes, weil es die jüngste Entscheidung des Entwicklers ist; R5 ist gröber und öffnet gerade nicht, was R3 oder R4 gebunden haben.
+
+**R1 ist die einzige Prüfung, die das Skript nicht selbst beantworten kann** — ihre Quelle ist das Gespräch und nicht das Register. Die Instanz erkennt sie und gibt das Wort des Entwicklers mit dem Argument `--word` an das Kommando weiter.
+
+Dass R3 und R4 `accepted` oder `confirmed` verlangen, ist keine Einzelheit dieser Liste, sondern Vorgabe 2.11: Eine angenommene Festlegung wird nie `fixed`. Fehlende Felder blockieren nie; sie machen die Prüfung stumm, die sie bräuchte, und die Liste endet dann bei R7.
+
 **Was bewusst nicht einfließt.** Vier Größen, die man erwarten könnte, bleiben draußen, und jede aus einem Grund. Das **Alter** einer Entscheidung: Zeitregeln sind fragil, weil Projekte verschieden schnell laufen; eine Festlegung gilt als frisch, bis sich zum ersten Mal Arbeit an ihr gerieben hat — das ist ein Ereignis und kein Datum. Die **Umbaukosten**: Sie entscheiden nicht, ob ein Gedanke verfolgt wird, sondern sie sind eine Zahl, die der Entwickler zur Entscheidung braucht; sie stehen im geparkten Satz und nicht in der Ableitung. Jede Form von **Gewichtung**: Die Prüfungen werden gelesen, nicht verrechnet — genau daran scheitert eine Instanz (1.2). Und **neues Wissen, das einen Grund hinfällig macht**: Dass eine Annahme von gestern heute nicht mehr trägt, ist beim Vorbeigehen nicht erkennbar; das braucht einen eigenen Durchgang durch die Doku und gehört deshalb in die Konsistenzprüfung, nicht in die laufende Arbeit.
 
 Die Felder **gehören** zur Festlegung, aber sie **stehen** nicht bei ihr im Text. Das ist der Punkt, an dem die folgenden Abschnitte ansetzen.
