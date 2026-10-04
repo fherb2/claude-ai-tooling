@@ -54,6 +54,14 @@ Der Grund ist nicht nur der Kontext, den eine Nacherzählung kostet. Sie schafft
 
 Prüfbar: Auf jeden Abschnitt eines Regelteils, der eine Berechnung, eine Suchreihenfolge, eine Vergaberegel oder ein Dateiformat beschreibt, das ein Kommando erzeugt, lässt sich zeigen — das ist der Verstoß. Die Abgrenzung verläuft nicht am Thema, sondern an der Frage, wer rechnet: „Die erste zutreffende Prüfung bestimmt die Härte" ist Rechenvorschrift und gehört ins Skript; „fehlende Felder blockieren nie" ist eine Verhaltensregel für den Fall, dass das Skript nichts liefert, und bleibt im Regelteil.
 
+**Eine Form bleibt dennoch im Regelteil, wenn die Instanz sie selbst erzeugen oder erkennen muss** (ergänzt am 2026-10-04 bei der Entlastung). Der Prüfsatz oben fragt, wer rechnet. Zwei Fälle trifft er damit nicht, und beide sind bei der Durchsicht von `rules-core.de.md` aufgefallen.
+
+Die **Markerformen** `[D-0042]` und `[>D-0042]` schreibt zwar `apply` in die Prosa. Aber jeder einzelne Marker steht vorher als Vorschlag im Plan, von der Instanz formuliert, und in einer fremden, noch unmarkierten Doku muss sie vorhandene Marker erkennen. Sie liest hier nicht das Ergebnis eines Kommandos, sondern bildet die Form selbst.
+
+Die **Trailer-Grammatik der Commit-Notizen** hat überhaupt kein Kommando: Die Notiz schreibt die Instanz in die Commit-Nachricht, und `notes` liest sie nur aus dem Verlauf wieder heraus. Nähme man die Feldliste aus dem Regelteil, hätte die Mechanik keinen anderen Zuständigen, sondern gar keinen.
+
+Der Maßstab ist deshalb zweistufig. Zuerst: Ist überhaupt ein Kommando zuständig? Dann: Bekommt die Instanz die Form ausschließlich als dessen Ergebnis zu Gesicht, oder muss sie sie auch selbst bilden? Nur im ersten Fall verschwindet sie aus dem Regelteil.
+
 ## 2.7 Was kostet, sind Entscheidungen und Edits
 
 Rechenzeit von Skripten und Hooks ist vernachlässigbar. Kosten entstehen, wenn die Instanz ein Skript starten und überwachen, eine Ausgabe zu einer Entscheidung verarbeiten, etwas formulieren oder eine Datei ändern muss — der Dateiedit ist der teuerste Vorgang. Daraus: ein Skriptaufruf je Anker, nicht mehrere; Ausgaben sind **entscheidungsfertig** — eine Zeile je Gegenstand mit der Stelle, an der die Instanz nur noch ja/nein oder einen Wert einträgt; das Gerüst des Planabschnitts liefert das Skript, nicht Rohdaten, aus denen die Instanz es baut.
