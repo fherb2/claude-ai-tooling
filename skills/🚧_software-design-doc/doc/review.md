@@ -8,35 +8,27 @@ Die Arbeit am Vorhaben bestand seit einiger Zeit aus dem Lösen von Diskrepanzen
 
 **Ergebnis der Prüfung von Ebene 0:** Ziel, Leitidee, Rollenverteilung und Größenschranke (Kapitel 1.2, 1.3, 1.3.4, 1.10, Vorgabe 2.2) sind vollständig, in sich geschlossen und vom Entwickler geprüft. Dort gibt es nichts zu beanstanden; dieses Dokument sagt dazu nichts weiter.
 
-Alles Weitere sind Befunde. Jeder ist so aufgebaut, dass er ohne die Doku daneben verständlich ist: worum es sachlich geht, was dafür festgelegt wurde, was tatsächlich dasteht, welche Folge das hätte, und welche Wege es gibt. Die Wege sind Richtungen mit ihren Kosten, keine Entscheidungen. Die Reihenfolge ist nach Gewicht: zuerst der Befund, der die anderen erklärt, dann die Widersprüche, dann die Lücken, zuletzt der Anhang mit dem, was in der Umsetzung ohne Vorgabe entstanden ist.
+Alles Weitere sind Befunde. Jeder ist so aufgebaut, dass er ohne die Doku daneben verständlich ist: worum es sachlich geht, was dafür festgelegt wurde, was tatsächlich dasteht, welche Folge das hätte, und welche Wege es gibt. Die Wege sind Richtungen mit ihren Kosten, keine Entscheidungen. Die Reihenfolge: zuerst die Widersprüche zwischen Stellen, die beide festlegen wollen; dann, was versprochen ist, aber keinen Mechanismus hat; dann, was festgelegt ist, aber dessen Herleitung nicht trägt; dann Begründungen, die nicht mehr tragen; zuletzt der Anhang mit dem, was in der Umsetzung ohne Vorgabe entstanden ist. Eine gemeinsame Ursache für alle Befunde hat die Prüfung nicht ergeben; wo mehrere dieselbe Form haben, steht das beim Befund.
 
----
-
-## Der Befund, der die anderen erklärt
-
-### L-15 — Vorgaben stehen in Kapitel 1, Arbeitsregeln in Kapitel 2
-
-**Worum es geht.** Die Doku folgt dem Dreiersschema des Vorläufers. Segment 1 soll die Zusammenhänge erzählen — warum der Skill so gebaut ist, wie seine Teile zusammenwirken. Segment 2 soll die Vorgaben tragen — das, was man gegen eine Datei halten kann. Die Trennung ist kein Formalismus: Sie sorgt dafür, dass jede Festlegung genau ein normatives Zuhause hat. Zwei Stellen, die beide festlegen, driften auseinander, und niemand merkt, welche gilt — das ist die Begründung, die Anhang A.6 für den Vorläufer gibt und die Vorgabe 2.6 für das Skript wiederholt.
-
-**Was festgelegt ist.** Kapitel 2 beginnt mit dem Aufnahmetest: „Auf eine Datei muss sich zeigen lassen ‚das verletzt diese Vorgabe'. Was so nicht prüfbar ist, gehört als Begründung nach Kapitel 1 oder als Detail nach Kapitel 3."
-
-**Was tatsächlich dasteht.** Kapitel 1 trägt 21 datierte Festlegungen — gezählt an den Wendungen „entschieden am", „Festlegung des Entwicklers vom", „ergänzt am", „präzisiert am". Darunter: die gesamte Prüfliste R1–R7 (1.3.1), „Marker werden vorgeschlagen, nicht verfügt" (1.3.3), „Dazwischen gibt es nichts" (1.3.3), „Gefragt wird, wenn die Antwort etwas bewirkt — vorher nie" (1.7), „Jedes Kommando liest zuerst die Skill-Parameterdatei" (1.7.7), „Was überholt ist, darf nicht unmarkiert dastehen" (1.7.6), die Regel, wo eine Planung steht (1.7.3). Jede davon besteht den Aufnahmetest von Kapitel 2: Man kann auf eine Datei zeigen und sagen, sie verletze das.
-
-Kapitel 2 trägt umgekehrt drei Vorgaben, die nicht den Skill regeln, sondern die Arbeit an ihm: 2.14 (die Doku wendet das Vorhaben nicht auf sich an), 2.16 (Adressierung im Zieltext) und die beiden Ergänzungen zu 2.6 vom 3. und 4. Oktober. Alle drei sind in den letzten drei Tagen entstanden oder gewachsen.
-
-**Warum das ein Problem ist.** Wer wissen will, was gilt, muss beide Kapitel lesen und bei jedem Satz entscheiden, ob er Begründung oder Vorgabe ist. Wer eine Vorgabe ändert, findet die zweite Fassung in Kapitel 1 nicht, weil sie als Erzählung getarnt ist — und umgekehrt. Genau so entstehen die Diskrepanzen, an denen das Vorhaben zuletzt gearbeitet hat: L-12 unten ist ein Fall davon (1.8 und 2.9 sagen beide, der Skillstart frage, obwohl 1.7 das Gegenteil festlegt). Fünf der sechzehn Befunde in diesem Dokument sind Widersprüche zwischen zwei Stellen, die beide festlegen wollen.
-
-**Was zu tun wäre.** Es gibt zwei Richtungen, und sie schließen sich nicht aus.
-
-Die erste: Kapitel 1 von Vorgaben entlasten. Jede der 21 datierten Festlegungen bekommt in Kapitel 2 ihre normative Fassung — kurz, prüfbar, mit Datum —, und in Kapitel 1 bleibt die Begründung mit einem Verweis. Das ist Arbeit an etwa zwanzig Stellen, und sie verdoppelt kurzfristig nichts, weil der Text ja schon da ist; er wandert nur. Danach gibt es für jede Frage „gilt das?" genau einen Ort.
-
-Die zweite: die drei Arbeitsregeln aus Kapitel 2 herausnehmen und dorthin legen, wo Arbeitsregeln dieses Repositories stehen — in die Projekt-`CLAUDE.md` oder, weil sie nur dieses Vorhaben betreffen, in einen eigenen Abschnitt des Fahrplans. Dann heißt Kapitel 2 wieder, was es verspricht.
-
-Beides zusammen stellt die Trennung her, die das Dreiersschema voraussetzt. Ohne sie wird jeder weitere Befund wieder zu einer Regel, die an zwei Orten stehen muss.
+**Eine Korrektur am Dokument selbst.** Die erste Fassung dieses Reviews hat Kapitel 2 als den Ort für alles gelesen, was sich gegen eine Datei prüfen lässt — und daraus gefolgert, die funktionalen Festlegungen in Kapitel 1 seien fehlplatziert. Das war falsch: Kapitel 1 trägt, *was* der Skill tut, Kapitel 2 trägt, *wie* alles umgesetzt wird, was in diesem Vorhaben entsteht — Normative, die an keiner einzelnen Funktion hängen. Die Fehllesung hatte eine Quelle in der Doku, und die steht jetzt als L-15.
 
 ---
 
 ## Widersprüche zwischen Stellen, die beide festlegen
+
+### L-15 — Die Abgrenzung von Kapitel 1 und 2 ist nicht formuliert, und fünf Festlegungen stehen in beiden
+
+**Worum es geht.** Die Doku folgt dem Dreiersschema. Kapitel 1 trägt die Zusammenhänge und mit ihnen die funktionalen Festlegungen — *was* der Skill tut, wann er fragt, was ein Marker ist, wann eine Festlegung bindet. Kapitel 2 trägt die Normative, die nicht an einer Funktion hängen, sondern sagen, *wie* umgesetzt wird: Sprache der Schlüsselwörter, Größenschranke, Ausgabevertrag, Kosten, Hooks nur lesend, kein Zwang für den Entwickler. Der Vorläufer verlangte für jede Aussage genau ein normatives Zuhause (Anhang A.6): „Nie zwei gleichrangige Fassungen derselben Festlegung — sie driften auseinander, und niemand merkt, welche gilt."
+
+**Was festgelegt ist.** Der Kopf von Kapitel 2, vollständig: „Projektweite Festlegungen für alles, was in diesem Vorhaben entsteht: Regelteile, Skript, Hooks, Dokumentation. Aufnahmetest: Auf eine Datei muss sich zeigen lassen ‚das verletzt diese Vorgabe'. Was so nicht prüfbar ist, gehört als Begründung nach Kapitel 1 oder als Detail nach Kapitel 3." Das ist alles, was die Doku über die Abgrenzung der beiden Kapitel sagt. Der Vorläufer hatte in A.6 davor noch „Projektweite Festlegungen, die quer über den gesamten Code galten" — der Querschnittscharakter stand dort vor dem Aufnahmetest; beim Übertragen ist er zu „für alles, was entsteht" geworden, was etwas anderes sagt.
+
+**Was tatsächlich dasteht.** Zweierlei. Erstens: Der Kopf nennt den Aufnahmetest und nicht das Merkmal, das Kapitel 2 von Kapitel 1 trennt. Funktionale Festlegungen — die Prüfliste, „Marker werden vorgeschlagen, nicht verfügt", „gefragt wird am Anlass" — bestehen den Aufnahmetest ebenso: Man kann auf eine Datei zeigen und sagen, sie verletze das. Nach dem Kopf allein gehörten sie nach Kapitel 2, und genau so hat der Verfasser dieses Reviews ihn in der ersten Fassung gelesen.
+
+Zweitens: Fünf Festlegungen stehen in beiden Kapiteln, ohne dass eine Stelle die andere als Zuhause nennt. „Gefragt wird am Anlass": 1.7, 1.7.7, 1.8, 2.9. „Fehlende Felder blockieren nie": 1.3.1, 2.10. „Marker pflichtig am Definitionsort und in `relate`": 1.3.3 Funktionstabelle, 2.2 Bedingung 1, 1.7.4. „Hooks sind nur lesend": 1.3.5, 2.8. Die erhöhte Reibungsschwelle für `global`: 1.3.1 R6, 1.3.3, 2.9. Zum Vergleich, wie es richtig aussieht: „Annahmen machen nie `fixed`" steht in 1.3.1 mit dem Zusatz „ist keine Einzelheit dieser Liste, sondern Vorgabe 2.11" — ein Verweis, der das Zuhause benennt.
+
+**Warum das ein Problem ist.** Wo dieselbe Festlegung an zwei Orten steht, erreicht eine Änderung nur einen. L-12 ist der Fall, in dem das geschehen ist: Q-15 hat 1.7 geändert; 1.8 und 2.9 sagen noch das Alte. Die übrigen vier Doppelungen sind heute stimmig, aber jede nächste Änderung an ihnen hat dieselbe Chance. Und solange die Abgrenzung nicht formuliert ist, entscheidet jeder Schreibende nach Gefühl, wohin eine neue Festlegung gehört — sie landet dort, wo gerade gearbeitet wird, und beim nächsten Mal daneben. Dieses Review selbst ist der Beleg: Es hat die Abgrenzung aus dem Kopf von Kapitel 2 herausgelesen und falsch verstanden.
+
+**Was zu tun wäre.** Drei Schritte. Erstens die Abgrenzung in den Kopf von Kapitel 2 schreiben — dass Kapitel 1 trägt, was der Skill tut, und Kapitel 2, wie alles umgesetzt wird, was in diesem Vorhaben entsteht, unabhängig von einer einzelnen Funktion; der Aufnahmetest bleibt als zweite Bedingung dahinter. Zweitens für die fünf Doppelungen je ein Zuhause bestimmen — nach der Abgrenzung: funktional nach Kapitel 1, Normativ nach Kapitel 2 — und an der anderen Stelle einen Verweis setzen, wie 1.3.1 es für 2.11 schon tut. Drittens: Der Standard des Vorläufers wird mit Fahrplanschritt 7 zu `standard.de.md` und bringt seinen Aufnahmetest aus A.6 mit. Kapitel 1.11 zählt drei Anpassungen auf, die er dabei erfährt; die Abgrenzung von Segment 1 und 2 müsste die vierte sein — sonst erbt jedes Projekt, das den Standard über den Skill führt, dieselbe Lücke, aus der dieses Missverständnis entstanden ist.
 
 ### L-02 — `mode` bedeutet zweierlei
 
@@ -154,7 +146,7 @@ Zum Vergleich: Die Erstanlage (Leistung 1) hat in Kapitel 1.7.1 den längsten Ab
 
 **Warum das ein Problem ist.** Die Probe misst „Parken statt Abschuss" und erklärt das Design bei Verfehlen für gescheitert. Gemessen wird dann gegen eine Verhaltensbeschreibung, die nur in der Umsetzung existiert — und wenn sie verfehlt wird, gibt es keine Vorgabe, zu der man zurückgeht, sondern nur den Regeltext, der gerade versagt hat. Die Doku weiß nicht, was sie von dieser Leistung verlangt; sie weiß nur, wie sie sie gebaut hat.
 
-**Was zu tun wäre.** Eine Vorgabe in Kapitel 2, die für die Lage `design` festlegt, was prüfbar ist: dass keine Kollision mit einer `decided`-Festlegung als Ablehnung formuliert wird; dass jeder geparkte Satz Festlegung, Grund und Umbaukosten nennt; dass der Gedanke bis zu einem Vorschlag mit Kosten geführt wird, bevor der Entwickler entscheidet. Das sind drei Sätze, und sie stehen inhaltlich schon in Abschnitt 6 des Regelteils — sie müssen nur zur Vorgabe werden, damit der Regelteil ihre Umsetzung ist und nicht ihre einzige Quelle. Daneben wäre zu prüfen, ob 1.7.5 nicht auch die Erzählung verdient, die 1.7.1 hat: Szene 5 in Kapitel 1.6 zeigt den Fall, aber der Abschnitt, der die Leistung beschreibt, verweist nicht einmal auf sie.
+**Was zu tun wäre.** Kapitel 1.7.5 so ausarbeiten, dass es die Leistung festlegt und nicht nur benennt — das ist funktional und gehört deshalb nach Kapitel 1, nicht nach Kapitel 2. Festzulegen wäre, was in der Lage `design` prüfbar gilt: dass keine Kollision mit einer `decided`-Festlegung als Ablehnung formuliert wird; dass jeder geparkte Satz die Festlegung, ihren Grund und die Umbaukosten nennt; dass der Gedanke bis zu einem Vorschlag mit Kosten geführt wird, bevor der Entwickler entscheidet. Diese drei Sätze stehen inhaltlich schon in Abschnitt 6 des Regelteils — sie müssen nur in Kapitel 1 zur Festlegung werden, damit der Regelteil ihre Umsetzung ist und nicht ihre einzige Quelle. Daneben wäre zu prüfen, ob 1.7.5 nicht auch die Erzählung verdient, die 1.7.1 hat: Szene 5 in Kapitel 1.6 zeigt den Fall, aber der Abschnitt, der die Leistung beschreibt, verweist nicht einmal auf sie.
 
 ### L-07 — Die Planungsort-Regel folgt aus einem lokalen Konflikt
 
@@ -166,7 +158,7 @@ Zum Vergleich: Die Erstanlage (Leistung 1) hat in Kapitel 1.7.1 den längsten Ab
 
 **Warum das ein Problem ist.** Nicht, dass die Regel falsch wäre. Sondern dass sie im Skill an einer Stelle steht, die aus dem Ziel folgen soll, und dort mit einem Grund begründet ist, der außerhalb des Skills liegt. Was aus dem Ziel folgt, ist nur ein Teil: Geplante Schritte müssen ein Umbauziel tragen, weil sonst nichts öffnet (1.7.3, erster Absatz). Wo eine Planung steht und wie lang sie sein darf, ist Methodik — dieselbe Sorte Regel wie Phasen, Segmente und Arbeitsschleife, die Kapitel 1.11 in den Regelteil `standard.de.md` verweist.
 
-**Was zu tun wäre.** Die Regel teilen. Was der Mechanismus braucht — ein geplanter Schritt ist ein Text unter einer Überschrift, er trägt ein Umbauziel, er steht in einem Abschnitt mit der Rolle `plan` oder in einer Datei aus `planned_steps` — bleibt in `rules-planning.de.md` und bekommt seine Vorgabe in Kapitel 2. Was Methodik ist — die drei Orte, die zehn Sätze, das Löschen der Planungsdatei — wandert nach `standard.de.md` zu den übrigen Anpassungen des Vorläufers, die Kapitel 1.11 schon aufzählt („die Regel, wo ein Plan steht, wird durch Kapitel 3.4 ersetzt"). Dann lädt ein Projekt, das den Standard des Vorläufers nicht führt, diese Regel auch nicht — und der Skill zwingt niemandem eine Methodik auf, die aus einem fremden Vorfall stammt.
+**Was zu tun wäre.** Die Regel teilen. Was der Mechanismus braucht — ein geplanter Schritt ist ein Text unter einer Überschrift, er trägt ein Umbauziel, er steht in einem Abschnitt mit der Rolle `plan` oder in einer Datei aus `planned_steps` — bleibt in `rules-planning.de.md`; seine Festlegung steht in Kapitel 1.7.3 bereits, sie wäre nur vom Methodikteil zu trennen. Was Methodik ist — die drei Orte, die zehn Sätze, das Löschen der Planungsdatei — wandert nach `standard.de.md` zu den übrigen Anpassungen des Vorläufers, die Kapitel 1.11 schon aufzählt („die Regel, wo ein Plan steht, wird durch Kapitel 3.4 ersetzt"). Dann lädt ein Projekt, das den Standard des Vorläufers nicht führt, diese Regel auch nicht — und der Skill zwingt niemandem eine Methodik auf, die aus einem fremden Vorfall stammt.
 
 ### L-16 — Eine Vorgabe wird angewendet, die nirgends steht
 
@@ -238,7 +230,7 @@ Zwei Punkte sind keine Lücken in der Herleitung, aber die Kette macht sichtbar,
 
 | | Befund | Art |
 |---|---|---|
-| L-15 | Vorgaben in Kapitel 1, Arbeitsregeln in Kapitel 2 — die Grenze wird nicht gehalten | strukturell; Ursache der Widersprüche |
+| L-15 | Die Abgrenzung von Kapitel 1 und 2 ist nicht formuliert; fünf Festlegungen stehen in beiden | Lücke in der Doku; Doppelung |
 | L-02 | `mode` bedeutet Lage und Abwahl zugleich | Widerspruch zu 2.1 |
 | L-04 | Wer Marker in die Prosa schreibt: drei Antworten | Widerspruch |
 | L-10 | H3 eingeplant und unentschieden zugleich | Widerspruch Fahrplan / Probe-Tor |
