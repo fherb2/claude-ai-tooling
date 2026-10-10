@@ -13,7 +13,6 @@
 // named in the same row of the official documentation, where what you lose by
 // deleting them reads "Nothing user-facing". /plans additionally keeps a plan
 // carried out on one machine from resurfacing on another as an open task.
-// Reasoning per pattern in 3.9 of the doc
 /cache
 /plugins/cache
 /debug
@@ -52,7 +51,6 @@
 
 // Machine-bound: backup copies, session markers, environment, shell captures,
 // IDE connection
-// Reasoning per pattern in 3.9 of the doc
 /backups
 /ide
 /sessions
@@ -63,7 +61,7 @@
 // carries the session id, so it never becomes a working directory again, and
 // after a reboot it no longer exists locally either. A directory pattern takes
 // its contents with it; the second line is belt and braces, because this one
-// carries a wildcard. See 3.9
+// carries a wildcard.
 /projects/-tmp*
 /projects/-tmp*/**
 
