@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Rebuild both download packages of claude-sync-watch from files/ and prove
-# that each entry matches its source.
+# that each entry matches its source. Next to the archives it places a loose
+# copy of .stignore, so that an update of the ignore list alone needs no
+# reinstallation (doku 2.7, 2.8).
 #
 # Usage:
 #     home-.claude-sharing/scripts/pack_packages.sh
@@ -43,7 +45,8 @@
 #     install_service.sh plus chapter 2.7 have to follow in the same go.
 #
 #     What to report afterwards: the two archive names, and per package that
-#     every entry matched its source and the file set was as determined. Report
+#     every entry matched its source and the file set was as determined; the
+#     same for the loose .stignore. Report
 #     any deviation verbatim -- a deviation is an error, not a variant (2.7).
 #     Output is German like that of the check script (named exception in 2.5).
 set -euo pipefail
@@ -141,6 +144,12 @@ for language in "${LANGUAGES[@]}"; do
     printf 'gepackt: %s\n' "$(basename "$zip_path")"
 done
 
+# The loose copy of the ignore list. It is a copy like the archives and goes
+# stale with files/ just the same, which is why it is made here and nowhere
+# else (doku 2.7).
+cp -p "$SRC/.stignore" "$OUT/.stignore"
+printf 'kopiert: .stignore\n'
+
 printf '\nPruefung gegen die Quellen:\n'
 
 for language in "${LANGUAGES[@]}"; do
@@ -182,6 +191,14 @@ for language in "${LANGUAGES[@]}"; do
         FAILED=1
     fi
 done
+
+printf '  .stignore (lose Kopie):\n'
+if [ "$(sha256sum < "$OUT/.stignore")" = "$(sha256sum < "$SRC/.stignore")" ]; then
+    printf '    gleich        .stignore\n'
+else
+    printf '    ABWEICHUNG    .stignore\n'
+    FAILED=1
+fi
 
 # Direction three: does files/ hold anything that no package carries? The two
 # checks above compare the archives against the determination; this one compares
