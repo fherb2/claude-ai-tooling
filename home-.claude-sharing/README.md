@@ -1,6 +1,6 @@
 # Syncthing-Sync für `~/.claude`
 
-*Stand: 2026-10-01*
+*Stand: 2026-10-10*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.en.md)*
 
@@ -18,7 +18,7 @@ Die Eigenleistung dieses Vorhabens liegt woanders: Syncthing führt Dateien, die
 
 ## Was mitwandert — und was nicht
 
-Abgeglichen wird der gesamte Inhalt von `~/.claude`, einschließlich der Sitzungsprotokolle und Chats unter `projects/` — sie sind der eigentliche Zweck. Ausgenommen ist, was in der Ausschlussliste `.stignore` steht; welches Muster warum, sagt Kapitel 3.9 der Doku. Daneben gibt es eine zweite Liste für einen einzelnen Rechner — siehe das nächste Kapitel.
+Abgeglichen wird der gesamte Inhalt von `~/.claude`, einschließlich der Sitzungsprotokolle und Chats unter `projects/` — sie sind der eigentliche Zweck. Ausgenommen ist, was in der Ausschlussliste `.stignore` steht; warum ein Muster dort steht, sagen die Kommentare in der Liste selbst, für einige Muster zusätzlich Kapitel 3.9 der Doku. Daneben gibt es eine zweite Liste für einen einzelnen Rechner — siehe das nächste Kapitel.
 
 Vier Punkte, die man vorher wissen sollte:
 
@@ -301,6 +301,17 @@ Eine bestehende Installation wird nicht neu aufgesetzt, sondern überschrieben: 
 **Entpacken löscht nichts.** Aus einer Installation von vor der Sprachtrennung bleibt deshalb `conflict-resolution.md` liegen — die Arbeitsanweisung ohne Sprachkürzel. Gelesen wird sie nicht mehr, denn der Wächter bildet den Namen aus seiner Sprache (`conflict-resolution.de.md`); sie sieht nur aus wie die maßgebliche. Das Installationsskript benennt, was es davon findet, und entfernt nichts von selbst: Auf einem fremden Rechner zu löschen ist nicht seine Sache. **Kein** Überbleibsel ist dagegen `__pycache__/` — den legt Python selbst an, sobald der Wächter seinen Meldungskatalog lädt; gelöscht entsteht er beim nächsten Lauf erneut.
 
 **Ein Ordner, ein Katalog.** Liegen mehrere `messages_*.py` nebeneinander — weil beide Pakete entpackt oder Dateien aus dem Repository dazukopiert wurden —, entscheidet nicht mehr das Paket über die Sprache, sondern der Schalter `--lang`. Die Dienstdefinition übergibt keinen, also gilt Deutsch. Auch darauf weist das Installationsskript hin.
+
+### Nur die Ausschlussliste aktualisieren
+
+Meist ändert sich bei einer neuen Fassung nur die Ausschlussliste. Für diesen Fall liegt sie in `downloads/` zusätzlich als einzelne Datei neben den Paketen; eine Neuinstallation ist dann nicht nötig. Die Datei gehört an **zwei** Stellen: in den Werkzeugordner, dessen Fassung die maßgebliche ist, und von dort in den abgeglichenen Ordner:
+
+    curl -fsSL -o ~/.claude-sync-watch/.stignore https://raw.githubusercontent.com/fherb2/claude-ai-tooling/master/home-.claude-sharing/downloads/.stignore && \
+    cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore
+
+**Beide Zeilen gehören dazu.** Bleibt im Werkzeugordner die alte Fassung liegen, bietet das nächste `install_service.sh` genau diese zur Übernahme an — mit der Vorgabe Ja, und die neue Liste wäre wieder fort. Eigene Zeilen in `~/.claude/.stignore` gehen dabei verloren wie beim Aktualisieren des ganzen Pakets; was nur für diesen Rechner gilt, gehört nach `~/.claude/.stignore-local`. Danach den Ordner in Syncthing einmal neu einlesen lassen (`http://127.0.0.1:8384`): Wann Syncthing eine geänderte Liste von selbst liest, ist nicht dokumentiert.
+
+Am Knoten läuft kein Werkzeug; dort wird der Inhalt im Reiter *Ignore Patterns* des Ordners ersetzt. Damit die Liste dort unverändert gelten kann, braucht der Knoten einmalig eine leere Datei `.stignore-local` im Wurzelverzeichnis des Ordners: Die Liste bindet sie per `#include` ein, und eine fehlende Include-Datei ist für Syncthing ein Fehler.
 
 ### Wieder abmelden
 

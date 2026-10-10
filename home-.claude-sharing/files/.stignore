@@ -26,6 +26,14 @@
 /plugins/installed_plugins.unreadable.*.kept
 /policy-limits.*
 
+// Register of the marketplaces known locally. Machine-bound twice over: its
+// "lastUpdated" records when THIS machine last refreshed the catalogue, and
+// every Claude Code start rewrites it, so two machines can never agree on its
+// content; its "installLocation" points into /plugins/marketplaces, which is
+// excluded above, so the reference travels but the target does not. Four
+// rewrites within seven minutes and a threefold conflict on 2026-10-10.
+/plugins/known_marketplaces.json
+
 // Download cache of the claude.ai account sync. The server side of your
 // account is the source of truth; every signed-in machine fetches these
 // trees for itself at start-up and re-checks them every ten minutes. Claude
