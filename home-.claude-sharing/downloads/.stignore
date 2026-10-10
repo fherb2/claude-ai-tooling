@@ -70,6 +70,15 @@
 // Reasoning and the price of this exclusion in 1.3 of the doc
 /file-history
 
+// Timestamp of the last local housekeeping sweep, governed by
+// cleanupPeriodDays. The value travels, its meaning does not: it asserts that
+// THIS filesystem was swept, which is false anywhere else, and an incoming
+// newer stamp makes the receiving machine skip a sweep it never ran. Rewritten
+// at every Claude Code start with millisecond resolution, so two machines can
+// never agree on its content: two conflict copies within one second on
+// 2026-10-10, 2.7 seconds apart from the original.
+/.last-cleanup
+
 // Transient files
 *.log
 *.sock
