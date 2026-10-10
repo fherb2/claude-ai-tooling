@@ -170,7 +170,7 @@ Beispiel für ein Konfigurationsverzeichnis mit Zugangsdaten — **ein Beispiel,
 #recycle
 ```
 
-**Auch der Knoten braucht die Muster, und dort pflegt sie niemand automatisch.** Auf den Arbeitsrechnern vergleicht das Installationsskript die wirksame Liste gegen die maßgebliche und bietet die Übernahme an; auf der Synology läuft kein solches Skript. Jede spätere Änderung an den Mustern ist dort **von Hand** nachzutragen, und nichts meldet sich, wenn das unterbleibt. Eine `#include`-Zeile gehört dort nicht hinein: Die eingebundene Datei entstünde mangels Skript nicht, und eine fehlende Include-Datei ist ein Fehler.
+**Auch der Knoten braucht die Muster, und dort pflegt sie niemand automatisch.** Auf den Arbeitsrechnern vergleicht das Installationsskript die wirksame Liste gegen die maßgebliche und bietet die Übernahme an; auf der Synology läuft kein solches Skript. Jede spätere Änderung an den Mustern ist dort **von Hand** nachzutragen, und nichts meldet sich, wenn das unterbleibt. Die maßgebliche Liste gilt dort **unverändert**, samt ihrer Zeile `#include .stignore-local`. Dafür wird im Wurzelverzeichnis des Ordners einmalig eine Datei `.stignore-local` angelegt, leer oder nur mit einem Kommentar: Mangels Skript entsteht sie dort nicht von selbst, und eine fehlende Include-Datei ist ein Fehler. Danach wird bei jeder Änderung nur der Inhalt im Reiter *Ignore Patterns* ersetzt; die Datei liegt im Repo zusätzlich einzeln unter `downloads/.stignore`.
 
 **Ausdrücklich prüfen, ob die Muster wirklich greifen** — ein falsch formuliertes Muster sieht aus, als würde es wirken, und tut es nicht. Kontrolle schlicht dadurch, dass die betreffenden Dateien auf der Gegenseite **nicht** auftauchen.
 
