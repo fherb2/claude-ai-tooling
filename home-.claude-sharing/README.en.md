@@ -1,6 +1,6 @@
 # Syncthing sync for `~/.claude`
 
-*Last updated: 2026-10-01*
+*Last updated: 2026-10-10*
 
 *[Deutsche Fassung](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.md)*
 
@@ -20,7 +20,7 @@ The contribution of this project lies elsewhere: Syncthing deliberately does **n
 
 ## What travels — and what does not
 
-Everything in `~/.claude` is synchronised, including the session transcripts and chats under `projects/` — they are the actual point of the exercise. Excluded is whatever the ignore list `.stignore` names; which pattern is there for what reason is set out in chapter 3.9 of the documentation. Next to it sits a second list for a single machine — see the next chapter.
+Everything in `~/.claude` is synchronised, including the session transcripts and chats under `projects/` — they are the actual point of the exercise. Excluded is whatever the ignore list `.stignore` names; why a pattern is there is stated by the comments in the list itself, and for some patterns also in chapter 3.9 of the documentation. Next to it sits a second list for a single machine — see the next chapter.
 
 Four points worth knowing beforehand:
 
@@ -303,6 +303,17 @@ An existing installation is not set up again but overwritten: download the curre
 **Unpacking deletes nothing.** An installation from before the split by language therefore keeps `conflict-resolution.md` — the working instruction without a language code. It is not read any more, because the watcher builds the name from its own language (`conflict-resolution.en.md`); it merely looks like the authoritative one. The setup script names whatever it finds of these and removes nothing by itself: deleting on someone else's machine is not its business. What is **not** a leftover is `__pycache__/` — Python creates it itself as soon as the watcher loads its message catalogue; deleted, it comes back on the next pass.
 
 **One folder, one catalogue.** Where several `messages_*.py` sit side by side — because both packages were unpacked, or files were copied in from the repository — the package no longer decides the language; the `--lang` switch does. The service definition passes none, so German applies. The setup script points that out as well.
+
+### Updating only the ignore list
+
+Most of the time, a new version changes nothing but the ignore list. For that case it also sits in `downloads/` as a single file next to the packages, and no reinstallation is needed. The file belongs in **two** places: in the tool folder, whose version is the authoritative one, and from there in the synchronised folder:
+
+    curl -fsSL -o ~/.claude-sync-watch/.stignore https://raw.githubusercontent.com/fherb2/claude-ai-tooling/master/home-.claude-sharing/downloads/.stignore && \
+    cp ~/.claude-sync-watch/.stignore ~/.claude/.stignore
+
+**Both lines belong there.** If the old version stays in the tool folder, the next `install_service.sh` offers exactly that one for taking over — defaulting to yes, and the new list would be gone again. Your own lines in `~/.claude/.stignore` are lost just as with an update of the whole package; whatever applies to this machine alone belongs in `~/.claude/.stignore-local`. Afterwards have Syncthing rescan the folder once (`http://127.0.0.1:8384`): when Syncthing reads a changed list by itself is not documented.
+
+No tool runs on the node; there, replace the content in the folder's *Ignore Patterns* tab. For the list to apply there unchanged, the node needs an empty file `.stignore-local` in the root of the folder, once: the list pulls it in with `#include`, and a missing include file is an error for Syncthing.
 
 ### Removing the service again
 
