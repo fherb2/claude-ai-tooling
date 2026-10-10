@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Master branch is the supported state. The parts of the project are without version numbers.
+The master branch is the supported state. The parts of the project have no version numbers.
 
 ## Reporting a Vulnerability
 

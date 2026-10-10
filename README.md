@@ -1,6 +1,6 @@
 # Claude-AI-Tooling
 
-*Last updated: 2026-09-15*
+*Last updated: 2026-10-10*
 
 *[Deutsche Fassung](README.de.md)*
 
@@ -15,7 +15,7 @@ Tools / components for the daily work with Claude — claude.ai, Claude Desktop 
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`pack-source-to-txt/`](pack-source-to-txt/README.en.md)<br>✅ | **The whole codebase of your project as a single file**: precise, up-to-date project context for an AI without access to the machine.                                                                                                      |
 | [`home-.claude-sharing/`](home-.claude-sharing/README.en.md)<br>✅ | **Working across several machines**: chat memory and working instructions / skills instead of many separate ones spread over the systems: `~/.claude` in sync on all machines, conflicts are reported and resolved under guidance. |
-| [`skills/`](skills/README.en.md)<br>☑ | Instead of many CLAUDE.md instructions: **have the rules loaded automatically**. In the context first and only when actually needed: Claude Code **skills with a "silent" trigger** — and, since September 2026, **guaranteed capabilities with a hook trigger** too.                                                |
+| [`skills/`](skills/README.en.md)<br>☑ | **Various skills for coding and more.** Claude **skills with a "silent" trigger**.                                                   |
 | [`CLAUDE.md-Snippets/`](CLAUDE.md-Snippets/README.en.md)<br>✅ | **Ready-made blocks of text for instruction files**: paragraphs to be copied out one by one, for the `CLAUDE.md` of a local installation and for the places where claude.ai takes instructions. |
 | [`safety-related/`](safety-related/)<br>✅ | **Configurations and notes for using Claude safely**: ready-made `settings.json` blocks for the Bash sandbox and the tool permissions, with one line of explanation per parameter — plus a report on which boundary actually holds in which constellation of editor, SSH and container. |
 | [`vscode-dev-container/`](vscode-dev-container/README.en.md)<br>✅ | **A dev container that draws the line between agent and machine**: a Dockerfile and a `devcontainer.json` with narrow mounts instead of the whole home, an SSH agent instead of key files, the network boundary on the host — meant as a base for other things to build on. |
