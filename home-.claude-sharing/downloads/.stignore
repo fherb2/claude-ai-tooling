@@ -79,6 +79,12 @@
 // 2026-10-10, 2.7 seconds apart from the original.
 /.last-cleanup
 
+// Local cache of the organisation's managed settings, written by Claude Code,
+// with its signature and fetch time. ".synced-at" holds the millisecond time
+// of a fetch, so two machines rewriting it can never agree on its content:
+// two conflict copies per file within one second on 2026-10-22.
+/remote-settings.json*
+
 // Transient files
 *.log
 *.sock
