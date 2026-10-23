@@ -87,6 +87,19 @@
 // exclusion rests on the content, not on documentation.
 /.last-update-result.json
 
+// Prompt history and the pasted text it refers to. Documented as "Prompts
+// you've typed, with timestamp and project path. Used for up-arrow recall,
+// Ctrl+R history search, and ! shell-command completion"; paste-cache holds
+// the "Contents of large pastes", and deleting it costs the "Pasted text in
+// recalled prompts". Resume, continue and rewind do not
+// depend on either. Every prompt on every machine appends a line to the same
+// file, so parallel use on two machines ends in a conflict copy; one was
+// examined on 2026-10-23. The price of excluding: each machine recalls only
+// the prompts typed on it. paste-cache goes along, because without the history
+// that refers to it, its files are useless elsewhere.
+/history.jsonl
+/paste-cache
+
 // Local cache of the organisation's managed settings, written by Claude Code,
 // with its signature and fetch time. ".synced-at" holds the millisecond time
 // of a fetch, so two machines rewriting it can never agree on its content:
