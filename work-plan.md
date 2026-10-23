@@ -35,7 +35,15 @@ Die Nummern sind Kennungen, keine Reihenfolge: Maßgeblich ist, in welcher Folge
 
 **Lokal nachziehen statt ersetzen.** Trägt der lokale Klon Unveröffentlichtes oder uncommittete Änderungen, die bleiben sollen, wird er nicht ersetzt: Claude holt den umgeschriebenen Zweig herein, prüft, dass sein Baum dem bisherigen gleicht, und setzt den Zweig per `checkout -B` darauf; Arbeitsverzeichnis und uncommittete Änderungen bleiben unberührt (bewährt an `freecad`, `Karlin-Elektroplanung`, `mcu-slotring`).
 
-**Nächster Teilschritt: Repos, die nur auf GitHub liegen.** Für sie braucht Claude eine Liste vom Entwickler — von hier aus lässt sie sich nicht abrufen, weil die GitHub-API HTTPS braucht und `gh` auf diesem Rechner fehlt. Je Repository dann: Analyse in einem Scratchpad-Klon, Plan, Umschreiben und Push wie im Verfahren oben; ein lokaler Klon entfällt, der Scratchpad-Klon wird danach gelöscht. Archivierte Repos hebt der Entwickler vorher aus der Archivierung und archiviert sie danach wieder.
+**Plan für die Repos, die nur auf GitHub liegen, noch nicht ausgeführt** (Liste und Entscheidungen des Entwicklers vom 23. Oktober 2026; keines ist archiviert). Je Repository: Das bei der Analyse geklonte, unberührte Original im Scratchpad ist zugleich die Sicherung; eine frische Kopie davon wird umgeschrieben (`mailmap`, gegebenenfalls Ersetzungslisten, `--date-order`), wie im Verfahren oben geprüft und mit `--force-with-lease` für alle Zweige und Tags gepusht; danach wird der Scratchpad-Ordner gelöscht. Ein lokaler Klon entfällt. Bei jeder Abweichung hält Claude an. Reihenfolge und Besonderheiten:
+
+- `netcup-managmt`: leer, nichts zu tun.
+- `packageImportsTest`, `urbackup-gated` (ein annotierter Tag, LFS), `karlincam_projects`: nur Identitäten. Der Kontaktabschnitt in der `README.md` von `karlincam_projects` bleibt (bewusst geschrieben).
+- `zarr_wildlife_recording_py`, `wildlifeRecords2Hdf`: zusätzlich die Autorzeilen in `pyproject.toml` und in der mitkopierten `setup.cfg` (je eine Fassung) → `fherb2` mit noreply-Adresse; fremde Autorzeilen unter `test_zone/` bleiben.
+- `npstyping`: zusätzlich die Einträge in `authors` und `maintainers` der `pyproject.toml`; der Commit von `github-actions[bot]` bleibt.
+- `zarrcompatibility`: zusätzlich `authors` und `maintainers` der `pyproject.toml` (Name mit Platzhalter-Adresse) → `fherb2` mit noreply-Adresse; die Modulköpfe mit dem Autornamen bleiben (Entscheidung des Entwicklers).
+- `z21client`: zusätzlich die zwei automatisch erzeugten `Signed-off-by`-Zeilen in Commit-Nachrichten → noreply-Adresse. Alles bewusst Geschriebene bleibt: Lizenz- und README-Texte mit Namen und Adresse, Modulköpfe, die Sphinx-`conf.py`.
+- `nptyping` (öffentlicher Fork) und `docker-openvpn-bridge` (privat, inhaltlich ein Fork): Die eigenen Commits liegen nur an Zweigspitzen (zwei bzw. drei, kein fremder Commit darauf). Statt das ganze Repository umzuschreiben, werden nur diese Commits mit neuer Identität neu gebaut — gleicher Inhalt, gleiche Nachricht, gleiche Zeitstempel, auf dem unveränderten fremden Unterbau. Grund: Das Werkzeug entfernte sonst die Signaturen der 45 bzw. 53 von GitHub signierten fremden Commits, ihre Hashes änderten sich, und der Fork verlöre die gemeinsame Historie mit dem Original.
 
 ## 11 `vscode-dev-container`: Feldnachweise abschließen
 
