@@ -125,22 +125,6 @@ Was hier ausgeschlossen ist, wird **weder empfangen noch gesendet**. Eine Einbah
 
 Was Du hier aussperrst, bleibt auf den anderen Rechnern selbstverständlich erhalten. Es kommt nur hier nicht an.
 
-### Zwei Dinge liegen außerhalb von `projects/`
-
-Projektbezogenes steckt nicht nur in den Sitzungsprotokollen:
-
-| Ort | was drinsteckt |
-| --- | --- |
-| `history.jsonl` | jeder getippte Prompt, mit Zeitstempel und Projektpfad |
-| `paste-cache/` | die eingefügten Textinhalte dazu |
-
-Beide sind **nicht projektweise trennbar** — die Historie ist eine einzige Datei über alle Projekte, die Paste-Dateien tragen im Namen nur einen Hash. Für einen Rechner mit Auswahl gibt es dort nur ganz oder gar nicht:
-
-    /history.jsonl
-    /paste-cache
-
-Der Preis betrifft allein diesen Rechner: Der Rückruf per Pfeiltaste, die Suche mit `Ctrl+R` und die Vervollständigung von `!`-Shell-Befehlen greifen dann nur noch auf das zurück, was hier getippt wurde.
-
 ### Prüfen, ob die Muster wirklich greifen
 
 Ein falsch formuliertes Muster sieht aus, als wirkte es. Die Probe geht mit einer harmlosen Datei statt mit echtem Gut:

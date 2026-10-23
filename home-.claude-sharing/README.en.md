@@ -127,22 +127,6 @@ Whatever is excluded here is **neither received nor sent**. A one-way street —
 
 What you shut out here of course stays on the other machines. It just does not arrive here.
 
-### Two things sit outside `projects/`
-
-Project-related content is not only in the session transcripts:
-
-| Location | what is in it |
-| --- | --- |
-| `history.jsonl` | every prompt you typed, with timestamp and project path |
-| `paste-cache/` | the pasted text that went with them |
-
-Neither can be **split by project** — the history is a single file across all projects, and the paste files carry only a hash in their name. For a machine with a selection it is all or nothing:
-
-    /history.jsonl
-    /paste-cache
-
-The price affects this machine alone: up-arrow recall, `Ctrl+R` search and `!` shell-command completion then draw only on what was typed here.
-
 ### Checking that the patterns really bite
 
 A badly formed pattern looks as though it works. The probe uses a harmless file rather than the real thing:
