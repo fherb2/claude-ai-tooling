@@ -79,6 +79,14 @@
 // 2026-10-10, 2.7 seconds apart from the original.
 /.last-cleanup
 
+// Outcome of the last self-update of THIS installation: install path,
+// success or failure, and the versions before and after (e.g. "native",
+// 2.1.304 -> 2.1.308 on 2026-10-23). The same trap as /.last-cleanup: the
+// statement is true only for the machine that ran the update and false
+// anywhere else. Not listed in the official description of ~/.claude, so the
+// exclusion rests on the content, not on documentation.
+/.last-update-result.json
+
 // Local cache of the organisation's managed settings, written by Claude Code,
 // with its signature and fetch time. ".synced-at" holds the millisecond time
 // of a fetch, so two machines rewriting it can never agree on its content:
