@@ -1,6 +1,6 @@
 # Syncthing-Sync für `~/.claude`
 
-*Stand: 2026-10-22*
+*Stand: 2026-10-23*
 
 *[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/home-.claude-sharing/README.en.md)*
 
