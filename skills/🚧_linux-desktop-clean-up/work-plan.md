@@ -6,10 +6,6 @@ Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die 
 
 Skripte zum Analysieren und Löschen schreiben. Die Sprache (Bash oder Python) ist noch nicht gewählt; ebenso das Format der Übergabe an das Löschskript. Aus dem Test zu Tabelle 3: `.VOB` gehört zu den Videoendungen.
 
-## 4 Weitere Chrome-Ordner
-
-Behandlung weiterer Chrome-Ordner ermitteln (`concept.md`, Abschnitt 4.3).
-
 ## 9 Weitere Installationswege
 
 Weitere Installationswege von Firefox, Chrome (bzw. Chromium) und VS Code klären, insbesondere Snap und Flatpak: Wo liegen dort Cache und Profile, und gelten die Regeln aus `concept.md`, Abschnitte 4.2 bis 4.4? Getestet sind bisher nur die klassischen Pfade.

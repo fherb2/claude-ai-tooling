@@ -152,7 +152,7 @@ Diese Regeln gelten nur für die getesteten klassischen Pfade. Andere Installati
 
 Die Ordner `Cache`, `Cache_Data`, `Code Cache`, `js` und `wasm` selbst werden nie gelöscht.
 
-Noch zu ermitteln: Behandlung weiterer Chrome-Ordner (`~/.config/google-chrome`: `component_crx_cache`, `GPUCache` u. a. waren nur für das Backup als Cache eingestuft).
+Weitere Ordner unter `~/.config/google-chrome` (Shader-, GPU- und Paket-Caches, heruntergeladene Komponenten) werden nicht angefasst. Gemessen auf dem Entwicklungsrechner zusammen rund 190 MiB, zu wenig für Recherche und Test. Ist der Ordner auf einem Rechner auffällig groß, zeigt ihn Tabelle 3 über die Größe je Verzeichnis.
 
 Diese Regeln gelten nur für die getesteten klassischen Pfade. Andere Installationswege (Snap, Flatpak und andere, auch Chromium) behandelt Abschnitt 4.11.
 
