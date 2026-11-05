@@ -1,13 +1,12 @@
 # Plan: Clean-up-Skill für Linux-Desktops
 
-Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Die Belege dazu liegen in der Sitzung und im Bericht `~/Dokumente/urbackup-analyse-2026-11-04/bericht_ausschluss-methodik.md`. Implementierungssprache (Bash oder Python) ist nicht festgelegt.
+Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungssprache (Bash oder Python) ist nicht festgelegt.
 
 ## 1 Zweck und Geltung
 
 - Der Skill löscht nur unnütze Datenansammlungen und weist den Nutzer auf Datenmengen hin, um die er sich selbst kümmern muss.
 - Er entfernt keine installierte Software, auch nicht, wenn sie vermutlich nicht mehr gebraucht wird. Solche Funde werden nur gemeldet.
 - Geltungsbereich: Linux-Desktops und -Laptops (Ubuntu, Kubuntu und ähnliche), keine Server. Er geht nicht vom Istzustand eines einzelnen Rechners aus, sondern misst den Zustand jedes Mal neu.
-- Ablage: `~/.claude/skills/`.
 
 ## 2 Grundsätze
 
