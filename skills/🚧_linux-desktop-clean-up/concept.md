@@ -56,7 +56,9 @@ Das Ergebnis übergibt er in drei Tabellen:
 |---|---|
 | 1 | Bekannte, im Skill beschriebene und durch Tests gesicherte Stellen (Abschnitt 4 außer den Rechercheergebnissen aus 4.11): was gefunden wurde und was sich mit dem Skill direkt und in kurzer Zeit säubern lässt |
 | 2 | Durch Recherche belegte Stellen (Abschnitt 4.11), je Zeile mit der Einschätzung, wie sicher der Beleg ist |
-| 3 | Auswertung der Statistiken: wo möglicherweise weitere Aufräummöglichkeiten bestehen |
+| 3 | Auswertung der Statistiken: Größe je Verzeichnis und große Einzeldateien außerhalb der bekannten Bereiche, wo möglicherweise weitere Aufräummöglichkeiten bestehen |
+
+Vor den Tabellen nennt der Skill den Füllstand je eingehängtem Dateisystem (belegt, Gesamtgröße, Prozent). Gibt es btrfs-Snapshots, nennt er ihre Zahl und, wenn die btrfs-Quotas aktiv sind, ihre Belegung; sonst entfällt diese Angabe. Der Füllstand zeigt, auf welchem Dateisystem Aufräumen überhaupt etwas bringt.
 
 Aufbau der Tabellen:
 
@@ -65,7 +67,10 @@ Aufbau der Tabellen:
 - Jede Tabelle zeigt nur eine Zusammenfassung je Bereich, eine Zeile je Bereich. Die Einzelheiten (Einzellisten, Histogramm, nummerierte Auswahllisten) kommen erst, wenn der Bereich bearbeitet wird. Nach der Datenerfassung wird nicht alles sofort präsentiert.
 - Spalten von Tabelle 1: Bereich (mit Abschnitt in diesem Dokument), Fundort, Größe, Behandlung (ohne Rückfrage / mit Rückfrage / nur melden), braucht root, Programm muss beendet sein, Hinweis zur Sicherung.
 - Spalten von Tabelle 2: Programm, Ordner, Größe, Belegstufe mit Quelle, Programm muss beendet sein, Kommentar zur Sicherung.
-- Inhalt und Spalten von Tabelle 3 werden per Test ermittelt (`work-plan.md`, Schritt 1).
+- Inhalt von Tabelle 3 (ermittelt per Test, `tests/table3_probe.py`; jeweils ohne die Bereiche aus Abschnitt 4):
+  - Größe je Verzeichnis: die oberste Ebene unter dem Home und den Systemverzeichnissen mit Größe. Tiefere Ebenen nur, wenn ein Unterordner den Elternordner nicht bloß wiederholt. Für Verzeichnisse im Home eine zusätzliche Spalte: Anteil der Daten, die seit über einem Jahr unverändert sind (für Systemverzeichnisse nicht, weil Software Änderungszeiten oft festsetzt). Treffer, die einem Bereich aus Abschnitt 5 entsprechen, sind gekennzeichnet.
+  - Große Einzeldateien ab 150 MiB, soweit 4.7, 4.8 und 4.10 sie nicht abdecken: zusammengefasst je Bereich aus Abschnitt 5 eine Zeile mit Zahl und Summe, alles Übrige als eine Zeile "Sonstiges". Die Einzeldateien zeigt der Skill erst bei der Bearbeitung.
+  - Verworfen nach dem Test: Zuwachs in den letzten Tagen (ein einzelner Lauf misst nur geänderte, nicht gewachsene Daten) und Datenmenge je Dateiart (keine neue Handlungsmöglichkeit gegenüber Ort und Größe).
 
 Ausgabe während der Analyse: Dauern einzelne Schritte lange (der Lüfter kann dabei hochdrehen), gibt das Analyseskript, das der Nutzer ausführt, laufend aus, welchen Analyseschritt es gerade ausführt.
 
