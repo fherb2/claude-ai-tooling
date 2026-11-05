@@ -18,7 +18,7 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
    - Nicht dazu gehören die Proxy-Dateien eines Videoschnittprogramms: datenreduzierte Fassungen der Quellvideos, mit denen die Vorschau während der Bearbeitung mit wenig Ressourcen rechnet. Sie sind keine bloßen Kopien, sondern veränderte Repräsentanten der eigentlichen Daten, entstehen in einem eigenen Arbeitsschritt und werden nicht on-the-fly neu erzeugt, wenn sie fehlen. Das sind Arbeitsdaten, kein Cache.
 
    Nutzdaten wie Downloads, Installationsdateien, Images und Medien (Abschnitte 4.7 bis 4.10) löscht der Skill nur nach Entscheidung des Nutzers.
-5. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie viel Platz es war, was nur gemeldet wurde.
+5. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie groß die entfernte Datenmenge war (nicht der frei gewordene Platz), was nur gemeldet wurde.
 6. Nutzereingaben: Was zu erhalten und was zu löschen ist, formuliert allein der Nutzer. Die Instanz bewertet die Angaben und überführt sie in eine schematisch richtige Zuordnung, die dem Skript oder Befehl übergeben wird. Das gilt für alle Nutzereingaben im Skill.
 7. Ordnernamen: Sie werden bei der Abarbeitung an die Sprache des Systems und des Desktops des Nutzers angepasst. Namen wie `Downloads`, `Videos`, `Musik`, `Bilder` oder `Dokumente` stehen in keiner Zeichenkette eines Skripts. Die Instanz ermittelt den Pfad auf dem Rechner (XDG-Benutzerverzeichnisse: `~/.config/user-dirs.dirs`, `xdg-user-dir`), prüft im Home, dass der Ordner existiert, und startet erst dann das Skript oder den Agenten. Sie übergibt den aufgelösten Pfad als Parameter. Messbefund: Auf diesem Rechner heißen `Downloads` und `Videos` englisch, `Musik`, `Bilder`, `Dokumente`, `Schreibtisch` deutsch.
 
@@ -57,6 +57,14 @@ Das Ergebnis übergibt er in drei Tabellen:
 | 1 | Bekannte, im Skill beschriebene und durch Tests gesicherte Stellen (Abschnitt 4 außer den Rechercheergebnissen aus 4.11): was gefunden wurde und was sich mit dem Skill direkt und in kurzer Zeit säubern lässt |
 | 2 | Durch Recherche belegte Stellen (Abschnitt 4.11), je Zeile mit der Einschätzung, wie sicher der Beleg ist |
 | 3 | Auswertung der Statistiken: wo möglicherweise weitere Aufräummöglichkeiten bestehen |
+
+Aufbau der Tabellen:
+
+- Das Analyseskript liefert maschinenlesbare Daten. Die Tabellen baut die Instanz daraus; in Tabelle 2 ergänzt sie die Ergebnisse der Recherche.
+- Jede Tabelle zeigt nur eine Zusammenfassung je Bereich, eine Zeile je Bereich. Die Einzelheiten (Einzellisten, Histogramm, nummerierte Auswahllisten) kommen erst, wenn der Bereich bearbeitet wird. Nach der Datenerfassung wird nicht alles sofort präsentiert.
+- Spalten von Tabelle 1: Bereich (mit Abschnitt in diesem Dokument), Fundort, Größe, Behandlung (ohne Rückfrage / mit Rückfrage / nur melden), braucht root, Programm muss beendet sein, Hinweis zur Sicherung.
+- Spalten von Tabelle 2: Programm, Ordner, Größe, Belegstufe mit Quelle, Programm muss beendet sein, Kommentar zur Sicherung.
+- Inhalt und Spalten von Tabelle 3 werden per Test ermittelt (`work-plan.md`, Schritt 1).
 
 Ausgabe während der Analyse: Dauern einzelne Schritte lange (der Lüfter kann dabei hochdrehen), gibt das Analyseskript, das der Nutzer ausführt, laufend aus, welchen Analyseschritt es gerade ausführt.
 

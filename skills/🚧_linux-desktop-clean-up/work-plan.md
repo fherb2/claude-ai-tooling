@@ -2,9 +2,9 @@
 
 Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die Nummern der übrigen werden dabei nicht neu vergeben, neue Schritte zählen hoch. Die Festlegungen stehen in `concept.md`.
 
-## 1 Tabellen und Löschlisten
+## 1 Inhalt von Tabelle 3
 
-Aufbau der drei Tabellen und der Löschlisten nach der Analyse festlegen. Daraus entsteht später der Code.
+Per Test ermitteln, welche systemweiten Statistiken Tabelle 3 enthält und welche Spalten sie hat (`concept.md`, Abschnitt 3.3). Aufbau von Tabelle 1 und 2 ist festgelegt; das Format der Übergabe an das Löschskript entscheidet Schritt 2.
 
 ## 2 Skripte
 
