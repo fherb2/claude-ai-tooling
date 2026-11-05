@@ -14,10 +14,6 @@ Klären, wie der Skill in der Claude-Code-Erweiterung von VS Code die Ergebnisda
 - b) ein weiteres Verzeichnis über die `settings.json` freigeben (Einstellung `additionalDirectories` vermutet, gegen die offizielle Doku prüfen);
 - c) Ergebnisse in das Arbeitsverzeichnis der Sitzung statt nach `/tmp` schreiben.
 
-## 11 Caches ohne zugeordnete Anwendersoftware
-
-Klären, wie der Skill Ordner unter `~/.cache` behandelt, die keiner nach `concept.md`, Abschnitt 4.11, erfassten Anwendersoftware zuzuordnen sind (Programme ohne Starter-Eintrag, Erweiterungen, Kommandozeilenwerkzeuge). Anlass: Der Test zu Tabelle 3 fand `~/.cache/markdown-pdf-m` mit einem eigenen Chrome (251 MiB), das zu einer VS-Code-Erweiterung gehört und durch alle drei Tabellen fällt.
-
 ## 14 Docker
 
 Behandlung von Docker festlegen (`concept.md`, Abschnitt 5): Was belegen Images, Build-Cache, angehaltene Container und Volumes; welche davon lassen sich nach Grundsatz 3 gezielt aufräumen; wie wird das Zwischenspeicher-Volume der Dev-Container behandelt. Zu beachten: Mit dem containerd-Snapshotter liegen die Daten unter `/var/lib/containerd`, nicht nur unter `/var/lib/docker`.
