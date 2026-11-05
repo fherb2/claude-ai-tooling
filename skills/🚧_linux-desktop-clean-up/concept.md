@@ -308,8 +308,8 @@ Dieser Schritt kommt im Ablauf als letzter dieser Gruppe: nach dem Download-Ordn
 
 - Kein klarer Befund liegt auch vor, wenn ein Ordner nur durch Drittquellen oder durch Rückschluss aus mehreren Hinweisen belegt ist; für Tabelle 2 zählen nur die Belegstufen hoch und mittel (Abschnitt 3.5).
 - Ergibt die Recherche keinen klaren Befund, werden Daten, die ganz offensichtlich solchen Programmen zugeordnet sind, vollständig vom Löschvorschlag ausgeschlossen. Sie werden auch gegenüber dem Nutzer nicht aufgelistet oder genannt.
-- Skill-eigene Analysen und Anzeigen (auch Tabelle 3 in 3.3) filtern diese Daten.
-- Ausnahme: Verlangt der Nutzer selbst, Ordnergrößen zu ermitteln und anzuzeigen, oder alle Dateien in einem Bereich des Dateisystems zu erfassen und deren Größe anzuzeigen, gilt der Filter nicht. Das ist eine zusätzlich angeforderte Aufgabe nach 3.7. Keine der im Skill definierten Aufgaben ist von dieser Art.
+- Skill-eigene Analysen und Anzeigen (auch Tabelle 3 in 3.3) filtern diese Daten. Ausgenommen ist die Größe je Verzeichnis in Tabelle 3: Sie zählt nur und schlägt nichts zum Löschen vor; ein verschwiegener Ordner verfälschte die Übersicht.
+- Ausnahme: Verlangt der Nutzer selbst, Ordnergrößen zu ermitteln und anzuzeigen, oder alle Dateien in einem Bereich des Dateisystems zu erfassen und deren Größe anzuzeigen, gilt der Filter nicht. Das ist eine zusätzlich angeforderte Aufgabe nach 3.7.
 - Deshalb ist die Analyse am Anfang, einschließlich der Recherche, sehr umfassend durchzuführen. Der Nutzer erfährt das zu Beginn (3.1, Schritt 6).
 
 **Geltung des stillen Ausschlusses (Punkt 2)**
