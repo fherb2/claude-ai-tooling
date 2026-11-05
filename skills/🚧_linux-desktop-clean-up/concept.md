@@ -13,7 +13,11 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
 1. Nichts ist pauschal. Für jeden Bereich ist einzeln festgelegt, wie der Skill damit umgeht.
 2. Drei Arten der Behandlung je Bereich: **löschen ohne Rückfrage**, **vor dem Löschen fragen**, **nur vorschlagen oder melden**.
 3. Ein Aufräumbefehl eines Programms wird nur eingesetzt, wenn feststeht, was er genau entfernt. Sammelbefehle wie `docker system prune` sind nicht pauschal erlaubt.
-4. Gelöscht wird nur, was beim nächsten Start der Anwendung nicht mehr verwendet oder von selbst neu erzeugt wird. Zustand, Einstellungen, Datenbanken und Nutzdaten bleiben.
+4. Ohne Entscheidung des Nutzers gelöscht werden nur programmeigene Zwischendateien, die rein aus Performance-Gründen angelegt werden und die das Programm entweder nicht mehr benötigt oder jederzeit on-the-fly und vollautomatisch neu erzeugt, wenn sie fehlen. Zustand, Einstellungen, Datenbanken und Nutzdaten bleiben. Zwei Extremfälle grenzen das ab:
+   - Dazu gehört ein HTTP-Cache: Er hält nur eine Kopie einer bereits heruntergeladenen Datei vor, damit ein erneuter, langsamer Zugriff ins Internet entfällt.
+   - Nicht dazu gehören die Proxy-Dateien eines Videoschnittprogramms: datenreduzierte Fassungen der Quellvideos, mit denen die Vorschau während der Bearbeitung mit wenig Ressourcen rechnet. Sie sind keine bloßen Kopien, sondern veränderte Repräsentanten der eigentlichen Daten, entstehen in einem eigenen Arbeitsschritt und werden nicht on-the-fly neu erzeugt, wenn sie fehlen. Das sind Arbeitsdaten, kein Cache.
+
+   Nutzdaten wie Downloads, Installationsdateien, Images und Medien (Abschnitte 4.7 bis 4.10) löscht der Skill nur nach Entscheidung des Nutzers.
 5. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie viel Platz es war, was nur gemeldet wurde.
 6. Nutzereingaben: Was zu erhalten und was zu löschen ist, formuliert allein der Nutzer. Die Instanz bewertet die Angaben und überführt sie in eine schematisch richtige Zuordnung, die dem Skript oder Befehl übergeben wird. Das gilt für alle Nutzereingaben im Skill.
 7. Ordnernamen: Sie werden bei der Abarbeitung an die Sprache des Systems und des Desktops des Nutzers angepasst. Namen wie `Downloads`, `Videos`, `Musik`, `Bilder` oder `Dokumente` stehen in keiner Zeichenkette eines Skripts. Die Instanz ermittelt den Pfad auf dem Rechner (XDG-Benutzerverzeichnisse: `~/.config/user-dirs.dirs`, `xdg-user-dir`), prüft im Home, dass der Ordner existiert, und startet erst dann das Skript oder den Agenten. Sie übergibt den aufgelösten Pfad als Parameter. Messbefund: Auf diesem Rechner heißen `Downloads` und `Videos` englisch, `Musik`, `Bilder`, `Dokumente`, `Schreibtisch` deutsch.
@@ -54,7 +58,7 @@ Das Ergebnis übergibt er in zwei Tabellen:
 
 Ausgabe während der Analyse: Dauern einzelne Schritte lange (der Lüfter kann dabei hochdrehen), gibt das Analyseskript, das der Nutzer ausführt, laufend aus, welchen Analyseschritt es gerade ausführt.
 
-Software-Erfassung: Zu Beginn der Analyse erfasst der Skill auch die Anwendersoftware des Nutzers (Abschnitt 4.11). Dem Nutzer sagt er dazu nur, dass er prüft, welche Software Cache- und Download-Ordner mitbringt, und dass er sich im Internet über die Details der Programme informiert. Am Ende der Analyse nennt er dem Nutzer kurz die Software, zu der er bei der Bereinigung noch Vorschläge machen wird. Firefox und Chrome stehen in dieser Liste, falls sie installiert sind.
+Software-Erfassung: Zu Beginn der Analyse erfasst der Skill auch die Anwendersoftware des Nutzers (Abschnitt 4.11). Dem Nutzer sagt er dazu nur, dass er prüft, welche Software Cache- und Download-Ordner mitbringt, und dass er sich im Internet über die Details der Programme informiert. Am Ende der Analyse nennt er dem Nutzer kurz die Software, zu der er bei der Bereinigung noch Vorschläge machen wird. Firefox, Chrome und VS Code stehen in dieser Liste, falls sie installiert sind.
 
 ### 3.4 Zweite Aufgabe: Tabelle 1
 
@@ -151,7 +155,7 @@ Dieser Schritt umfasst die Log-Files und das System-Journal. Im Skill heißt er 
 
 - Alles löschen bis auf die letzten x Tage. x ist standardmäßig 14, der Nutzer kann den Wert ändern. Der Skill wendet das auf die jeweils passenden Dateien an:
   - Journal: `journalctl --vacuum-time=<x>`. Laut Manpage entfernt es nur archivierte Journal-Dateien und braucht root-Rechte.
-  - Log-Files außerhalb des Journals: nur archivierte, rotierte Dateien (Name mit Ziffer, Datum, `.gz` oder `.old`), nach Dateidatum, nie die laufende Datei.
+  - Log-Files außerhalb des Journals: nur archivierte, rotierte Dateien (Name mit Ziffer, Datum, `.gz` oder `.old`), nach Dateidatum, nie die laufende Datei. Für Dateien unter `/var/log` braucht das root-Rechte.
 - Löschen nach Loglevel (info, debug und darunter) entfällt als Angebot. Beim Journal ist es technisch nicht möglich: `--vacuum-*` kennt nur Alter, Größe und Dateianzahl, keine Stufe (Manpage). Hinweis für den Nutzer, nicht Angebot: `MaxLevelStore` in `journald.conf` begrenzt künftige Einträge auf eine Stufe, wirkt nicht auf vorhandene Einträge und ändert die Konfiguration.
 
 **Messbefunde, auf denen das beruht (dieser Rechner)**
@@ -174,8 +178,6 @@ Dieser Schritt umfasst die Log-Files und das System-Journal. Im Skill heißt er 
 - Befehl bei Zustimmung: `pip cache purge` (laut Dokumentation leert er HTTP- und Wheel-Cache).
 - Hinweis an den Nutzer: Nächste Installationen laden Pakete neu herunter oder bauen sie neu, besonders spürbar in wechselnden Netzen.
 - Messbefund: 986 MiB, fast alles im HTTP-Cache (`http-v2`); zwei Einträge ab 50 MiB (591 MiB und 63 MiB). `pip cache list` zeigt nur die selbst gebauten Wheels (1,8 MiB), nicht die Einträge des HTTP-Caches. Die Paketnamen der großen Einträge ließen sich über die Metadatendateien per einfacher Textsuche nicht ermitteln.
-
-Namen werden nicht angezeigt.
 
 ### 4.7 .deb-Dateien
 
@@ -217,7 +219,7 @@ Dieser Schritt kommt im Ablauf vor 4.7 und 4.8.
 - Für Dateien direkt im Download-Ordner: Größe und Alter.
 - Für jeden Ordner direkt darunter: Größe des gesamten Inhalts über alle Ebenen, und das Alter der jüngsten geänderten oder erstellten Datei darin, ermittelt über den ganzen Dateibaum.
 - Das Alter einer Datei ist die Zeit seit dem späteren von Änderungs- und Anlegezeit, in vollen Tagen.
-- Die Ausgabe erfolgt getrennt in drei Gruppen nach Alter: 0 bis 3 Tage, 4 bis 14 Tage, älter (unter 4 Tage, 4 bis unter 15 Tage, ab 15 Tage).
+- Die Ausgabe erfolgt getrennt in drei Gruppen nach Alter: unter 4 Tage, 4 bis unter 15 Tage, ab 15 Tage.
 - Unvollständige Downloads (zum Beispiel `*.crdownload` bei Chrome, `*.part`) bilden eine eigene Gruppe, unabhängig von den drei Zeitgruppen. Messbefund: Im Download-Ordner liegen mehrere `*.crdownload` mit 230 bis 671 MiB.
 - In jeder Gruppe wird nummeriert und nach Größe absteigend sortiert.
 
@@ -229,7 +231,8 @@ Dieser Schritt kommt im Ablauf vor 4.7 und 4.8.
 **Vor dem Löschen**
 
 - Die Instanz zeigt die übersetzte Löschliste (Pfade, Gesamtgröße), und der Nutzer bestätigt sie.
-- Der Skill weist darauf hin, dass gelöschte Dateien nur wiederherstellbar sind, wenn der Ordner gesichert wird. Auf diesem Rechner ist der Download-Ordner vom Backup ausgeschlossen.
+- Der Skill weist darauf hin, dass gelöschte Dateien nur wiederherstellbar sind, wenn der Ordner gesichert wird.
+- Messbefund (Entwicklungsrechner): Dort ist der Download-Ordner vom Backup ausgeschlossen.
 
 ### 4.10 Vagabundierende Medien
 
@@ -258,7 +261,7 @@ Dieser Schritt kommt im Ablauf nach dem Download-Ordner (4.9). Seine Stellung zu
 
 **Grundlage für die Bereinigung: pro Programm genau zwei Dinge**
 
-1. Cache- und Download-Ordner, deren Inhalt gelöscht werden darf, **nur** wenn die Dokumentation im Internet zum Programm belegt, dass dort nur gecacht oder heruntergeladen wird. Sie werden dem Nutzer offen mitgeteilt und zum Aufräumen angeboten. Nachsehen im Dateisystem allein genügt dafür nicht. Das gilt nur für Software, deren Details nicht schon bei der Entwicklung des Skills geklärt wurden. Geklärt sind Firefox, Chrome und der Download-Ordner des Nutzers am Desktop; dort gelten die Festlegungen aus 4.2, 4.3 und 4.9.
+1. Cache- und Download-Ordner, deren Inhalt gelöscht werden darf, **nur** wenn die Dokumentation im Internet zum Programm belegt, dass dort nur gecacht oder heruntergeladen wird. Sie werden dem Nutzer offen mitgeteilt und zum Aufräumen angeboten. Nachsehen im Dateisystem allein genügt dafür nicht. Das gilt nur für Software, deren Details nicht schon bei der Entwicklung des Skills geklärt wurden. Geklärt sind Firefox, Chrome, VS Code und der Download-Ordner des Nutzers am Desktop; dort gelten die Festlegungen aus 4.2, 4.3, 4.4 und 4.9.
 2. Ordner, die bei Programmen, die Daten verarbeiten, typischerweise als Eingangsdaten dienen. Treffer in solchen Ordnern schließt die Instanz stillschweigend aus den Suchläufen aus, weil sie als Arbeitsdaten und nicht als unwichtige Daten gelten. Das geschieht ohne Meldung an den Nutzer. Für diese Zuordnung darf die Instanz auch im Dateisystem nachsehen.
 
 **Kein klarer Befund**
