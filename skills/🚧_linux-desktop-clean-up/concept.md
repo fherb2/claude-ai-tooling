@@ -182,7 +182,7 @@ Dieser Schritt umfasst die Log-Files und das System-Journal. Im Skill heißt er 
 6. Die Ursache selbst zu beheben, gehört nicht zum Skill. Will der Nutzer das beim Abarbeiten gleich erledigen, ist das erlaubt. Danach fährt der Skill fort.
 7. Log-Files allgemein: Es geht nicht nur um das Journal, sondern um alle Log-Files, die in kurzer Zeit auffällig groß geworden sind.
    - Die Analyse wertet nur Zeit- und Datumsangaben sowie Größen der einzelnen Log-Files der verschiedenen Dienste und Programme aus, nicht den Inhalt.
-   - Als Log-Files gelten alle Dateien unter `/var/log` rekursiv sowie im Home Dateien mit `*.log*` im Namen und Ordner namens `log` oder `logs` bis Tiefe 5, ohne den Projektordner `~/git`.
+   - Als Log-Files gelten alle Dateien unter `/var/log` rekursiv sowie im Home nur in den Anwendungsordnern `~/.config`, `~/.local/share`, `~/.cache` und `~/.var`: Dateien mit `*.log*` im Namen und Ordner namens `log` oder `logs`. Projekt- und Quellcode-Ordner bleiben draußen; der Test zu Tabelle 3 hat mit einer Regel über das ganze Home Git-Reflogs (`.git/logs`) und Quellcode-Ordner getroffen.
    - Auffällig ist ein stark ungleichmäßiger Verlauf mit sehr großen Datenmengen in wenigen Tagen oder Stunden. Konkret: Aufeinanderfolgende, rotierte Dateien eines Programms haben zusammen mindestens 100 MiB, und mehr als die Hälfte davon liegt in einem Zeitfenster von höchstens zwei Tagen (nach Änderungszeit). Zusätzlich gilt jede Einzeldatei ab 50 MiB als auffällig.
    - Die Ergebnisse stehen in einer eigenen Liste für alle Log-File-Analysen. Den Ursachen geht der Nutzer nach.
 
