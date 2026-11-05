@@ -219,7 +219,7 @@ Dieser Schritt kommt im Ablauf vor 4.7 und 4.8.
 - Für Dateien direkt im Download-Ordner: Größe und Alter.
 - Für jeden Ordner direkt darunter: Größe des gesamten Inhalts über alle Ebenen, und das Alter der jüngsten geänderten oder erstellten Datei darin, ermittelt über den ganzen Dateibaum.
 - Das Alter einer Datei ist die Zeit seit dem späteren von Änderungs- und Anlegezeit, in vollen Tagen.
-- Die Ausgabe erfolgt getrennt in drei Gruppen nach Alter: unter 4 Tage, 4 bis unter 15 Tage, ab 15 Tage.
+- Die Ausgabe erfolgt getrennt in drei Gruppen nach Alter: unter 4 Tagen, 4 bis unter 15 Tagen, ab 15 Tagen.
 - Unvollständige Downloads (zum Beispiel `*.crdownload` bei Chrome, `*.part`) bilden eine eigene Gruppe, unabhängig von den drei Zeitgruppen. Messbefund: Im Download-Ordner liegen mehrere `*.crdownload` mit 230 bis 671 MiB.
 - In jeder Gruppe wird nummeriert und nach Größe absteigend sortiert.
 
