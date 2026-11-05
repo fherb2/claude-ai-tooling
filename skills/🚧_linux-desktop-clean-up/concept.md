@@ -70,6 +70,11 @@ Aufbau der Tabellen:
 - Inhalt von Tabelle 3 (ermittelt per Test, `tests/table3_probe.py`; jeweils ohne die Bereiche aus Abschnitt 4):
   - Größe je Verzeichnis: die oberste Ebene unter dem Home und den Systemverzeichnissen mit Größe. Tiefere Ebenen nur, wenn ein Unterordner den Elternordner nicht bloß wiederholt. Für Verzeichnisse im Home eine zusätzliche Spalte: Anteil der Daten, die seit über einem Jahr unverändert sind (für Systemverzeichnisse nicht, weil Software Änderungszeiten oft festsetzt). Treffer, die einem Bereich aus Abschnitt 5 entsprechen, sind gekennzeichnet.
   - Große Einzeldateien ab 150 MiB, soweit 4.7, 4.8 und 4.10 sie nicht abdecken: zusammengefasst je Bereich aus Abschnitt 5 eine Zeile mit Zahl und Summe, alles Übrige als eine Zeile "Sonstiges". Die Einzeldateien zeigt der Skill erst bei der Bearbeitung.
+  - Reste deinstallierter Programme: Das Skript liefert die Anwendungsordner im Home (`~/.config`, `~/.local/share`, `~/.cache`, `~/.var/app` und Punkt-Ordner im Home) mit Größe und letzter Änderung, ohne die Bereiche aus Abschnitt 4. Die Instanz ordnet sie der erfassten Anwendersoftware (4.11), Desktop- und Systembestandteilen sowie Werkzeugen ohne Starter-Eintrag zu und zeigt nur die Ordner ohne Zuordnung, je mit Begründung. Ein reiner Namensabgleich taugt nur als Vorfilter (im Test zwei Drittel Fehlalarme). Gelöscht wird nur nach Entscheidung des Nutzers: Ein Rest kann Einstellungen enthalten, die bei einer Neuinstallation wieder gebraucht werden.
+  - Doppelte Dateien ab 1 MiB, nur Nutzerdaten im Home: ohne Anwendungsordner, ohne `.git`-Ordner, ohne Entwicklungsartefakte und ohne Systemverzeichnisse (dort sind Kopien programmintern oder, bei Git LFS, systembedingt). Erst nach Größe gruppiert, dann per Inhalt verglichen. In der Tabelle Zahl der Gruppen und überzählige Menge; bei der Bearbeitung je Gruppe alle Fundorte, der Nutzer entscheidet, welche Kopie bleibt.
+  - Reste abgebrochener Git-Abrufe (`tmp_pack_*`, `tmp_idx_*`, `tmp_obj_*` innerhalb von `.git`): Zahl und Größe. Die Behandlung folgt mit dem Bereich "Git-Repositories" aus Abschnitt 5.
+  - Absturzabbilder: nur `/var/crash` und der Ordner von systemd-coredump; eine Zeile nur, wenn dort etwas liegt. Die Behandlung wird recherchiert, wenn ein Rechner dort etwas hat. Eine Suche nach Dateien namens `core` entfällt (im Test nur Fehltreffer).
+  - Entwicklungsartefakte (`.venv` und andere Ordner mit `pyvenv.cfg`, `node_modules`, `build`, `dist`, `target`, Werkzeug-Caches) nur in Projekten im Home, erkannt an einem Projektkennzeichen (`.git`, `pyproject.toml`, `package.json`, `Cargo.toml` u. a.); ohne Anwendungsordner, Punkt-Ordner im Home und Systemverzeichnisse (dort sind es meist Teile installierter Software). Je Projekt eine Zeile: Größe der Artefakte, letzte Änderung an den Quelldateien, ob eine Abhängigkeitsliste vorhanden ist. `__pycache__` gehört nicht hierher, sondern zu 4.12.
   - Verworfen nach dem Test: Zuwachs in den letzten Tagen (ein einzelner Lauf misst nur geänderte, nicht gewachsene Daten) und Datenmenge je Dateiart (keine neue Handlungsmöglichkeit gegenüber Ort und Größe).
 
 Ausgabe während der Analyse: Dauern einzelne Schritte lange (der Lüfter kann dabei hochdrehen), gibt das Analyseskript, das der Nutzer ausführt, laufend aus, welchen Analyseschritt es gerade ausführt.
@@ -309,6 +314,16 @@ Dieser Schritt kommt im Ablauf nach dem Download-Ordner (4.9). Seine Stellung zu
 
 Offen, wird später genau diskutiert:
 - Für welche Suchläufe der stille Ausschluss gilt. Vorschlag: für 4.7, 4.8 und 4.10, nicht für den Download-Ordner (4.9).
+
+### 4.12 Python-Bytecode-Cache
+
+| Was | Behandlung |
+|---|---|
+| Ordner `__pycache__` im Home | ganz löschen einschließlich Ordner, ohne Rückfrage |
+
+- Python legt die Dateien bei Bedarf selbst neu an; es ist ein Cache im Sinne von Grundsatz 4.
+- Nur im Home. Unter `/usr` und anderen Systemverzeichnissen legt die Paketverwaltung sie an; ein normaler Nutzer kann sie dort nicht neu schreiben.
+- Gehört erst nach dem Test (`work-plan.md`, Schritt 13) in Tabelle 1.
 
 ## 5 Bereiche, für die noch keine Behandlung festgelegt ist
 
