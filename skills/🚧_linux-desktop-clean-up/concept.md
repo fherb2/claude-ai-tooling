@@ -1,6 +1,6 @@
 # Plan: Clean-up-Skill für Linux-Desktops
 
-Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungssprache (Bash oder Python) ist nicht festgelegt.
+Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungssprache der Skripte: Python, nur mit der Standardbibliothek.
 
 ## 1 Zweck und Geltung
 

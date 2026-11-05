@@ -2,9 +2,17 @@
 
 Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die Nummern der übrigen werden dabei nicht neu vergeben, neue Schritte zählen hoch. Die Festlegungen stehen in `concept.md`.
 
-## 2 Skripte
+## 15 Analyseskript
 
-Skripte zum Analysieren und Löschen schreiben. Die Sprache (Bash oder Python) ist noch nicht gewählt; ebenso das Format der Übergabe an das Löschskript. Aus dem Test zu Tabelle 3: `.VOB` gehört zu den Videoendungen.
+Ein Durchlauf durch das Dateisystem; Ausgabe als JSON für den Füllstand und die drei Tabellen (`concept.md`, Abschnitt 3.3). Python, nur Standardbibliothek. Aus dem Test zu Tabelle 3: `.VOB` gehört zu den Videoendungen.
+
+## 16 Löschskript
+
+Bekommt eine Löschliste und den Bereich und löscht genau das; die Liste schreibt die Instanz nach der Auswahl des Nutzers (Grundsatz 6). Format der Übergabe wird hier entschieden.
+
+## 17 Journal-Auswertung
+
+Eigenes Skript für Abschnitt 4.5: Histogramm, Quellen, Spitzen, auffällige Log-Files; höchstens vier Worker mit niedriger Priorität; liest `journalctl`, nicht das Dateisystem.
 
 ## 14 Nachprobe Build-Cache (ab 8. November 2026)
 
