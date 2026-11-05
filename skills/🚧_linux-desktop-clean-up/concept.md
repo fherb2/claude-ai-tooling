@@ -28,7 +28,7 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
 
 1. Der Skill wird mitunter beim Nachdenken von selbst geladen. Er fragt deshalb zuerst, ob er jetzt überhaupt angewendet werden soll. Bei "nein" endet er. Bei "ja" geht es weiter.
 2. Er nennt, wofür er vorgesehen ist (Abschnitt 1).
-3. Er erklärt die Arbeitsweise: Der Skill startet selbst keine Skripte oder Befehle auf dem System. Es gibt zwei Wege, beide mit der Ausführung durch den Nutzer (damit sind auch root-Zugriffe unproblematisch):
+3. Er erklärt die Arbeitsweise: Grundsätzlich startet der Skill selbst keine Skripte oder Befehle auf dem System; die Ausnahme regelt Schritt 5. Es gibt zwei Wege, beide mit der Ausführung durch den Nutzer (damit sind auch root-Zugriffe unproblematisch):
    - Der Skill übergibt dem Nutzer einen Codeblock. Der Nutzer führt ihn aus. Dabei entsteht eine Datei im Ordner `/tmp`, die der Skill liest. Dafür braucht er Zugriff auf `/tmp`.
    - Der Skill erstellt ein Skript in `/tmp` oder nutzt ein im Skill vorhandenes und übergibt dem Nutzer den Aufruf. Die Ergebnisse landen wieder in `/tmp` und werden vom Skill ausgewertet.
 4. Der Skill ermittelt, wo er läuft:
@@ -291,8 +291,6 @@ Offen, wird später genau diskutiert:
 - Für welche Suchläufe der stille Ausschluss gilt. Vorschlag: für 4.7, 4.8 und 4.10, nicht für den Download-Ordner (4.9).
 
 ## 5 Bereiche, für die noch keine Behandlung festgelegt ist
-
-Messung und Merkliste liegen im Bericht, Anhang "Offene Punkte":
 
 - Docker: Container, Images, Build-Cache, Volumes; Dev-Container-Zwischenspeicher-Volume
 - Suchindex Baloo (`balooctl purge`)
