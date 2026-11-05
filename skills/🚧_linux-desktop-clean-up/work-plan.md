@@ -14,10 +14,6 @@ Behandlung weiterer Chrome-Ordner ermitteln (`concept.md`, Abschnitt 4.3).
 
 Für welche Suchläufe der stille Ausschluss gilt, genau diskutieren (`concept.md`, Abschnitt 4.11).
 
-## 8 Stellung der vagabundierenden Medien
-
-Die Stellung der vagabundierenden Medien (`concept.md`, Abschnitt 4.10) im Ablauf gegenüber den .deb-Dateien (4.7) und den Image-Dateien und Archiven (4.8) festlegen.
-
 ## 9 Weitere Installationswege
 
 Weitere Installationswege von Firefox, Chrome (bzw. Chromium) und VS Code klären, insbesondere Snap und Flatpak: Wo liegen dort Cache und Profile, und gelten die Regeln aus `concept.md`, Abschnitte 4.2 bis 4.4? Getestet sind bisher nur die klassischen Pfade.

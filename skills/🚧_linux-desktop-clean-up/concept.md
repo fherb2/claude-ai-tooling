@@ -221,7 +221,7 @@ Dieser Schritt umfasst die Log-Files und das System-Journal. Im Skill heißt er 
 
 ### 4.7 .deb-Dateien
 
-Reihenfolge im Ablauf: erst das Aufräumen des Download-Ordners (Abschnitt 4.9), danach 4.7, danach 4.8. Dann ist die Trefferwahrscheinlichkeit gering.
+Reihenfolge im Ablauf: erst das Aufräumen des Download-Ordners (Abschnitt 4.9), danach 4.7, danach 4.8, danach 4.10. Dann ist die Trefferwahrscheinlichkeit gering.
 
 - Der Skill sucht `*.deb` im Download-Ordner des Nutzers (Grundsatz 7) und im Home bis Tiefe 5, ohne Papierkorb und `~/.cache`. Hintergrund: Wer `.deb`-Dateien per Hand mit `dpkg -i` installiert, lässt sie oft liegen.
 - Je Datei liest er Paketname und Version aus dem Paket (`dpkg-deb -f`) und vergleicht mit der installierten Version (`dpkg-query`, `dpkg --compare-versions`).
@@ -246,7 +246,7 @@ Reihenfolge wie in 4.7: nach dem Aufräumen des Download-Ordners.
 
 ### 4.9 Download-Ordner
 
-Dieser Schritt kommt im Ablauf vor 4.7 und 4.8.
+Dieser Schritt kommt im Ablauf vor 4.7, 4.8 und 4.10.
 
 **Welche Ordner**
 
@@ -276,7 +276,7 @@ Dieser Schritt kommt im Ablauf vor 4.7 und 4.8.
 
 ### 4.10 Vagabundierende Medien
 
-Dieser Schritt kommt im Ablauf nach dem Download-Ordner (4.9). Seine Stellung zu 4.7 und 4.8 ist offen.
+Dieser Schritt kommt im Ablauf als letzter dieser Gruppe: nach dem Download-Ordner (4.9), den .deb-Dateien (4.7) und den Image-Dateien und Archiven (4.8).
 
 - Der Skill listet Mediendateien, die nicht unterhalb der Ordner für Videos, Musik, Bilder und Dokumente des Nutzers liegen (Grundsatz 7) und die offensichtlich auch nicht in Ordnern liegen, in denen Programme solche Daten bearbeiten.
 - Das ist nicht nur ein Suchlauf, sondern eine nachfolgende Filterung durch die Instanz: Sie bewertet vorab das Wesen des Ordners, in dem die Daten liegen. Übrig bleiben "vagabundierende" Medien, die irgendwohin gelegt und vergessen wurden.
