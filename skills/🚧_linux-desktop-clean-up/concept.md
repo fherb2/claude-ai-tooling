@@ -341,9 +341,26 @@ Fehlt dem Nutzer in einer Liste etwas, kann er eine zusätzliche Suche nach 3.7 
 - Ohne eigenen Test in Tabelle 1 aufgenommen: Das Verhalten ist durch die Python-Spezifikation festgelegt, und das Löschen kann nichts entfernen, was Python nicht selbst neu erzeugt. Belegt in [PEP 3147](https://peps.python.org/pep-3147/): Der Ordner wird beim Import angelegt, und scheitert das Schreiben, "the import will still succeed"; eine `.pyc` aus `__pycache__` wird nur benutzt, wenn die Quelldatei existiert ("Python will not import a pyc file from the cache directory unless the source file exists"). Programme ohne Quelltext legen ihre `.pyc` dorthin, wo die Quelldatei stünde, nicht in `__pycache__`.
 - Folge des Löschens: Der erste Start eines Programms dauert etwas länger.
 
+### 4.13 Docker
+
+Gilt für Docker mit Root-Dienst. Podman und Docker im Rootless-Modus werden nur gemeldet. Sammelbefehle wie `docker system prune` und `docker image prune -a` sind ausgeschlossen (Grundsatz 3); `image prune -a` würde auch die Erhalten-Liste übergehen. Mit dem containerd-Snapshotter liegen die Daten unter `/var/lib/containerd`, nicht nur unter `/var/lib/docker`.
+
+**Ablauf**
+
+1. **Build-Cache:** Alles, was nicht jünger als 2 Tage ist, wird gelöscht; der Nutzer kann die Grenze ändern. Mittel: `docker builder prune --all` mit Filter `until` (ohne `--all` entfernt der Befehl nur "dangling" Cache; [Doku](https://docs.docker.com/reference/cli/docker/builder/prune/)). Wie `until` genau abgrenzt, sagt die Doku nicht; das klärt der Test.
+2. **Beendete Container:** durchnummeriert vorgelegt (Name, Image, beendet seit, Größe). Der Nutzer wählt, welche nicht mehr gebraucht werden. Gelöscht wird mit `docker rm -v`, also samt ihren anonymen Volumes; benannte Volumes bleiben ("if a volume was specified with a name, it will not be removed", [Doku](https://docs.docker.com/reference/cli/docker/container/rm/)). Laufende Container und ihre Images bleiben und werden nicht aufgeführt.
+3. **Compose-Projekte:** Die Analyse sucht im Home die Compose-Dateien (`compose.yaml`, `compose.yml`, `docker-compose.yaml`, `docker-compose.yml`). Für jede bestimmt Compose selbst die Images (`docker compose -f <Datei> config --images`, "Print the image names, one per line", löst Variablen auf; [Doku](https://docs.docker.com/reference/cli/docker/compose/config/)); kein eigenes Parsen. Durchnummeriert vorgelegt: Pfad und Änderungsdatum der Datei, Projektname, Images, Zustand (läuft / beendet / heruntergefahren). Der Nutzer nennt die Projekte, die er nicht mehr braucht; deren Images kommen von der Erhalten-Liste herunter. Die Compose-Dateien selbst fasst der Skill nicht an. Scheitert der Befehl für eine Datei (etwa weil eine `.env` fehlt), bleiben alle Images ohne Container erhalten, und der Skill meldet die Datei. Ein unklarer Fall führt nicht zum Löschen.
+4. **Zweite Image-Prüfung:** Alle Images, die jetzt keinem Container mehr zuzuordnen sind, werden einzeln mit `docker rmi` gelöscht, außer denen auf der Erhalten-Liste. Lokal gebaute Images ohne Container und ohne Eintrag in der Erhalten-Liste gehören dazu.
+5. **Benannte Volumes** werden nur gemeldet, nie gelöscht (zum Beispiel `vscode`, der Zwischenspeicher der Dev-Container von VS Code).
+
+**Ergebnisbericht:** Für Docker nennt er, was gelöscht wurde, aber keine Größe; ausdrückliche Ausnahme von Grundsatz 5 (Images teilen sich Schichten, eine Größe wird nicht berechnet).
+
+**Tabelle:** Tabelle 2, bis der Test gelaufen ist (`work-plan.md`, Schritt 14).
+
+**Messbefund (Entwicklungsrechner):** zusammen rund 4,2 GiB (`/var/lib/containerd` 2,7 GiB, `/var/lib/docker` 1,5 GiB), davon Build-Cache 1,96 GB, Volume `vscode` 1,51 GB, ein beendeter Container mit 336 MB.
+
 ## 5 Bereiche, für die noch keine Behandlung festgelegt ist
 
-- Docker: Container, Images, Build-Cache, Volumes; Dev-Container-Zwischenspeicher-Volume
 - Suchindex Baloo (`balooctl purge`)
 - Git-Repositories (`git gc`, LFS, abgebrochene Abrufe)
 - Papierkorb, Vorschaubilder

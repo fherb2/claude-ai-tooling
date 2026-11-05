@@ -14,6 +14,14 @@ Klären, wie der Skill in der Claude-Code-Erweiterung von VS Code die Ergebnisda
 - b) ein weiteres Verzeichnis über die `settings.json` freigeben (Einstellung `additionalDirectories` vermutet, gegen die offizielle Doku prüfen);
 - c) Ergebnisse in das Arbeitsverzeichnis der Sitzung statt nach `/tmp` schreiben.
 
-## 14 Docker
+## 14 Test: Docker
 
-Behandlung von Docker festlegen (`concept.md`, Abschnitt 5): Was belegen Images, Build-Cache, angehaltene Container und Volumes; welche davon lassen sich nach Grundsatz 3 gezielt aufräumen; wie wird das Zwischenspeicher-Volume der Dev-Container behandelt. Zu beachten: Mit dem containerd-Snapshotter liegen die Daten unter `/var/lib/containerd`, nicht nur unter `/var/lib/docker`.
+Den Ablauf aus `concept.md`, Abschnitt 4.13, am Entwicklungsrechner erproben. Testobjekte (vom Nutzer freigegeben): der beendete Container `objective_payne`, die Images aus `vsc-testprojekt` und der zwei Monate alte Build-Cache. Zu klären:
+
+- Wie grenzt `docker builder prune --all --filter until=48h` ab: nach Erstellung oder nach letzter Benutzung?
+- Welchen Namen gibt `docker compose config --images` für einen Dienst mit `build:` und ohne `image:` aus, und stimmt er mit dem Namen des gebauten Images überein? (Braucht ein kleines Compose-Projekt zum Test.)
+- Lassen sich Projektname und Zustand eines Compose-Projekts mit Compose-Befehlen bestimmen, ohne die Datei selbst zu lesen?
+- Entfernt `docker rm -v` die anonymen Volumes, und bleibt `vscode` erhalten?
+- Löscht die zweite Image-Prüfung danach genau die Images ohne Container?
+
+Gelingt der Test, gehört 4.13 in Tabelle 1.
