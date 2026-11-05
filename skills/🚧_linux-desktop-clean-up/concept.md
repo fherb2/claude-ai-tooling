@@ -117,6 +117,8 @@ Nur `apt-get clean`. `/var/lib/apt/lists` gehört nicht dazu.
 
 Die Schwelle von 30 Tagen für "lange unverändert" ist bestätigt.
 
+Diese Regeln gelten nur für die getesteten klassischen Pfade. Andere Installationswege (Snap, Flatpak und andere) behandelt Abschnitt 4.11.
+
 ### 4.3 Chrome
 
 `<Profil>`: jedes Verzeichnis unter `~/.cache/google-chrome/` (zum Beispiel `Default`, `System Profile`), nicht nur das aktivste. Verzeichnisse ohne Cache (leer oder nicht vorhanden) werden übersprungen.
@@ -133,6 +135,8 @@ Die Ordner `Cache`, `Cache_Data`, `Code Cache`, `js` und `wasm` selbst werden ni
 
 Noch zu ermitteln: Behandlung weiterer Chrome-Ordner (`~/.config/google-chrome`: `component_crx_cache`, `GPUCache` u. a. waren nur für das Backup als Cache eingestuft).
 
+Diese Regeln gelten nur für die getesteten klassischen Pfade. Andere Installationswege (Snap, Flatpak und andere, auch Chromium) behandelt Abschnitt 4.11.
+
 ### 4.4 VS Code
 
 | Was | Behandlung |
@@ -143,6 +147,8 @@ Noch zu ermitteln: Behandlung weiterer Chrome-Ordner (`~/.config/google-chrome`:
 | Ordner in `~/.config/Code/CachedData` außer der installierten Version (Commit aus `/usr/share/code/resources/app/product.json`), älter als 3 Tage | löschen ohne Rückfrage, auch wenn VS Code läuft |
 | `~/.config/Code/CachedExtensionVSIXs`: Pakete mit Namen nach Erweiterung und Version | nicht anfassen; VS Code hält darin selbst höchstens 20 Pakete, je Erweiterung die neueste Version |
 | `~/.config/Code/CachedExtensionVSIXs`: versteckte Dateien (Name beginnt mit `.`, danach UUID), die kein gültiges Archiv sind und älter als 3 Tage | löschen ohne Rückfrage, auch wenn VS Code läuft |
+
+Diese Regeln gelten nur für die getesteten klassischen Pfade. Andere Installationswege (Snap, Flatpak und andere) behandelt Abschnitt 4.11.
 
 ### 4.5 Log-Files und System-Journal
 
@@ -272,7 +278,7 @@ Dieser Schritt kommt im Ablauf nach dem Download-Ordner (4.9). Seine Stellung zu
   4. Es muss mindestens eine Hauptkategorie vorliegen, die nicht `Settings` und nicht `System` ist. Ein Eintrag, der nur `System` oder `Settings` trägt, fällt heraus.
   5. `Utility` gilt als Anwendersoftware.
 - Messbefund (dieser Rechner): 74 Programme erfasst, 4 wegen `Terminal=true` ausgeschlossen, 24 als System oder Einstellungen. Einige Ausreißer (zum Beispiel Emoji Selector) und mehrfache Einträge derselben Software sind in Kauf genommen: Sie kosten nur Zeit und Token, die Bereinigung bleibt auf der sicheren Seite.
-- Software, die im Skill bereits untersucht ist (Firefox, Chrome, VS Code; Abschnitte 4.2 bis 4.4), bleibt bei der Recherche außen vor. Sie steht in der Liste am Ende der Analyse, falls sie installiert ist. Der Skill kann später durch weitere Analysen um Software erweitert werden, deren Details bekannt sind.
+- Software, die im Skill bereits untersucht ist (Firefox, Chrome, VS Code; Abschnitte 4.2 bis 4.4), bleibt bei der Recherche außen vor, soweit sie auf einem der getesteten klassischen Pfade installiert ist. Findet die Analyse eines dieser Programme in einem anderen Installationsweg (Snap, Flatpak oder andere), wird es wie jede andere Anwendersoftware recherchiert, und seine Ordner stehen in Tabelle 2. Die Software steht in der Liste am Ende der Analyse, falls sie installiert ist. Der Skill kann später durch weitere Analysen um Software erweitert werden, deren Details bekannt sind.
 
 **Grundlage für die Bereinigung: pro Programm genau zwei Dinge**
 
