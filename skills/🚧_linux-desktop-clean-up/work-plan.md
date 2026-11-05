@@ -41,7 +41,3 @@ Klären, wie der Skill in der Claude-Code-Erweiterung von VS Code die Ergebnisda
 ## 11 Caches ohne zugeordnete Anwendersoftware
 
 Klären, wie der Skill Ordner unter `~/.cache` behandelt, die keiner nach `concept.md`, Abschnitt 4.11, erfassten Anwendersoftware zuzuordnen sind (Programme ohne Starter-Eintrag, Erweiterungen, Kommandozeilenwerkzeuge). Anlass: Der Test zu Tabelle 3 fand `~/.cache/markdown-pdf-m` mit einem eigenen Chrome (251 MiB), das zu einer VS-Code-Erweiterung gehört und durch alle drei Tabellen fällt.
-
-## 13 Test: Python-Bytecode-Cache
-
-In einem Projekt im Home die `__pycache__`-Ordner löschen, das Projekt starten und prüfen, ob sie neu entstehen. Gelingt das, gehört 4.12 (`concept.md`) in Tabelle 1.

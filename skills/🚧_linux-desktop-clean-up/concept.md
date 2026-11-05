@@ -323,7 +323,8 @@ Offen, wird später genau diskutiert:
 
 - Python legt die Dateien bei Bedarf selbst neu an; es ist ein Cache im Sinne von Grundsatz 4.
 - Nur im Home. Unter `/usr` und anderen Systemverzeichnissen legt die Paketverwaltung sie an; ein normaler Nutzer kann sie dort nicht neu schreiben.
-- Gehört erst nach dem Test (`work-plan.md`, Schritt 13) in Tabelle 1.
+- Ohne eigenen Test in Tabelle 1 aufgenommen: Das Verhalten ist durch die Python-Spezifikation festgelegt, und das Löschen kann nichts entfernen, was Python nicht selbst neu erzeugt. Belegt in [PEP 3147](https://peps.python.org/pep-3147/): Der Ordner wird beim Import angelegt, und scheitert das Schreiben, "the import will still succeed"; eine `.pyc` aus `__pycache__` wird nur benutzt, wenn die Quelldatei existiert ("Python will not import a pyc file from the cache directory unless the source file exists"). Programme ohne Quelltext legen ihre `.pyc` dorthin, wo die Quelldatei stünde, nicht in `__pycache__`.
+- Folge des Löschens: Der erste Start eines Programms dauert etwas länger.
 
 ## 5 Bereiche, für die noch keine Behandlung festgelegt ist
 
