@@ -105,12 +105,12 @@ Nur `apt-get clean`. `/var/lib/apt/lists` gehört nicht dazu.
 
 ### 4.2 Firefox
 
-Profilname `<Profil>`: das Verzeichnis unter `~/.cache/mozilla/firefox/`, das den zuletzt geschriebenen `cache2/index` enthält (aktives Profil).
+`<Profil>`: jedes Profilverzeichnis des Nutzers mit Inhalt, sowohl unter `~/.cache/mozilla/firefox/` (Cache-Ordner) als auch unter `~/.mozilla/firefox/` (Profilordner), nicht nur das aktive. Leere Verzeichnisse werden übersprungen.
 
 | Was | Behandlung |
 |---|---|
 | `~/.cache/mozilla/firefox/<Profil>/cache2/entries`: Dateien, deren Anlege- und Änderungszeit älter als 3 Tage ist | löschen ohne Rückfrage, auch wenn Firefox läuft |
-| `cache2/index` des aktiven Profils | läuft Firefox: stehen lassen; läuft er nicht: mitlöschen |
+| `cache2/index` jedes Profils | läuft irgendein Firefox: alle stehen lassen; läuft keiner: mitlöschen |
 | Verzeichnisse `cache2`, `entries`, `doomed` | nie löschen, nur Dateien darin |
 | Übriger Inhalt von `~/.cache/mozilla/firefox/<Profil>/` (`remote-settings`, `startupCache`, `safebrowsing`, `personality-provider`, `ads-client.sqlite*`, `thumbnails`, `settings`, `activity-stream.*.json`) | nicht anfassen |
 | `cache2` oder `startupCache` unter `~/.mozilla/firefox/<Profil>/` (Profilordner, nicht `~/.cache`), seit mehr als 30 Tagen unverändert | ganz löschen einschließlich Ordner, ohne Rückfrage, im Ergebnis melden; auch bei laufendem Firefox |
