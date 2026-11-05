@@ -47,26 +47,41 @@ Gleich zu Beginn der Untersuchung prüft der Skill, ob das System Snapshots anbi
 Der Skill untersucht das System auf Stellen, die sich aufräumen lassen:
 
 - bekannte Stellen: solche, für die der Skill konkrete Lösungsbeschreibungen und Löschskripte enthält (Abschnitt 4),
+- Cache- und Download-Ordner der Anwendersoftware, die die Recherche zur Laufzeit belegt (Abschnitt 4.11),
 - zusätzlich systemweite Statistiken.
 
-Das Ergebnis übergibt er in zwei Tabellen:
+Das Ergebnis übergibt er in drei Tabellen:
 
 | Tabelle | Inhalt |
 |---|---|
-| 1 | Bekannte, im Skill beschriebene Stellen: was gefunden wurde und was sich mit dem Skill direkt und in kurzer Zeit säubern lässt |
-| 2 | Auswertung der Statistiken: wo möglicherweise weitere Aufräummöglichkeiten bestehen |
+| 1 | Bekannte, im Skill beschriebene und durch Tests gesicherte Stellen (Abschnitt 4 außer den Rechercheergebnissen aus 4.11): was gefunden wurde und was sich mit dem Skill direkt und in kurzer Zeit säubern lässt |
+| 2 | Durch Recherche belegte Stellen (Abschnitt 4.11), je Zeile mit der Einschätzung, wie sicher der Beleg ist |
+| 3 | Auswertung der Statistiken: wo möglicherweise weitere Aufräummöglichkeiten bestehen |
 
 Ausgabe während der Analyse: Dauern einzelne Schritte lange (der Lüfter kann dabei hochdrehen), gibt das Analyseskript, das der Nutzer ausführt, laufend aus, welchen Analyseschritt es gerade ausführt.
 
-Software-Erfassung: Zu Beginn der Analyse erfasst der Skill auch die Anwendersoftware des Nutzers (Abschnitt 4.11). Dem Nutzer sagt er dazu nur, dass er prüft, welche Software Cache- und Download-Ordner mitbringt, und dass er sich im Internet über die Details der Programme informiert. Am Ende der Analyse nennt er dem Nutzer kurz die Software, zu der er bei der Bereinigung noch Vorschläge machen wird. Firefox, Chrome und VS Code stehen in dieser Liste, falls sie installiert sind.
+Software-Erfassung: Zu Beginn der Analyse erfasst der Skill auch die Anwendersoftware des Nutzers (Abschnitt 4.11). Dem Nutzer sagt er dazu nur, dass er prüft, welche Software Cache- und Download-Ordner mitbringt, und dass er sich im Internet über die Details der Programme informiert. Am Ende der Analyse nennt er dem Nutzer kurz die Software, zu der er bei der Bereinigung noch Vorschläge machen wird. Firefox, Chrome und VS Code stehen in dieser Liste, falls sie installiert sind. Die durch Recherche belegten Ordner dieser Software stehen in Tabelle 2.
 
 ### 3.4 Zweite Aufgabe: Tabelle 1
 
 Der Skill schlägt vor, zuerst Tabelle 1 Schritt für Schritt gemeinsam mit dem Nutzer abzuarbeiten und dabei aufzuräumen. Zu Beginn weist er lose darauf hin, dass eine vorherige Sicherung (oder ein Snapshot) sinnvoll sein kann. Der Hinweis ist nicht dringend formuliert, weil die Maßnahmen in Tabelle 1 bereits belegt und getestet sind.
 
+Die Zeilen für Log-Files und Journal (4.5) sowie für Nutzdaten (4.7 bis 4.10) tragen den Hinweis, dass Gelöschtes nur über ein Backup oder einen Snapshot zurückkommt. Getestet ist dort der Löschvorgang; ob eine Datei noch gebraucht wird, entscheidet der Nutzer.
+
 ### 3.5 Dritte Aufgabe: Tabelle 2
 
-Ist Tabelle 1 erledigt, bietet der Skill an, den Rest gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche hinzuziehen. Dabei gilt:
+Ist Tabelle 1 erledigt, schlägt der Skill vor, Tabelle 2 ebenso Schritt für Schritt abzuarbeiten. Dabei gilt:
+
+- Jede Zeile nennt die Einschätzung des Belegs in zwei Stufen:
+  - **hoch**: Die offizielle Dokumentation des Programms sagt es ausdrücklich.
+  - **mittel**: Es steht nur in einem Entwicklerforum, im Issue-Tracker des Programms oder in einem Distributions-Wiki.
+- Ein Ordner, der nur durch Drittquellen oder durch Rückschluss aus mehreren Hinweisen belegt ist, gilt als "kein klarer Befund" (Abschnitt 4.11) und steht in keiner Tabelle.
+- Ein Kommentar in der Zeile darf darauf hinweisen, dass ein Backup oder Snapshot angebracht sein kann, weil die Maßnahme nicht getestet ist.
+- Für das Löschen gelten die Regeln aus 4.11, insbesondere die Aufforderung, das Programm vorher zu beenden.
+
+### 3.6 Vierte Aufgabe: Tabelle 3
+
+Ist Tabelle 2 erledigt, bietet der Skill an, den Rest gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche hinzuziehen. Dabei gilt:
 
 - Der Skill sagt, dass er dafür keine vorgefertigten Anweisungen und Lösungen hat. Sie werden erst erarbeitet.
 - Er führt den Nutzer durch die einzelnen Befunde und erarbeitet mit ihm Schritt für Schritt, ob es dort überhaupt etwas zu tun gibt und wie man es angehen würde.
@@ -74,7 +89,7 @@ Ist Tabelle 1 erledigt, bietet der Skill an, den Rest gemeinsam zu erforschen: I
 - Der Skill weist den Nutzer darauf hin, dass die erarbeiteten Maßnahmen möglichst gut belegt sein sollten, damit kein Unfall passiert.
 - Er weist darauf hin, dass die hier erarbeiteten Aufräumarbeiten völlig ungetestet sein werden und deshalb eine vollständige Sicherung beziehungsweise der Snapshot-Mechanismus (Abschnitt 3.2) dringend zu empfehlen ist.
 
-### 3.6 Zusätzlich angeforderte Suchen
+### 3.7 Zusätzlich angeforderte Suchen
 
 Bittet der Nutzer den Skill zusätzlich, nach weiteren Dateien zu suchen, und beschreibt er, welche er meint, gilt keine der bisherigen Regeln dieses Plans. Das ist kein Automatismus des Skills, sondern eine zusätzlich angeforderte Aufgabe. Ihre Randbedingungen beruhen nicht auf den Festlegungen des Skills, sondern werden im Einzelnen mit dem Nutzer ausgehandelt.
 
@@ -266,9 +281,10 @@ Dieser Schritt kommt im Ablauf nach dem Download-Ordner (4.9). Seine Stellung zu
 
 **Kein klarer Befund**
 
+- Kein klarer Befund liegt auch vor, wenn ein Ordner nur durch Drittquellen oder durch Rückschluss aus mehreren Hinweisen belegt ist; für Tabelle 2 zählen nur die Belegstufen hoch und mittel (Abschnitt 3.5).
 - Ergibt die Recherche keinen klaren Befund, werden Daten, die ganz offensichtlich solchen Programmen zugeordnet sind, vollständig vom Löschvorschlag ausgeschlossen. Sie werden auch gegenüber dem Nutzer nicht aufgelistet oder genannt.
-- Skill-eigene Analysen und Anzeigen (auch Tabelle 2 in 3.3) filtern diese Daten.
-- Ausnahme: Verlangt der Nutzer selbst, Ordnergrößen zu ermitteln und anzuzeigen, oder alle Dateien in einem Bereich des Dateisystems zu erfassen und deren Größe anzuzeigen, gilt der Filter nicht. Das ist eine zusätzlich angeforderte Aufgabe nach 3.6. Keine der im Skill definierten Aufgaben ist von dieser Art.
+- Skill-eigene Analysen und Anzeigen (auch Tabelle 3 in 3.3) filtern diese Daten.
+- Ausnahme: Verlangt der Nutzer selbst, Ordnergrößen zu ermitteln und anzuzeigen, oder alle Dateien in einem Bereich des Dateisystems zu erfassen und deren Größe anzuzeigen, gilt der Filter nicht. Das ist eine zusätzlich angeforderte Aufgabe nach 3.7. Keine der im Skill definierten Aufgaben ist von dieser Art.
 - Deshalb ist die Analyse am Anfang, einschließlich der Recherche, sehr umfassend durchzuführen. Der Nutzer erfährt das zu Beginn (3.1, Schritt 6).
 
 Offen, wird später genau diskutiert:
