@@ -312,8 +312,21 @@ Dieser Schritt kommt im Ablauf als letzter dieser Gruppe: nach dem Download-Ordn
 - Ausnahme: Verlangt der Nutzer selbst, Ordnergrößen zu ermitteln und anzuzeigen, oder alle Dateien in einem Bereich des Dateisystems zu erfassen und deren Größe anzuzeigen, gilt der Filter nicht. Das ist eine zusätzlich angeforderte Aufgabe nach 3.7. Keine der im Skill definierten Aufgaben ist von dieser Art.
 - Deshalb ist die Analyse am Anfang, einschließlich der Recherche, sehr umfassend durchzuführen. Der Nutzer erfährt das zu Beginn (3.1, Schritt 6).
 
-Offen, wird später genau diskutiert:
-- Für welche Suchläufe der stille Ausschluss gilt. Vorschlag: für 4.7, 4.8 und 4.10, nicht für den Download-Ordner (4.9).
+**Geltung des stillen Ausschlusses (Punkt 2)**
+
+Der Ausschluss gilt überall dort, wo der Skill einzelne Dateien zur Auswahl für das Löschen vorlegt und dabei nach eigenem Urteil sucht. Er gilt nicht, wo ein objektives Kriterium entscheidet, wo der Nutzer den Ort selbst bestimmt hat oder wo nur gezählt wird.
+
+| Suchlauf | stiller Ausschluss |
+|---|---|
+| 4.7 .deb-Dateien | nein (objektiver Versionsvergleich) |
+| 4.8 Image-Dateien und Archive | ja |
+| 4.9 Download-Ordner | nein (Ort vom Nutzer bestimmt) |
+| 4.10 Vagabundierende Medien | ja |
+| Tabelle 3: große Einzeldateien | ja |
+| Tabelle 3: doppelte Dateien | ja |
+| Tabelle 3: Größe je Verzeichnis | nein (nur gezählt; ein verschwiegener Ordner verfälschte die Übersicht) |
+
+Fehlt dem Nutzer in einer Liste etwas, kann er eine zusätzliche Suche nach 3.7 anfordern; dort gilt der Ausschluss nicht.
 
 ### 4.12 Python-Bytecode-Cache
 
