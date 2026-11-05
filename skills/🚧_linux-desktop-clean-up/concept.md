@@ -60,6 +60,7 @@ Das Ergebnis übergibt er in drei Tabellen:
 
 Aufbau der Tabellen:
 
+- Die Analyse durchläuft das Dateisystem nur ein einziges Mal und erfasst dabei alles, was die Tabellen brauchen.
 - Das Analyseskript liefert maschinenlesbare Daten. Die Tabellen baut die Instanz daraus; in Tabelle 2 ergänzt sie die Ergebnisse der Recherche.
 - Jede Tabelle zeigt nur eine Zusammenfassung je Bereich, eine Zeile je Bereich. Die Einzelheiten (Einzellisten, Histogramm, nummerierte Auswahllisten) kommen erst, wenn der Bereich bearbeitet wird. Nach der Datenerfassung wird nicht alles sofort präsentiert.
 - Spalten von Tabelle 1: Bereich (mit Abschnitt in diesem Dokument), Fundort, Größe, Behandlung (ohne Rückfrage / mit Rückfrage / nur melden), braucht root, Programm muss beendet sein, Hinweis zur Sicherung.

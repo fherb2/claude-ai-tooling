@@ -6,6 +6,17 @@ Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die 
 
 Per Test ermitteln, welche systemweiten Statistiken Tabelle 3 enthält und welche Spalten sie hat (`concept.md`, Abschnitt 3.3). Aufbau von Tabelle 1 und 2 ist festgelegt; das Format der Übergabe an das Löschskript entscheidet Schritt 2.
 
+**Plan des Tests (freigegeben, in Ausführung):** Das reine Lese-Skript `tests/table3_probe.py` erhebt in einem einzigen Durchlauf über Home, `/var`, `/opt`, `/usr/local` und `/srv` sechs Statistiken, jeweils ohne die Bereiche aus Abschnitt 4:
+
+- S1: Größe je Verzeichnis bis Tiefe 3, die größten 30; `~/git` mitgezählt und gekennzeichnet.
+- S2: Einzeldateien ab 150 MiB.
+- S3: Zuwachs in den letzten 7 und 30 Tagen je Verzeichnis der obersten Ebene.
+- S4: seit über einem Jahr unverändert, je Verzeichnis der obersten Ebene.
+- S5: Belegung je Dateisystem, Zahl und (bei aktiven Quotas) Belegung der btrfs-Snapshots.
+- S6: Datenmenge je Dateiart.
+
+Der Nutzer führt es mit root-Rechten und niedriger Priorität aus; Home und Download-Ordner kommen als Parameter. Die Ausgabe geht per `tee` nach `/tmp/table3_probe.log` und danach nach `tests/test_results/`. Auswertung gemeinsam: Welche Statistik zeigt etwas, das Tabelle 1 und 2 nicht abdecken?
+
 ## 2 Skripte
 
 Skripte zum Analysieren und Löschen schreiben. Die Sprache (Bash oder Python) ist noch nicht gewählt.
