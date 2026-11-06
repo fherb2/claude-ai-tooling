@@ -16,6 +16,10 @@ Was ohne Rückfrage gelöscht wird, ist eng begrenzt: programmeigene Zwischendat
 
 Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/linux-desktop-clean-up`. Er lädt sich nicht von selbst.
 
+## Ohne Gewähr
+
+**Für die Funktion dieses Skills wird keine Gewähr übernommen.** Er löscht Dateien, und gelöschte Dateien kommen nur über eine Sicherung zurück. Seine Regeln sind an einem einzelnen Rechner entwickelt und geprüft; auf einem anderen System, mit anderer Software oder in einer späteren Version eines Programms können sie anders wirken. **Lege vor der Nutzung mindestens ein vollständiges Backup an** — oder, auf btrfs, einen Snapshot —, und prüfe, dass es sich zurückspielen lässt. Was der Skill anrichtet, verantwortet, wer ihn einsetzt.
+
 ## Installation
 
 ### Claude Code
@@ -42,9 +46,9 @@ Ablauf:
 2. Umgebung ermitteln: Desktop, die Benutzerordner nach XDG und abweichende Download-Ziele von Firefox und Chrome — Ordnernamen wie „Downloads“ oder „Bilder“ setzt der Skill nie selbst ein, sie heißen je nach Sprache anders.
 3. Analyse: ein einziger Durchlauf durch Home, `/var`, `/opt`, `/usr/local` und `/srv`, nur lesend.
 4. Füllstand und drei Tabellen: **Tabelle 1** — durch Tests gesicherte Bereiche; **Tabelle 2** — Cache-Ordner weiterer Programme, die der Skill zur Laufzeit recherchiert, mit Belegstufe; **Tabelle 3** — Statistik zum gemeinsamen Erforschen (Größe je Verzeichnis, große Dateien, Reste deinstallierter Programme, Duplikate, Entwicklungsartefakte).
-5. Bereich für Bereich durch Tabelle 1: Einzelheiten zeigen, Entscheidung einholen, Probelauf, nach Bestätigung echter Lauf. Danach Tabelle 3 auf Wunsch gemeinsam erforschen.
-6. Ergebnisbericht: was gelöscht wurde und wie viel, was übersprungen und was nur gemeldet wurde.
-7. Zum Schluss Tabelle 2: Für diese Stellen hat der Skill keine getesteten Erfahrungen. Er bietet an, sie im Nachgang gemeinsam weiter zu klären — mit Recherche in der Dokumentation und mit dem ausdrücklichen Hinweis vor jedem Löschen, was belegt und was Vermutung ist.
+5. Bereich für Bereich durch Tabelle 1: Einzelheiten zeigen, Entscheidung einholen, Probelauf, nach Bestätigung echter Lauf.
+6. Ergebnisbericht: was gelöscht wurde und wie viel, was übersprungen und was nur gemeldet wurde. Damit endet der eigentliche Lauf.
+7. Nachgang, auf Wunsch und jederzeit abbrechbar: zuerst Tabelle 2, dann Tabelle 3. Für diese Stellen hat der Skill keine getesteten Erfahrungen; er klärt sie gemeinsam mit dem Nutzer, mit Recherche in der Dokumentation und mit dem ausdrücklichen Hinweis vor jedem Löschen, was belegt und was Vermutung ist. Für Tabelle 2 liegt die Recherche schon aus der Analyse vor, für Tabelle 3 beginnt sie erst.
 
 ### Die Skripte
 

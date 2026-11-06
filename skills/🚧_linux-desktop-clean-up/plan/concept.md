@@ -93,9 +93,9 @@ Der Skill schlägt vor, zuerst Tabelle 1 Schritt für Schritt gemeinsam mit dem 
 
 Die Zeilen für Log-Files und Journal (4.5) sowie für Nutzdaten (4.7 bis 4.10) tragen den Hinweis, dass Gelöschtes nur über ein Backup oder einen Snapshot zurückkommt. Getestet ist dort der Löschvorgang; ob eine Datei noch gebraucht wird, entscheidet der Nutzer.
 
-### 3.5 Letzte Aufgabe: Tabelle 2
+### 3.5 Nachgang zu Tabelle 2
 
-Tabelle 2 steht am Anfang mit den anderen Tabellen da, wird aber als letzte bearbeitet, wenn alle anderen Aufräumschritte (Tabelle 1, Tabelle 3) durch sind. Für ihre Zeilen gilt:
+Mit Tabelle 1 und dem Ergebnisbericht (Grundsatz 5) endet der eigentliche Lauf des Skills. Danach bietet er einen Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3 (3.6); der Nutzer kann nach jedem Teil aufhören. Tabelle 2 kommt vor Tabelle 3, weil für ihre Posten die Recherche schon vorliegt. Für ihre Zeilen gilt:
 
 - Jede Zeile nennt die Einschätzung des Belegs in zwei Stufen:
   - **hoch**: Die offizielle Dokumentation des Programms sagt es ausdrücklich.
@@ -104,11 +104,11 @@ Tabelle 2 steht am Anfang mit den anderen Tabellen da, wird aber als letzte bear
 - Ein Kommentar in der Zeile darf darauf hinweisen, dass ein Backup oder Snapshot angebracht sein kann, weil die Maßnahme nicht getestet ist.
 - Für das Löschen gelten die Regeln aus 4.11, insbesondere die Aufforderung, das Programm vorher zu beenden.
 
-Abschluss des Skills: Der Skill wiederholt die Stellen aus Tabelle 2 und sagt dem Nutzer, dass er für diese Posten keine getesteten und belegten Erfahrungen besitzt. Er bietet an, alle oder einen Teil davon jetzt, als Nachgang zum Skill, gemeinsam weiter zu klären: Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Dabei geht er gewohnt vorsichtig vor und erinnert den Nutzer vor jedem Löschen daran, was tatsächlich belegt und was Vermutung ist, damit der Nutzer abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird im Nachgang wie bei einer zusätzlich angeforderten Aufgabe (3.7).
+Nachgang zu Tabelle 2: Der Skill wiederholt die Stellen aus Tabelle 2 und sagt dem Nutzer, dass er für diese Posten keine getesteten und belegten Erfahrungen besitzt. Er bietet an, alle oder einen Teil davon gemeinsam weiter zu klären: Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Dabei geht er gewohnt vorsichtig vor und erinnert den Nutzer vor jedem Löschen daran, was tatsächlich belegt und was Vermutung ist, damit der Nutzer abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird im Nachgang wie bei einer zusätzlich angeforderten Aufgabe (3.7).
 
-### 3.6 Dritte Aufgabe: Tabelle 3
+### 3.6 Nachgang zu Tabelle 3
 
-Ist Tabelle 1 erledigt, bietet der Skill an, den Rest gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche hinzuziehen. Dabei gilt:
+Nach dem Nachgang zu Tabelle 2, oder wenn der Nutzer ihn auslässt, bietet der Skill an, den Rest gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche hinzuziehen. Dabei gilt:
 
 - Der Skill sagt, dass er dafür keine vorgefertigten Anweisungen und Lösungen hat. Sie werden erst erarbeitet.
 - Er führt den Nutzer durch die einzelnen Befunde und erarbeitet mit ihm Schritt für Schritt, ob es dort überhaupt etwas zu tun gibt und wie man es angehen würde.
@@ -313,7 +313,7 @@ Dieser Schritt kommt im Ablauf als letzter dieser Gruppe: nach dem Download-Ordn
 
 **Grundlage für die Bereinigung: pro Programm genau zwei Dinge**
 
-1. Cache- und Download-Ordner, deren Inhalt gelöscht werden darf, **nur** wenn die Dokumentation im Internet zum Programm belegt, dass dort nur gecacht oder heruntergeladen wird. Als Cache gilt ein Ordner nur, wenn die Dokumentation belegt, dass das Programm die Daten darin jederzeit vollautomatisch wiederherstellt und dass ihr Fehlen den Arbeitsvorgang bis auf Zeitverlust nicht beeinflusst (Grundsatz 4). Wie die Dokumentation den Ordner nennt, zählt nicht. Geht aus der Dokumentation nicht hervor, dass das Programm den Verlust dieser Daten im laufenden Betrieb verträgt, wird erst gelöscht, wenn das Programm beendet ist; der Skill fordert den Nutzer dazu auf. Sie werden dem Nutzer offen mitgeteilt und zum Abschluss des Skills zur gemeinsamen weiteren Klärung angeboten (3.5). Nachsehen im Dateisystem allein genügt dafür nicht. Das gilt nur für Software, deren Details nicht schon bei der Entwicklung des Skills geklärt wurden. Geklärt sind Firefox, Chrome, VS Code und der Download-Ordner des Nutzers am Desktop; dort gelten die Festlegungen aus 4.2, 4.3, 4.4 und 4.9.
+1. Cache- und Download-Ordner, deren Inhalt gelöscht werden darf, **nur** wenn die Dokumentation im Internet zum Programm belegt, dass dort nur gecacht oder heruntergeladen wird. Als Cache gilt ein Ordner nur, wenn die Dokumentation belegt, dass das Programm die Daten darin jederzeit vollautomatisch wiederherstellt und dass ihr Fehlen den Arbeitsvorgang bis auf Zeitverlust nicht beeinflusst (Grundsatz 4). Wie die Dokumentation den Ordner nennt, zählt nicht. Geht aus der Dokumentation nicht hervor, dass das Programm den Verlust dieser Daten im laufenden Betrieb verträgt, wird erst gelöscht, wenn das Programm beendet ist; der Skill fordert den Nutzer dazu auf. Sie werden dem Nutzer offen mitgeteilt und im Nachgang zur gemeinsamen weiteren Klärung angeboten (3.5). Nachsehen im Dateisystem allein genügt dafür nicht. Das gilt nur für Software, deren Details nicht schon bei der Entwicklung des Skills geklärt wurden. Geklärt sind Firefox, Chrome, VS Code und der Download-Ordner des Nutzers am Desktop; dort gelten die Festlegungen aus 4.2, 4.3, 4.4 und 4.9.
 2. Ordner, die bei Programmen, die Daten verarbeiten, typischerweise als Eingangsdaten dienen. Treffer in solchen Ordnern schließt die Instanz stillschweigend aus den Suchläufen aus, weil sie als Arbeitsdaten und nicht als unwichtige Daten gelten. Das geschieht ohne Meldung an den Nutzer. Für diese Zuordnung darf die Instanz auch im Dateisystem nachsehen.
 
 **Kein klarer Befund**

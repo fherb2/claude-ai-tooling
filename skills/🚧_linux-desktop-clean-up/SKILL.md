@@ -79,7 +79,7 @@ Dann drei Tabellen, **je Bereich eine Zeile**. Einzellisten, Histogramme und Aus
 
 ## Reihenfolge der Bearbeitung
 
-Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; weise zu Beginn lose darauf hin, dass eine Sicherung oder ein Snapshot sinnvoll sein kann. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach Tabelle 3, dann der Ergebnisbericht, zuletzt Tabelle 2 — mit ihr endet der Skill.
+Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; weise zu Beginn lose darauf hin, dass eine Sicherung oder ein Snapshot sinnvoll sein kann. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach der Ergebnisbericht; mit ihm endet der eigentliche Lauf. Dann bietest du den Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3; der Nutzer kann nach jedem Teil aufhören.
 
 Je Bereich: die Einzelheiten zeigen, die Entscheidung des Nutzers einholen, wo eine nötig ist, den Auftrag schreiben, **Probelauf**, Ergebnis zeigen, nach Bestätigung **echter Lauf**:
 
@@ -133,17 +133,11 @@ Im Bericht keine Größe.
 
 **4.14 Papierkorb** — zuletzt. Frage nach x Tagen (Vorgabe 14, 0 = alles). Auftrag `rule` mit `{"days": x}`, für Papierkörbe auf anderen Dateisystemen zusätzlich `"other_trashes": [...]` aus der Analyse. Maßgeblich ist das Datum des Verschiebens in den Papierkorb; Einträge ohne gültige `.trashinfo` werden nur gemeldet. Hinweis: endgültig weg, ein Backup hilft nur, wenn der Papierkorb gesichert wird.
 
-## Tabelle 3
-
-Biete an, die Befunde gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche. Sag dazu: Dafür gibt es keine vorgefertigten Lösungen; sie werden erst erarbeitet, sollten gut belegt sein und sind ungetestet — eine vollständige Sicherung oder ein Snapshot ist dringend zu empfehlen. Vorher räumst du dort nichts auf.
-
-Bittet der Nutzer zusätzlich um eine Suche nach weiteren Dateien, gilt keine der Regeln dieses Skills; die Randbedingungen handelst du mit ihm aus. Für solche Suchen gilt auch der stille Ausschluss nicht.
-
 ## Ergebnisbericht
 
-Nach Tabelle 1 und Tabelle 3, vor Tabelle 2, stellst du aus den Berichten der einzelnen Läufe einen Gesamtbericht zusammen: je Bereich, was gelöscht wurde (Anzahl, entfernte Datenmenge; bei Docker die gelöschten Container und Images ohne Größe), was übersprungen wurde und warum, was nur gemeldet wurde. Darunter die Summe der entfernten Datenmenge. Sag ausdrücklich, dass das nicht der frei gewordene Platz ist: Snapshots, Kompression und noch geöffnete Dateien können ihn kleiner machen.
+Nach Tabelle 1, vor dem Nachgang, stellst du aus den Berichten der einzelnen Läufe einen Gesamtbericht zusammen: je Bereich, was gelöscht wurde (Anzahl, entfernte Datenmenge; bei Docker die gelöschten Container und Images ohne Größe), was übersprungen wurde und warum, was nur gemeldet wurde. Darunter die Summe der entfernten Datenmenge. Sag ausdrücklich, dass das nicht der frei gewordene Platz ist: Snapshots, Kompression und noch geöffnete Dateien können ihn kleiner machen.
 
-## Tabelle 2: Anwendersoftware (4.11)
+## Tabelle 2: Anwendersoftware (4.11) und Nachgang
 
 Grundlage sind die erfassten Programme in `software.desktop.included` (die Regeln dafür setzt das Skript um) und die Ordner unter `~/.cache`, die du einem Eigentümer ohne Starter-Eintrag zuordnen kannst (Erweiterung, Kommandozeilenwerkzeug, Bibliothek). Firefox, Chrome und VS Code auf den klassischen Pfaden recherchierst du nicht.
 
@@ -151,4 +145,10 @@ Je Programm suchst du in der Dokumentation genau zwei Dinge:
 1. **Cache- und Download-Ordner.** Als Cache gilt ein Ordner nur, wenn die Dokumentation belegt, dass das Programm die Daten darin jederzeit vollautomatisch wiederherstellt und ihr Fehlen bis auf Zeitverlust nichts ändert — wie die Dokumentation ihn nennt, zählt nicht; Nachsehen im Dateisystem allein genügt nicht. Geht nicht hervor, dass das Programm den Verlust im laufenden Betrieb verträgt, löschst du erst, wenn es beendet ist, und forderst den Nutzer dazu auf.
 2. **Ordner mit Eingangsdaten** datenverarbeitender Programme. Treffer darin schließt du still aus den Suchläufen 4.8, 4.10 und den großen Einzeldateien und Duplikaten in Tabelle 3 aus — ohne Meldung. Nicht still ausgeschlossen wird bei 4.7, 4.9 und bei der Größe je Verzeichnis.
 
-**Belegstufe** je Zeile: **hoch** — die offizielle Dokumentation sagt es ausdrücklich; **mittel** — nur Entwicklerforum, Issue-Tracker oder Distributions-Wiki. Nur Drittquellen oder Rückschluss gilt als **kein klarer Befund**: Dann nennst du die Daten des Programms nirgends und schließt sie von jedem Löschvorschlag aus (die Größe je Verzeichnis zählt sie trotzdem mit). Ordner unter `~/.cache` ohne zuordenbaren Eigentümer kommen nach Tabelle 3. **Tabelle 2 bearbeitest du als letzte**, wenn alle anderen Aufräumschritte durch sind, und mit ihr endet der Skill: Wiederhole die Stellen aus Tabelle 2 und sag dem Nutzer, dass du für diese Posten keine getesteten und belegten Erfahrungen besitzt. Biete an, alle oder einen Teil davon jetzt, als Nachgang zum Skill, gemeinsam weiter zu klären — Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Geh dabei vorsichtig vor und erinnere den Nutzer vor jedem Löschen, was tatsächlich belegt und was Vermutung ist, damit er abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird im Nachgang wie bei einer zusätzlich angeforderten Suche.
+**Belegstufe** je Zeile: **hoch** — die offizielle Dokumentation sagt es ausdrücklich; **mittel** — nur Entwicklerforum, Issue-Tracker oder Distributions-Wiki. Nur Drittquellen oder Rückschluss gilt als **kein klarer Befund**: Dann nennst du die Daten des Programms nirgends und schließt sie von jedem Löschvorschlag aus (die Größe je Verzeichnis zählt sie trotzdem mit). Ordner unter `~/.cache` ohne zuordenbaren Eigentümer kommen nach Tabelle 3. **Nachgang zu Tabelle 2** (nach dem Ergebnisbericht): Wiederhole die Stellen aus Tabelle 2 und sag dem Nutzer, dass du für diese Posten keine getesteten und belegten Erfahrungen besitzt. Biete an, alle oder einen Teil davon gemeinsam weiter zu klären — Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Geh dabei vorsichtig vor und erinnere den Nutzer vor jedem Löschen, was tatsächlich belegt und was Vermutung ist, damit er abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird im Nachgang wie bei einer zusätzlich angeforderten Suche.
+
+## Nachgang zu Tabelle 3
+
+Nach dem Nachgang zu Tabelle 2, oder wenn der Nutzer ihn auslässt, biete an, die Befunde gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche. Sag dazu: Dafür gibt es keine vorgefertigten Lösungen; sie werden erst erarbeitet, sollten gut belegt sein und sind ungetestet — eine vollständige Sicherung oder ein Snapshot ist dringend zu empfehlen. Vorher räumst du dort nichts auf.
+
+Bittet der Nutzer zusätzlich um eine Suche nach weiteren Dateien, gilt keine der Regeln dieses Skills; die Randbedingungen handelst du mit ihm aus. Für solche Suchen gilt auch der stille Ausschluss nicht.
