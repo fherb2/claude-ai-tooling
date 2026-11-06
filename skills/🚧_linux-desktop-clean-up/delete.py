@@ -32,6 +32,10 @@ DAY = 86400
 CACHE_AGE = 3 * DAY
 STALE_PROFILE_AGE = 30 * DAY
 WALKED_ROOTS = ["/var", "/opt", "/usr/local", "/srv"]
+APT_ARCHIVES = "/var/cache/apt/archives"
+LOG_DIR = "/var/log"
+JOURNAL_DIR = "/var/log/journal"
+VSCODE_PRODUCT = "/usr/share/code/resources/app/product.json"
 ENTRY_NAME = re.compile(r"^[0-9a-f]{16}_")
 ROTATED = re.compile(r"(\.\d+(\.gz|\.xz|\.zst)?|-\d{8}(\.gz|\.xz|\.zst)?|\.gz|\.xz|\.zst|\.old)$")
 PROGRAMS = {"firefox": ("firefox", "firefox-bin"), "chrome": ("chrome",), "code": ("code",)}
@@ -240,7 +244,7 @@ def index_files(d, folder, names, program, group):
 
 def rule_apt(d, home, params, now):
     """4.1: apt-get clean; the removed amount is measured beforehand."""
-    archives = "/var/cache/apt/archives"
+    archives = APT_ARCHIVES
     size = sum(tree_size(os.path.join(archives, n)) for n in listdir(archives) if n.endswith(".deb"))
     size += sum(tree_size(os.path.join(archives, "partial", n)) for n in listdir(os.path.join(archives, "partial")))
     done = d.command(["apt-get", "clean"])
@@ -293,7 +297,7 @@ def rule_vscode(d, home, params, now):
     index_files(d, folder, ["index", "index-dir"], "code", "index")
     commit = None
     try:
-        with open("/usr/share/code/resources/app/product.json", encoding="utf-8") as fh:
+        with open(VSCODE_PRODUCT, encoding="utf-8") as fh:
             commit = json.load(fh).get("commit")
     except (OSError, ValueError):
         d.report.skipped("CachedData", "installed version unknown; CachedData left alone")
@@ -321,17 +325,17 @@ def is_zip(path):
 def rule_logs(d, home, params, now):
     """4.5: journal older than x days (journalctl), rotated archived log files older than x days."""
     days = int(params["days"])
-    journal = "/var/log/journal"
+    journal = JOURNAL_DIR
     before = tree_size(journal)
     done = d.command(["journalctl", f"--vacuum-time={days}d"])
     if not d.dry_run and done and done.returncode == 0:
         d.report.removed(journal, max(0, before - tree_size(journal)), "journal")
     limit = now - days * DAY
-    candidates = [("/var/log", True)] + [(os.path.join(home, c), False)
+    candidates = [(LOG_DIR, True)] + [(os.path.join(home, c), False)
                                          for c in (".config", ".local/share", ".cache", ".var")]
     for base, everything in candidates:
         for folder, dirs, files in os.walk(base):
-            dirs[:] = [x for x in dirs if not (folder == "/var/log" and x == "journal")]
+            dirs[:] = [x for x in dirs if os.path.join(folder, x) != JOURNAL_DIR]
             in_log_dir = everything or any(p in ("log", "logs") for p in folder.split(os.sep))
             for name in files:
                 if not (in_log_dir or ".log" in name) or not ROTATED.search(name):
