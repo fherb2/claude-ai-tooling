@@ -36,7 +36,7 @@ Wurde der Skill nicht ausdrücklich mit `/linux-desktop-clean-up` aufgerufen —
 
 1. Nenne den Zweck: unnütze Datenansammlungen löschen, auf große Datenmengen hinweisen, um die der Nutzer sich selbst kümmern muss; keine Software entfernen. Gilt für Linux-Desktops und -Laptops, nicht für Server.
 2. Erkläre die Arbeitsweise (vorheriger Abschnitt).
-3. Sag ihm: Der Vorgang dauert länger, kann umfangreiche Internetrecherchen umfassen und verbraucht viele Token; für ein gutes Rechercheergebnis empfiehlst du das Modell Opus.
+3. Sag ihm: Der Vorgang dauert länger, kann umfangreiche Internetrecherchen umfassen und verbraucht viele Token; für ein gutes Rechercheergebnis empfiehlst du das Modell Opus. Sag ihm außerdem deutlich: Für die Funktion des Skills wird keine Gewähr übernommen, und gelöschte Dateien kommen nur über eine Sicherung zurück. Empfiehl, vor der Nutzung mindestens ein vollständiges Backup oder, auf btrfs, einen Snapshot anzulegen und zu prüfen, dass es sich zurückspielen lässt.
 4. Lass ihn diese Arbeitsweise bestätigen, bevor es weitergeht.
 5. Frage alle Angaben ab, die die Analyse braucht, bevor sie startet: die **Größenschwelle** (eine Zahl für große Einzeldateien, Images, Archive und Medien; Vorgabe 150 MiB) und ob auch **allgemeine Archive** (`.zip`, `.tar.*`, `.7z`, `.rar`) bei den Images erfasst werden sollen. Danach läuft die Analyse ohne Rückfrage.
 
@@ -79,7 +79,7 @@ Dann drei Tabellen, **je Bereich eine Zeile**. Einzellisten, Histogramme und Aus
 
 ## Reihenfolge der Bearbeitung
 
-Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; weise zu Beginn lose darauf hin, dass eine Sicherung oder ein Snapshot sinnvoll sein kann. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach der Ergebnisbericht; mit ihm endet der eigentliche Lauf. Dann bietest du den Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3; der Nutzer kann nach jedem Teil aufhören.
+Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; die Empfehlung zur Sicherung hast du schon zu Beginn gegeben. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach der Ergebnisbericht; mit ihm endet der eigentliche Lauf. Dann bietest du den Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3; der Nutzer kann nach jedem Teil aufhören.
 
 Je Bereich: die Einzelheiten zeigen, die Entscheidung des Nutzers einholen, wo eine nötig ist, den Auftrag schreiben, **Probelauf**, Ergebnis zeigen, nach Bestätigung **echter Lauf**:
 
