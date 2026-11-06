@@ -2,15 +2,21 @@
 
 Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die Nummern der übrigen werden dabei nicht neu vergeben, neue Schritte zählen hoch. Die Festlegungen stehen in `concept.md`.
 
-## 16 Löschskript
-
-Bekommt eine Löschliste und den Bereich und löscht genau das; die Liste schreibt die Instanz nach der Auswahl des Nutzers (Grundsatz 6). Format der Übergabe wird hier entschieden.
-
-**Plan 16 (freigegeben, in Ausführung):** `delete.py` im Skill-Ordner, ein Lauf je Bereich, Auftrag als JSON-Datei von der Instanz. Zwei Arten von Aufträgen: **Liste** (vom Nutzer ausgewählte Pfade bzw. Container: 4.7 bis 4.10, 4.13) und **Regel** (der Bereich mit seinen Parametern; das Skript wendet die Regel aus `concept.md` an: 4.1, 4.2 bis 4.4, 4.5, 4.6, 4.12, 4.13 Build-Cache und zweite Image-Prüfung, 4.14). `running()` prüft laufende Programme über `/proc`. Festes Verbot unabhängig vom Auftrag: `/`, das Home selbst, Ordner direkt unter `/` oder direkt unter dem Home, alles unter `/boot`, alles außerhalb der von der Analyse durchlaufenen Wurzeln (Home, `/var`, `/opt`, `/usr/local`, `/srv`), andere Dateisysteme und symbolische Links (beides hat die Analyse nicht betreten). `--dry-run` führt alles aus außer dem Löschen und meldet, was gelöscht würde. Ergebnisbericht je Lauf als JSON nach `/tmp` (gelöscht, entfernte Datenmenge, übersprungen mit Grund; Docker ohne Größe); den Gesamtbericht nach Grundsatz 5 stellt die Instanz zusammen. Prüfung: jede Regel an einem Test-Home im Scratchpad, danach beim Nutzer Probelauf und echter Lauf je Bereich.
-
 ## 17 Journal-Auswertung
 
 Eigenes Skript für Abschnitt 4.5: Histogramm, Quellen, Spitzen, auffällige Log-Files; höchstens vier Worker mit niedriger Priorität; liest `journalctl`, nicht das Dateisystem.
+
+## 18 SKILL.md, Regelteil und README (deutsch)
+
+Den Skilltext schreiben, zunächst nur in deutscher Fassung: wie die Instanz den Ablauf aus `concept.md` führt (Beginn mit Abfrage der Parameter, Analyse, Füllstand und drei Tabellen, Bereiche in festgelegter Reihenfolge, Aufträge für `delete.py` mit Probelauf, Ergebnisbericht nach Grundsatz 5). Teilung in eine dünne `SKILL.md` und nachgeladene Regeldateien nach `skill-dev-doc.md`, Kapitel 5.2 (die Bedingungen sind erfüllt; entschieden wird beim Schreiben). Dazu die `README.md` nach `skill-dev-doc.md`, Kapitel 6.1.
+
+## 19 Echter Lauf als Abschluss
+
+Der vollständige Ablauf am Entwicklungsrechner mit echten Löschungen, als finales Debugging. Vorher: Simulationstest `tests/test_delete.py` bestanden, Probeläufe je Bereich angesehen.
+
+## 20 Englische Fassung
+
+Erst wenn die deutsche Fassung samt README fertig ist: `SKILL.en.md`, Regeldateien und `README.en.md` als Übersetzung, die deutschen Dateien erhalten das Sprachkürzel (`skill-dev-doc.md`, Kapitel 5.1); danach die Download-Pakete (Kapitel 5.3).
 
 ## 14 Nachprobe Build-Cache (ab 8. November 2026)
 

@@ -7,7 +7,7 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
 - Der Skill löscht nur unnütze Datenansammlungen und weist den Nutzer auf Datenmengen hin, um die er sich selbst kümmern muss.
 - Er entfernt keine installierte Software, auch nicht, wenn sie vermutlich nicht mehr gebraucht wird. Solche Funde werden nur gemeldet.
 - Geltungsbereich: Linux-Desktops und -Laptops (Ubuntu, Kubuntu und ähnliche), keine Server. Er geht nicht vom Istzustand eines einzelnen Rechners aus, sondern misst den Zustand jedes Mal neu.
-- Sprache: Der Skill entsteht in einer deutschen und einer englischen Fassung. Die Sprache steht zu Beginn fest: aus dem bisherigen Kontext des Chats, sonst aus der installierten Fassung. Antwortet der Nutzer in einer anderen Sprache, arbeitet der Skill in dieser weiter. Die Skripte geben ihre Bildschirmmeldungen einheitlich auf Englisch aus; ihre Ergebnisse liest die Instanz und berichtet dem Nutzer in seiner Sprache.
+- Sprache: Der Skill entsteht in einer deutschen und einer englischen Fassung. Zuerst wird die deutsche Fassung samt README fertiggestellt; die englische folgt danach (`work-plan.md`, Schritt 20). Die Sprache steht zu Beginn fest: aus dem bisherigen Kontext des Chats, sonst aus der installierten Fassung. Antwortet der Nutzer in einer anderen Sprache, arbeitet der Skill in dieser weiter. Die Skripte geben ihre Bildschirmmeldungen einheitlich auf Englisch aus; ihre Ergebnisse liest die Instanz und berichtet dem Nutzer in seiner Sprache.
 
 ## 2 Grundsätze
 
