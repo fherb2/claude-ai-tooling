@@ -211,10 +211,13 @@ class DevArtifacts:
     def __init__(self):
         self.projects = {}
 
-    def project(self, path, names):
+    def project(self, path, names, is_project=True):
+        if path in self.projects:
+            return
         has_deps = bool(names & DEPENDENCY_LISTS) or any(n.startswith("requirements") and n.endswith(".txt")
                                                          for n in names)
-        self.projects[path] = {"artifacts": defaultdict(int), "dependency_list": has_deps, "last_source": 0}
+        self.projects[path] = {"artifacts": defaultdict(int), "dependency_list": has_deps, "last_source": 0,
+                               "is_project": is_project}
 
     def file(self, ctx, path, name, st, area):
         if not ctx.project:
@@ -229,7 +232,8 @@ class DevArtifacts:
         rows = []
         for path, info in self.projects.items():
             if info["artifacts"]:
-                rows.append({"project": path, "size": sum(info["artifacts"].values()),
+                rows.append({"project": path, "is_project": info["is_project"],
+                             "size": sum(info["artifacts"].values()),
                              "artifacts": dict(sorted(info["artifacts"].items(), key=lambda i: -i[1])),
                              "dependency_list": info["dependency_list"],
                              "last_source": info["last_source"] or None})
@@ -269,11 +273,17 @@ def walk(root, home, areas, sinks, artifacts, stats, progress):
                         continue
                     area = ctx.area or areas.of_dir(entry.path, entry.name)
                     in_git = ctx.in_git or entry.name == ".git"
-                    artifact = ctx.artifact
-                    if project and not artifact and not in_git and not area and (
-                            entry.name in ARTIFACT_NAMES or os.path.exists(os.path.join(entry.path, "pyvenv.cfg"))):
-                        artifact = entry.path
-                    stack.append((entry.path, ctx.child(entry.name, area, in_git, artifact, project)))
+                    artifact, owner = ctx.artifact, project
+                    if not artifact and not in_git and not area:
+                        if project and entry.name in ARTIFACT_NAMES:
+                            artifact = entry.path
+                        elif ctx.is_home and not ctx.dot_top and os.path.exists(os.path.join(entry.path, "pyvenv.cfg")):
+                            artifact = entry.path
+                            if not owner:
+                                # a Python environment outside a project counts on its own
+                                owner = current
+                                artifacts.project(current, names, is_project=False)
+                    stack.append((entry.path, ctx.child(entry.name, area, in_git, artifact, owner)))
                     continue
                 if not entry.is_file(follow_symlinks=False):
                     continue
