@@ -79,7 +79,7 @@ Dann drei Tabellen, **je Bereich eine Zeile**. Einzellisten, Histogramme und Aus
 
 ## Reihenfolge der Bearbeitung
 
-Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; weise zu Beginn lose darauf hin, dass eine Sicherung oder ein Snapshot sinnvoll sein kann. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach Tabelle 3, zuletzt Tabelle 2 — mit ihr endet der Skill.
+Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; weise zu Beginn lose darauf hin, dass eine Sicherung oder ein Snapshot sinnvoll sein kann. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach Tabelle 3, dann der Ergebnisbericht, zuletzt Tabelle 2 — mit ihr endet der Skill.
 
 Je Bereich: die Einzelheiten zeigen, die Entscheidung des Nutzers einholen, wo eine nötig ist, den Auftrag schreiben, **Probelauf**, Ergebnis zeigen, nach Bestätigung **echter Lauf**:
 
@@ -139,6 +139,10 @@ Biete an, die Befunde gemeinsam zu erforschen: Inhalte genauer ansehen, Internet
 
 Bittet der Nutzer zusätzlich um eine Suche nach weiteren Dateien, gilt keine der Regeln dieses Skills; die Randbedingungen handelst du mit ihm aus. Für solche Suchen gilt auch der stille Ausschluss nicht.
 
+## Ergebnisbericht
+
+Nach Tabelle 1 und Tabelle 3, vor Tabelle 2, stellst du aus den Berichten der einzelnen Läufe einen Gesamtbericht zusammen: je Bereich, was gelöscht wurde (Anzahl, entfernte Datenmenge; bei Docker die gelöschten Container und Images ohne Größe), was übersprungen wurde und warum, was nur gemeldet wurde. Darunter die Summe der entfernten Datenmenge. Sag ausdrücklich, dass das nicht der frei gewordene Platz ist: Snapshots, Kompression und noch geöffnete Dateien können ihn kleiner machen.
+
 ## Tabelle 2: Anwendersoftware (4.11)
 
 Grundlage sind die erfassten Programme in `software.desktop.included` (die Regeln dafür setzt das Skript um) und die Ordner unter `~/.cache`, die du einem Eigentümer ohne Starter-Eintrag zuordnen kannst (Erweiterung, Kommandozeilenwerkzeug, Bibliothek). Firefox, Chrome und VS Code auf den klassischen Pfaden recherchierst du nicht.
@@ -148,7 +152,3 @@ Je Programm suchst du in der Dokumentation genau zwei Dinge:
 2. **Ordner mit Eingangsdaten** datenverarbeitender Programme. Treffer darin schließt du still aus den Suchläufen 4.8, 4.10 und den großen Einzeldateien und Duplikaten in Tabelle 3 aus — ohne Meldung. Nicht still ausgeschlossen wird bei 4.7, 4.9 und bei der Größe je Verzeichnis.
 
 **Belegstufe** je Zeile: **hoch** — die offizielle Dokumentation sagt es ausdrücklich; **mittel** — nur Entwicklerforum, Issue-Tracker oder Distributions-Wiki. Nur Drittquellen oder Rückschluss gilt als **kein klarer Befund**: Dann nennst du die Daten des Programms nirgends und schließt sie von jedem Löschvorschlag aus (die Größe je Verzeichnis zählt sie trotzdem mit). Ordner unter `~/.cache` ohne zuordenbaren Eigentümer kommen nach Tabelle 3. **Tabelle 2 bearbeitest du als letzte**, wenn alle anderen Aufräumschritte durch sind, und mit ihr endet der Skill: Wiederhole die Stellen aus Tabelle 2 und sag dem Nutzer, dass du für diese Posten keine getesteten und belegten Erfahrungen besitzt. Biete an, alle oder einen Teil davon jetzt, als Nachgang zum Skill, gemeinsam weiter zu klären — Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Geh dabei vorsichtig vor und erinnere den Nutzer vor jedem Löschen, was tatsächlich belegt und was Vermutung ist, damit er abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird im Nachgang wie bei einer zusätzlich angeforderten Suche.
-
-## Ergebnisbericht
-
-Am Ende stellst du aus den Berichten der einzelnen Läufe einen Gesamtbericht zusammen: je Bereich, was gelöscht wurde (Anzahl, entfernte Datenmenge; bei Docker die gelöschten Container und Images ohne Größe), was übersprungen wurde und warum, was nur gemeldet wurde. Darunter die Summe der entfernten Datenmenge. Sag ausdrücklich, dass das nicht der frei gewordene Platz ist: Snapshots, Kompression und noch geöffnete Dateien können ihn kleiner machen.
