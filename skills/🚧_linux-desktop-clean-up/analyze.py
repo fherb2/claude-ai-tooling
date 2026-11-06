@@ -420,6 +420,31 @@ def installed_vscode_commit():
         return None
 
 
+class LogSizes:
+    """4.5 in the first analysis: two sums only, log files and the journal."""
+
+    JOURNAL = ("/var/log/journal" + os.sep, "/run/log/journal" + os.sep)
+
+    def __init__(self):
+        self.logs = Bucket()
+        self.journal = Bucket()
+
+    def file(self, ctx, path, name, st, area):
+        if area != "4.5":
+            return
+        (self.journal if path.startswith(self.JOURNAL) else self.logs).add(st.st_size)
+
+    def result(self):
+        volatile = "/run/log/journal"
+        for folder, _, files in os.walk(volatile):
+            for name in files:
+                try:
+                    self.journal.add(os.lstat(os.path.join(folder, name)).st_size)
+                except OSError:
+                    pass
+        return {"log_files": self.logs.out(), "journal": self.journal.out()}
+
+
 class PipCache:
     """4.6: size of the pip cache and its entries from 50 MiB on (no names)."""
 
@@ -787,10 +812,10 @@ def main():
     dup_candidates, git_left, crashes = DuplicateCandidates(), GitLeftovers(), CrashDumps()
     artifacts = DevArtifacts()
     apt, browsers, vscode = AptArchives(), BrowserCache(home, started), VSCodeCache(home, started)
-    pip, pycache, compose = PipCache(), PyCache(), ComposeFiles()
+    pip, pycache, compose, logs = PipCache(), PyCache(), ComposeFiles(), LogSizes()
     user_files = UserFiles(home, downloads, media_dirs, args.threshold * MiB, args.archives, started)
     sinks = [dir_sizes, large, dup_candidates, git_left, crashes, artifacts,
-             apt, browsers, vscode, pip, pycache, compose, user_files]
+             apt, browsers, vscode, pip, pycache, compose, user_files, logs]
 
     print("Step 1/4: file system usage", file=sys.stderr)
     fill = filesystems()
@@ -802,7 +827,7 @@ def main():
     print("\nStep 4/4: package versions, media folders, Docker", file=sys.stderr)
     table1 = {"4.1_apt": apt.result(), **{f"4.{n}_{k}": v for n, (k, v) in
                                          zip((2, 3), browsers.result().items())},
-              "4.4_vscode": vscode.result(), "4.6_pip": pip.result()}
+              "4.4_vscode": vscode.result(), "4.5_logs": logs.result(), "4.6_pip": pip.result()}
     files = user_files.result()
     table1.update({"4.7_deb_files": files["deb_files"], "4.8_images_archives": files["images_archives"],
                    "4.9_downloads": files["downloads"], "4.10_stray_media": files["stray_media"],

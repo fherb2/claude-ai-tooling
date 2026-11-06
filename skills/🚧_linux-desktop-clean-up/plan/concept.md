@@ -23,6 +23,8 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
 6. Nutzereingaben: Was zu erhalten und was zu löschen ist, formuliert allein der Nutzer. Die Instanz bewertet die Angaben und überführt sie in eine schematisch richtige Zuordnung, die dem Skript oder Befehl übergeben wird. Das gilt für alle Nutzereingaben im Skill.
 7. Ordnernamen: Sie werden bei der Abarbeitung an die Sprache des Systems und des Desktops des Nutzers angepasst. Namen wie `Downloads`, `Videos`, `Musik`, `Bilder` oder `Dokumente` stehen in keiner Zeichenkette eines Skripts. Die Instanz ermittelt den Pfad auf dem Rechner (XDG-Benutzerverzeichnisse: `~/.config/user-dirs.dirs`, `xdg-user-dir`), prüft im Home, dass der Ordner existiert, und startet erst dann das Skript oder den Agenten. Sie übergibt den aufgelösten Pfad als Parameter. Messbefund: Auf diesem Rechner heißen `Downloads` und `Videos` englisch, `Musik`, `Bilder`, `Dokumente`, `Schreibtisch` deutsch.
 
+Zum Alter einer Datei: Wo dieses Dokument die Anlegezeit nennt (4.2 bis 4.4, 4.9), verwenden die Skripte die Zeit der letzten Statusänderung (`ctime`). Das Anlegedatum liefert Python 3.12 unter Linux nicht. Die Statusänderung ist nie älter als das Anlegen; eine Datei erscheint damit höchstens jünger, als sie ist, und wird im Zweifel nicht gelöscht.
+
 ## 3 Ablauf des Skills
 
 ### 3.1 Beginn
@@ -176,7 +178,9 @@ Diese Regeln gelten nur für die getesteten klassischen Pfade. Andere Installati
 
 Dieser Schritt umfasst die Log-Files und das System-Journal. Im Skill heißt er so.
 
-**Analyse (Teil des Analyseskripts, Abschnitt 3.3)**
+**In der Anfangsanalyse (3.3)** erhebt das Analyseskript nur zwei Summen ohne Inhalt: den Speicherbedarf aller Log-Files (Abgrenzung wie unten in Punkt 7) und den des Journals (`/var/log/journal` und das flüchtige `/run/log/journal`). Sie stehen als zwei Zeilen in Tabelle 1. Die Auswertung unten läuft erst, wenn der Bereich bearbeitet wird, mit einem eigenen Skript (`work-plan.md`, Schritt 17).
+
+**Auswertung beim Bearbeiten des Bereichs**
 
 1. Das Skript gibt während der Analyse laufend aus, welchen Schritt es gerade ausführt.
 2. Es erzeugt Multiprocessing-Worker, jeden für eine Datei (Journal-Dateien und Log-Files). Es sind höchstens 4 Worker, bei weniger Kernen entsprechend weniger, und sie laufen mit niedriger Priorität (`nice`, `ionice`).
