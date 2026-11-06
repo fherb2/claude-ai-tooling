@@ -365,11 +365,22 @@ Gilt für Docker mit Root-Dienst. Podman und Docker im Rootless-Modus werden nur
 
 **Messbefund (Entwicklungsrechner):** zusammen rund 4,2 GiB (`/var/lib/containerd` 2,7 GiB, `/var/lib/docker` 1,5 GiB), davon Build-Cache 1,96 GB, Volume `vscode` 1,51 GB, ein beendeter Container mit 336 MB.
 
+### 4.14 Papierkorb
+
+Dieser Schritt kommt im Ablauf als letzter aller Bereiche: Was ein früherer Schritt (heute oder künftig) nur in den Papierkorb verschiebt statt zu löschen, wird so mit erfasst.
+
+- Ort nach der [Trash Specification](https://specifications.freedesktop.org/trash/latest/) von freedesktop.org: `$XDG_DATA_HOME/Trash`, meist `~/.local/share/Trash`, mit den Unterordnern `files` (die Dateien) und `info` (je eine `.trashinfo`). Auf anderen eingehängten Dateisystemen gibt es eigene Papierkörbe (`$topdir/.Trash/$uid` oder `$topdir/.Trash-$uid`); sie werden mit erfasst, wenn es sie gibt.
+- Analyse (3.3): nur Größe und Zahl der Einträge je Papierkorb, ohne Inhalt.
+- Der Skill fragt nach x Tagen; Vorgabe 14, 0 heißt "alles". Gelöscht werden die Einträge, die länger als x Tage im Papierkorb liegen. Maßgeblich ist der Schlüssel `DeletionDate` der `.trashinfo` ("when the file/directory was trashed", Format `YYYY-MM-DDThh:mm:ss`), nicht die Änderungszeit der Datei. Gelöscht werden jeweils Datei und `.trashinfo` zusammen; die Spezifikation schreibt den Löschvorgang nicht vor, das ist abgeleitet.
+- Einträge ohne gültige `.trashinfo` werden nicht gelöscht, nur gemeldet: Ihr Alter ist unbekannt.
+- Hinweis an den Nutzer: Was hier gelöscht wird, ist endgültig weg; ein Backup hilft nur, wenn der Papierkorb gesichert wird. Messbefund (Entwicklungsrechner): Dort ist der Papierkorb vom Backup ausgeschlossen.
+- Tabelle 1: Der Vorgang ist durch die Spezifikation beschrieben, der Nutzer entscheidet über x.
+
 ## 5 Bereiche, für die noch keine Behandlung festgelegt ist
 
 - Suchindex Baloo (`balooctl purge`)
 - Git-Repositories (`git gc`, LFS, abgebrochene Abrufe)
-- Papierkorb, Vorschaubilder
+- Vorschaubilder
 - Zwischenspeicher von Claude Desktop, Sandbox-Image von Claude Desktop
 - Flatpak, Snap, AppImage, Wine
 - Python-Umgebungen, Toolchains im Home, Syncthing-Versionen

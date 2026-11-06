@@ -80,6 +80,7 @@ class Areas:
             "/var/log": "4.5",
             "/var/lib/docker": "4.13",
             "/var/lib/containerd": "4.13",
+            os.path.join(home, ".local/share/Trash"): "4.14",
         }
 
     def in_container(self, path):
@@ -443,6 +444,41 @@ class LogSizes:
                 except OSError:
                     pass
         return {"log_files": self.logs.out(), "journal": self.journal.out()}
+
+
+class TrashSizes:
+    """4.14: size and number of entries per trash directory, no content."""
+
+    def __init__(self, home):
+        self.home_trash = os.path.join(home, ".local/share/Trash")
+        self.size = 0
+
+    def file(self, ctx, path, name, st, area):
+        if area == "4.14" and path.startswith(os.path.join(self.home_trash, "files") + os.sep):
+            self.size += st.st_size
+
+    @staticmethod
+    def entries(trash):
+        try:
+            return sum(1 for n in os.listdir(os.path.join(trash, "info")) if n.endswith(".trashinfo"))
+        except OSError:
+            return 0
+
+    def result(self, mounts, uid):
+        rows = [{"path": self.home_trash, "entries": self.entries(self.home_trash), "size": self.size}]
+        for mount in mounts:
+            for trash in (os.path.join(mount, ".Trash", str(uid)), os.path.join(mount, f".Trash-{uid}")):
+                if not os.path.isdir(trash) or trash == self.home_trash:
+                    continue
+                size = 0
+                for folder, _, files in os.walk(os.path.join(trash, "files")):
+                    for name in files:
+                        try:
+                            size += os.lstat(os.path.join(folder, name)).st_size
+                        except OSError:
+                            pass
+                rows.append({"path": trash, "entries": self.entries(trash), "size": size})
+        return rows
 
 
 class PipCache:
@@ -824,9 +860,10 @@ def main():
     artifacts = DevArtifacts()
     apt, browsers, vscode = AptArchives(), BrowserCache(home, started), VSCodeCache(home, started)
     pip, pycache, compose, logs = PipCache(), PyCache(), ComposeFiles(), LogSizes()
+    trash = TrashSizes(home)
     user_files = UserFiles(home, downloads, media_dirs, args.threshold * MiB, args.archives, started)
     sinks = [dir_sizes, large, dup_candidates, git_left, crashes, artifacts,
-             apt, browsers, vscode, pip, pycache, compose, user_files, logs]
+             apt, browsers, vscode, pip, pycache, compose, user_files, logs, trash]
 
     print("Step 1/4: file system usage", file=sys.stderr)
     fill = filesystems()
@@ -842,7 +879,8 @@ def main():
     files = user_files.result()
     table1.update({"4.7_deb_files": files["deb_files"], "4.8_images_archives": files["images_archives"],
                    "4.9_downloads": files["downloads"], "4.10_stray_media": files["stray_media"],
-                   "4.12_pycache": pycache.result(), "4.13_docker": safe(docker_state, compose.paths)})
+                   "4.12_pycache": pycache.result(), "4.13_docker": safe(docker_state, compose.paths),
+                   "4.14_trash": trash.result([m["mount"] for m in fill["mounts"]], os.stat(home).st_uid)})
 
     data = {
         "meta": {"tool": "analyze.py", "delivery": "15b",
