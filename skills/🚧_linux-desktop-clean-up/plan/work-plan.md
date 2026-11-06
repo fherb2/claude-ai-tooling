@@ -6,6 +6,8 @@ Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die 
 
 Eigenes Skript für Abschnitt 4.5: Histogramm, Quellen, Spitzen, auffällige Log-Files; höchstens vier Worker mit niedriger Priorität; liest `journalctl`, nicht das Dateisystem.
 
+**Plan 17 (freigegeben, in Ausführung):** `journal_stats.py` im Skill-Ordner, läuft beim Bearbeiten von 4.5. Einheiten: `journal_files()` (Dateien, Gesamtgröße), `count_file()` (eine Journal-Datei, nur Zeit, Stufe, Quelle), Worker (höchstens 4, je eine Datei, Priorität vom Aufruf geerbt), `histogram()` (Zeiträume und Spalten nach 4.5, nur so weit das Journal reicht), `spikes()` (ab 10.000 am Tag und über dem Zehnfachen des Medians, sortiert nach Überschuss), `log_files()` (Abgrenzung nach 4.5, rotierte Dateien je Programm, auffällig nach den Schwellen aus 4.5), `max_level_store()` (nur Information). Ausgabe JSON nach `/tmp/cleanup-journal.json`, Meldungen englisch. Prüfung: Lauf am Entwicklungsrechner, Abgleich mit der Messung aus der Backup-Analyse (urbackup-Client, 4. November).
+
 ## 18 SKILL.md, Regelteil und README (deutsch)
 
 Den Skilltext schreiben, zunächst nur in deutscher Fassung: wie die Instanz den Ablauf aus `concept.md` führt (Beginn mit Abfrage der Parameter, Analyse, Füllstand und drei Tabellen, Bereiche in festgelegter Reihenfolge, Aufträge für `delete.py` mit Probelauf, Ergebnisbericht nach Grundsatz 5). Teilung in eine dünne `SKILL.md` und nachgeladene Regeldateien nach `skill-dev-doc.md`, Kapitel 5.2 (die Bedingungen sind erfüllt; entschieden wird beim Schreiben). Dazu die `README.md` nach `skill-dev-doc.md`, Kapitel 6.1.
