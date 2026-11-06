@@ -37,6 +37,20 @@ ROTATED = re.compile(r"(\.\d+(\.gz|\.xz|\.zst)?|-\d{8}(\.gz|\.xz|\.zst)?|\.gz|\.
 PROGRAMS = {"firefox": ("firefox", "firefox-bin"), "chrome": ("chrome",), "code": ("code",)}
 
 
+def mount_points():
+    """All mount points, bind mounts on the same file system included (/proc/self/mountinfo)."""
+    points = set()
+    try:
+        with open("/proc/self/mountinfo", encoding="utf-8") as fh:
+            for line in fh:
+                fields = line.split()
+                if len(fields) > 4:
+                    points.add(fields[4].encode().decode("unicode_escape"))
+    except OSError:
+        pass
+    return points
+
+
 class Report:
     def __init__(self, area, dry_run):
         self.data = {"area": area, "dry_run": dry_run, "removed_bytes": 0, "removed_count": 0,
@@ -64,6 +78,7 @@ class Guard:
 
     def __init__(self, home):
         self.home = home
+        self.mounts = mount_points()
         self.roots = [home] + WALKED_ROOTS
         self.devices = {}
         for root in self.roots:
@@ -72,8 +87,8 @@ class Guard:
             except OSError:
                 pass
 
-    def reason(self, path):
-        """Why path must not be deleted, or None."""
+    def reason(self, path, allow_link=False):
+        """Why path must not be deleted, or None. allow_link: the link itself may go (trash), never its target."""
         path = os.path.normpath(path)
         if not os.path.isabs(path):
             return "not an absolute path"
@@ -90,8 +105,10 @@ class Guard:
             return "does not exist"
         except OSError as exc:
             return f"not accessible: {exc.strerror}"
-        if os.path.islink(path):
+        if os.path.islink(path) and not allow_link:
             return "symbolic link"
+        if path in self.mounts or any(m.startswith(path + os.sep) for m in self.mounts):
+            return "is or contains a mount point"
         if os.path.dirname(path) == self.home and os.path.isdir(path):
             return "folder directly under home"
         if root in self.devices and st.st_dev != self.devices[root]:
@@ -105,19 +122,19 @@ class Deleter:
         self.dry_run = dry_run
         self.report = report
 
-    def remove(self, path, group=None):
+    def remove(self, path, group=None, allow_link=False):
         """Delete one file or folder after the ban check; True if removed (or would be, in a dry run)."""
-        reason = self.guard.reason(path)
+        reason = self.guard.reason(path, allow_link)
         if reason:
             self.report.skipped(path, reason)
             return False
-        if os.path.isdir(path) and crosses_device(path):
+        if os.path.isdir(path) and not os.path.islink(path) and crosses_device(path):
             self.report.skipped(path, "contains another file system")
             return False
         size = tree_size(path)
         if not self.dry_run:
             try:
-                if os.path.isdir(path):
+                if os.path.isdir(path) and not os.path.islink(path):
                     shutil.rmtree(path)
                 else:
                     os.unlink(path)
@@ -396,7 +413,7 @@ def rule_trash(d, home, params, now):
             if trashed >= limit:
                 continue
             item = os.path.join(files, name[:-len(".trashinfo")])
-            if os.path.lexists(item) and not d.remove(item, "trash entries"):
+            if os.path.lexists(item) and not d.remove(item, "trash entries", allow_link=True):
                 continue          # the .trashinfo stays with its entry
             d.remove(info_path, "trashinfo")
             deleted.add(name[:-len(".trashinfo")])

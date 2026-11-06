@@ -886,12 +886,27 @@ def safe(func, *args):
         return {"error": repr(exc)}
 
 
+def mount_points():
+    """All mount points, bind mounts on the same file system included (/proc/self/mountinfo)."""
+    points = set()
+    try:
+        with open("/proc/self/mountinfo", encoding="utf-8") as fh:
+            for line in fh:
+                fields = line.split()
+                if len(fields) > 4:
+                    points.add(fields[4].encode().decode("unicode_escape"))
+    except OSError:
+        pass
+    return points
+
+
 def walk(root, home, areas, sinks, artifacts, stats, progress):
     """Single pass over one start directory, staying on its device."""
     try:
         device = os.stat(root).st_dev
     except OSError:
         return
+    mounts = mount_points()
     stack = [(root, Ctx(root, (), root == home, False, areas.of_dir(root, ""), False, None, None))]
     while stack:
         current, ctx = stack.pop()
@@ -914,7 +929,8 @@ def walk(root, home, areas, sinks, artifacts, stats, progress):
                     continue
                 if entry.is_dir(follow_symlinks=False):
                     st = entry.stat(follow_symlinks=False)
-                    if st.st_dev != device:
+                    if st.st_dev != device or entry.path in mounts:
+                        # mounted data is analysed only at its real location, if that lies in a root
                         stats["other_filesystems"].append(entry.path)
                         continue
                     area = ctx.area or areas.of_dir(entry.path, entry.name)
