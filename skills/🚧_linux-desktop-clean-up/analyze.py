@@ -329,8 +329,8 @@ class BrowserCache:
             return
         if parts[1:3] == ["Cache", "Cache_Data"]:
             kind, rest = "cache_data", parts[3:]
-        elif parts[1:4] == ["Code Cache", "js"]:
-            kind, rest = "code_cache_js", parts[4:]
+        elif parts[1:3] == ["Code Cache", "js"]:
+            kind, rest = "code_cache_js", parts[3:]
         else:
             return
         slot = self.chrome_profiles[parts[0]][kind]
