@@ -111,6 +111,9 @@ class Deleter:
         if reason:
             self.report.skipped(path, reason)
             return False
+        if os.path.isdir(path) and crosses_device(path):
+            self.report.skipped(path, "contains another file system")
+            return False
         size = tree_size(path)
         if not self.dry_run:
             try:
@@ -137,6 +140,19 @@ class Deleter:
             return None
         self.report.command(" ".join(full), done.returncode, done.stdout + done.stderr)
         return done
+
+
+def crosses_device(path):
+    """True if a folder below path lies on another file system; rmtree would descend into it."""
+    device = os.lstat(path).st_dev
+    for folder, dirs, _ in os.walk(path):
+        for name in dirs:
+            try:
+                if os.lstat(os.path.join(folder, name)).st_dev != device:
+                    return True
+            except OSError:
+                pass
+    return False
 
 
 def tree_size(path):
