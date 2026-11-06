@@ -7,6 +7,7 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
 - Der Skill löscht nur unnütze Datenansammlungen und weist den Nutzer auf Datenmengen hin, um die er sich selbst kümmern muss.
 - Er entfernt keine installierte Software, auch nicht, wenn sie vermutlich nicht mehr gebraucht wird. Solche Funde werden nur gemeldet.
 - Geltungsbereich: Linux-Desktops und -Laptops (Ubuntu, Kubuntu und ähnliche), keine Server. Er geht nicht vom Istzustand eines einzelnen Rechners aus, sondern misst den Zustand jedes Mal neu.
+- Sprache: Der Skill entsteht in einer deutschen und einer englischen Fassung. Die Sprache steht zu Beginn fest: aus dem bisherigen Kontext des Chats, sonst aus der installierten Fassung. Antwortet der Nutzer in einer anderen Sprache, arbeitet der Skill in dieser weiter. Die Skripte geben ihre Bildschirmmeldungen in dieser Sprache aus; die Instanz übergibt sie als Parameter.
 
 ## 2 Grundsätze
 
@@ -37,6 +38,7 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
 5. Auf ausdrücklichen Wunsch des Nutzers führt der Skill Skripte selbst aus. Diese Variante bietet er nur an, wenn er auf demselben System läuft. Voraussetzung ist, dass der Nutzer die Session vorher mit `/cd /tmp` in diesen Ordner verlegt hat. Root-Zugriffe delegiert er trotzdem an den Nutzer. Eine Prüfung der Claude-Code-Version entfällt, `/cd` gibt es seit mehreren Monaten. `/cd` funktioniert in Claude Code in der Konsole, in der Erweiterung von VS Code nicht (beides vom Nutzer geprüft). Dort ist diese Variante also nicht möglich.
 6. Er teilt dem Nutzer mit: Der Vorgang dauert länger, kann umfangreiche Internetrecherchen umfassen und verbraucht zahlreiche Token. Für ein gutes Rechercheergebnis empfiehlt er das Modell Opus.
 7. Der Nutzer bestätigt diese Arbeitsweise, bevor es weitergeht.
+8. Er fragt alle Angaben ab, die die Analyse vom Nutzer braucht, bevor sie startet: die Größenschwelle für 4.8 und 4.10 (Vorgabe 150 MiB) und ob in 4.8 auch allgemeine Archivformate erfasst werden. Die Analyse läuft danach ohne weitere Rückfrage.
 
 ### 3.2 Snapshots
 
@@ -237,8 +239,8 @@ Reihenfolge wie in 4.7: nach dem Aufräumen des Download-Ordners.
 
 - Gemeint sind Image-Dateien, meist `*.img`, zum Beispiel zum Schreiben auf Datenträger, Sticks oder SD-Karten, sowie Archive, die zum Packen mehrerer Dateien dienen.
 - Endungen: Images `*.img`, `*.iso`; Archive `*.zip`, `*.tar`, `*.tar.gz`, `*.tgz`, `*.tar.xz`, `*.tar.bz2`, `*.7z`, `*.rar`.
-- Der Skill fragt den Nutzer vorher, ob auch allgemeine Archivformate erfasst werden sollen.
-- Der Nutzer gibt vorher die Größenschwelle an. Vorgabe ist 150 MiB.
+- Der Skill fragt den Nutzer vor der Analyse (3.1, Schritt 8), ob auch allgemeine Archivformate erfasst werden sollen.
+- Der Nutzer gibt vor der Analyse die Größenschwelle an. Vorgabe ist 150 MiB.
 - Gesucht wird nur im Home des Nutzers. Ausgenommen sind die Anwendungsordner `~/.config`, `~/.local` und `~/.cache` sowie der Papierkorb, weil dort Dateien liegen, die Anwendungen selbst benutzen (Beispiel: `~/.config/Claude/vm_bundles/…/rootfs.img`).
 - Der Skill sammelt die Treffer, sortiert nach Größe absteigend, nummeriert und zeigt sie an.
 - Der Nutzer nennt die Nummern, die der Skill vorher genauer untersuchen soll, ob es sich um wichtige Sachen handelt.
