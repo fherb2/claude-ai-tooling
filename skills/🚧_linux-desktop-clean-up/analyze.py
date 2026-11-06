@@ -5,12 +5,12 @@ data for the fill level and the tables of the skill; the instance reads the
 JSON result and builds the tables. Nothing is written except the result
 file, nothing is deleted. Progress goes to stderr.
 
-Delivery 15a: fill level and table 3. Tables 1 and 2 follow (15b, 15c).
+Deliveries: 15a fill level and table 3, 15b table 1; table 2 follows (15c).
 
 Usage (paths resolved by the instance beforehand):
     sudo nice -n 19 ionice -c3 python3 -I analyze.py --home /home/<user> \
-        --downloads <download dir> --threshold 150 [--archives] \
-        [--output /tmp/cleanup-analysis.json]
+        --downloads <download dir> --media-dir <dir> [--media-dir <dir> ...] \
+        --threshold 150 [--archives] [--output /tmp/cleanup-analysis.json]
 """
 
 import argparse
@@ -240,6 +240,379 @@ class DevArtifacts:
         return sorted(rows, key=lambda r: r["size"], reverse=True)
 
 
+# --- table 1: the areas of concept.md section 4 -------------------------------------------------
+
+CACHE_AGE = 3 * DAY
+STALE_PROFILE_AGE = 30 * DAY
+PIP_BIG = 50 * MiB
+DEB_DEPTH = 5
+ENTRY_NAME = re.compile(r"^[0-9a-f]{16}_")
+PARTIAL_DOWNLOAD = (".crdownload", ".part")
+COMPOSE_NAMES = {"compose.yaml", "compose.yml", "docker-compose.yaml", "docker-compose.yml"}
+
+
+def below(path, base):
+    """Path components of path below base, or None if path is not inside base."""
+    if not path.startswith(base + os.sep):
+        return None
+    return path[len(base) + 1:].split(os.sep)
+
+
+def age(st, now):
+    """Seconds since the later of modification and status change."""
+    return now - max(st.st_mtime, st.st_ctime)
+
+
+class Bucket:
+    """Count and size of a group of files."""
+
+    def __init__(self):
+        self.count = 0
+        self.size = 0
+
+    def add(self, size):
+        self.count += 1
+        self.size += size
+
+    def out(self):
+        return {"count": self.count, "size": self.size}
+
+
+class AptArchives:
+    """4.1: downloaded packages in the apt cache."""
+
+    def __init__(self):
+        self.packages = Bucket()
+
+    def file(self, ctx, path, name, st, area):
+        if area == "4.1" and name.endswith(".deb"):
+            self.packages.add(st.st_size)
+
+    def result(self):
+        return self.packages.out()
+
+
+class BrowserCache:
+    """4.2 and 4.3: old entries and index files per profile."""
+
+    def __init__(self, home, now):
+        self.now = now
+        self.ff_cache = os.path.join(home, ".cache/mozilla/firefox")
+        self.ff_profiles = os.path.join(home, ".mozilla/firefox")
+        self.chrome = os.path.join(home, ".cache/google-chrome")
+        self.firefox = defaultdict(lambda: {"old_entries": Bucket(), "all_entries": Bucket(), "index": False})
+        self.remnants = defaultdict(lambda: {"size": 0, "newest": 0})
+        self.chrome_profiles = defaultdict(lambda: defaultdict(lambda: {"old_entries": Bucket(),
+                                                                         "all_entries": Bucket(), "index": False}))
+
+    def file(self, ctx, path, name, st, area):
+        if area != "4.2" and area != "4.3":
+            return
+        parts = below(path, self.ff_cache)
+        if parts and len(parts) >= 3 and parts[1] == "cache2":
+            profile = self.firefox[parts[0]]
+            if parts[2] == "entries" and len(parts) == 4:
+                profile["all_entries"].add(st.st_size)
+                if age(st, self.now) > CACHE_AGE:
+                    profile["old_entries"].add(st.st_size)
+            elif parts[2] == "index" and len(parts) == 3:
+                profile["index"] = True
+            return
+        parts = below(path, self.ff_profiles)
+        if parts and len(parts) >= 3 and parts[1] in ("cache2", "startupCache"):
+            remnant = self.remnants[os.path.join(self.ff_profiles, parts[0], parts[1])]
+            remnant["size"] += st.st_size
+            remnant["newest"] = max(remnant["newest"], st.st_mtime)
+            return
+        parts = below(path, self.chrome)
+        if not parts or len(parts) < 3:
+            return
+        if parts[1:3] == ["Cache", "Cache_Data"]:
+            kind, rest = "cache_data", parts[3:]
+        elif parts[1:4] == ["Code Cache", "js"]:
+            kind, rest = "code_cache_js", parts[4:]
+        else:
+            return
+        slot = self.chrome_profiles[parts[0]][kind]
+        if len(rest) == 1 and ENTRY_NAME.match(rest[0]):
+            slot["all_entries"].add(st.st_size)
+            if age(st, self.now) > CACHE_AGE:
+                slot["old_entries"].add(st.st_size)
+        elif rest and (rest[0] == "index" or rest[0] == "index-dir"):
+            slot["index"] = True
+
+    @staticmethod
+    def _slot(slot):
+        return {"old_entries": slot["old_entries"].out(), "all_entries": slot["all_entries"].out(),
+                "index": slot["index"]}
+
+    def result(self):
+        remnants = [{"path": p, "size": r["size"], "newest": int(r["newest"]),
+                     "stale": self.now - r["newest"] > STALE_PROFILE_AGE} for p, r in sorted(self.remnants.items())]
+        return {
+            "firefox": {"profiles": {p: self._slot(s) for p, s in sorted(self.firefox.items())},
+                        "profile_remnants": remnants},
+            "chrome": {"profiles": {p: {k: self._slot(s) for k, s in kinds.items()}
+                                    for p, kinds in sorted(self.chrome_profiles.items())}},
+        }
+
+
+class VSCodeCache:
+    """4.4: Cache_Data entries, old CachedData folders, broken VSIX downloads, CacheStorage size."""
+
+    def __init__(self, home, now):
+        self.now = now
+        self.base = os.path.join(home, ".config/Code")
+        self.cache_data = {"old_entries": Bucket(), "all_entries": Bucket(), "index": False}
+        self.cached_data = defaultdict(lambda: {"size": 0, "newest": 0})
+        self.vsix_broken = []
+        self.cache_storage = Bucket()
+
+    def file(self, ctx, path, name, st, area):
+        if area != "4.4":
+            return
+        parts = below(path, self.base)
+        if not parts:
+            return
+        if parts[:2] == ["Cache", "Cache_Data"] and len(parts) >= 3:
+            if len(parts) == 3 and ENTRY_NAME.match(parts[2]):
+                self.cache_data["all_entries"].add(st.st_size)
+                if age(st, self.now) > CACHE_AGE:
+                    self.cache_data["old_entries"].add(st.st_size)
+            elif parts[2] in ("index", "index-dir"):
+                self.cache_data["index"] = True
+        elif parts[0] == "CachedData" and len(parts) >= 3:
+            folder = self.cached_data[parts[1]]
+            folder["size"] += st.st_size
+            folder["newest"] = max(folder["newest"], st.st_mtime)
+        elif parts[0] == "CachedExtensionVSIXs" and len(parts) == 2 and name.startswith("."):
+            if age(st, self.now) > CACHE_AGE and not is_zip(path):
+                self.vsix_broken.append({"path": path, "size": st.st_size, "mtime": int(st.st_mtime)})
+        elif parts[0] == "WebStorage" and "CacheStorage" in parts:
+            self.cache_storage.add(st.st_size)
+
+    def result(self):
+        commit = installed_vscode_commit()
+        old = [{"folder": os.path.join(self.base, "CachedData", n), "size": f["size"], "newest": int(f["newest"])}
+               for n, f in sorted(self.cached_data.items())
+               if n != commit and self.now - f["newest"] > CACHE_AGE]
+        return {"installed_commit": commit,
+                "cache_data": {"old_entries": self.cache_data["old_entries"].out(),
+                               "all_entries": self.cache_data["all_entries"].out(),
+                               "index": self.cache_data["index"]},
+                "cached_data_old": old, "vsix_broken": self.vsix_broken,
+                "cache_storage": self.cache_storage.out()}
+
+
+def is_zip(path):
+    try:
+        with open(path, "rb") as fh:
+            return fh.read(4) == b"PK\x03\x04"
+    except OSError:
+        return False
+
+
+def installed_vscode_commit():
+    try:
+        with open("/usr/share/code/resources/app/product.json", encoding="utf-8") as fh:
+            return json.load(fh).get("commit")
+    except (OSError, ValueError):
+        return None
+
+
+class PipCache:
+    """4.6: size of the pip cache and its entries from 50 MiB on (no names)."""
+
+    def __init__(self):
+        self.total = Bucket()
+        self.big = []
+
+    def file(self, ctx, path, name, st, area):
+        if area == "4.6":
+            self.total.add(st.st_size)
+            if st.st_size >= PIP_BIG:
+                self.big.append({"size": st.st_size, "mtime": int(st.st_mtime)})
+
+    def result(self):
+        return {"total": self.total.out(), "big_entries": sorted(self.big, key=lambda r: -r["size"])}
+
+
+class UserFiles:
+    """4.7 to 4.10: .deb files, images and archives, the download folder, stray media."""
+
+    def __init__(self, home, downloads, media_dirs, threshold, archives, now):
+        self.home, self.downloads, self.now = home, downloads, now
+        self.media_dirs = media_dirs
+        self.threshold, self.archives = threshold, archives
+        self.excluded = [os.path.join(home, d) for d in (".config", ".local", ".cache")]
+        self.trash = os.path.join(home, ".local/share/Trash")
+        self.debs, self.images, self.media = [], [], []
+        self.download_entries = defaultdict(lambda: {"size": 0, "youngest_age": None, "is_dir": False})
+
+    def _inside(self, path, bases):
+        return any(path == b or path.startswith(b + os.sep) for b in bases)
+
+    def file(self, ctx, path, name, st, area):
+        if not ctx.is_home:
+            return
+        group = file_group(name)
+        in_downloads = area == "4.9"
+        if in_downloads:
+            parts = below(path, self.downloads)
+            entry = self.download_entries[os.path.join(self.downloads, parts[0])]
+            entry["size"] += st.st_size
+            entry["is_dir"] = len(parts) > 1
+            file_age = age(st, self.now)
+            if entry["youngest_age"] is None or file_age < entry["youngest_age"]:
+                entry["youngest_age"] = file_age
+        if group == "deb" and (in_downloads or (len(ctx.parts) < DEB_DEPTH and not area
+                                                and not self._inside(path, [self.trash, os.path.join(self.home, ".cache")]))):
+            self.debs.append({"path": path, "size": st.st_size})
+            return
+        if in_downloads or area or st.st_size < self.threshold or self._inside(path, self.excluded):
+            return
+        if group == "disk image" or (group == "archive" and self.archives):
+            self.images.append({"path": path, "size": st.st_size, "mtime": int(st.st_mtime), "group": group})
+        elif group in MEDIA_GROUPS and not ctx.dot_top and not self._inside(path, self.media_dirs):
+            self.media.append({"path": path, "size": st.st_size, "mtime": int(st.st_mtime), "group": group,
+                               "in_git": ctx.in_git, "project": ctx.project})
+
+    def result(self):
+        for deb in self.debs:
+            deb.update(deb_status(deb["path"]))
+        folders = {}
+        for row in self.media:
+            folder = os.path.dirname(row["path"])
+            if folder not in folders:
+                folders[folder] = neighbour_groups(folder)
+        downloads = []
+        for path, e in sorted(self.download_entries.items(), key=lambda i: -i[1]["size"]):
+            days = int(e["youngest_age"] // DAY) if e["youngest_age"] is not None else None
+            downloads.append({"path": path, "is_dir": e["is_dir"], "size": e["size"], "age_days": days,
+                              "partial": not e["is_dir"] and path.endswith(PARTIAL_DOWNLOAD)})
+        return {"deb_files": self.debs,
+                "images_archives": sorted(self.images, key=lambda r: -r["size"]),
+                "downloads": downloads,
+                "stray_media": {"files": sorted(self.media, key=lambda r: -r["size"]), "folders": folders}}
+
+
+def deb_status(path):
+    """Package and version of a .deb file compared with the installed version."""
+    fields = run(["dpkg-deb", "-f", path, "Package", "Version"])
+    if not fields:
+        return {"package": None, "status": "unreadable"}
+    info = dict(line.split(": ", 1) for line in fields.splitlines() if ": " in line)
+    package, version = info.get("Package"), info.get("Version")
+    if not package or not version:
+        return {"package": package, "status": "unreadable"}
+    installed = run(["dpkg-query", "-W", "-f=${Status}|${Version}", package])
+    if not installed or not installed.startswith("install ok installed"):
+        return {"package": package, "version": version, "installed": None, "status": "not_installed"}
+    inst_version = installed.split("|", 1)[1]
+    newer = subprocess.run(["dpkg", "--compare-versions", inst_version, "ge", version]).returncode == 0
+    return {"package": package, "version": version, "installed": inst_version,
+            "status": "same_or_newer_installed" if newer else "older_installed"}
+
+
+def neighbour_groups(folder):
+    """File groups of the files in a folder, for the instance's judgement of the folder."""
+    counts = defaultdict(int)
+    try:
+        with os.scandir(folder) as it:
+            for entry in it:
+                if entry.is_file(follow_symlinks=False):
+                    counts[file_group(entry.name)] += 1
+    except OSError:
+        pass
+    return dict(counts)
+
+
+class PyCache:
+    """4.12: __pycache__ folders in the home."""
+
+    def __init__(self):
+        self.dirs = set()
+        self.total = Bucket()
+
+    def file(self, ctx, path, name, st, area):
+        if area == "4.12" and ctx.is_home:
+            parts = ctx.parts
+            self.dirs.add(parts[:parts.index("__pycache__") + 1] if "__pycache__" in parts else parts)
+            self.total.add(st.st_size)
+
+    def result(self):
+        return {"folders": len(self.dirs), "files": self.total.count, "size": self.total.size}
+
+
+class ComposeFiles:
+    """Compose files in the home, for 4.13."""
+
+    def __init__(self):
+        self.paths = []
+
+    def file(self, ctx, path, name, st, area):
+        if ctx.is_home and name in COMPOSE_NAMES and not ctx.artifact:
+            self.paths.append(path)
+
+
+def json_lines(cmd):
+    out = run(cmd)
+    if out is None:
+        return None
+    rows = []
+    for line in out.splitlines():
+        try:
+            rows.append(json.loads(line))
+        except ValueError:
+            pass
+    return rows
+
+
+def docker_state(compose_paths):
+    """4.13: state of Docker read through its own commands; nothing is changed."""
+    state = {"podman_present": bool(run(["sh", "-c", "command -v podman"]))}
+    containers = json_lines(["docker", "ps", "-a", "--format", "json"])
+    if containers is None:
+        state["available"] = False
+        return state
+    state["available"] = True
+    state["stopped_containers"] = [{"name": c.get("Names"), "image": c.get("Image"), "status": c.get("Status"),
+                                    "size": c.get("Size"), "created": c.get("CreatedAt")}
+                                   for c in containers if c.get("State") != "running"]
+    state["running_images"] = sorted({c.get("Image") for c in containers if c.get("State") == "running"})
+    state["used_images"] = sorted({c.get("Image") for c in containers})
+    state["images"] = [{"name": f"{i.get('Repository')}:{i.get('Tag')}", "id": i.get("ID"),
+                        "created": i.get("CreatedSince"), "size": i.get("Size")}
+                       for i in json_lines(["docker", "images", "--format", "json"]) or []]
+    volumes = [v.get("Name", "") for v in json_lines(["docker", "volume", "ls", "--format", "json"]) or []]
+    state["named_volumes"] = [v for v in volumes if not re.fullmatch(r"[0-9a-f]{64}", v)]
+    state["anonymous_volumes"] = [v for v in volumes if re.fullmatch(r"[0-9a-f]{64}", v)]
+    state["disk_usage"] = json_lines(["docker", "system", "df", "--format", "json"])
+    listed = {}
+    for project in json_lines(["docker", "compose", "ls", "-a", "--format", "json"]) or []:
+        for cfg in str(project.get("ConfigFiles", "")).split(","):
+            listed[cfg.strip()] = project.get("Status")
+    compose = []
+    for path in sorted(compose_paths):
+        try:
+            mtime = int(os.stat(path).st_mtime)
+        except OSError:
+            mtime = None
+        config = run(["docker", "compose", "-f", path, "config", "--format", "json"])
+        images = run(["docker", "compose", "-f", path, "config", "--images"])
+        name = None
+        if config:
+            try:
+                name = json.loads(config).get("name")
+            except ValueError:
+                pass
+        compose.append({"path": path, "mtime": mtime, "project": name,
+                        "images": [i if ":" in i else i + ":latest" for i in images.split()] if images else None,
+                        "state": listed.get(path, "down")})
+    state["compose"] = compose
+    return state
+
+
 def walk(root, home, areas, sinks, artifacts, stats, progress):
     """Single pass over one start directory, staying on its device."""
     try:
@@ -386,11 +759,14 @@ def main():
     parser.add_argument("--downloads", required=True)
     parser.add_argument("--threshold", type=int, default=150, help="size threshold in MiB")
     parser.add_argument("--archives", action="store_true", help="section 4.8 covers general archives")
+    parser.add_argument("--media-dir", action="append", default=[],
+                        help="user folder for videos, music, pictures or documents (repeatable)")
     parser.add_argument("--output", default="/tmp/cleanup-analysis.json")
     args = parser.parse_args()
     home = os.path.realpath(args.home)
     downloads = os.path.realpath(args.downloads)
-    for path in (home, downloads):
+    media_dirs = [os.path.realpath(d) for d in args.media_dir]
+    for path in [home, downloads] + media_dirs:
         if not os.path.isdir(path):
             print(f"Not a directory: {path}", file=sys.stderr)
             return 2
@@ -410,26 +786,37 @@ def main():
     dir_sizes, large = DirSizes(started), LargeFiles(args.threshold * MiB, args.archives)
     dup_candidates, git_left, crashes = DuplicateCandidates(), GitLeftovers(), CrashDumps()
     artifacts = DevArtifacts()
-    sinks = [dir_sizes, large, dup_candidates, git_left, crashes, artifacts]
+    apt, browsers, vscode = AptArchives(), BrowserCache(home, started), VSCodeCache(home, started)
+    pip, pycache, compose = PipCache(), PyCache(), ComposeFiles()
+    user_files = UserFiles(home, downloads, media_dirs, args.threshold * MiB, args.archives, started)
+    sinks = [dir_sizes, large, dup_candidates, git_left, crashes, artifacts,
+             apt, browsers, vscode, pip, pycache, compose, user_files]
 
-    print("Step 1/3: file system usage", file=sys.stderr)
+    print("Step 1/4: file system usage", file=sys.stderr)
     fill = filesystems()
     for root in [home] + [r for r in SYSTEM_ROOTS if os.path.isdir(r)]:
-        print(f"\nStep 2/3: walking {root}", file=sys.stderr)
+        print(f"\nStep 2/4: walking {root}", file=sys.stderr)
         walk(root, home, areas, sinks, artifacts, stats, progress)
-    print("\nStep 3/3: comparing files of equal size", file=sys.stderr)
+    print("\nStep 3/4: comparing files of equal size", file=sys.stderr)
     duplicates = find_duplicates(dup_candidates, stats, progress)
-    print(file=sys.stderr)
+    print("\nStep 4/4: package versions, media folders, Docker", file=sys.stderr)
+    table1 = {"4.1_apt": apt.result(), **{f"4.{n}_{k}": v for n, (k, v) in
+                                         zip((2, 3), browsers.result().items())},
+              "4.4_vscode": vscode.result(), "4.6_pip": pip.result()}
+    files = user_files.result()
+    table1.update({"4.7_deb_files": files["deb_files"], "4.8_images_archives": files["images_archives"],
+                   "4.9_downloads": files["downloads"], "4.10_stray_media": files["stray_media"],
+                   "4.12_pycache": pycache.result(), "4.13_docker": docker_state(compose.paths)})
 
     data = {
-        "meta": {"tool": "analyze.py", "delivery": "15a",
+        "meta": {"tool": "analyze.py", "delivery": "15b",
                  "started": datetime.fromtimestamp(started, timezone.utc).isoformat(timespec="seconds"),
                  "duration_s": round(time.time() - started, 1), "files": stats["files"],
                  "read_errors": stats["read_errors"], "other_filesystems": sorted(stats["other_filesystems"]),
                  "params": {"home": home, "downloads": downloads, "threshold_mib": args.threshold,
-                            "archives": args.archives}},
+                            "archives": args.archives, "media_dirs": media_dirs}},
         "fill_level": fill,
-        "table1": {},
+        "table1": table1,
         "software": {},
         "table3": {
             "dir_sizes": dir_sizes.result(home),
