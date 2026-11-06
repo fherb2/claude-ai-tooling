@@ -39,11 +39,12 @@ Der Skill startet selbst keine Befehle auf dem Rechner. Er gibt dem Nutzer Befeh
 Ablauf:
 
 1. Zweck und Arbeitsweise erklären, Bestätigung einholen, die Größenschwelle für große Dateien abfragen (Vorgabe 150 MiB) und ob auch Archive erfasst werden sollen.
-2. Umgebung ermitteln: Desktop und die Benutzerordner nach XDG — Ordnernamen wie „Downloads“ oder „Bilder“ setzt der Skill nie selbst ein, sie heißen je nach Sprache anders.
+2. Umgebung ermitteln: Desktop, die Benutzerordner nach XDG und abweichende Download-Ziele von Firefox und Chrome — Ordnernamen wie „Downloads“ oder „Bilder“ setzt der Skill nie selbst ein, sie heißen je nach Sprache anders.
 3. Analyse: ein einziger Durchlauf durch Home, `/var`, `/opt`, `/usr/local` und `/srv`, nur lesend.
 4. Füllstand und drei Tabellen: **Tabelle 1** — durch Tests gesicherte Bereiche; **Tabelle 2** — Cache-Ordner weiterer Programme, die der Skill zur Laufzeit recherchiert, mit Belegstufe; **Tabelle 3** — Statistik zum gemeinsamen Erforschen (Größe je Verzeichnis, große Dateien, Reste deinstallierter Programme, Duplikate, Entwicklungsartefakte).
-5. Bereich für Bereich: Einzelheiten zeigen, Entscheidung einholen, Probelauf, nach Bestätigung echter Lauf.
+5. Bereich für Bereich durch Tabelle 1: Einzelheiten zeigen, Entscheidung einholen, Probelauf, nach Bestätigung echter Lauf. Danach Tabelle 3 auf Wunsch gemeinsam erforschen.
 6. Ergebnisbericht: was gelöscht wurde und wie viel, was übersprungen und was nur gemeldet wurde.
+7. Zum Schluss Tabelle 2: Für diese Stellen hat der Skill keine getesteten Erfahrungen. Er bietet an, sie im Nachgang gemeinsam weiter zu klären — mit Recherche in der Dokumentation und mit dem ausdrücklichen Hinweis vor jedem Löschen, was belegt und was Vermutung ist.
 
 ### Die Skripte
 
@@ -78,8 +79,6 @@ Das Alter einer Datei bestimmen die Skripte aus der späteren von Änderungs- un
 - Der vollständige Lauf mit echten Löschungen als Abschluss.
 - Die englische Fassung und die Installationspakete; erst danach entfällt das Baustellenschild.
 - Eine Nachprobe zum Docker-Build-Cache.
-- Löschen in Tabelle 2 (recherchierte Cache-Ordner weiterer Programme): Das Löschskript nimmt dafür noch keinen Auftrag an.
-- Download-Ziele, die ein Browser abweichend vom Standard eingestellt hat: Die Analyse erfasst bisher nur den Download-Ordner nach XDG.
 - Die Web-Fassung ist noch nicht erprobt.
 
 **Bewusst offen gelassen:** Für einige Bereiche ist noch keine Behandlung festgelegt — Suchindex Baloo, Git-Repositories, Vorschaubilder, Zwischenspeicher von Claude Desktop, Flatpak, Snap, AppImage und Wine, Python-Umgebungen, Toolchains, Syncthing-Versionen, Duplikate und Migrationsreste. Der Skill zeigt sie in Tabelle 3 und erforscht sie auf Wunsch gemeinsam mit dem Nutzer, löscht dort aber nichts nach eigenen Regeln.

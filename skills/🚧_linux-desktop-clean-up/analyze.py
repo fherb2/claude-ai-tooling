@@ -9,7 +9,7 @@ Deliveries: 15a fill level and table 3, 15b table 1, 15c software inventory (tab
 
 Usage (paths resolved by the instance beforehand):
     sudo nice -n 19 ionice -c3 python3 -I analyze.py --home /home/<user> \
-        --downloads <download dir> --media-dir <dir> [--media-dir <dir> ...] \
+        --downloads <download dir> [--downloads <dir> ...] --media-dir <dir> [--media-dir <dir> ...] \
         --desktop "$XDG_CURRENT_DESKTOP" --threshold 150 [--archives] \
         [--output /tmp/cleanup-analysis.json]
 """
@@ -76,13 +76,14 @@ class Areas:
             os.path.join(home, ".config/Code/CachedData"): "4.4",
             os.path.join(home, ".config/Code/CachedExtensionVSIXs"): "4.4",
             os.path.join(home, ".cache/pip"): "4.6",
-            downloads: "4.9",
             "/var/cache/apt/archives": "4.1",
             "/var/log": "4.5",
             "/var/lib/docker": "4.13",
             "/var/lib/containerd": "4.13",
             os.path.join(home, ".local/share/Trash"): "4.14",
         }
+        for folder in downloads:          # XDG download folder and download targets set in browsers
+            self.paths[folder] = "4.9"
 
     def in_container(self, path):
         return any(path.startswith(c + os.sep) for c in self.containers)
@@ -520,8 +521,9 @@ class UserFiles:
         group = file_group(name)
         in_downloads = area == "4.9"
         if in_downloads:
-            parts = below(path, self.downloads)
-            entry = self.download_entries[os.path.join(self.downloads, parts[0])]
+            base = next(d for d in self.downloads if path.startswith(d + os.sep))
+            parts = below(path, base)
+            entry = self.download_entries[os.path.join(base, parts[0])]
             entry["size"] += st.st_size
             entry["is_dir"] = len(parts) > 1
             file_age = age(st, self.now)
@@ -1045,7 +1047,8 @@ def write_result(path, data):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--home", required=True)
-    parser.add_argument("--downloads", required=True)
+    parser.add_argument("--downloads", action="append", required=True,
+                        help="download folder (repeatable: XDG folder and browser download targets)")
     parser.add_argument("--threshold", type=int, default=150, help="size threshold in MiB")
     parser.add_argument("--archives", action="store_true", help="section 4.8 covers general archives")
     parser.add_argument("--desktop", default="", help="value of XDG_CURRENT_DESKTOP (lost under sudo)")
@@ -1054,9 +1057,9 @@ def main():
     parser.add_argument("--output", default="/tmp/cleanup-analysis.json")
     args = parser.parse_args()
     home = os.path.realpath(args.home)
-    downloads = os.path.realpath(args.downloads)
+    downloads = sorted({os.path.realpath(d) for d in args.downloads}, key=len, reverse=True)
     media_dirs = [os.path.realpath(d) for d in args.media_dir]
-    for path in [home, downloads] + media_dirs:
+    for path in [home] + downloads + media_dirs:
         if not os.path.isdir(path):
             print(f"Not a directory: {path}", file=sys.stderr)
             return 2

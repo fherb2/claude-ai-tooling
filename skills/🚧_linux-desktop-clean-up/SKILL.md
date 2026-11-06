@@ -45,17 +45,17 @@ Wurde der Skill nicht ausdrücklich mit `/linux-desktop-clean-up` aufgerufen —
 Gib dem Nutzer diesen Block; er schreibt nach `/tmp/cleanup-env.txt`:
 
 ```bash
-{ echo "DESKTOP=$XDG_CURRENT_DESKTOP"; echo "HOME=$HOME"; for d in DOWNLOAD VIDEOS MUSIC PICTURES DOCUMENTS; do echo "$d=$(xdg-user-dir $d)"; done; } | tee /tmp/cleanup-env.txt
+{ echo "DESKTOP=$XDG_CURRENT_DESKTOP"; echo "HOME=$HOME"; for d in DOWNLOAD VIDEOS MUSIC PICTURES DOCUMENTS; do echo "$d=$(xdg-user-dir $d)"; done; grep -h '"browser.download.dir"' ~/.mozilla/firefox/*/prefs.js 2>/dev/null | sed 's/^/FIREFOX /'; for p in ~/.config/google-chrome/*/Preferences; do [ -f "$p" ] && python3 -c 'import json,sys; print("CHROME", json.load(open(sys.argv[1])).get("download", {}).get("default_directory", ""))' "$p"; done; } | tee /tmp/cleanup-env.txt
 ```
 
-`xdg-user-dir` liefert für einen nicht eingerichteten Ordner das Home selbst. Ein solcher Eintrag gilt als nicht vorhanden: Den Download-Ordner ohne Eintrag meldest du, Medienordner ohne Eintrag lässt du aus dem Aufruf weg — mit dem Home als Medienordner fiele das ganze Home aus 4.10 heraus.
+Download-Ziele, die in Firefox oder Chrome vom Standard abweichen (Zeilen `FIREFOX`, `CHROME`), sind weitere Download-Ordner; jeder geht als eigenes `--downloads` in die Analyse. Erfasst wird nur, was im Home liegt. `xdg-user-dir` liefert für einen nicht eingerichteten Ordner das Home selbst. Ein solcher Eintrag gilt als nicht vorhanden: Den Download-Ordner ohne Eintrag meldest du, Medienordner ohne Eintrag lässt du aus dem Aufruf weg — mit dem Home als Medienordner fiele das ganze Home aus 4.10 heraus.
 
 Gibt es btrfs (das zeigt die Analyse), schlage vor, vor jedem Aufräumschritt einen Snapshot anzulegen und ihn erst zu entfernen, wenn nachweislich alles funktioniert.
 
 ## Analyse
 
 ```bash
-sudo nice -n 19 ionice -c3 python3 -I "${CLAUDE_SKILL_DIR}/analyze.py" --home "$HOME" --downloads "<Download-Ordner>" --media-dir "<Videos>" --media-dir "<Musik>" --media-dir "<Bilder>" --media-dir "<Dokumente>" --desktop "$XDG_CURRENT_DESKTOP" --threshold <MiB> [--archives]
+sudo nice -n 19 ionice -c3 python3 -I "${CLAUDE_SKILL_DIR}/analyze.py" --home "$HOME" --downloads "<Download-Ordner>" [--downloads "<Browser-Ziel>" …] --media-dir "<Videos>" --media-dir "<Musik>" --media-dir "<Bilder>" --media-dir "<Dokumente>" --desktop "$XDG_CURRENT_DESKTOP" --threshold <MiB> [--archives]
 ```
 
 Das Skript zeigt seinen Fortschritt und schreibt `/tmp/cleanup-analysis.json`: `fill_level`, `table1` (Bereiche 4.1 bis 4.14 außer 4.11), `software` (Starter-Einträge, Flatpak, Snap, Anwendungsordner mit Vorfilter), `table3`. Es liest nur. Sag dem Nutzer vorher, dass du dabei auch prüfst, welche Software Cache- und Download-Ordner mitbringt, und dich im Internet über die Programme informierst.
@@ -79,7 +79,7 @@ Dann drei Tabellen, **je Bereich eine Zeile**. Einzellisten, Histogramme und Aus
 
 ## Reihenfolge der Bearbeitung
 
-Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; weise zu Beginn lose darauf hin, dass eine Sicherung oder ein Snapshot sinnvoll sein kann. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach Tabelle 2, danach Tabelle 3.
+Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; weise zu Beginn lose darauf hin, dass eine Sicherung oder ein Snapshot sinnvoll sein kann. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach Tabelle 3, zuletzt Tabelle 2 — mit ihr endet der Skill.
 
 Je Bereich: die Einzelheiten zeigen, die Entscheidung des Nutzers einholen, wo eine nötig ist, den Auftrag schreiben, **Probelauf**, Ergebnis zeigen, nach Bestätigung **echter Lauf**:
 
@@ -133,6 +133,12 @@ Im Bericht keine Größe.
 
 **4.14 Papierkorb** — zuletzt. Frage nach x Tagen (Vorgabe 14, 0 = alles). Auftrag `rule` mit `{"days": x}`, für Papierkörbe auf anderen Dateisystemen zusätzlich `"other_trashes": [...]` aus der Analyse. Maßgeblich ist das Datum des Verschiebens in den Papierkorb; Einträge ohne gültige `.trashinfo` werden nur gemeldet. Hinweis: endgültig weg, ein Backup hilft nur, wenn der Papierkorb gesichert wird.
 
+## Tabelle 3
+
+Biete an, die Befunde gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche. Sag dazu: Dafür gibt es keine vorgefertigten Lösungen; sie werden erst erarbeitet, sollten gut belegt sein und sind ungetestet — eine vollständige Sicherung oder ein Snapshot ist dringend zu empfehlen. Vorher räumst du dort nichts auf.
+
+Bittet der Nutzer zusätzlich um eine Suche nach weiteren Dateien, gilt keine der Regeln dieses Skills; die Randbedingungen handelst du mit ihm aus. Für solche Suchen gilt auch der stille Ausschluss nicht.
+
 ## Tabelle 2: Anwendersoftware (4.11)
 
 Grundlage sind die erfassten Programme in `software.desktop.included` (die Regeln dafür setzt das Skript um) und die Ordner unter `~/.cache`, die du einem Eigentümer ohne Starter-Eintrag zuordnen kannst (Erweiterung, Kommandozeilenwerkzeug, Bibliothek). Firefox, Chrome und VS Code auf den klassischen Pfaden recherchierst du nicht.
@@ -141,13 +147,7 @@ Je Programm suchst du in der Dokumentation genau zwei Dinge:
 1. **Cache- und Download-Ordner.** Als Cache gilt ein Ordner nur, wenn die Dokumentation belegt, dass das Programm die Daten darin jederzeit vollautomatisch wiederherstellt und ihr Fehlen bis auf Zeitverlust nichts ändert — wie die Dokumentation ihn nennt, zählt nicht; Nachsehen im Dateisystem allein genügt nicht. Geht nicht hervor, dass das Programm den Verlust im laufenden Betrieb verträgt, löschst du erst, wenn es beendet ist, und forderst den Nutzer dazu auf.
 2. **Ordner mit Eingangsdaten** datenverarbeitender Programme. Treffer darin schließt du still aus den Suchläufen 4.8, 4.10 und den großen Einzeldateien und Duplikaten in Tabelle 3 aus — ohne Meldung. Nicht still ausgeschlossen wird bei 4.7, 4.9 und bei der Größe je Verzeichnis.
 
-**Belegstufe** je Zeile: **hoch** — die offizielle Dokumentation sagt es ausdrücklich; **mittel** — nur Entwicklerforum, Issue-Tracker oder Distributions-Wiki. Nur Drittquellen oder Rückschluss gilt als **kein klarer Befund**: Dann nennst du die Daten des Programms nirgends und schließt sie von jedem Löschvorschlag aus (die Größe je Verzeichnis zählt sie trotzdem mit). Ordner unter `~/.cache` ohne zuordenbaren Eigentümer kommen nach Tabelle 3. Gelöscht wird in Tabelle 2 nach Zustimmung über einen Auftrag `list` — die Ausnahme von der Beschränkung auf 4.7 bis 4.10 gibt es im Skript noch nicht; melde das dem Nutzer und lass ihn diese Ordner bis dahin selbst leeren.
-
-## Tabelle 3
-
-Biete an, die Befunde gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche. Sag dazu: Dafür gibt es keine vorgefertigten Lösungen; sie werden erst erarbeitet, sollten gut belegt sein und sind ungetestet — eine vollständige Sicherung oder ein Snapshot ist dringend zu empfehlen. Vorher räumst du dort nichts auf.
-
-Bittet der Nutzer zusätzlich um eine Suche nach weiteren Dateien, gilt keine der Regeln dieses Skills; die Randbedingungen handelst du mit ihm aus. Für solche Suchen gilt auch der stille Ausschluss nicht.
+**Belegstufe** je Zeile: **hoch** — die offizielle Dokumentation sagt es ausdrücklich; **mittel** — nur Entwicklerforum, Issue-Tracker oder Distributions-Wiki. Nur Drittquellen oder Rückschluss gilt als **kein klarer Befund**: Dann nennst du die Daten des Programms nirgends und schließt sie von jedem Löschvorschlag aus (die Größe je Verzeichnis zählt sie trotzdem mit). Ordner unter `~/.cache` ohne zuordenbaren Eigentümer kommen nach Tabelle 3. **Tabelle 2 bearbeitest du als letzte**, wenn alle anderen Aufräumschritte durch sind, und mit ihr endet der Skill: Wiederhole die Stellen aus Tabelle 2 und sag dem Nutzer, dass du für diese Posten keine getesteten und belegten Erfahrungen besitzt. Biete an, alle oder einen Teil davon jetzt, als Nachgang zum Skill, gemeinsam weiter zu klären — Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Geh dabei vorsichtig vor und erinnere den Nutzer vor jedem Löschen, was tatsächlich belegt und was Vermutung ist, damit er abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird im Nachgang wie bei einer zusätzlich angeforderten Suche.
 
 ## Ergebnisbericht
 
