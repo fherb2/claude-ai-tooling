@@ -184,7 +184,7 @@ Dieser Schritt umfasst die Log-Files und das System-Journal. Im Skill heißt er 
 **Auswertung beim Bearbeiten des Bereichs**
 
 1. Das Skript gibt während der Analyse laufend aus, welchen Schritt es gerade ausführt.
-2. Es erzeugt Multiprocessing-Worker, jeden für eine Datei (Journal-Dateien und Log-Files). Es sind höchstens 4 Worker, bei weniger Kernen entsprechend weniger, und sie laufen mit niedriger Priorität (`nice`, `ionice`).
+2. Es erzeugt Multiprocessing-Worker, jeden für eine Datei (Journal-Dateien und Log-Files). Die Zahl der Worker ist die Hälfte der physischen Kerne, aufgerundet (ermittelt vor dem Start; logische Prozessoren nur, wenn die Kerntopologie nicht lesbar ist), höchstens so viele wie Dateien. Sie laufen mit niedriger Priorität (`nice`, `ionice`).
 3. Journal-Histogramm als Tabelle:
    - Es nennt zuerst die aktuelle Gesamtgröße des Journals. Auf die Zahl der Dateien kommt es nicht an.
    - Zeilen sind Zeiträume (Bins), Spalten sind die Loglevel 0 bis 7. Einträge ohne Stufe oder außerhalb von 0 bis 7 stehen in einer eigenen Spalte. Jeder Eintrag zählt in genau einem Bin.

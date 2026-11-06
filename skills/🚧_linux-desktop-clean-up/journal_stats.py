@@ -41,6 +41,19 @@ COMM = re.compile(r'"_COMM":"((?:[^"\\]|\\.)*)"')
 ROTATED = re.compile(r"(\.\d+(\.gz|\.xz|\.zst)?|-\d{8}(\.gz|\.xz|\.zst)?|\.gz|\.xz|\.zst|\.old)$")
 
 
+def physical_cores():
+    """Number of physical cores available to this process; logical CPUs if the topology is unreadable."""
+    cpus = os.sched_getaffinity(0)
+    cores = set()
+    for cpu in cpus:
+        try:
+            with open(f"/sys/devices/system/cpu/cpu{cpu}/topology/core_cpus_list", encoding="ascii") as fh:
+                cores.add(fh.read().strip())
+        except OSError:
+            return len(cpus)
+    return len(cores) or len(cpus)
+
+
 def journal_files():
     files = []
     for folder in JOURNAL_DIRS:
@@ -213,8 +226,9 @@ def main():
         print("Warning: not running as root; the journal may be incomplete.", file=sys.stderr)
 
     files = journal_files()
-    workers = max(1, min(4, os.cpu_count() or 1))
-    print(f"Step 1/2: reading {len(files)} journal files with {workers} workers", file=sys.stderr)
+    cores = physical_cores()
+    workers = max(1, min(-(-cores // 2), len(files)))      # half the physical cores, rounded up
+    print(f"Step 1/2: reading {len(files)} journal files with {workers} workers ({cores} cores)", file=sys.stderr)
     levels, sources = defaultdict(int), defaultdict(int)
     oldest = newest = None
     with multiprocessing.Pool(workers) as pool:
@@ -233,6 +247,7 @@ def main():
         "meta": {"tool": "journal_stats.py",
                  "started": datetime.fromtimestamp(now, timezone.utc).isoformat(timespec="seconds"),
                  "duration_s": round(time.time() - now, 1), "journal_files": len(files),
+                 "cores": cores, "workers": workers,
                  "entries": sum(levels.values()),
                  "oldest": datetime.fromtimestamp(oldest).isoformat(timespec="minutes") if oldest else None},
         "journal_disk_usage": disk_usage(),
