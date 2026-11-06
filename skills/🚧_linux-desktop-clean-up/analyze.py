@@ -5,12 +5,13 @@ data for the fill level and the tables of the skill; the instance reads the
 JSON result and builds the tables. Nothing is written except the result
 file, nothing is deleted. Progress goes to stderr.
 
-Deliveries: 15a fill level and table 3, 15b table 1; table 2 follows (15c).
+Deliveries: 15a fill level and table 3, 15b table 1, 15c software inventory (table 2).
 
 Usage (paths resolved by the instance beforehand):
     sudo nice -n 19 ionice -c3 python3 -I analyze.py --home /home/<user> \
         --downloads <download dir> --media-dir <dir> [--media-dir <dir> ...] \
-        --threshold 150 [--archives] [--output /tmp/cleanup-analysis.json]
+        --desktop "$XDG_CURRENT_DESKTOP" --threshold 150 [--archives] \
+        [--output /tmp/cleanup-analysis.json]
 """
 
 import argparse
@@ -676,6 +677,201 @@ def docker_state(compose_paths):
     return state
 
 
+# --- software inventory: data for table 2 and for leftovers of uninstalled programs (4.11) ------
+
+MAIN_CATEGORIES = {"AudioVideo", "Audio", "Video", "Development", "Education", "Game", "Graphics",
+                   "Network", "Office", "Science", "Settings", "System", "Utility"}
+
+
+def desktop_dirs(home):
+    """Starter entry locations of concept.md 4.11 with their origin; the user's own come first."""
+    return [(os.path.join(home, ".local/share/applications"), "local"),
+            (os.path.join(home, ".local/share/flatpak/exports/share/applications"), "flatpak"),
+            ("/usr/local/share/applications", "local"),
+            ("/var/lib/flatpak/exports/share/applications", "flatpak"),
+            ("/var/lib/snapd/desktop/applications", "snap"),
+            ("/usr/share/applications", "system")]
+
+
+def read_desktop_entry(path):
+    """Keys of the [Desktop Entry] group (unlocalised)."""
+    keys, in_group = {}, False
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                line = line.strip()
+                if line.startswith("["):
+                    in_group = line == "[Desktop Entry]"
+                elif in_group and "=" in line:
+                    key, value = line.split("=", 1)
+                    keys.setdefault(key.strip(), value.strip())
+    except OSError:
+        return None
+    return keys
+
+
+def exclusion_reason(keys, desktops):
+    """Rules 1-4 of concept.md 4.11; None if the entry counts as user software."""
+    split = lambda key: [v for v in keys.get(key, "").split(";") if v]
+    if keys.get("Type") != "Application":
+        return "type"
+    if keys.get("NoDisplay", "").lower() == "true" or keys.get("Hidden", "").lower() == "true":
+        return "hidden"
+    only, never = split("OnlyShowIn"), split("NotShowIn")
+    if (only and not set(only) & desktops) or set(never) & desktops:
+        return "desktop"
+    if keys.get("Terminal", "").lower() == "true":
+        return "terminal"
+    main = set(split("Categories")) & MAIN_CATEGORIES
+    if not main - {"Settings", "System"}:
+        return "system_or_settings"
+    return None
+
+
+def desktop_entries(home, current_desktop):
+    """User software from the starter entries, plus the excluded entries with their reason."""
+    desktops = {d for d in current_desktop.split(":") if d}
+    seen, included, excluded = set(), [], []
+    for folder, origin in desktop_dirs(home):
+        for base, _, files in os.walk(folder):
+            for fname in sorted(files):
+                if not fname.endswith(".desktop"):
+                    continue
+                path = os.path.join(base, fname)
+                entry_id = os.path.relpath(path, folder).replace(os.sep, "-")
+                if entry_id in seen:
+                    continue          # an earlier location overrides this entry
+                seen.add(entry_id)
+                keys = read_desktop_entry(path)
+                if keys is None:
+                    continue
+                reason = exclusion_reason(keys, desktops)
+                row = {"id": entry_id, "name": keys.get("Name"), "path": path, "origin": origin}
+                if reason:
+                    excluded.append({**row, "reason": reason})
+                    continue
+                command = keys.get("Exec", "").split()
+                included.append({**row, "exec": os.path.basename(command[0]) if command else None,
+                                 "categories": [c for c in keys.get("Categories", "").split(";") if c],
+                                 "wm_class": keys.get("StartupWMClass")})
+    package_of(included)
+    return {"current_desktop": current_desktop, "included": included, "excluded": excluded}
+
+
+def package_of(entries):
+    """Debian package and version of system starter entries, with one dpkg -S for all."""
+    paths = [e["path"] for e in entries if e["origin"] in ("system", "local")]
+    if not paths:
+        return
+    try:
+        out = subprocess.run(["dpkg", "-S", *paths], capture_output=True, text=True).stdout
+    except FileNotFoundError:
+        return
+    owner = {}
+    for line in out.splitlines():
+        package, _, path = line.partition(": ")
+        owner[path.strip()] = package.split(":")[0].split(",")[0].strip()
+    versions = {}
+    if owner:
+        listing = run(["dpkg-query", "-W", "-f=${Package} ${Version}\n", *sorted(set(owner.values()))]) or ""
+        versions = dict(line.split(" ", 1) for line in listing.splitlines() if " " in line)
+    for e in entries:
+        package = owner.get(e["path"])
+        e["package"] = package
+        e["version"] = versions.get(package)
+        if e["origin"] == "system" and package:
+            e["origin"] = "deb"
+
+
+def other_installs(home):
+    """Installed Flatpaks (system and user) and Snaps."""
+    flatpaks = []
+    for line in (run(["flatpak", "list", "--app", "--system", "--columns=application,name,version"]) or "").splitlines():
+        cols = line.split("\t")
+        flatpaks.append({"id": cols[0], "name": cols[1] if len(cols) > 1 else None,
+                         "version": cols[2] if len(cols) > 2 else None, "scope": "system"})
+    try:
+        for app in sorted(os.listdir(os.path.join(home, ".local/share/flatpak/app"))):
+            flatpaks.append({"id": app, "name": None, "version": None, "scope": "user"})
+    except OSError:
+        pass
+    snaps = [{"name": cols[0], "version": cols[1] if len(cols) > 1 else None}
+             for cols in (line.split() for line in (run(["snap", "list"]) or "").splitlines()[1:]) if cols]
+    return {"flatpak": flatpaks, "snap": snaps}
+
+
+class AppFolders:
+    """Application folders in the home with size and newest change, without section 4 areas."""
+
+    def __init__(self, home):
+        self.home = home
+        self.size = defaultdict(int)
+        self.newest = defaultdict(float)
+
+    def folder(self, parts):
+        if not parts or not parts[0].startswith("."):
+            return None
+        if parts[0] in (".config", ".cache"):
+            return parts[:2] if len(parts) >= 2 else None
+        if parts[0] in (".local", ".var"):
+            inner = "share" if parts[0] == ".local" else "app"
+            return parts[:3] if len(parts) >= 3 and parts[1] == inner else None
+        return parts[:1]
+
+    def file(self, ctx, path, name, st, area):
+        if area or not ctx.is_home:
+            return
+        key = self.folder(ctx.parts)
+        if key:
+            self.size[key] += st.st_size
+            self.newest[key] = max(self.newest[key], st.st_mtime)
+
+    def result(self, tokens):
+        rows = []
+        for key, size in sorted(self.size.items(), key=lambda i: -i[1]):
+            rows.append({"path": os.path.join(self.home, *key), "size": size, "newest": int(self.newest[key]),
+                         "prefilter_match": match_installed(key[-1], tokens)})
+        return rows
+
+
+def norm(name):
+    return re.sub(r"[^a-z0-9]", "", (name or "").lower())
+
+
+def installed_tokens(desktop, installs):
+    """Normalised names of installed software; used only for the prefilter, not written out."""
+    tokens = set()
+    for e in desktop["included"] + desktop["excluded"]:
+        tokens.update(norm(p) for p in e["id"][:-8].split("."))
+        tokens.update(norm(e.get(k)) for k in ("name", "exec", "wm_class", "package"))
+    tokens.update(norm(p) for p in (run(["dpkg-query", "-W", "-f=${Package}\n"]) or "").split())
+    for f in installs["flatpak"]:
+        tokens.update(norm(p) for p in f["id"].split("."))
+    tokens.update(norm(s["name"]) for s in installs["snap"])
+    tokens.discard("")
+    return tokens
+
+
+def match_installed(name, tokens):
+    """Best matching installed name for a folder name, or None (prefilter only)."""
+    key = norm(name)
+    if not key:
+        return None
+    if key in tokens:
+        return key
+    if len(key) >= 4:
+        for token in sorted(tokens):
+            if len(token) >= 4 and (token in key or key in token):
+                return token
+    return None
+
+
+def software(home, current_desktop, app_folders):
+    desktop = desktop_entries(home, current_desktop)
+    installs = other_installs(home)
+    return {"desktop": desktop, **installs, "app_folders": app_folders.result(installed_tokens(desktop, installs))}
+
+
 def safe(func, *args):
     """Run a step after the walk; a failure is recorded instead of losing the whole analysis."""
     try:
@@ -831,6 +1027,7 @@ def main():
     parser.add_argument("--downloads", required=True)
     parser.add_argument("--threshold", type=int, default=150, help="size threshold in MiB")
     parser.add_argument("--archives", action="store_true", help="section 4.8 covers general archives")
+    parser.add_argument("--desktop", default="", help="value of XDG_CURRENT_DESKTOP (lost under sudo)")
     parser.add_argument("--media-dir", action="append", default=[],
                         help="user folder for videos, music, pictures or documents (repeatable)")
     parser.add_argument("--output", default="/tmp/cleanup-analysis.json")
@@ -860,10 +1057,10 @@ def main():
     artifacts = DevArtifacts()
     apt, browsers, vscode = AptArchives(), BrowserCache(home, started), VSCodeCache(home, started)
     pip, pycache, compose, logs = PipCache(), PyCache(), ComposeFiles(), LogSizes()
-    trash = TrashSizes(home)
+    trash, app_folders = TrashSizes(home), AppFolders(home)
     user_files = UserFiles(home, downloads, media_dirs, args.threshold * MiB, args.archives, started)
     sinks = [dir_sizes, large, dup_candidates, git_left, crashes, artifacts,
-             apt, browsers, vscode, pip, pycache, compose, user_files, logs, trash]
+             apt, browsers, vscode, pip, pycache, compose, user_files, logs, trash, app_folders]
 
     print("Step 1/4: file system usage", file=sys.stderr)
     fill = filesystems()
@@ -872,7 +1069,7 @@ def main():
         walk(root, home, areas, sinks, artifacts, stats, progress)
     print("\nStep 3/4: comparing files of equal size", file=sys.stderr)
     duplicates = find_duplicates(dup_candidates, stats, progress)
-    print("\nStep 4/4: package versions, media folders, Docker", file=sys.stderr)
+    print("\nStep 4/4: package versions, media folders, Docker, installed software", file=sys.stderr)
     table1 = {"4.1_apt": apt.result(), **{f"4.{n}_{k}": v for n, (k, v) in
                                          zip((2, 3), browsers.result().items())},
               "4.4_vscode": vscode.result(), "4.5_logs": logs.result(), "4.6_pip": pip.result()}
@@ -883,15 +1080,16 @@ def main():
                    "4.14_trash": trash.result([m["mount"] for m in fill["mounts"]], os.stat(home).st_uid)})
 
     data = {
-        "meta": {"tool": "analyze.py", "delivery": "15b",
+        "meta": {"tool": "analyze.py", "delivery": "15c",
                  "started": datetime.fromtimestamp(started, timezone.utc).isoformat(timespec="seconds"),
                  "duration_s": round(time.time() - started, 1), "files": stats["files"],
                  "read_errors": stats["read_errors"], "other_filesystems": sorted(stats["other_filesystems"]),
                  "params": {"home": home, "downloads": downloads, "threshold_mib": args.threshold,
-                            "archives": args.archives, "media_dirs": media_dirs}},
+                            "archives": args.archives, "media_dirs": media_dirs,
+                            "desktop": args.desktop}},
         "fill_level": fill,
         "table1": table1,
-        "software": {},
+        "software": safe(software, home, args.desktop, app_folders),
         "table3": {
             "dir_sizes": dir_sizes.result(home),
             "large_files": sorted(large.rows, key=lambda r: r["size"], reverse=True),
