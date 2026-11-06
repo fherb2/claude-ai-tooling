@@ -723,6 +723,8 @@ def exclusion_reason(keys, desktops):
     if keys.get("Terminal", "").lower() == "true":
         return "terminal"
     main = set(split("Categories")) & MAIN_CATEGORIES
+    if not main:
+        return "no_main_category"
     if not main - {"Settings", "System"}:
         return "system_or_settings"
     return None
@@ -844,7 +846,10 @@ def installed_tokens(desktop, installs):
     for e in desktop["included"] + desktop["excluded"]:
         tokens.update(norm(p) for p in e["id"][:-8].split("."))
         tokens.update(norm(e.get(k)) for k in ("name", "exec", "wm_class", "package"))
-    tokens.update(norm(p) for p in (run(["dpkg-query", "-W", "-f=${Package}\n"]) or "").split())
+    # only packages actually installed; dpkg also lists removed ones whose records remain
+    listing = run(["dpkg-query", "-W", "-f=${db:Status-Abbrev} ${Package}\n"]) or ""
+    tokens.update(norm(f[1]) for f in (line.split() for line in listing.splitlines())
+                  if len(f) == 2 and f[0].startswith("ii"))
     for f in installs["flatpak"]:
         tokens.update(norm(p) for p in f["id"].split("."))
     tokens.update(norm(s["name"]) for s in installs["snap"])
