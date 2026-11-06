@@ -587,10 +587,12 @@ def json_lines(cmd):
     rows = []
     for line in out.splitlines():
         try:
-            rows.append(json.loads(line))
+            item = json.loads(line)
         except ValueError:
-            pass
-    return rows
+            continue
+        # some commands print one JSON object per line, others a single array
+        rows.extend(item if isinstance(item, list) else [item])
+    return [r for r in rows if isinstance(r, dict)]
 
 
 def docker_state(compose_paths):
@@ -636,6 +638,15 @@ def docker_state(compose_paths):
                         "state": listed.get(path, "down")})
     state["compose"] = compose
     return state
+
+
+def safe(func, *args):
+    """Run a step after the walk; a failure is recorded instead of losing the whole analysis."""
+    try:
+        return func(*args)
+    except Exception as exc:  # noqa: BLE001 - any failure here must not discard the walk
+        print(f"\nWarning: {func.__name__} failed: {exc!r}", file=sys.stderr)
+        return {"error": repr(exc)}
 
 
 def walk(root, home, areas, sinks, artifacts, stats, progress):
@@ -831,7 +842,7 @@ def main():
     files = user_files.result()
     table1.update({"4.7_deb_files": files["deb_files"], "4.8_images_archives": files["images_archives"],
                    "4.9_downloads": files["downloads"], "4.10_stray_media": files["stray_media"],
-                   "4.12_pycache": pycache.result(), "4.13_docker": docker_state(compose.paths)})
+                   "4.12_pycache": pycache.result(), "4.13_docker": safe(docker_state, compose.paths)})
 
     data = {
         "meta": {"tool": "analyze.py", "delivery": "15b",
