@@ -30,7 +30,7 @@ Zum Alter einer Datei: Wo dieses Dokument die Anlegezeit nennt (4.2 bis 4.4, 4.9
 
 ### 3.1 Beginn
 
-1. Der Skill wird mitunter beim Nachdenken von selbst geladen. Er fragt deshalb zuerst, ob er jetzt überhaupt angewendet werden soll. Bei "nein" endet er. Bei "ja" geht es weiter.
+1. In Claude Code wird der Skill nur über `/linux-desktop-clean-up` aufgerufen (`disable-model-invocation: true`); eine Rückfrage, ob er angewendet werden soll, entfällt dort. Wurde er nicht ausdrücklich aufgerufen — etwa auf claude.ai, wo er von selbst geladen werden kann —, fragt er zuerst, ob er jetzt angewendet werden soll. Bei "nein" endet er.
 2. Er nennt, wofür er vorgesehen ist (Abschnitt 1).
 3. Er erklärt die Arbeitsweise: Grundsätzlich startet der Skill selbst keine Skripte oder Befehle auf dem System; die Ausnahme regelt Schritt 5. Es gibt zwei Wege, beide mit der Ausführung durch den Nutzer (damit sind auch root-Zugriffe unproblematisch):
    - Der Skill übergibt dem Nutzer einen Codeblock. Der Nutzer führt ihn aus. Dabei entsteht eine Datei im Ordner `/tmp`, die der Skill liest. Dafür braucht er Zugriff auf `/tmp`.
@@ -387,8 +387,8 @@ Dieser Schritt kommt im Ablauf als letzter aller Bereiche: Was ein früherer Sch
 - Python-Umgebungen, Toolchains im Home, Syncthing-Versionen
 - Doppelte Dateien, Migrationsreste
 
-Festgelegt zur Aufrufart: Der Skill läuft nur auf ausdrücklichen Wunsch des Nutzers. Ob sich das fest im Skill verankern lässt, ist unklar; deshalb bleibt die Rückfrage in Abschnitt 3.1 Schritt 1 der erste Schritt.
+Festgelegt zur Aufrufart: Der Skill läuft nur auf ausdrücklichen Wunsch des Nutzers. In Claude Code verankert das Frontmatter-Feld `disable-model-invocation: true` das fest: Claude lädt ihn nicht von selbst, die Beschreibung steht nicht im Kontext ([Skills](https://code.claude.com/docs/en/skills)). Ein stiller Trigger entfällt.
 
-Name des Skills, `README.md` und die Aufteilung in `SKILL.md` und Zusatzdateien werden im Moment nicht bearbeitet.
+Festgelegt zum Aufbau: Name `linux-desktop-clean-up`; eine einzige `SKILL.md` ohne nachgeladene Regeldateien. Die Bedingung für eine Teilung (`skill-dev-doc.md`, Kapitel 5.2: die Abwahl ist ein realistischer Ausgang) fällt mit dem ausdrücklichen Aufruf weg, und nur der Körper der `SKILL.md` wird nach einer Verdichtung des Kontexts wieder eingespielt — bei einem langen Lauf ein Grund für eine Datei. Zielwelt: web und code, ein Skilltext mit einem Abschnitt für die Übergabe der Skripte (in Claude Code über `${CLAUDE_SKILL_DIR}`, auf claude.ai als Download, nie als Artefakt).
 
 Die anstehenden Schritte stehen in `work-plan.md`.
