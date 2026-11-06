@@ -4,7 +4,9 @@ Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die 
 
 ## 15 Analyseskript
 
-Ein Durchlauf durch das Dateisystem; Ausgabe als JSON für den Füllstand und die drei Tabellen (`concept.md`, Abschnitt 3.3). Python, nur Standardbibliothek. Aus dem Test zu Tabelle 3: `.VOB` gehört zu den Videoendungen.
+Ein Durchlauf durch das Dateisystem; Ausgabe als JSON für den Füllstand und die drei Tabellen (`concept.md`, Abschnitt 3.3). Python, nur Standardbibliothek. Aus dem Test zu Tabelle 3: `.VOB` gehört zu den Videoendungen. Gebaut in drei Lieferungen: 15a Gerüst und Tabelle 3, 15b Tabelle 1 (4.1 bis 4.10, 4.12, 4.13), 15c Software-Erfassung (4.11, Anwendungsordner, Caches ohne Zuordnung).
+
+**Plan 15a (freigegeben, in Ausführung):** `analyze.py` im Skill-Ordner, Aufruf mit root-Rechten und niedriger Priorität, Parameter `--home`, `--downloads`, `--threshold` (MiB, eine Zahl für alles) und `--output` (Vorgabe `/tmp/cleanup-analysis.json`); Bildschirmmeldungen englisch. Einheiten: `KNOWN_AREAS` (Bereiche aus Abschnitt 4, eine Stelle), `walk()` (ein Durchlauf, bleibt im Dateisystem, gibt jedem Ordner seine Zugehörigkeit mit), Sammler je Auswertung (Größe je Verzeichnis mit Altanteil, große Einzeldateien, Duplikat-Kandidaten, Git-Reste, Absturzabbilder, Entwicklungsartefakte), `find_duplicates()`, `filesystems()`, `write_result()`. JSON: Kopf (Zeit, Parameter, Laufzeit, Lesefehler), Füllstand, Tabelle 3, Tabelle 1 und Software leer bis 15b/15c. Treffer aus Abschnitt 5 kennzeichnet die Instanz, nicht das Skript. Prüfung: Lauf am Entwicklungsrechner, Abgleich mit den Testläufen.
 
 ## 16 Löschskript
 
