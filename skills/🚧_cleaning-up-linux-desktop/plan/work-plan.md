@@ -16,7 +16,9 @@ Erst wenn die deutsche Fassung samt README fertig ist: `SKILL.en.md`, Regeldatei
 
 ## 21 Erkennung von Snapshot-Fähigkeit und -Werkzeugen
 
-`analyze.py`: btrfs, ZFS und LVM erkennen, Timeshift und Snapper (installiert, eingerichtet), vorhandene Snapshots und freien Platz je Dateisystem im Füllstandsteil der Ergebnisdatei ausgeben (`concept.md`, 3.2 und 3.3). Nur lesend.
+`analyze.py`: btrfs, ZFS und LVM erkennen, Timeshift und Snapper (installiert, eingerichtet), vorhandene Snapshots und freien Platz je Dateisystem ausgeben (`concept.md`, 3.2 und 3.3). Nur lesend.
+
+**Plan 21 (freigegeben, in Ausführung):** `filesystems()` liefert je Einhängepunkt zusätzlich den verfügbaren Platz (`statvfs`). Nach dem Durchlauf, geschützt über `safe()`, ein neuer Schlüssel `safeguards` neben `fill_level` mit `detect_btrfs()` (je Gerät: Einhängepunkte, Subvolume am Einhängepunkt über `btrfs subvolume show`, Snapshots über `btrfs subvolume list -s`: Zahl und Namen mit Präfix, fremde nur gezählt), `detect_zfs()` (`zfs list -H -t snapshot -o name`) und `detect_lvm()` (`lvs` mit den Feldern `lv_name`, `vg_name`, `lv_attr`, `origin`, `lv_size`, `vg_free`, `lv_path`) — ZFS und LVM mit `tested: false`, nur an nachgebauten Ausgaben geprüft — sowie `detect_tools()` (Timeshift und Snapper nur nach Installation und Konfiguration, ohne Aufruf der Werkzeuge, ihre Snapshots zählt `detect_btrfs()` mit). `run()` bekommt eine Zeitgrenze. Test `tests/test_safeguards.py` mit nachgebauten Ausgaben; Lauf am Entwicklungsrechner (zwei btrfs-Dateisysteme, keine Snapshots, Timeshift und Snapper nicht installiert). Für den Test von Timeshift und Snapper werden sie vorher installiert und danach wieder entfernt (beides in den Paketquellen vorhanden). In der README steht ein kurzer Hinweis, dass ZFS und LVM mangels Testsystem ungeprüft sind (Schritt 24).
 
 ## 22 Snapshot-Skript
 

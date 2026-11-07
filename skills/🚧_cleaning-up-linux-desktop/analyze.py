@@ -5,7 +5,8 @@ data for the fill level and the tables of the skill; the instance reads the
 JSON result and builds the tables. Nothing is written except the result
 file, nothing is deleted. Progress goes to stderr.
 
-Deliveries: 15a fill level and table 3, 15b table 1, 15c software inventory (table 2).
+Deliveries: 15a fill level and table 3, 15b table 1, 15c software inventory (table 2),
+21 detection of snapshot mechanisms and tools (key "safeguards").
 
 Usage (paths resolved by the instance beforehand):
     sudo nice -n 19 ionice -c3 python3 -I analyze.py --home /home/<user> \
@@ -19,6 +20,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -35,6 +37,8 @@ DUP_MIN = 1024**2
 PARTIAL = 1024**2
 CHUNK = 4 * 1024**2
 MiB = 1024**2
+PREFIX = "cleaning-up-linux-desktop-"      # name prefix of the skill's own snapshots and archives
+TOOL_TIMEOUT = 30
 
 GROUPS = {
     "video": "mp4 mkv avi mov wmv flv webm m4v mpg mpeg ts mts m2ts 3gp vob",
@@ -1000,10 +1004,10 @@ def find_duplicates(candidates, stats, progress):
     return sorted(groups, key=lambda g: g["size"] * (len(g["paths"]) - 1), reverse=True)
 
 
-def run(cmd):
+def run(cmd, timeout=TOOL_TIMEOUT):
     try:
-        done = subprocess.run(cmd, capture_output=True, text=True)
-    except FileNotFoundError:
+        done = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except (FileNotFoundError, subprocess.TimeoutExpired):
         return None
     return done.stdout if done.returncode == 0 else None
 
@@ -1015,7 +1019,13 @@ def filesystems():
     mounts, btrfs = [], {}
     for line in out.splitlines()[1:]:
         source, fstype, size, used, target = line.split(None, 4)
-        mounts.append({"mount": target, "source": source, "fstype": fstype, "size": int(size), "used": int(used)})
+        try:
+            stat = os.statvfs(target)
+            avail = stat.f_bavail * stat.f_frsize
+        except OSError:
+            avail = None
+        mounts.append({"mount": target, "source": source, "fstype": fstype, "size": int(size), "used": int(used),
+                       "avail": avail})
         if fstype == "btrfs":
             btrfs.setdefault(source, target)
     snapshots = []
@@ -1034,6 +1044,108 @@ def filesystems():
                             if len(f) >= 3 and f[0].startswith("0/") and f[0][2:] in ids)
         snapshots.append({"mount": target, "count": len(ids), "exclusive": exclusive})
     return {"mounts": mounts, "snapshots": snapshots}
+
+
+# --- safeguards: which snapshot mechanisms the system offers (concept.md 3.2), read-only -------
+
+def detect_btrfs(mounts):
+    """Per btrfs device: mount points, subvolume at each mount point, existing snapshots."""
+    devices = defaultdict(list)
+    for m in mounts:
+        if m["fstype"] == "btrfs":
+            devices[m["source"]].append(m)
+    found = []
+    for device, entries in devices.items():
+        first = entries[0]["mount"]
+        listing = run(["btrfs", "subvolume", "list", "-s", first])
+        names = []
+        if listing is not None:
+            for line in listing.splitlines():
+                if line.startswith("ID ") and " path " in line:
+                    names.append(line.split(" path ", 1)[1].strip())
+        mount_rows = []
+        for m in entries:
+            info = run(["btrfs", "subvolume", "show", m["mount"]])
+            subvolume = None
+            if info:
+                fields = {}
+                for line in info.splitlines():
+                    key, _, value = line.strip().partition(":")
+                    fields.setdefault(key, value.strip())
+                subvolume = {"name": fields.get("Name"), "id": fields.get("Subvolume ID")}
+            mount_rows.append({"mount": m["mount"], "avail": m.get("avail"), "subvolume": subvolume})
+        found.append({"kind": "btrfs", "device": device, "tested": True,
+                      "tool_present": shutil.which("btrfs") is not None,
+                      "mounts": mount_rows,
+                      "snapshots": {"listed": listing is not None, "count": len(names),
+                                    "ours": sorted(n for n in names if os.path.basename(n).startswith(PREFIX))}})
+    return found
+
+
+def detect_zfs(mounts):
+    """ZFS mounts and their snapshots; checked only against reproduced outputs (tested: false)."""
+    zfs_mounts = [m for m in mounts if m["fstype"] == "zfs"]
+    if not zfs_mounts:
+        return []
+    listing = run(["zfs", "list", "-H", "-t", "snapshot", "-o", "name"])
+    names = [l.strip() for l in (listing or "").splitlines() if l.strip()]
+    return [{"kind": "zfs", "device": m["source"], "tested": False, "tool_present": shutil.which("zfs") is not None,
+             "mounts": [{"mount": m["mount"], "avail": m.get("avail"), "dataset": m["source"]}],
+             "snapshots": {"listed": listing is not None,
+                           "count": sum(1 for n in names if n.split("@")[0] == m["source"]),
+                           "ours": sorted(n for n in names if n.split("@")[0] == m["source"]
+                                          and n.split("@", 1)[-1].startswith(PREFIX))}}
+            for m in zfs_mounts]
+
+
+def detect_lvm(mounts):
+    """Logical volumes below mount points, their volume group's free space and snapshot volumes (tested: false)."""
+    candidates = [m for m in mounts if m["source"].startswith("/dev/")]
+    if not candidates or shutil.which("lvs") is None:
+        return []
+    out = run(["lvs", "--noheadings", "--separator", "|", "--units", "b", "--nosuffix", "-o",
+               "lv_name,vg_name,lv_attr,origin,lv_size,vg_free,lv_path"])
+    if out is None:
+        return []
+    volumes = []
+    for line in out.splitlines():
+        cols = [c.strip() for c in line.split("|")]
+        if len(cols) == 7:
+            volumes.append(dict(zip(("lv_name", "vg_name", "lv_attr", "origin", "lv_size", "vg_free", "lv_path"), cols)))
+    found = []
+    for m in candidates:
+        real = os.path.realpath(m["source"])
+        volume = next((v for v in volumes if v["lv_path"] and os.path.realpath(v["lv_path"]) == real), None)
+        if volume is None:
+            continue
+        snaps = [v["lv_name"] for v in volumes if v["origin"] == volume["lv_name"] and v["vg_name"] == volume["vg_name"]]
+        found.append({"kind": "lvm", "device": m["source"], "tested": False, "tool_present": True,
+                      "mounts": [{"mount": m["mount"], "avail": m.get("avail"),
+                                  "volume": volume["lv_name"], "volume_group": volume["vg_name"],
+                                  "vg_free": int(volume["vg_free"] or 0)}],
+                      "snapshots": {"listed": True, "count": len(snaps),
+                                    "ours": sorted(n for n in snaps if n.startswith(PREFIX))}})
+    return found
+
+
+def detect_tools():
+    """Timeshift and Snapper: installed and configured; the tools themselves are not called."""
+    def configured(path):
+        try:
+            return bool(os.listdir(path)) if os.path.isdir(path) else os.path.exists(path)
+        except OSError:
+            return False
+    return {"timeshift": {"installed": shutil.which("timeshift") is not None,
+                          "configured": configured("/etc/timeshift/timeshift.json")},
+            "snapper": {"installed": shutil.which("snapper") is not None,
+                        "configured": configured("/etc/snapper/configs")}}
+
+
+def safeguards(mounts):
+    """Snapshot-capable file systems and snapshot tools; the skill offers what is found here."""
+    return {"prefix": PREFIX,
+            "filesystems": detect_btrfs(mounts) + detect_zfs(mounts) + detect_lvm(mounts),
+            "tools": detect_tools()}
 
 
 def write_result(path, data):
@@ -1104,7 +1216,7 @@ def main():
                    "4.14_trash": trash.result([m["mount"] for m in fill["mounts"]], os.stat(home).st_uid)})
 
     data = {
-        "meta": {"tool": "analyze.py", "delivery": "15c",
+        "meta": {"tool": "analyze.py", "delivery": "21",
                  "started": datetime.fromtimestamp(started, timezone.utc).isoformat(timespec="seconds"),
                  "duration_s": round(time.time() - started, 1), "files": stats["files"],
                  "read_errors": stats["read_errors"], "other_filesystems": sorted(stats["other_filesystems"]),
@@ -1112,6 +1224,7 @@ def main():
                             "archives": args.archives, "media_dirs": media_dirs,
                             "desktop": args.desktop}},
         "fill_level": fill,
+        "safeguards": safe(safeguards, fill["mounts"]),
         "table1": table1,
         "software": safe(software, home, args.desktop, app_folders),
         "table3": {
