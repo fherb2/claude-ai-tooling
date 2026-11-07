@@ -1,8 +1,10 @@
 # cleaning-up-linux-desktop — einen Linux-Desktop aufräumen, ohne Arbeitsdaten zu gefährden
 
-*Stand: 2026-11-07*
+*Stand: 2026-11-08*
 
-**🚧 In Arbeit.** Skilltext und Skripte sind geschrieben und an einem Entwicklungsrechner geprüft; der vollständige Lauf des installierten Skills steht noch aus, ebenso die englische Fassung (siehe „Stand und Offenes“). — Für Claude Code und claude.ai.
+*[English version](https://github.com/fherb2/claude-ai-tooling/blob/master/skills/cleaning-up-linux-desktop/README.en.md)*
+
+**✅☑ Fertig und nutzbar.** Anweisungen und Skripte vollständig, Frontmatter gesetzt, deutsche und englische Fassung, Installationspakete gebaut; ein vollständiger Lauf mit echten Löschungen ist am Entwicklungsrechner durchgelaufen. Kein stiller Trigger: Der Skill wird nur ausdrücklich aufgerufen. — Für Claude Code und claude.ai.
 
 ---
 
@@ -69,7 +71,7 @@ Alle fünf brauchen nur Python 3 mit der Standardbibliothek (`backup.py` ruft f�
 Vor dem ersten Löschen und vor dem Nachgang bietet der Skill an, was das System hergibt, und der Nutzer wählt: eine eigene Sicherung bestätigen, einen **btrfs-Snapshot**, die Befehle von **Timeshift** oder **Snapper**, wenn eines davon eingerichtet ist, oder ein **Archiv** der zu löschenden Dateien als `tar` oder `zip`. Für belegte Caches wird nicht gesichert, für Nutzdaten und für Anwendungsordner ohne Beleg schon, nach Rückfrage.
 
 - **Eigene Sicherungen** tragen den Namenspräfix `cleaning-up-linux-desktop-`. Die Skripte fassen nichts ohne diesen Präfix an, und Analyse wie Löschläufe nehmen Dateien mit dem Präfix aus.
-- **Snapshots** liegen standardmäßig in `<Einhängepunkt>/.cleaning-up-linux-desktop-snapshots/`; der Nutzer kann einen anderen Ort unterhalb des Einhängepunkts wählen. Sie sind schreibgeschützt und halten gelöschte Daten fest, bis sie entfernt sind.
+- **Snapshots** liegen standardmäßig in `<Einhängepunkt>/.cleaning-up-linux-desktop-snapshots/`; der Nutzer kann einen anderen Ort unterhalb des Einhängepunkts wählen. Sie sind schreibgeschützt und halten gelöschte Daten fest, bis sie entfernt sind. Jedes Dateisystem bekommt ein eigenes Label, damit die Namen eindeutig bleiben.
 - **Archive** liegen in einem Ordner je Lauf, je Sicherungsschritt eine Datei. Vor dem Schreiben prüft das Skript den Platz am Zielort samt Reserve (Vorgabe die größere von 10 % und 10 GiB, nie unter der größeren von 5 % und 5 GiB), danach vergleicht es das Archiv mit den Dateien. Scheitert etwas, wird nichts gelöscht. `tar` behält Besitzer, ACLs und erweiterte Attribute; `zip` behält sie **nicht** (auch keine Hardlinks), packt aber dateiweise schneller.
 - **Zurückholen** geschieht selektiv: Es kommt nur zurück, was fehlt, nichts wird überschrieben.
 - **ZFS und LVM** erkennt der Skill und meldet sie, bietet dafür aber keinen Snapshot an. Es fehlte ein Testsystem; diese Varianten sind ungeprüft. Dort sichert der Nutzer selbst oder wählt das Archiv.
@@ -106,13 +108,8 @@ Das Alter einer Datei bestimmen die Skripte aus der späteren von Änderungs- un
 
 ## Stand und Offenes
 
-**Status:** Skilltext und Skripte sind geschrieben. Analyse, Journal-Auswertung, Snapshots (btrfs) und Archive sind am Entwicklungsrechner gelaufen, das Löschen ist in einer Simulation geprüft (`tests/test_delete.py`), die Skripte außerdem in eigenen Tests (`tests/`), darunter `tests/test_mounts.py`, der jeden Dateizugriff auf simulierte Einhängepunkte protokolliert. Noch nicht an einer echten Einhängung geprüft ist der Fall mit `tmpfs`; das folgt in einem Probelauf am Rechner.
+**Status:** Fertig: Anweisungen, Skripte, beide Sprachfassungen und die Installationspakete für Claude Code und claude.ai. Am Entwicklungsrechner ist ein vollständiger Lauf mit echten Löschungen durchgelaufen, über drei Sitzungen mit Abbruch und Wiederaufnahme; die Skripte sind außerdem in eigenen Tests geprüft (`tests/`), darunter `tests/test_mounts.py`, der jeden Dateizugriff auf simulierte Einhängepunkte protokolliert. Die Analyse lief dabei mit eingehängter Netzfreigabe unter dem Home ohne Hänger durch.
 
-**Offen** (Reihenfolge im Fahrplan, `plan/work-plan.md`):
-
-- Der vollständige Lauf des installierten Skills mit echten Löschungen als Abschluss.
-- Die englische Fassung; erst danach entfällt das Baustellenschild.
-- Eine Nachprobe zum Docker-Build-Cache.
-- Die Web-Fassung ist noch nicht erprobt.
+**Offen:** nichts.
 
 **Bewusst offen gelassen:** Für einige Bereiche ist noch keine Behandlung festgelegt — Suchindex Baloo, Git-Repositories, Vorschaubilder, Zwischenspeicher von Claude Desktop, Flatpak, Snap, AppImage und Wine, Python-Umgebungen, Toolchains, Syncthing-Versionen, Duplikate und Migrationsreste. Der Skill zeigt sie in Tabelle 3 und erforscht sie auf Wunsch gemeinsam mit dem Nutzer, löscht dort aber nichts nach eigenen Regeln.

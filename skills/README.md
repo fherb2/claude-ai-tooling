@@ -1,6 +1,6 @@
 # Skills für Claude Code
 
-*Stand: 2026-09-18*
+*Stand: 2026-11-08*
 
 *[English version](README.en.md)*
 
@@ -26,6 +26,7 @@ Wiederverwendbare Skills für Claude Code, claude.ai und Claude Desktop (Chat + 
 | [`chat-export/`](chat-export/README.md)<br>✅☑ | **Chats aus claude.ai in das laufende Projekt holen** — als durchsuchbare JSON-Dateien, über den angemeldeten Chrome oder aus einem Kontoexport-ZIP; auch Nachtragen bereits geholter Chats. Führt eine eigene Implementierungsdoku (siehe unten). |
 | [`recall-skills-after-compact/`](recall-skills-after-compact/README.md)<br>✅☑ | **Nach jeder Kontext-Kompression an die zuvor geladenen Skills erinnern** — garantierte Fähigkeit mit Hook-Auslöser statt stillem Trigger: installiert wie ein Skill, verdrahtet über einen `settings.json`-Eintrag; zusätzlich auf Zuruf per `/recall-skills-after-compact`. |
 | [`system-access/`](system-access/README.md)<br>✅☑ | **Regeln für das Arbeiten auf einem laufenden System** — welches System überhaupt gemeint ist, welcher Bereich darin freigegeben ist, was vor einem Eingriff lesend zu erkunden ist und wie der Rückweg aussieht; dazu der Schutz der eigenen Verbindung und der Arbeit anderer Menschen am System. Für Wartung, Aktualisierung und Schwachstellensuche — nicht für die gewöhnliche Arbeit im Projektordner. |
+| [`cleaning-up-linux-desktop/`](cleaning-up-linux-desktop/README.md)<br>✅☑ | **Einen Linux-Desktop aufräumen, ohne Arbeitsdaten zu gefährden** — misst zuerst, löscht Caches nach getesteten Regeln und Nutzdaten nur nach Auswahl des Nutzers, sichert vorher (Snapshot oder Archiv) und führt ein Protokoll für Wiederaufnahme und Rückweg; Eingehängtes fasst er nie an. Bringt fünf Python-Skripte mit und führt ein eigenes Konzept samt Tests (`plan/`, `tests/`). |
 
 (✅ deutsche Fassung fertig und nutzbar · ☑ englische Fassung fertig und nutzbar · 🚧 in Arbeit · ⚠️ mit Vorbehalt)
 
