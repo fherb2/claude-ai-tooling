@@ -17,7 +17,7 @@ Dieser Skill läuft lange und in vielen Schritten; sein ganzer Regelteil steht d
 4. Installierte Software wird nie entfernt, auch nicht, wenn sie vermutlich nicht mehr gebraucht wird; solche Funde werden gemeldet.
 5. Was zu erhalten und was zu löschen ist, formuliert allein der Nutzer. Du übersetzt seine Angaben in einen Auftrag für das Skript und zeigst ihm die Übersetzung vor der Ausführung.
 6. Ordnernamen wie Downloads, Videos, Musik, Bilder, Dokumente setzt du nie selbst ein. Du ermittelst sie über die XDG-Benutzerverzeichnisse und übergibst die aufgelösten Pfade.
-7. Was eingehängt ist (Netzfreigabe, anderer Datenträger, Bind-Mount), wird nie gelöscht, nie durchlaufen und nie angefasst, nicht einmal gelesen oder gezählt; Links werden nie verfolgt. Die Skripte setzen das selbst durch, nach dem Namen und vor jedem Zugriff, denn schon die Abfrage einer nicht antwortenden Netzfreigabe blockiert den Prozess. Eingehängte Daten erfasst nur, wer an ihrem echten Ort beginnt, und nur wenn der in der Analyse liegt. Einzige Ausnahme: der Zielort einer Archivsicherung, den der Nutzer wählt; er wird nur beschrieben.
+7. Was eingehängt ist (Netzfreigabe, anderer Datenträger, Bind-Mount), wird nie gelöscht, nie durchlaufen und nie angefasst, nicht einmal gelesen oder gezählt; Links werden nie verfolgt. Die Skripte setzen das selbst durch, nach dem Namen und vor jedem Zugriff, denn schon die Abfrage einer nicht antwortenden Netzfreigabe blockiert den Prozess. Eingehängte Daten erfasst nur, wer an ihrem echten Ort beginnt, und nur wenn der in der Analyse liegt. Zwei Ausnahmen: Der Zielort einer Archivsicherung, den der Nutzer wählt, wird nur beschrieben. Und bei den Starter-Einträgen für Tabelle 2 liest das Analyseskript ein Linkziel, nachdem es dessen Pfad nach dem Namen geprüft hat.
 8. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie groß die entfernte Datenmenge war (nicht der frei gewordene Platz), was nur gemeldet wurde. Für Docker ohne Größe.
 9. Eigene Snapshots und Archive tragen den Namenspräfix `cleaning-up-linux-desktop-`. Die Skripte fassen nichts ohne diesen Präfix an und nehmen Dateien mit dem Präfix von allen Löschläufen aus. Davon weichst du nur auf ausdrücklichen Wunsch des Nutzers ab.
 
@@ -115,7 +115,7 @@ Biete nach der Analyse alle Varianten an, die `safeguards` hergibt, und lass wä
 sudo python3 -I "${CLAUDE_SKILL_DIR}/snapshots.py" create --mount <Einhängepunkt> --label <Bezeichnung> [--base-dir <Ordner>] [--dry-run]
 ```
 
-Erst Probelauf, dann echt; den Namen nennt `/tmp/cleanup-snapshots-create.json`. Sag dazu: Ein Snapshot hält gelöschte Daten fest, Platz wird erst frei, wenn er entfernt ist.
+Erst Probelauf, dann echt. Gib jedem Dateisystem ein **eigenes Label**, das den Einhängepunkt nennt (etwa `root-vor-loeschen`, `home-vor-loeschen`): Mit gleichem Label tragen Snapshots, die in derselben Sekunde entstehen, denselben Namen, und `remove --name` bricht dann mit „ambiguous“ ab. Gib jedem Aufruf außerdem eine eigene Berichtsdatei (`--report /tmp/cleanup-snapshots-create-<label>.json`), sonst überschreibt der nächste Aufruf den Bericht des vorigen; der Bericht nennt den Namen. Sag dazu: Ein Snapshot hält gelöschte Daten fest, Platz wird erst frei, wenn er entfernt ist.
 
 **Archiv.** Frage nach:
 - **Format:** `tar` (Vorgabe) behält Besitzer, ACLs, erweiterte Attribute, Hardlinks und Links; unkomprimiert bei schnellem Ziel (interne SSD), als `tar.gz` bei langsamem (USB-Stick, Netz). `zip` packt dateiweise (Medien nur ablegen, Rest gepackt), behält aber **Besitzer, ACLs, erweiterte Attribute und Hardlinks nicht**. Weise bei zip ausdrücklich darauf hin, zum Beispiel auf die Herkunfts-URL von Downloads sowie Tags und Bewertungen aus Dolphin (nach Wissen, nicht geprüft).
@@ -155,7 +155,7 @@ sudo python3 -I "${CLAUDE_SKILL_DIR}/delete.py" --home "$HOME" --order /tmp/clea
 
 Jeder Lauf schreibt `/tmp/cleanup-report-<Bereich>.json` (entfernte Anzahl und Datenmenge, Gruppen, übersprungene Pfade mit Grund, ausgeführte Befehle). Übersprungenes zeigst du dem Nutzer mit Grund. Das Skript verweigert unabhängig vom Auftrag: `/`, das Home, Ordner direkt unter `/` oder dem Home, `/boot`, alles außerhalb von Home, `/var`, `/opt`, `/usr/local`, `/srv`, Einhängepunkte und alles, was einen enthält oder darunter liegt, Links (außer im Papierkorb).
 
-Auftragsformen: `{"area": "<Bereich>", "kind": "rule", "params": {...}}` für Regeln, `{"area": "<Bereich>", "kind": "list", "paths": [...]}` für ausgewählte Pfade (nur 4.7 bis 4.10).
+Auftragsformen: `{"area": "<Bereich>", "kind": "rule", "params": {...}}` für Regeln, `{"area": "<Bereich>", "kind": "list", "paths": [...]}` für ausgewählte Pfade (nur 4.7, 4.8 und 4.10).
 
 ## Die Bereiche
 
@@ -210,7 +210,7 @@ Je Programm suchst du in der Dokumentation genau zwei Dinge:
 1. **Cache- und Download-Ordner.** Als Cache gilt ein Ordner nur, wenn die Dokumentation belegt, dass das Programm die Daten darin jederzeit vollautomatisch wiederherstellt und ihr Fehlen bis auf Zeitverlust nichts ändert — wie die Dokumentation ihn nennt, zählt nicht; Nachsehen im Dateisystem allein genügt nicht. Geht nicht hervor, dass das Programm den Verlust im laufenden Betrieb verträgt, löschst du erst, wenn es beendet ist, und forderst den Nutzer dazu auf.
 2. **Ordner mit Eingangsdaten** datenverarbeitender Programme. Treffer darin schließt du still aus den Suchläufen 4.8, 4.10 und den großen Einzeldateien und Duplikaten in Tabelle 3 aus — ohne Meldung. Nicht still ausgeschlossen wird bei 4.7, 4.9 und bei der Größe je Verzeichnis.
 
-**Belegstufe** je Zeile: **hoch** — die offizielle Dokumentation sagt es ausdrücklich; **mittel** — nur Entwicklerforum, Issue-Tracker oder Distributions-Wiki. Nur Drittquellen oder Rückschluss gilt als **kein klarer Befund**: Dann nennst du die Daten des Programms nirgends und schließt sie von jedem Löschvorschlag aus (die Größe je Verzeichnis zählt sie trotzdem mit). Ordner unter `~/.cache` ohne zuordenbaren Eigentümer kommen nach Tabelle 3. **Nachgang zu Tabelle 2** (nach dem Ergebnisbericht): Wiederhole die Stellen aus Tabelle 2 und sag dem Nutzer, dass du für diese Posten keine getesteten und belegten Erfahrungen besitzt. Biete an, alle oder einen Teil davon gemeinsam weiter zu klären — Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Geh dabei vorsichtig vor und erinnere den Nutzer vor jedem Löschen, was tatsächlich belegt und was Vermutung ist, damit er abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird im Nachgang wie bei einer zusätzlich angeforderten Suche.
+**Belegstufe** je Zeile: **hoch** — die offizielle Dokumentation sagt es ausdrücklich; **mittel** — nur Entwicklerforum, Issue-Tracker oder Distributions-Wiki. Nur Drittquellen oder Rückschluss gilt als **kein klarer Befund**: Dann nennst du die Daten des Programms nirgends und schließt sie von jedem Löschvorschlag aus (die Größe je Verzeichnis zählt sie trotzdem mit). Ordner unter `~/.cache` ohne zuordenbaren Eigentümer kommen nach Tabelle 3. **Nachgang zu Tabelle 2** (nach dem Ergebnisbericht): Wiederhole die Stellen aus Tabelle 2 und sag dem Nutzer, dass du für diese Posten keine getesteten und belegten Erfahrungen besitzt. Biete an, alle oder einen Teil davon gemeinsam weiter zu klären — Recherchen in der Dokumentation, gemeinsam Strategien zum Aufräumen entwickeln und ausführen. Geh dabei vorsichtig vor und erinnere den Nutzer vor jedem Löschen, was tatsächlich belegt und was Vermutung ist, damit er abschätzen kann, ob wirklich gelöscht werden soll. Das Löschskript nimmt für Tabelle 2 keinen Auftrag an; gelöscht wird mit dem festen Block aus „Löschen im Nachgang“.
 
 ## Nachgang zu Tabelle 3
 
@@ -218,16 +218,57 @@ Nach dem Nachgang zu Tabelle 2, oder wenn der Nutzer ihn auslässt, biete an, di
 
 Bittet der Nutzer zusätzlich um eine Suche nach weiteren Dateien, gilt keine der Regeln dieses Skills; die Randbedingungen handelst du mit ihm aus. Für solche Suchen gilt auch der stille Ausschluss nicht.
 
+## Löschen im Nachgang
+
+`delete.py` lehnt Ordner direkt unter dem Home ab, und für die Posten aus Tabelle 2 und 3 gibt es keine Regel. Was dort nach der Entscheidung des Nutzers wegkommt, löschst du deshalb mit diesem festen Block und schreibst keinen eigenen. Ändern darfst du nur die fünf Zeilen oben: `GANZ` (Ordner oder Dateien, die ganz weg sollen) und `INHALT` (Ordner, die geleert werden und selbst bleiben) mit absoluten Pfaden ohne Schrägstrich am Ende, `PROG` (Muster laufender Programme, die vorher beendet sein müssen), die laufende Nummer in `OUT`, und `DRY`: zuerst `1` für den Probelauf, nach der Bestätigung des Nutzers `0`. „Begonnen“ steht im Protokoll vor dem echten Lauf. Der Block läuft ohne `sudo`. Er prüft je Pfad nach dem Namen, bevor er ihn anfasst: unter dem Home, kein eigener Präfix, kein anderer Einhängepunkt (aus `/proc/self/mountinfo`) und keiner darunter; danach kein Link und `realpath` gleich. Er nennt scheinbare und belegte Größe; zeige dem Nutzer beide, denn bei Image-Dateien (sparse) kann die belegte weit kleiner sein.
+
+```bash
+DRY=1                                   # 1 = Probelauf, 0 = echt
+GANZ=( )                                # Ordner oder Dateien, die ganz weg sollen
+INHALT=( )                              # Ordner, deren Inhalt weg soll; der Ordner selbst bleibt
+PROG=''                                 # Muster laufender Programme, die vorher beendet sein müssen; leer = keins
+OUT=/tmp/cleanup-nachgang-1.txt
+{
+mounts() { awk '{ t = $5; gsub(/\\040/, " ", t); gsub(/\\011/, "\t", t); gsub(/\\012/, "\n", t); gsub(/\\134/, "\\", t); print t }' /proc/self/mountinfo; }
+mnt_of() { mounts | X="$1/" awk '{ t = ($0 == "/" ? "" : $0) "/" } index(ENVIRON["X"], t) == 1 && length($0) > length(m) { m = $0 } END { print m }'; }
+HM="$(mnt_of "$HOME")"
+if [ -n "$PROG" ] && pgrep -a -f "$PROG"; then echo "ABBRUCH: Programm läuft (siehe oben)"; exit 1; fi
+SUM=0; SUMB=0
+for P in "${GANZ[@]}" "${INHALT[@]}"; do
+  echo "## $P"
+  case "$P" in "$HOME"/?*) ;; *) echo "übersprungen: nicht unter dem Home"; continue ;; esac
+  case "$P" in *cleaning-up-linux-desktop-*) echo "übersprungen: eigene Sicherung (Präfix)"; continue ;; esac
+  if [ "$(mnt_of "$P")" != "$HM" ]; then echo "übersprungen: liegt auf einem anderen Einhängepunkt"; continue; fi
+  if [ -n "$(mounts | X="$P/" awk 'index($0 "/", ENVIRON["X"]) == 1')" ]; then echo "übersprungen: Einhängepunkt darunter"; continue; fi
+  if [ -L "$P" ] || [ ! -e "$P" ]; then echo "übersprungen: Link oder nicht vorhanden"; continue; fi
+  if [ "$(realpath -e -- "$P")" != "$P" ]; then echo "übersprungen: realpath weicht ab"; continue; fi
+  B="$(du -sb --one-file-system -- "$P" | cut -f1)"; A="$(du -sB1 --one-file-system -- "$P" | cut -f1)"
+  echo "Größe (Bytes, scheinbar): $B  belegt: $A  Einträge: $(find "$P" -xdev | wc -l)"
+  KEEP=0; for I in "${INHALT[@]}"; do [ "$I" = "$P" ] && KEEP=1; done
+  if [ "$DRY" = 1 ]; then echo "Probelauf: würde $([ $KEEP = 1 ] && echo 'den Inhalt' || echo 'alles') entfernen"; SUM=$((SUM+B)); SUMB=$((SUMB+A)); continue; fi
+  if [ $KEEP = 1 ]; then
+    [ -d "$P" ] || { echo "übersprungen: kein Ordner"; continue; }
+    find "$P" -mindepth 1 -xdev -delete; echo "find Rückgabewert: $?"
+  else
+    rm -rf --one-file-system -- "$P"; echo "rm Rückgabewert: $?"
+  fi
+  R=0; RB=0; [ -e "$P" ] && { R="$(du -sb --one-file-system -- "$P" | cut -f1)"; RB="$(du -sB1 --one-file-system -- "$P" | cut -f1)"; }
+  echo "danach (Bytes): $R"; SUM=$((SUM+B-R)); SUMB=$((SUMB+A-RB))
+done
+echo "## Summe (Bytes, scheinbar): $SUM  belegt: $SUMB"
+} 2>&1 | tee "$OUT"
+```
+
 ## Betriebsart: Aufräumen der Sicherungen
 
 Nur, wenn das Protokoll den letzten Lauf als abgeschlossen ausweist; sonst geh zur Wiederaufnahme. Das Aufräumen kann an einem späteren Zeitpunkt liegen, an dem der Nutzer sich überzeugen konnte, dass alles funktioniert. Stelle fest, was von den Namen im Protokoll noch existiert und was es festhält (`snapshots.py list`, `backup.py list --target <Ziel>`; die Berichte liegen als `/tmp/cleanup-snapshots-list.json` und `/tmp/cleanup-backup-list.json`). Der Nutzer entscheidet, was weg soll. Entfernt wird nur, was den Präfix trägt, je Schritt mit Probelauf zuerst:
 
 ```bash
-sudo python3 -I "${CLAUDE_SKILL_DIR}/snapshots.py" remove --name <Name> [--dry-run]
+sudo python3 -I "${CLAUDE_SKILL_DIR}/snapshots.py" remove --name <Name oder voller Pfad> --report /tmp/cleanup-snapshots-remove-<n>.json [--dry-run]
 sudo python3 -I "${CLAUDE_SKILL_DIR}/backup.py" remove --target "<Zielordner>" --run <Lauf> [--dry-run]
 ```
 
-Jedes Entfernen ist ein Schritt im Protokoll. Timeshift und Snapper räumst du mit deren Befehlen als Block auf. Danach fragst du, ob das Protokoll gelöscht werden soll; du löschst es nur, wenn der Nutzer es will. Stehen Sonderbehandlungen darin, sag es ihm. Er kann auch nur den Protokollteil dieser und früherer Sitzungen entfernen lassen und die Datei mit den Sonderbehandlungen behalten.
+Tragen Snapshots auf mehreren Dateisystemen denselben Namen (Läufe vor der Regel „ein Label je Dateisystem“), gib den vollen Pfad aus `snapshots.py list` an; `<n>` zählt die Aufrufe, damit jeder seinen eigenen Bericht behält. Jedes Entfernen ist ein Schritt im Protokoll. Timeshift und Snapper räumst du mit deren Befehlen als Block auf. Danach fragst du, ob das Protokoll gelöscht werden soll; du löschst es nur, wenn der Nutzer es will. Stehen Sonderbehandlungen darin, sag es ihm. Er kann auch nur den Protokollteil dieser und früherer Sitzungen entfernen lassen und die Datei mit den Sonderbehandlungen behalten.
 
 ## Betriebsart: Wiederaufnahme nach einem Abbruch
 

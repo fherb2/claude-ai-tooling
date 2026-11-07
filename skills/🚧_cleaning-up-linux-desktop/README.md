@@ -26,7 +26,7 @@ Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/cleaning-up-linux-de
 
 1. **Paket herunterladen.** `downloads/cleaning-up-linux-desktop_de_local.zip`
 
-2. **Entpacken.** Das Archiv enthält einen Ordner `cleaning-up-linux-desktop/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` in einem Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
+2. **Entpacken.** Das Archiv enthält einen Ordner `cleaning-up-linux-desktop/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
 ### claude.ai und Claude Desktop (Chat + Cowork)
 
@@ -50,7 +50,7 @@ Ablauf:
 5. Sichern und Protokoll anlegen (siehe unten).
 6. Bereich für Bereich durch Tabelle 1: Einzelheiten zeigen, Entscheidung einholen, Probelauf, nach Bestätigung echter Lauf.
 7. Ergebnisbericht: was gelöscht wurde und wie viel, was übersprungen und was nur gemeldet wurde. Damit endet der eigentliche Lauf.
-8. Nachgang, auf Wunsch und jederzeit abbrechbar, mit einer neuen Sicherung davor: zuerst Tabelle 2, dann Tabelle 3. Für diese Stellen hat der Skill keine getesteten Erfahrungen; er klärt sie gemeinsam mit dem Nutzer, mit Recherche in der Dokumentation und mit dem ausdrücklichen Hinweis vor jedem Löschen, was belegt und was Vermutung ist. Für Tabelle 2 liegt die Recherche schon aus der Analyse vor, für Tabelle 3 beginnt sie erst.
+8. Nachgang, auf Wunsch und jederzeit abbrechbar, mit einer neuen Sicherung davor: zuerst Tabelle 2, dann Tabelle 3. Für diese Stellen hat der Skill keine getesteten Erfahrungen; er klärt sie gemeinsam mit dem Nutzer, mit Recherche in der Dokumentation und mit dem ausdrücklichen Hinweis vor jedem Löschen, was belegt und was Vermutung ist. Für Tabelle 2 liegt die Recherche schon aus der Analyse vor, für Tabelle 3 beginnt sie erst. Gelöscht wird im Nachgang mit einem festen Befehlsblock, der je Pfad Einhängepunkte, Links und den Präfix der eigenen Sicherungen prüft und zuerst als Probelauf läuft.
 
 ### Die Skripte
 
@@ -77,7 +77,7 @@ Vor dem ersten Löschen und vor dem Nachgang bietet der Skill an, was das System
 
 ### Was das Löschskript immer verweigert
 
-Unabhängig vom Auftrag löscht `delete.py` nie: `/`, das Home selbst, einen Ordner direkt unter `/` oder direkt unter dem Home, irgendetwas unter `/boot`, etwas außerhalb von Home, `/var`, `/opt`, `/usr/local` und `/srv`, einen Einhängepunkt oder einen Ordner, der einen enthält, alles mit dem Präfix der eigenen Sicherungen und einen symbolischen Link — außer im Papierkorb, und dort nur den Link, nie sein Ziel. Diese Sperre fängt einen Übersetzungsfehler ab, bevor er Schaden anrichtet; sie darf bei einer Vereinfachung nicht wegfallen.
+Unabhängig vom Auftrag löscht `delete.py` nie: `/`, das Home selbst, einen Ordner direkt unter `/` oder direkt unter dem Home, irgendetwas unter `/boot`, etwas außerhalb von Home, `/var`, `/opt`, `/usr/local` und `/srv`, einen Einhängepunkt, einen Ordner, der einen enthält, und alles, was auf einem liegt, alles mit dem Präfix der eigenen Sicherungen und einen symbolischen Link — außer im Papierkorb, und dort nur den Link, nie sein Ziel. Diese Sperre fängt einen Übersetzungsfehler ab, bevor er Schaden anrichtet; sie darf bei einer Vereinfachung nicht wegfallen.
 
 ### Einhängepunkte, Links und hängende Läufe
 
