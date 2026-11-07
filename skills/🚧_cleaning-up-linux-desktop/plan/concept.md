@@ -19,16 +19,19 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
    - Nicht dazu gehören die Proxy-Dateien eines Videoschnittprogramms: datenreduzierte Fassungen der Quellvideos, mit denen die Vorschau während der Bearbeitung mit wenig Ressourcen rechnet. Sie sind keine bloßen Kopien, sondern veränderte Repräsentanten der eigentlichen Daten, entstehen in einem eigenen Arbeitsschritt und werden nicht on-the-fly neu erzeugt, wenn sie fehlen. Das sind Arbeitsdaten, kein Cache.
 
    Nutzdaten wie Downloads, Installationsdateien, Images und Medien (Abschnitte 4.7 bis 4.10) löscht der Skill nur nach Entscheidung des Nutzers.
-5. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie groß die entfernte Datenmenge war (nicht der frei gewordene Platz), was nur gemeldet wurde.
+5. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie groß die entfernte Datenmenge war (nicht der frei gewordene Platz), was nur gemeldet wurde. Wurde gesichert, nennt er die Sicherungen (Name, Ort, Größe) und dass sie Platz festhalten, bis sie entfernt sind; sie lassen sich später mit dem Skill aufräumen (3.9).
 6. Nutzereingaben: Was zu erhalten und was zu löschen ist, formuliert allein der Nutzer. Die Instanz bewertet die Angaben und überführt sie in eine schematisch richtige Zuordnung, die dem Skript oder Befehl übergeben wird. Das gilt für alle Nutzereingaben im Skill.
 7. Ordnernamen: Sie werden bei der Abarbeitung an die Sprache des Systems und des Desktops des Nutzers angepasst. Namen wie `Downloads`, `Videos`, `Musik`, `Bilder` oder `Dokumente` stehen in keiner Zeichenkette eines Skripts. Die Instanz ermittelt den Pfad auf dem Rechner (XDG-Benutzerverzeichnisse: `~/.config/user-dirs.dirs`, `xdg-user-dir`), prüft im Home, dass der Ordner existiert, und startet erst dann das Skript oder den Agenten. Sie übergibt den aufgelösten Pfad als Parameter. Messbefund: Auf diesem Rechner heißen `Downloads` und `Videos` englisch, `Musik`, `Bilder`, `Dokumente`, `Schreibtisch` deutsch.
 8. Eingehängtes und Links: Was eingehängt ist (anderes Dateisystem oder Bind-Mount), wird nie gelöscht und nie durchlaufen; eingehängte Daten werden nur an ihrem echten Ort erfasst, wenn dieser im Untersuchungsbereich liegt. Will der Nutzer sie aufräumen, geht er an diesen Ort. Symbolische Links werden nie verfolgt; gelöscht wird ein Link selbst nur im Papierkorb (4.14), sein Ziel nie.
+9. Eigene Sicherungen: Alle Snapshots und Archive, die der Skill anlegt, tragen den Namenspräfix `cleaning-up-linux-desktop-` mit Datum und Uhrzeit. Die Skripte fassen Snapshots und Archive ohne diesen Präfix nie an; davon weicht der Skill nur auf ausdrücklichen Wunsch des Nutzers ab. Dateien mit dem Präfix sind von allen Löschläufen ausgenommen.
 
 Zum Alter einer Datei: Wo dieses Dokument die Anlegezeit nennt (4.2 bis 4.4, 4.9), verwenden die Skripte die Zeit der letzten Statusänderung (`ctime`). Das Anlegedatum liefert Python 3.12 unter Linux nicht. Die Statusänderung ist nie älter als das Anlegen; eine Datei erscheint damit höchstens jünger, als sie ist, und wird im Zweifel nicht gelöscht.
 
 ## 3 Ablauf des Skills
 
 ### 3.1 Beginn
+
+**Betriebsarten.** Der Skill kennt drei: das Aufräumen (der normale Lauf, dieser Abschnitt und die folgenden), das Aufräumen der Sicherungen eines früheren Laufs (3.9) und die Wiederaufnahme nach einem abgebrochenen Lauf (3.10). Zuerst sucht die Instanz das Protokoll (3.8). Findet sie es im Home nicht, fragt sie, ob es unter anderem Namen oder an anderer Stelle liegt; erst danach gilt: kein Protokoll. Dann schlägt sie die Betriebsart vor: kein Protokoll heißt normaler Lauf, ein offener Schritt führt zur Wiederaufnahme, ein abgeschlossener Lauf mit noch vorhandenen Sicherungen zum Aufräumen der Sicherungen. Der Nutzer entscheidet. Die Schritte 2 bis 7 gelten für alle Betriebsarten, Schritt 8 nur für den normalen Lauf.
 
 1. In Claude Code wird der Skill nur über `/cleaning-up-linux-desktop` aufgerufen (`disable-model-invocation: true`); eine Rückfrage, ob er angewendet werden soll, entfällt dort. Wurde er nicht ausdrücklich aufgerufen — etwa auf claude.ai, wo er von selbst geladen werden kann —, fragt er zuerst, ob er jetzt angewendet werden soll. Bei "nein" endet er.
 2. Er nennt, wofür er vorgesehen ist (Abschnitt 1).
@@ -39,13 +42,34 @@ Zum Alter einer Datei: Wo dieses Dokument die Anlegezeit nennt (4.2 bis 4.4, 4.9
    - In der Claude-App (claude.ai): Zu jedem Block und jedem Skript sagt er dem Nutzer immer, welche Datei danach hochzuladen ist.
    - Nicht in der Claude-App (Claude Code): Er fragt, ob er auf dem betreffenden System gestartet wurde. Wenn ja und der Nutzer nur will, dass Claude Code die Ergebnisse in `/tmp` liest, gibt er ihm den Befehl `/add-dir /tmp` vor, nicht `/cd`. Dann kann er alle Ergebnisdateien auswerten, ohne dass der Nutzer jedes Mal den Zugriff außerhalb des Arbeitsverzeichnisses freigeben muss. Das gilt für Claude Code in der Konsole. In der Erweiterung von VS Code gibt es `/add-dir` nicht (vom Nutzer geprüft); Lesen in `/tmp` funktioniert dort trotzdem; im Berechtigungsmodus "auto" ohne Rückfrage, sonst muss der Nutzer jeden Zugriff einzeln freigeben (Beobachtung des Nutzers). Der Skill sagt das zu Beginn an, damit die Rückfragen nicht überraschen.
 5. Auf ausdrücklichen Wunsch des Nutzers führt der Skill Skripte selbst aus. Diese Variante bietet er nur an, wenn er auf demselben System läuft. Voraussetzung ist, dass der Nutzer die Session vorher mit `/cd /tmp` in diesen Ordner verlegt hat. Root-Zugriffe delegiert er trotzdem an den Nutzer. Eine Prüfung der Claude-Code-Version entfällt, `/cd` gibt es seit mehreren Monaten. `/cd` funktioniert in Claude Code in der Konsole, in der Erweiterung von VS Code nicht (beides vom Nutzer geprüft). Dort ist diese Variante also nicht möglich.
-6. Er teilt dem Nutzer mit: Der Vorgang dauert länger, kann umfangreiche Internetrecherchen umfassen und verbraucht zahlreiche Token. Für ein gutes Rechercheergebnis empfiehlt er das Modell Opus. Außerdem sagt er deutlich: Für die Funktion des Skills wird keine Gewähr übernommen, gelöschte Dateien kommen nur über eine Sicherung zurück; er empfiehlt, vor der Nutzung mindestens ein vollständiges Backup oder einen Snapshot anzulegen und zu prüfen, dass es sich zurückspielen lässt (gleichlautend mit dem Abschnitt „Ohne Gewähr“ der README).
+6. Er teilt dem Nutzer mit: Der Vorgang dauert länger, kann umfangreiche Internetrecherchen umfassen und verbraucht zahlreiche Token. Für ein gutes Rechercheergebnis empfiehlt er das Modell Opus. Außerdem sagt er deutlich: Für die Funktion des Skills wird keine Gewähr übernommen, gelöschte Dateien kommen nur über eine Sicherung zurück; er empfiehlt, vor dem ersten Löschen mindestens ein vollständiges Backup oder einen Snapshot anzulegen und zu prüfen, dass es sich zurückspielen lässt. Der Skill macht das an dieser Stelle gemeinsam mit dem Nutzer (3.2); wer will, kann es auch schon vorher selbst tun (sinngleich mit dem Abschnitt „Ohne Gewähr“ der README).
 7. Der Nutzer bestätigt diese Arbeitsweise, bevor es weitergeht.
 8. Er fragt alle Angaben ab, die die Analyse vom Nutzer braucht, bevor sie startet: die Größenschwelle, eine einzige Zahl für 4.8, 4.10 und die großen Einzeldateien in Tabelle 3 (Vorgabe 150 MiB), und ob in 4.8 auch allgemeine Archivformate erfasst werden. Die Analyse läuft danach ohne weitere Rückfrage.
 
-### 3.2 Snapshots
+### 3.2 Sicherung
 
-Gleich zu Beginn der Untersuchung prüft der Skill, ob das System Snapshots anbietet (zum Beispiel btrfs). Wenn ja, schlägt er dem Nutzer vor, diesen Mechanismus in den einzelnen Aufräumschritten jeweils zu nutzen. Die Snapshots werden erst später entfernt, wenn nachweislich alles funktioniert.
+**Zeitpunkt.** Die Analyse liest nur und braucht keine Sicherung. Gesichert wird vor dem ersten Löschen und ein zweites Mal vor dem Nachgang zu Tabelle 2 und 3 (3.5), weil dort Ungetestetes geschieht. Ob statt dessen vor jedem Aufräumschritt gesichert wird, entscheidet der Nutzer; Vorgabe ist einmal je Zeitpunkt. Die Wahl kommt ins Protokoll (3.8).
+
+**Varianten.** Nach der Analyse bietet der Skill alle an, die das System hergibt, und der Nutzer entscheidet; die Wahl, der Zielort und die Namen kommen ins Protokoll:
+
+1. Eigene Sicherung: Der Nutzer bestätigt, dass eine aktuelle Sicherung vorliegt, die sich zurückspielen lässt. Der Skill sichert dann nichts selbst.
+2. Snapshot des Dateisystems, schreibgeschützt: btrfs (getestet), ZFS und LVM (Befehle recherchiert, nicht getestet; sie kommen später, `work-plan.md`, Schritt 25). Der Ubuntu-24.04-Desktop-Installer bietet ZFS und LVM an, btrfs nicht ([Ubuntu-Dokumentation](https://ubuntu.com/desktop/docs/en/24.04/reference/advanced-disk-setup-features/)); ext4 und xfs ohne LVM kennen keine Snapshots.
+3. Timeshift oder Snapper, wenn die Analyse sie erkennt: Der Skill gibt deren Befehle als Block, die Namen oder Kennungen kommen ins Protokoll. Das Skript `snapshots.py` fasst sie nicht an.
+4. Archiv der zu löschenden Dateien (unten).
+
+**Erkennung.** Die Analyse (3.3) stellt fest, ob btrfs, ZFS oder LVM vorliegt, ob Timeshift oder Snapper installiert und eingerichtet sind, welche Snapshots es schon gibt und wie viel Platz je Dateisystem frei ist. Snapshots halten gelöschte Daten fest: Platz wird erst frei, wenn sie entfernt sind (3.9).
+
+**Archiv.**
+
+- Umfang: Nutzdaten (4.7 bis 4.10, Download-Ordner, Papierkorb) und Anwendungsordner, für die kein Beleg vorliegt, dass es reine Caches sind (Nachgang zu Tabelle 2 und 3). Belegte Caches (Tabelle 1) werden nicht gesichert. Vor jeder Sicherung fragt der Skill, ob der Nutzer sie wirklich will.
+- Formate, der Nutzer wählt:
+  - **tar** (GNU tar im pax-Format): behält Besitzer, ACLs, erweiterte Attribute (`--acls --xattrs`), Hardlinks und Links. Nach dem [GNU-tar-Handbuch](https://www.gnu.org/software/tar/manual/html_node/Extended-File-Attributes.html) werden beim Entpacken nur erweiterte Attribute im Namensraum `user` wiederhergestellt. Ein Ordner `cleaning-up-linux-desktop-backup-<Datum>-<Uhrzeit>/` je Lauf, darin je Sicherungsschritt ein tar. Bei schnellem Ziel (interne SSD) unkomprimiert, bei langsamem (USB-Stick, Netz) als `.tar.gz` mit Stufe 1; der Nutzer entscheidet. Vorgabe ist tar, weil die Nutzdaten meist unkomprimierbar sind und nichts verloren geht.
+  - **ZIP:** eine Datei `cleaning-up-linux-desktop-backup-<Datum>-<Uhrzeit>.zip` je Lauf, auf der obersten Ebene je Sicherungsschritt ein Ordner. Dateiweise: Video, Audio, Bilder, Archive, Images und `.deb` (nach Dateiendung) werden nur abgelegt, alles andere mit Stufe 3 gepackt. Wer ZIP wählt, erfährt ausdrücklich, was verloren geht: Besitzer, ACLs, erweiterte Attribute (nach meinem Wissen, nicht geprüft, zum Beispiel die Herkunfts-URL von Downloads sowie Tags und Bewertungen aus Dolphin) und Hardlinks; Links werden als Links gespeichert, nie verfolgt.
+- Zielort: Vorgabe `~/`. Der Skill fragt, ob der Nutzer lieber ein externes Gerät nimmt (Stick, Netzfreigabe). Bei einer Netzfreigabe weist er darauf hin, dass die Übertragung in der Regel deutlich länger dauert als an einem direkt angeschlossenen, ausreichend modernen Speichergerät. Liegt das Ziel auf demselben Dateisystem wie die Daten, wird durch das Aufräumen kein Platz frei, solange das Archiv existiert.
+- Platzprüfung: Vor jedem Sicherungsschritt prüft das Skript, ob der freie Platz am Ziel für die Gesamtmenge reicht (unkomprimiert gerechnet) und danach eine Reserve bleibt. Vorgabe ist die größere von 10 % des Ziel-Dateisystems und 10 GiB. Der Nutzer darf sie senken, aber nie unter die größere von 5 % und 5 GiB. Reicht der Platz nicht, bricht das Skript ab, und der Skill schlägt ein anderes Ziel vor.
+- Ablauf: Probelauf von `delete.py` mit Kandidatenpfaden, dann `backup.py` (schreibt das Archiv und verifiziert es), erst dann das echte Löschen. Scheitert die Sicherung, wird nichts gelöscht.
+
+**Zurückholen.** Selektiv: nur fehlende Dateien aus der Sicherung zurückkopieren, nichts überschreiben. Ein Zurückrollen eines ganzen Subvolumes oder Dateisystems geschieht nur auf ausdrücklichen Wunsch und mit Warnung: Das Protokoll im Home würde auf den Stand des Snapshots zurückgesetzt.
 
 ### 3.3 Erste Aufgabe: allgemeine Untersuchung
 
@@ -63,7 +87,7 @@ Das Ergebnis übergibt er in drei Tabellen:
 | 2 | Durch Recherche belegte Stellen (Abschnitt 4.11), je Zeile mit der Einschätzung, wie sicher der Beleg ist |
 | 3 | Auswertung der Statistiken: Größe je Verzeichnis und große Einzeldateien außerhalb der bekannten Bereiche, wo möglicherweise weitere Aufräummöglichkeiten bestehen |
 
-Vor den Tabellen nennt der Skill den Füllstand je eingehängtem Dateisystem (belegt, Gesamtgröße, Prozent). Gibt es btrfs-Snapshots, nennt er ihre Zahl und, wenn die btrfs-Quotas aktiv sind, ihre Belegung; sonst entfällt diese Angabe. Der Füllstand zeigt, auf welchem Dateisystem Aufräumen überhaupt etwas bringt.
+Vor den Tabellen nennt der Skill den Füllstand je eingehängtem Dateisystem (belegt, Gesamtgröße, Prozent). Gibt es btrfs-Snapshots, nennt er ihre Zahl und, wenn die btrfs-Quotas aktiv sind, ihre Belegung; sonst entfällt diese Angabe. Dazu nennt er, welche Snapshot-Fähigkeiten und -Werkzeuge das System bietet (3.2). Der Füllstand zeigt, auf welchem Dateisystem Aufräumen überhaupt etwas bringt.
 
 Aufbau der Tabellen:
 
@@ -89,13 +113,13 @@ Software-Erfassung: Zu Beginn der Analyse erfasst der Skill auch die Anwendersof
 
 ### 3.4 Zweite Aufgabe: Tabelle 1
 
-Der Skill schlägt vor, zuerst Tabelle 1 Schritt für Schritt gemeinsam mit dem Nutzer abzuarbeiten und dabei aufzuräumen. Die Empfehlung zur Sicherung hat der Skill schon zu Beginn ausgesprochen (3.1, Schritt 6); vor Tabelle 1 wiederholt er sie nicht.
+Der Skill schlägt vor, zuerst Tabelle 1 Schritt für Schritt gemeinsam mit dem Nutzer abzuarbeiten und dabei aufzuräumen. Die Empfehlung zur Sicherung hat der Skill schon zu Beginn ausgesprochen (3.1, Schritt 6). Vor dem ersten Löschen sichert er gemeinsam mit dem Nutzer (3.2) und trägt die Sicherung ins Protokoll ein (3.8).
 
 Die Zeilen für Log-Files und Journal (4.5) sowie für Nutzdaten (4.7 bis 4.10) tragen den Hinweis, dass Gelöschtes nur über ein Backup oder einen Snapshot zurückkommt. Getestet ist dort der Löschvorgang; ob eine Datei noch gebraucht wird, entscheidet der Nutzer.
 
 ### 3.5 Nachgang zu Tabelle 2
 
-Mit Tabelle 1 und dem Ergebnisbericht (Grundsatz 5) endet der eigentliche Lauf des Skills. Danach bietet er einen Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3 (3.6); der Nutzer kann nach jedem Teil aufhören. Tabelle 2 kommt vor Tabelle 3, weil für ihre Posten die Recherche schon vorliegt. Für ihre Zeilen gilt:
+Mit Tabelle 1 und dem Ergebnisbericht (Grundsatz 5) endet der eigentliche Lauf des Skills. Vor dem Nachgang bietet der Skill eine neue Sicherung an (3.2). Danach bietet er einen Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3 (3.6); der Nutzer kann nach jedem Teil aufhören. Tabelle 2 kommt vor Tabelle 3, weil für ihre Posten die Recherche schon vorliegt. Für ihre Zeilen gilt:
 
 - Jede Zeile nennt die Einschätzung des Belegs in zwei Stufen:
   - **hoch**: Die offizielle Dokumentation des Programms sagt es ausdrücklich.
@@ -119,6 +143,34 @@ Nach dem Nachgang zu Tabelle 2, oder wenn der Nutzer ihn auslässt, bietet der S
 ### 3.7 Zusätzlich angeforderte Suchen
 
 Bittet der Nutzer den Skill zusätzlich, nach weiteren Dateien zu suchen, und beschreibt er, welche er meint, gilt keine der bisherigen Regeln dieses Plans. Das ist kein Automatismus des Skills, sondern eine zusätzlich angeforderte Aufgabe. Ihre Randbedingungen beruhen nicht auf den Festlegungen des Skills, sondern werden im Einzelnen mit dem Nutzer ausgehandelt.
+
+### 3.8 Protokoll
+
+Zweck: Ein kurzes Protokoll des Laufs, nur damit in einer neuen Sitzung ein Rollback möglich ist.
+
+- **Ort und Name:** Vorgabe im Home, `cleaning-up-linux-desktop-protocol.md`. Beim Start sucht die Instanz dort; gibt es nichts, fragt sie nach einem anderen Namen oder Ort und kann die Datei über ihre erste Zeile suchen lassen (Befehlsblock für den Nutzer).
+- **Kopfzeile:** Die erste Zeile lautet genau `# cleaning-up-linux-desktop Protocol`. Nur sie ist als Token englisch; der übrige Text steht in der Sprache des Nutzers, solange er nichts anderes will.
+- **Aufbau:** ein Kopf mit den Eckdaten des Laufs (gewählte Sicherungsvariante, Zielort, Takt der Sicherung), dann das Protokoll, je Sitzung mit Datum, und ein eigener Abschnitt „Sonderbehandlungen“ ohne Protokollcharakter.
+- **Einträge, kurz:**
+  - Je Schritt eine Zeile mit Bereich und was getan wurde. Die Instanz schreibt „begonnen“, wenn sie den Befehlsblock übergibt, und danach „erledigt“ oder „abgebrochen“. So bleibt ein Abbruch mitten im Schritt sichtbar.
+  - Je Löschschritt die betroffenen Ordner (nicht jede Datei), damit der Bereich aus der Sicherung zurückgeholt werden kann. Die Berichte unter `/tmp` überstehen keinen Neustart.
+  - Übersprungene Schritte (mit dem Nutzer) und Besonderheiten.
+  - Jede Sicherung (Snapshot oder Archiv) und jedes Entfernen einer Sicherung als eigener Schritt mit Namen und Ort.
+- **Sonderbehandlungen:** Hier steht, was mit dem Nutzer besonders vereinbart wurde, zur Wiederverwendung beim nächsten Lauf. Ob etwas aufgenommen wird, fragt der Skill; beim nächsten Lauf fragt er, ob die Sonderbehandlungen wieder gelten sollen.
+- **Schreiben:** In Claude Code schreibt die Instanz die Datei selbst. Auf claude.ai gibt es sie als Download, bei einem neuen Start lädt der Nutzer sie hoch.
+
+### 3.9 Betriebsart: Aufräumen der Sicherungen
+
+- Nur, wenn das Protokoll den letzten Lauf als abgeschlossen ausweist; sonst führt der Weg zu 3.10. Das Aufräumen lässt sich auf einen späteren Zeitpunkt legen, an dem der Nutzer sich überzeugen konnte, dass alles funktioniert; beim normalen Lauf wird ihm das am Ende gesagt.
+- Ein lesendes Skript (`snapshots.py`) stellt fest, welche Sicherungen mit dem Präfix noch existieren und was sie festhalten. Zusammen mit dem Stand im Protokoll weiß die Instanz, was aufzuräumen ist.
+- Der Nutzer entscheidet, was entfernt wird. Entfernt wird nur, was den Präfix trägt, und jedes Entfernen ist ein Schritt im Protokoll.
+- Danach fragt der Skill, ob das Protokoll gelöscht werden soll; es wird nur gelöscht, wenn der Nutzer es will. Stehen Sonderbehandlungen darin, sagt der Skill das. Der Nutzer kann auch nur das Protokoll dieser und früherer Sitzungen entfernen und die Datei mit den Sonderbehandlungen stehen lassen.
+
+### 3.10 Betriebsart: Wiederaufnahme nach einem Abbruch
+
+- Gilt, wenn das Protokoll einen offenen Schritt oder einen nicht abgeschlossenen Lauf zeigt, zum Beispiel nach einem Neustart, bei dem die Sitzung verloren ging.
+- Die Instanz liest das Protokoll, stellt den Stand dar (erledigt, begonnen ohne Abschluss) und prüft, ob die genannten Sicherungen noch vorhanden sind (`snapshots.py`).
+- Dann schlägt sie vor, einen oder alle Schritte zurückzuholen (selektiv, 3.2) oder fortzusetzen. Der Nutzer entscheidet. Zurückgeholt wird je Schritt aus der Sicherung, die das Protokoll nennt. Gibt es keine, weist die Instanz auf die eigene Sicherung des Nutzers hin, die er selbst zurückspielt.
 
 ## 4 Festgelegte Bereiche
 
