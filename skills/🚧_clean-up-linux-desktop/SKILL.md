@@ -1,6 +1,6 @@
 ---
-name: linux-desktop-clean-up
-description: Räumt einen Linux-Desktop oder -Laptop (Ubuntu, Kubuntu und ähnliche) auf, ohne Arbeitsdaten zu gefährden — Caches, Paket- und Log-Reste, Papierkorb, Docker-Reste, alte Downloads und Installationsdateien. Misst zuerst, zeigt Füllstand und drei Tabellen, löscht Caches nach festen Regeln und Nutzdaten nur nach Auswahl des Nutzers. Entfernt keine installierte Software. Wird ausschließlich auf ausdrücklichen Aufruf mit /linux-desktop-clean-up angewendet.
+name: clean-up-linux-desktop
+description: Räumt einen Linux-Desktop oder -Laptop (Ubuntu, Kubuntu und ähnliche) auf, ohne Arbeitsdaten zu gefährden — Caches, Paket- und Log-Reste, Papierkorb, Docker-Reste, alte Downloads und Installationsdateien. Misst zuerst, zeigt Füllstand und drei Tabellen, löscht Caches nach festen Regeln und Nutzdaten nur nach Auswahl des Nutzers. Entfernt keine installierte Software. Wird ausschließlich auf ausdrücklichen Aufruf mit /clean-up-linux-desktop angewendet.
 license: CC0-1.0
 disable-model-invocation: true
 ---
@@ -30,7 +30,7 @@ Auf ausdrücklichen Wunsch führst du Skripte ohne `sudo` selbst aus; das bietes
 
 **claude.ai und Claude Desktop (Chat + Cowork):** Der Platzhalter für den Skill-Ordner wird hier nicht ersetzt. Suche den Ordner dieses Skills in deiner Ausführungsumgebung (`ls` unter `/mnt`), kopiere `analyze.py`, `delete.py` und `journal_stats.py` unverändert nach `/mnt/user-data/outputs` und biete sie als Download an — **nie als Artefakt**, denn ein Artefakt ist eine Abschrift durch dich und kann sich vom Original unterscheiden. Der Nutzer legt sie in einen Ordner seiner Wahl; in den Befehlen steht dieser Ordner statt `${CLAUDE_SKILL_DIR}`. Nach jedem Befehlsblock nennst du die Datei, die er dir hochladen soll. Aufträge für das Löschskript gibst du ebenfalls als Download.
 
-Wurde der Skill nicht ausdrücklich mit `/linux-desktop-clean-up` aufgerufen — etwa weil er auf claude.ai von selbst geladen wurde —, frage zuerst, ob er jetzt angewendet werden soll. Bei Nein endest du.
+Wurde der Skill nicht ausdrücklich mit `/clean-up-linux-desktop` aufgerufen — etwa weil er auf claude.ai von selbst geladen wurde —, frage zuerst, ob er jetzt angewendet werden soll. Bei Nein endest du.
 
 ## Beginn
 

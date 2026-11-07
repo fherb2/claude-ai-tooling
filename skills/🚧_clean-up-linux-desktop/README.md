@@ -1,4 +1,4 @@
-# linux-desktop-clean-up — einen Linux-Desktop aufräumen, ohne Arbeitsdaten zu gefährden
+# clean-up-linux-desktop — einen Linux-Desktop aufräumen, ohne Arbeitsdaten zu gefährden
 
 *Stand: 2026-11-06*
 
@@ -14,7 +14,7 @@ Was ohne Rückfrage gelöscht wird, ist eng begrenzt: programmeigene Zwischendat
 
 **Abgrenzung:** Der Skill entfernt keine installierte Software, auch keine, die vermutlich niemand mehr braucht; er meldet sie nur. Er ist für Desktops und Laptops gedacht (Ubuntu, Kubuntu und ähnliche), nicht für Server. Was eingehängt ist — ein anderes Dateisystem oder ein Bind-Mount —, wird nie durchlaufen und nie gelöscht.
 
-Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/linux-desktop-clean-up`. Er lädt sich nicht von selbst.
+Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/clean-up-linux-desktop`. Er lädt sich nicht von selbst.
 
 ## Ohne Gewähr
 
@@ -24,13 +24,13 @@ Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/linux-desktop-clean-
 
 ### Claude Code
 
-1. **Paket herunterladen.** `downloads/linux-desktop-clean-up_de_local.zip`
+1. **Paket herunterladen.** `downloads/clean-up-linux-desktop_de_local.zip`
 
-2. **Entpacken.** Das Archiv enthält einen Ordner `linux-desktop-clean-up/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
+2. **Entpacken.** Das Archiv enthält einen Ordner `clean-up-linux-desktop/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
 ### claude.ai und Claude Desktop (Chat + Cowork)
 
-1. **Paket herunterladen.** `downloads/linux-desktop-clean-up_de_web.zip`
+1. **Paket herunterladen.** `downloads/clean-up-linux-desktop_de_web.zip`
 
 2. **Hochladen.** Im dafür vorgesehenen Verwaltungsfeld für Skills der Anwendung das Archiv hochladen. Der Skill gilt danach für Dein Konto — nicht für Deine Organisation, und nicht gleichzeitig in Claude Code.
 
