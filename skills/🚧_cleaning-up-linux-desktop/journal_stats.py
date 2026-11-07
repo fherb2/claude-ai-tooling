@@ -4,6 +4,9 @@ Runs when the area is processed, not in the first analysis. Only time,
 priority and source of the journal entries are read, never message texts;
 of the log files only time and size. Result as JSON, progress on stderr.
 
+Mount points and links are never followed (concept.md, Grundsatz 8): in the home, nothing on
+another mount than the home itself is touched; the journal and /var/log are named system sources.
+
 Usage:
     sudo nice -n 19 ionice -c3 python3 -I journal_stats.py --home /home/<user> \
         [--output /tmp/cleanup-journal.json]
@@ -16,14 +19,17 @@ import multiprocessing
 import os
 import re
 import statistics
+import stat
 import subprocess
 import sys
+import threading
 import time
 from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 
 JOURNAL_DIRS = ["/var/log/journal", "/run/log/journal"]
 LOG_DIR = "/var/log"
+PREFIX = "cleaning-up-linux-desktop-"      # name prefix of the skill's own snapshots and archives
 APP_CONTAINERS = [".config", ".local/share", ".cache", ".var"]
 LEVELS = ["emerg", "alert", "crit", "err", "warning", "notice", "info", "debug", "none"]
 BINS = [(f"day {n + 1}", n, n) for n in range(14)] + [
@@ -39,6 +45,199 @@ PRIO = re.compile(r'"PRIORITY":"(\d+)"')
 IDENT = re.compile(r'"SYSLOG_IDENTIFIER":"((?:[^"\\]|\\.)*)"')
 COMM = re.compile(r'"_COMM":"((?:[^"\\]|\\.)*)"')
 ROTATED = re.compile(r"(\.\d+(\.gz|\.xz|\.zst)?|-\d{8}(\.gz|\.xz|\.zst)?|\.gz|\.xz|\.zst|\.old)$")
+
+
+def is_own(name):
+    """Names of the skill's own snapshots, archives and their container folders."""
+    return name.lstrip(".").startswith(PREFIX)
+
+
+STALL_SECONDS = 5
+MOUNT_REFRESH = 1.0
+
+
+def unescape_mount(field):
+    """Undo the octal escapes of /proc/self/mountinfo (space, tab, newline, backslash); UTF-8 stays as it is."""
+    return re.sub(r"\\([0-7]{3})", lambda m: chr(int(m.group(1), 8)), field)
+
+
+def mount_points():
+    """All mount points, bind mounts on the same file system included (/proc/self/mountinfo)."""
+    points = set()
+    try:
+        with open("/proc/self/mountinfo", encoding="utf-8", errors="surrogateescape") as fh:
+            for line in fh:
+                fields = line.split()
+                if len(fields) > 4:
+                    points.add(unescape_mount(fields[4]))
+    except OSError:
+        pass
+    return points
+
+
+class Walker:
+    """Folder walks that never touch a mount point and never follow a link (concept.md, Grundsatz 8),
+    with a line on stderr while a walk stays in one folder longer than STALL_SECONDS.
+
+    Mount points are recognised by name against /proc/self/mountinfo before any system call on them,
+    because already a stat of an unresponsive network mount blocks. In the home, nothing is touched that
+    lies on another mount than the home itself (set home); other start points are the caller's choice."""
+
+    def __init__(self, script, newline=False):
+        self.script, self.newline = script, newline
+        self.home = None
+        self.stall_seconds = STALL_SECONDS
+        self.points, self.read_at = set(), None
+        self.lock = threading.Lock()
+        self.thread = None
+        self.active = []                    # folder each running walk is reading, innermost last
+        self.folder = self.since = None
+        self.stalled = None                 # folder named in the last stall line
+        self.stalls = []                    # [{"folder", "seconds"}] for the report
+
+    def mounts(self, fresh=False):
+        """Mount points, read again when older than MOUNT_REFRESH seconds or when fresh is asked for."""
+        now = time.monotonic()
+        if fresh or self.read_at is None or now - self.read_at >= MOUNT_REFRESH:
+            self.points, self.read_at = mount_points(), now
+        return self.points
+
+    def on_other_mount(self, path, base, fresh=False):
+        """True if a mount point lies at path or between base and path: seen from base, path is mounted data."""
+        prefix = base.rstrip(os.sep) + os.sep
+        target = path.rstrip(os.sep) + os.sep
+        return any(m.startswith(prefix) and target.startswith(m.rstrip(os.sep) + os.sep)
+                   for m in self.mounts(fresh))
+
+    def mount_of(self, path):
+        """The mount point path lies on, by name: the longest mount point that is a prefix of path."""
+        target = path.rstrip(os.sep) + os.sep
+        return max((m for m in self.mounts() if target.startswith(m.rstrip(os.sep) + os.sep)), key=len, default="/")
+
+    def contains_mount(self, path, fresh=False):
+        """True if path is a mount point or one lies below it."""
+        prefix = path.rstrip(os.sep) + os.sep
+        return any(m == path or m.startswith(prefix) for m in self.mounts(fresh))
+
+    def allowed(self, path):
+        """False for a path in the home that is or lies below a mount point inside the home."""
+        return not (self.home and path.startswith(self.home + os.sep) and self.on_other_mount(path, self.home))
+
+    def listdir(self, path):
+        """Sorted names in path without mount points; empty if path itself is not allowed or unreadable."""
+        if not self.allowed(path):
+            return []
+        try:
+            names = os.listdir(path)
+        except OSError:
+            return []
+        points = self.mounts()
+        return sorted(n for n in names if os.path.join(path, n) not in points)
+
+    def walk(self, top, skipped=None):
+        """Top-down walk like os.walk(top): yields (folder, dirs, files); dirs may be pruned in place.
+        Never enters a mount point, a folder on another device, a link or a folder with the own prefix;
+        they go to skipped as (path, reason) if a list is given. Links are listed in files."""
+        if not self.allowed(top):
+            if skipped is not None:
+                skipped.append((top, "on another mount than the home"))
+            return
+        try:
+            st = os.lstat(top)
+        except OSError:
+            return
+        if stat.S_ISLNK(st.st_mode):           # scandir would follow it
+            if skipped is not None:
+                skipped.append((top, "link"))
+            return
+        device = st.st_dev
+        self.begin()
+        stack = [top]
+        try:
+            while stack:
+                folder = stack.pop()
+                self.enter(folder)
+                try:
+                    with os.scandir(folder) as it:
+                        entries = list(it)
+                except OSError:
+                    continue
+                points = self.mounts()
+                dirs, files = [], []
+                for entry in entries:
+                    if entry.path in points:
+                        reason = "mount point"
+                    elif is_own(entry.name):
+                        reason = "own snapshot or archive (prefix)"
+                    else:
+                        try:
+                            if not entry.is_dir(follow_symlinks=False):
+                                files.append(entry.name)
+                                continue
+                            if entry.stat(follow_symlinks=False).st_dev == device:
+                                dirs.append(entry.name)
+                                continue
+                        except OSError:
+                            continue
+                        reason = "other file system"
+                    if skipped is not None:
+                        skipped.append((entry.path, reason))
+                yield folder, dirs, files
+                stack.extend(os.path.join(folder, d) for d in reversed(dirs))
+        finally:
+            self.leave()
+
+    def begin(self):
+        """Start of a walk; walks may nest (a size inside a walk), each ends with leave()."""
+        self.active.append(None)
+
+    def enter(self, folder):
+        """The walk starts reading folder: progress for the stall check."""
+        with self.lock:
+            now = time.monotonic()
+            if self.stalled is not None:
+                self._moved_on(now, folder)
+            self.active[-1] = folder
+            self.folder, self.since = folder, now
+        if self.thread is None:
+            self.thread = threading.Thread(target=self._watch, daemon=True)
+            self.thread.start()
+
+    def leave(self):
+        """End of a walk; an outer walk continues in its folder."""
+        with self.lock:
+            now = time.monotonic()
+            self.active.pop()
+            outer = self.active[-1] if self.active else None
+            if self.stalled is not None:
+                self._moved_on(now, outer)
+            self.folder, self.since = outer, now
+
+    def _moved_on(self, now, folder):
+        seconds = round(now - self.since)
+        self.stalls.append({"folder": self.stalled, "seconds": seconds})
+        where = f', now in "{folder}"' if folder else ", walk finished"
+        self._say(f'moved on after {seconds} s in "{self.stalled}"{where}')
+        self.stalled = None
+
+    def _watch(self):
+        while True:
+            time.sleep(self.stall_seconds)
+            with self.lock:
+                if self.folder is None:
+                    continue
+                seconds = time.monotonic() - self.since
+                if seconds < self.stall_seconds:
+                    continue
+                hint = "" if self.stalled else " (huge folder or unresponsive mount?)"
+                self.stalled = self.folder
+                self._say(f'still in "{self.folder}" after {round(seconds)} s, no progress{hint}')
+
+    def _say(self, text):
+        print(("\n" if self.newline else "") + f"{self.script}: {text}", file=sys.stderr, flush=True)
+
+
+WALK = Walker("journal_stats.py", newline=True)
 
 
 def physical_cores():
@@ -57,7 +256,7 @@ def physical_cores():
 def journal_files():
     files = []
     for folder in JOURNAL_DIRS:
-        for base, _, names in os.walk(folder):
+        for base, _, names in WALK.walk(folder):
             files += [os.path.join(base, n) for n in names if n.endswith((".journal", ".journal~"))]
     return sorted(files)
 
@@ -141,12 +340,12 @@ def top_sources(sources, limit=15):
 def log_candidates(home):
     """Log files after the boundary of 4.5: /var/log without the journal, in the home only application folders."""
     journal = os.path.join(LOG_DIR, "journal")
-    for folder, dirs, files in os.walk(LOG_DIR):
+    for folder, dirs, files in WALK.walk(LOG_DIR):
         dirs[:] = [d for d in dirs if os.path.join(folder, d) != journal]
         for name in files:
             yield os.path.join(folder, name)
     for container in APP_CONTAINERS:
-        for folder, dirs, files in os.walk(os.path.join(home, container)):
+        for folder, dirs, files in WALK.walk(os.path.join(home, container)):
             in_log_dir = any(p in ("log", "logs") for p in folder.split(os.sep))
             for name in files:
                 if in_log_dir or ".log" in name:
@@ -161,7 +360,7 @@ def log_files(home):
             st = os.lstat(path)
         except OSError:
             continue
-        if not os.path.isfile(path) or os.path.islink(path):
+        if not stat.S_ISREG(st.st_mode):          # from lstat: a link is not followed
             continue
         key = os.path.join(os.path.dirname(path), ROTATED.sub("", os.path.basename(path)))
         groups[key].append((st.st_mtime, st.st_size, path))
@@ -221,6 +420,7 @@ def main():
     parser.add_argument("--output", default="/tmp/cleanup-journal.json")
     args = parser.parse_args()
     home = os.path.realpath(args.home)
+    WALK.home = home
     now = time.time()
     if os.geteuid() != 0:
         print("Warning: not running as root; the journal may be incomplete.", file=sys.stderr)
@@ -247,7 +447,7 @@ def main():
         "meta": {"tool": "journal_stats.py",
                  "started": datetime.fromtimestamp(now, timezone.utc).isoformat(timespec="seconds"),
                  "duration_s": round(time.time() - now, 1), "journal_files": len(files),
-                 "cores": cores, "workers": workers,
+                 "cores": cores, "workers": workers, "stalls": WALK.stalls,
                  "entries": sum(levels.values()),
                  "oldest": datetime.fromtimestamp(oldest).isoformat(timespec="minutes") if oldest else None},
         "journal_disk_usage": disk_usage(),

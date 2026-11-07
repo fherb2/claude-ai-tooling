@@ -1,6 +1,6 @@
 # Plan: Clean-up-Skill für Linux-Desktops
 
-Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungssprache der Skripte: Python, nur mit der Standardbibliothek.
+Stand: 2026-11-07. Das Dokument hält nur Festlegungen fest. Implementierungssprache der Skripte: Python, nur mit der Standardbibliothek.
 
 ## 1 Zweck und Geltung
 
@@ -22,7 +22,14 @@ Stand: 2026-11-05. Das Dokument hält nur Festlegungen fest. Implementierungsspr
 5. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie groß die entfernte Datenmenge war (nicht der frei gewordene Platz), was nur gemeldet wurde. Wurde gesichert, nennt er die Sicherungen (Name, Ort, Größe) und dass sie Platz festhalten, bis sie entfernt sind; sie lassen sich später mit dem Skill aufräumen (3.9).
 6. Nutzereingaben: Was zu erhalten und was zu löschen ist, formuliert allein der Nutzer. Die Instanz bewertet die Angaben und überführt sie in eine schematisch richtige Zuordnung, die dem Skript oder Befehl übergeben wird. Das gilt für alle Nutzereingaben im Skill.
 7. Ordnernamen: Sie werden bei der Abarbeitung an die Sprache des Systems und des Desktops des Nutzers angepasst. Namen wie `Downloads`, `Videos`, `Musik`, `Bilder` oder `Dokumente` stehen in keiner Zeichenkette eines Skripts. Die Instanz ermittelt den Pfad auf dem Rechner (XDG-Benutzerverzeichnisse: `~/.config/user-dirs.dirs`, `xdg-user-dir`), prüft im Home, dass der Ordner existiert, und startet erst dann das Skript oder den Agenten. Sie übergibt den aufgelösten Pfad als Parameter. Messbefund: Auf diesem Rechner heißen `Downloads` und `Videos` englisch, `Musik`, `Bilder`, `Dokumente`, `Schreibtisch` deutsch.
-8. Eingehängtes und Links: Was eingehängt ist (anderes Dateisystem oder Bind-Mount), wird nie gelöscht und nie durchlaufen; eingehängte Daten werden nur an ihrem echten Ort erfasst, wenn dieser im Untersuchungsbereich liegt. Will der Nutzer sie aufräumen, geht er an diesen Ort. Symbolische Links werden nie verfolgt; gelöscht wird ein Link selbst nur im Papierkorb (4.14), sein Ziel nie.
+8. Eingehängtes und Links: Was eingehängt ist (anderes Dateisystem, Netzfreigabe, Bind-Mount), wird nie gelöscht, nie durchlaufen und nie angefasst — nicht einmal gelesen, gezählt oder mit `stat` abgefragt. Der Grund ist die Netzfreigabe: Schon die Abfrage ihres Wurzelordners blockiert, wenn der Server nicht antwortet, und ein Prozess in diesem Zustand lässt sich auch mit `kill -KILL` nicht sofort beenden (Messbefund vom 7. November 2026, Probelauf zu 4.12 im ersten Lauf des installierten Skills: Zustand `D`, Kernel-Stack `cifs … wait_for_response`). Deshalb entscheiden die Skripte über Einhängepunkte **nach dem Namen**, gegen die Liste in `/proc/self/mountinfo`, bevor ein Systemaufruf auf den Pfad geht; erst danach prüfen sie das Gerät. Die Liste wird höchstens einmal je Sekunde neu gelesen, damit auch eine Einhängung während des Laufs erkannt wird, und das Home wird über `realpath` aufgelöst. Die Abgrenzung:
+   - **Im Home** wird nichts angefasst, was auf einem anderen Einhängepunkt liegt als das Home selbst, auch kein fester Pfad (Papierkorb, Cache-Ordner, Download-Ziel) und kein Ziel eines Links.
+   - **Benannte Systemquellen** außerhalb des Homes (Journal, `/var/log`, die Analysewurzeln `/var`, `/opt`, `/usr/local`, `/srv`) sind gewollte Ziele; ein Durchlauf, der dort beginnt, überschreitet keine weitere Grenze.
+   - **Der Zielort einer Archivsicherung** (3.2), den der Nutzer wählt, auch eine Netzfreigabe, wird nur beschrieben und nie durchlaufen.
+   - **Gelesen werden nur lokale Dateisysteme** (Blockgerät oder ZFS) beim Füllstand; Netz-, FUSE- und Speicher-Dateisysteme erscheinen dort nicht.
+   - Eingehängte Daten werden nur an ihrem echten Ort erfasst, wenn dieser im Untersuchungsbereich liegt. Will der Nutzer sie aufräumen, geht er an diesen Ort.
+   - Beim Zurückholen (3.2, 3.10) werden Ziele an oder unter einem Einhängepunkt ausgelassen und gemeldet; dort wird nichts angesehen.
+   - Symbolische Links werden nie verfolgt; auch ihr Ziel wird nicht gelesen. Die einzige Ausnahme sind die Starter-Einträge für Tabelle 2 (4.11): Das Ziel eines Links wird zuerst nur als Text aufgelöst und gelesen, wenn es auf keinem fremden Einhängepunkt liegt; sonst bleibt der Eintrag außen vor und wird mit Grund gemeldet. Gelöscht wird ein Link selbst nur im Papierkorb (4.14), sein Ziel nie.
 9. Eigene Sicherungen: Alle Snapshots und Archive, die der Skill anlegt, tragen den Namenspräfix `cleaning-up-linux-desktop-` mit Datum und Uhrzeit. Die Skripte fassen Snapshots und Archive ohne diesen Präfix nie an; davon weicht der Skill nur auf ausdrücklichen Wunsch des Nutzers ab. Dateien mit dem Präfix sind von allen Löschläufen ausgenommen.
 
 Zum Alter einer Datei: Wo dieses Dokument die Anlegezeit nennt (4.2 bis 4.4, 4.9), verwenden die Skripte die Zeit der letzten Statusänderung (`ctime`). Das Anlegedatum liefert Python 3.12 unter Linux nicht. Die Statusänderung ist nie älter als das Anlegen; eine Datei erscheint damit höchstens jünger, als sie ist, und wird im Zweifel nicht gelöscht.
@@ -87,7 +94,7 @@ Das Ergebnis übergibt er in drei Tabellen:
 | 2 | Durch Recherche belegte Stellen (Abschnitt 4.11), je Zeile mit der Einschätzung, wie sicher der Beleg ist |
 | 3 | Auswertung der Statistiken: Größe je Verzeichnis und große Einzeldateien außerhalb der bekannten Bereiche, wo möglicherweise weitere Aufräummöglichkeiten bestehen |
 
-Vor den Tabellen nennt der Skill den Füllstand je eingehängtem Dateisystem (belegt, Gesamtgröße, Prozent). Gibt es btrfs-Snapshots, nennt er ihre Zahl und, wenn die btrfs-Quotas aktiv sind, ihre Belegung; sonst entfällt diese Angabe. Dazu nennt er, welche Snapshot-Fähigkeiten und -Werkzeuge das System bietet (3.2). Der Füllstand zeigt, auf welchem Dateisystem Aufräumen überhaupt etwas bringt.
+Vor den Tabellen nennt der Skill den Füllstand je lokalem Dateisystem (belegt, Gesamtgröße, Prozent); Netzfreigaben und andere nicht lokale Dateisysteme erscheinen nicht, weil schon ihre Abfrage hängen kann (Grundsatz 8). Gibt es btrfs-Snapshots, nennt er ihre Zahl und, wenn die btrfs-Quotas aktiv sind, ihre Belegung; sonst entfällt diese Angabe. Dazu nennt er, welche Snapshot-Fähigkeiten und -Werkzeuge das System bietet (3.2). Der Füllstand zeigt, auf welchem Dateisystem Aufräumen überhaupt etwas bringt.
 
 Aufbau der Tabellen:
 
@@ -148,7 +155,7 @@ Bittet der Nutzer den Skill zusätzlich, nach weiteren Dateien zu suchen, und be
 
 Zweck: Ein kurzes Protokoll des Laufs, nur damit in einer neuen Sitzung ein Rollback möglich ist.
 
-- **Ort und Name:** Vorgabe im Home, `cleaning-up-linux-desktop-protocol.md`. Beim Start sucht die Instanz dort; gibt es nichts, fragt sie nach einem anderen Namen oder Ort und kann die Datei über ihre erste Zeile suchen lassen (Befehlsblock für den Nutzer).
+- **Ort und Name:** Vorgabe im Home, `cleaning-up-linux-desktop-protocol.md`. Beim Start sucht die Instanz dort; gibt es nichts, fragt sie nach einem anderen Namen oder Ort und kann die Datei über ihre erste Zeile suchen lassen: `analyze.py --find-protocol` durchsucht das Home nach Markdown-Dateien mit dieser Zeile, ohne `sudo` und ohne einen Einhängepunkt anzufassen (Befehlsblock für den Nutzer). Liegt das Protokoll auf einem Einhängepunkt, nennt der Nutzer den Pfad.
 - **Kopfzeile:** Die erste Zeile lautet genau `# cleaning-up-linux-desktop Protocol`. Nur sie ist als Token englisch; der übrige Text steht in der Sprache des Nutzers, solange er nichts anderes will.
 - **Aufbau:** ein Kopf mit den Eckdaten des Laufs (gewählte Sicherungsvariante, Zielort, Takt der Sicherung), dann das Protokoll, je Sitzung mit Datum, und ein eigener Abschnitt „Sonderbehandlungen“ ohne Protokollcharakter.
 - **Einträge, kurz:**
@@ -171,6 +178,24 @@ Zweck: Ein kurzes Protokoll des Laufs, nur damit in einer neuen Sitzung ein Roll
 - Gilt, wenn das Protokoll einen offenen Schritt oder einen nicht abgeschlossenen Lauf zeigt, zum Beispiel nach einem Neustart, bei dem die Sitzung verloren ging.
 - Die Instanz liest das Protokoll, stellt den Stand dar (erledigt, begonnen ohne Abschluss) und prüft, ob die genannten Sicherungen noch vorhanden sind (`snapshots.py`).
 - Dann schlägt sie vor, einen oder alle Schritte zurückzuholen (selektiv, 3.2) oder fortzusetzen. Der Nutzer entscheidet. Zurückgeholt wird je Schritt aus der Sicherung, die das Protokoll nennt. Gibt es keine, weist die Instanz auf die eigene Sicherung des Nutzers hin, die er selbst zurückspielt.
+
+### 3.11 Stillstand eines Durchlaufs
+
+Ein Skript kann in einem Ordner steckenbleiben, den es nicht umgehen konnte: eine Netzfreigabe, die ohne Einhängepunkt im Namen erreicht wird (zum Beispiel über einen Link), ein Gerät, das nicht antwortet, oder ein schlicht riesiger Ordner. Gegen das Hängen selbst helfen weder Zeitgrenzen noch Signale, solange der Prozess im Kernel wartet (Grundsatz 8); deshalb steht die Vermeidung an erster Stelle. Die Meldung sorgt dafür, dass ein Hänger sofort am Ort sichtbar ist, statt dass jemand minutenlang auf ein Skript wartet, das nichts tut.
+
+- **Wer meldet:** jedes Skript, das Ordner durchläuft (`analyze.py`, `delete.py`, `journal_stats.py`, `backup.py`, `snapshots.py` beim Zurückholen). Ein Hilfsthread läuft neben dem Durchlauf, weil der Hauptfaden im Kernel warten kann.
+- **Wann:** Alle 5 Sekunden prüft der Hilfsthread, ob der Durchlauf noch in demselben Ordner steht. Gemeint ist der tiefste Ordner, in dem er gerade liest, nicht der oberste des Auftrags. Verglichen wird dazu ein Schrittzähler, nicht der Pfadtext.
+- **Was:** Steht er noch dort, schreibt das Skript eine Zeile nach `stderr` mit dem Ordner und der bisherigen Wartezeit; sie wiederholt sich bei jeder weiteren Prüfung mit der Gesamtzeit. Geht der Durchlauf danach weiter, meldet er das sofort, nicht erst bei der nächsten Prüfung. Die erste Zeile enthält zusätzlich den Hinweis auf einen riesigen Ordner oder ein nicht antwortendes Gerät, damit der Nutzer die Lage deuten kann.
+- **Wortlaut** (der Skriptname steht vorn, weil der Nutzer die Zeile in einem Terminal liest und an die Instanz weitergibt):
+
+  ```
+  delete.py: still in "/pfad/ordner" after 5 s, no progress (huge folder or unresponsive mount?)
+  delete.py: still in "/pfad/ordner" after 10 s, no progress
+  delete.py: moved on after 23 s in "/pfad/ordner", now in "/pfad/anderer"
+  ```
+- **Bericht:** Jeder Stillstand steht außerdem in der Liste `stalls` (Ordner, Sekunden) im Bericht des Skripts, damit die Instanz hinterher sieht, was los war. Bei `analyze.py` steht sie in `meta`, bei `delete.py` im Bericht, bei `journal_stats.py` in `meta`, bei `backup.py` im Plan.
+- **Grenze:** Überwacht wird nur das Durchlaufen von Ordnern. Externe Befehle (`journalctl`, `apt-get`, `docker`, `btrfs`, `tar`) werden nicht überwacht.
+- **Aufgabe der Instanz:** Meldet der Nutzer, dass ein Lauf lange dauert, fragt sie zuerst nach den Zeilen dieser Meldung. Fehlen sie, lässt sie den Zustand des Prozesses ansehen (`ps -o pid,etime,stat,pcpu,cmd`, dazu `/proc/<pid>/wchan`): Zustand `D` ohne Plattenzugriff heißt, er wartet auf ein Gerät. Sie tut einen solchen Lauf nie als „dauert halt“ ab.
 
 ## 4 Festgelegte Bereiche
 
@@ -354,7 +379,7 @@ Dieser Schritt kommt im Ablauf als letzter dieser Gruppe: nach dem Download-Ordn
 
 - Die Instanz ermittelt die Anwendersoftware des Nutzers und stellt fest, bei welchen Programmen und wo Cache- und Download-Dateien liegen können. Quellen: Dokumentation im Internet oder Nachsehen im Dateisystem.
 - Als Anwendersoftware gilt jedes Programm mit Starter-Eintrag, das nicht zum Betriebssystem unmittelbar gehört. Die Regeln (Quelle: Desktop Entry Specification und Desktop Menu Specification von freedesktop.org):
-  1. Es zählt jeder Starter-Eintrag (`.desktop`) mit `Type=Application` aus `/usr/share/applications`, `/usr/local/share/applications`, `~/.local/share/applications`, den Flatpak-Exporten und den Snap-Einträgen. AppImages erscheinen dort, wenn sie integriert wurden.
+  1. Es zählt jeder Starter-Eintrag (`.desktop`) mit `Type=Application` aus `/usr/share/applications`, `/usr/local/share/applications`, `~/.local/share/applications`, den Flatpak-Exporten und den Snap-Einträgen. AppImages erscheinen dort, wenn sie integriert wurden. Die Flatpak-Exporte sind nach bisherigem Kenntnisstand (am System nicht geprüft) Links auf die Dateien der installierten App; ein Link wird nach Grundsatz 8 nur gelesen, wenn sein Ziel auf keinem fremden Einhängepunkt liegt. Sonst steht der Eintrag in der Liste der ausgeschlossenen mit dem Grund `link_not_followed`.
   2. Nicht, wenn `NoDisplay` oder `Hidden` gesetzt ist oder `OnlyShowIn` oder `NotShowIn` den aktuellen Desktop (`XDG_CURRENT_DESKTOP`) ausschließt.
   3. Nicht, wenn `Terminal=true` (Kommandozeilenprogramme).
   4. Es muss mindestens eine Hauptkategorie vorliegen, die nicht `Settings` und nicht `System` ist. Ein Eintrag, der nur `System` oder `Settings` trägt, fällt heraus.
@@ -425,8 +450,8 @@ Gilt für Docker mit Root-Dienst. Podman und Docker im Rootless-Modus werden nur
 
 Dieser Schritt kommt im Ablauf als letzter aller Bereiche: Was ein früherer Schritt (heute oder künftig) nur in den Papierkorb verschiebt statt zu löschen, wird so mit erfasst.
 
-- Ort nach der [Trash Specification](https://specifications.freedesktop.org/trash/latest/) von freedesktop.org: `$XDG_DATA_HOME/Trash`, meist `~/.local/share/Trash`, mit den Unterordnern `files` (die Dateien) und `info` (je eine `.trashinfo`). Auf anderen eingehängten Dateisystemen gibt es eigene Papierkörbe (`$topdir/.Trash/$uid` oder `$topdir/.Trash-$uid`); sie werden mit erfasst, wenn es sie gibt.
-- Analyse (3.3): nur Größe und Zahl der Einträge je Papierkorb, ohne Inhalt.
+- Ort nach der [Trash Specification](https://specifications.freedesktop.org/trash/latest/) von freedesktop.org: `$XDG_DATA_HOME/Trash`, meist `~/.local/share/Trash`, mit den Unterordnern `files` (die Dateien) und `info` (je eine `.trashinfo`). Auf anderen eingehängten Dateisystemen gibt es eigene Papierkörbe (`$topdir/.Trash/$uid` oder `$topdir/.Trash-$uid`); sie werden **nicht** erfasst und nicht gelöscht, denn schon ein Blick hinein ist ein Zugriff auf den Einhängepunkt (Grundsatz 8). Der Skill weist darauf hin, dass der Nutzer sie an ihrem Ort selbst leert.
+- Analyse (3.3): nur Größe und Zahl der Einträge des Papierkorbs im Home, ohne Inhalt.
 - Der Skill fragt nach x Tagen; Vorgabe 14, 0 heißt "alles". Gelöscht werden die Einträge, die länger als x Tage im Papierkorb liegen. Maßgeblich ist der Schlüssel `DeletionDate` der `.trashinfo` ("when the file/directory was trashed", Format `YYYY-MM-DDThh:mm:ss`), nicht die Änderungszeit der Datei. Gelöscht werden jeweils Datei und `.trashinfo` zusammen; die Spezifikation schreibt den Löschvorgang nicht vor, das ist abgeleitet.
 - Einträge ohne gültige `.trashinfo` werden nicht gelöscht, nur gemeldet: Ihr Alter ist unbekannt.
 - Hinweis an den Nutzer: Was hier gelöscht wird, ist endgültig weg; ein Backup hilft nur, wenn der Papierkorb gesichert wird. Messbefund (Entwicklungsrechner): Dort ist der Papierkorb vom Backup ausgeschlossen.

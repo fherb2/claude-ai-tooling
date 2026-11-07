@@ -56,7 +56,7 @@ Ablauf:
 
 | Datei | Aufgabe |
 | --- | --- |
-| `analyze.py` | die Analyse; schreibt `/tmp/cleanup-analysis.json` |
+| `analyze.py` | die Analyse; schreibt `/tmp/cleanup-analysis.json`; mit `--find-protocol` nur die Suche nach dem Protokoll früherer Läufe |
 | `journal_stats.py` | die Auswertung von Journal und Log-Files beim Bearbeiten dieses Bereichs; schreibt `/tmp/cleanup-journal.json` |
 | `delete.py` | das Löschen, ein Bereich je Lauf, mit Probelauf (`--dry-run`); schreibt `/tmp/cleanup-report-<Bereich>.json` |
 | `snapshots.py` | eigene btrfs-Snapshots: anlegen, auflisten, entfernen, selektiv zurückholen |
@@ -79,6 +79,12 @@ Vor dem ersten Löschen und vor dem Nachgang bietet der Skill an, was das System
 
 Unabhängig vom Auftrag löscht `delete.py` nie: `/`, das Home selbst, einen Ordner direkt unter `/` oder direkt unter dem Home, irgendetwas unter `/boot`, etwas außerhalb von Home, `/var`, `/opt`, `/usr/local` und `/srv`, einen Einhängepunkt oder einen Ordner, der einen enthält, alles mit dem Präfix der eigenen Sicherungen und einen symbolischen Link — außer im Papierkorb, und dort nur den Link, nie sein Ziel. Diese Sperre fängt einen Übersetzungsfehler ab, bevor er Schaden anrichtet; sie darf bei einer Vereinfachung nicht wegfallen.
 
+### Einhängepunkte, Links und hängende Läufe
+
+Was eingehängt ist — eine Netzfreigabe, ein anderer Datenträger, ein Bind-Mount —, fassen die Skripte nicht an: nicht löschen, nicht durchlaufen, nicht einmal lesen oder zählen. Der Anlass war der erste Lauf des installierten Skills: Der Probelauf zu `__pycache__` blieb in einer SMB-Freigabe unter dem Home hängen, deren Server nicht antwortete. Der Prozess stand im Kernel (Zustand `D`) und ließ sich auch mit `kill -KILL` nicht sofort beenden. Deshalb entscheiden die Skripte über Einhängepunkte nach dem Namen, gegen `/proc/self/mountinfo`, bevor sie irgendeinen Zugriff auf den Pfad machen; die Liste wird höchstens einmal je Sekunde neu gelesen. Im Home wird nichts angefasst, was auf einem anderen Einhängepunkt liegt als das Home selbst, auch kein fester Pfad und kein Ziel eines Links. Symbolische Links werden nicht verfolgt; einzige Ausnahme sind die Starter-Einträge für Tabelle 2, deren Linkziel nur gelesen wird, wenn es auf keinem fremden Einhängepunkt liegt. Der Füllstand zeigt nur lokale Dateisysteme, und Papierkörbe auf anderen Datenträgern bleiben unberührt: Der Nutzer leert sie an ihrem Ort. Der Zielort einer Archivsicherung, den der Nutzer wählt, auch eine Netzfreigabe, wird nur beschrieben.
+
+Steht ein Durchlauf länger als 5 Sekunden in demselben Ordner, schreibt das Skript alle 5 Sekunden eine Zeile mit dem Ordner nach `stderr`, und beim Weitergehen sofort eine weitere. Damit ist ein Hänger am Ort sichtbar. Gegen das Hängen selbst helfen Zeitgrenzen nicht, solange der Prozess im Kernel wartet; deshalb steht die Vermeidung an erster Stelle. Die Stillstände stehen auch als Liste `stalls` in den Berichten. Externe Befehle werden nicht überwacht. Die Protokollsuche (`analyze.py --find-protocol`) läuft nach denselben Regeln und braucht kein `sudo`.
+
 ### Was „Cache“ hier heißt
 
 Ein Ordner gilt nur dann als löschbarer Cache, wenn belegt ist, dass das Programm seine Daten jederzeit vollautomatisch wiederherstellt und ihr Fehlen bis auf Zeitverlust nichts ändert. Wie ein Ordner heißt, zählt nicht. Proxy-Dateien eines Videoschnittprogramms etwa sind kein Cache, auch wenn sie in einem Ordner dieses Namens liegen sollten: Sie entstehen in einem eigenen Arbeitsschritt und kommen nicht von selbst zurück.
@@ -100,7 +106,7 @@ Das Alter einer Datei bestimmen die Skripte aus der späteren von Änderungs- un
 
 ## Stand und Offenes
 
-**Status:** Skilltext und Skripte sind geschrieben. Analyse, Journal-Auswertung, Snapshots (btrfs) und Archive sind am Entwicklungsrechner gelaufen, das Löschen ist in einer Simulation geprüft (`tests/test_delete.py`), die Skripte außerdem in eigenen Tests (`tests/`).
+**Status:** Skilltext und Skripte sind geschrieben. Analyse, Journal-Auswertung, Snapshots (btrfs) und Archive sind am Entwicklungsrechner gelaufen, das Löschen ist in einer Simulation geprüft (`tests/test_delete.py`), die Skripte außerdem in eigenen Tests (`tests/`), darunter `tests/test_mounts.py`, der jeden Dateizugriff auf simulierte Einhängepunkte protokolliert. Noch nicht an einer echten Einhängung geprüft ist der Fall mit `tmpfs`; das folgt in einem Probelauf am Rechner.
 
 **Offen** (Reihenfolge im Fahrplan, `plan/work-plan.md`):
 

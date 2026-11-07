@@ -153,6 +153,7 @@ def main():
     home = fx.home
 
     # redirect the system paths and replace commands and the process check
+    d.WALK.home = home
     d.WALKED_ROOTS = [fx.var]
     d.APT_ARCHIVES = os.path.join(fx.var, "cache/apt/archives")
     d.LOG_DIR = os.path.join(fx.var, "log")
@@ -178,7 +179,9 @@ def main():
 
     report = d.Report("4.9", False)
     deleter = d.Deleter(home, False, report)
-    deleter.guard.mounts.add(os.path.join(home, "Downloads/mounted"))
+    real_points = d.mount_points
+    d.mount_points = lambda: real_points() | {os.path.join(home, "Downloads/mounted")}
+    d.WALK.read_at = None
     for path in ["Downloads/old.iso", "Downloads/folder", "Downloads/link", "Downloads/mounted", "Dokumente", "",
                  "Downloads/cleaning-up-linux-desktop-backup-x.tar"]:
         deleter.remove(os.path.join(home, path) if path else home)

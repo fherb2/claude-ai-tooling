@@ -22,8 +22,10 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from urllib.parse import unquote
@@ -43,23 +45,197 @@ ROTATED = re.compile(r"(\.\d+(\.gz|\.xz|\.zst)?|-\d{8}(\.gz|\.xz|\.zst)?|\.gz|\.
 PROGRAMS = {"firefox": ("firefox", "firefox-bin"), "chrome": ("chrome",), "code": ("code",)}
 
 
+def is_own(name):
+    """Names of the skill's own snapshots, archives and their container folders."""
+    return name.lstrip(".").startswith(PREFIX)
+
+
+STALL_SECONDS = 5
+MOUNT_REFRESH = 1.0
+
+
+def unescape_mount(field):
+    """Undo the octal escapes of /proc/self/mountinfo (space, tab, newline, backslash); UTF-8 stays as it is."""
+    return re.sub(r"\\([0-7]{3})", lambda m: chr(int(m.group(1), 8)), field)
+
+
 def mount_points():
     """All mount points, bind mounts on the same file system included (/proc/self/mountinfo)."""
     points = set()
     try:
-        with open("/proc/self/mountinfo", encoding="utf-8") as fh:
+        with open("/proc/self/mountinfo", encoding="utf-8", errors="surrogateescape") as fh:
             for line in fh:
                 fields = line.split()
                 if len(fields) > 4:
-                    points.add(fields[4].encode().decode("unicode_escape"))
+                    points.add(unescape_mount(fields[4]))
     except OSError:
         pass
     return points
 
 
-def is_own(name):
-    """Names of the skill's own snapshots, archives and their container folders."""
-    return name.lstrip(".").startswith(PREFIX)
+class Walker:
+    """Folder walks that never touch a mount point and never follow a link (concept.md, Grundsatz 8),
+    with a line on stderr while a walk stays in one folder longer than STALL_SECONDS.
+
+    Mount points are recognised by name against /proc/self/mountinfo before any system call on them,
+    because already a stat of an unresponsive network mount blocks. In the home, nothing is touched that
+    lies on another mount than the home itself (set home); other start points are the caller's choice."""
+
+    def __init__(self, script, newline=False):
+        self.script, self.newline = script, newline
+        self.home = None
+        self.stall_seconds = STALL_SECONDS
+        self.points, self.read_at = set(), None
+        self.lock = threading.Lock()
+        self.thread = None
+        self.active = []                    # folder each running walk is reading, innermost last
+        self.folder = self.since = None
+        self.stalled = None                 # folder named in the last stall line
+        self.stalls = []                    # [{"folder", "seconds"}] for the report
+
+    def mounts(self, fresh=False):
+        """Mount points, read again when older than MOUNT_REFRESH seconds or when fresh is asked for."""
+        now = time.monotonic()
+        if fresh or self.read_at is None or now - self.read_at >= MOUNT_REFRESH:
+            self.points, self.read_at = mount_points(), now
+        return self.points
+
+    def on_other_mount(self, path, base, fresh=False):
+        """True if a mount point lies at path or between base and path: seen from base, path is mounted data."""
+        prefix = base.rstrip(os.sep) + os.sep
+        target = path.rstrip(os.sep) + os.sep
+        return any(m.startswith(prefix) and target.startswith(m.rstrip(os.sep) + os.sep)
+                   for m in self.mounts(fresh))
+
+    def mount_of(self, path):
+        """The mount point path lies on, by name: the longest mount point that is a prefix of path."""
+        target = path.rstrip(os.sep) + os.sep
+        return max((m for m in self.mounts() if target.startswith(m.rstrip(os.sep) + os.sep)), key=len, default="/")
+
+    def contains_mount(self, path, fresh=False):
+        """True if path is a mount point or one lies below it."""
+        prefix = path.rstrip(os.sep) + os.sep
+        return any(m == path or m.startswith(prefix) for m in self.mounts(fresh))
+
+    def allowed(self, path):
+        """False for a path in the home that is or lies below a mount point inside the home."""
+        return not (self.home and path.startswith(self.home + os.sep) and self.on_other_mount(path, self.home))
+
+    def listdir(self, path):
+        """Sorted names in path without mount points; empty if path itself is not allowed or unreadable."""
+        if not self.allowed(path):
+            return []
+        try:
+            names = os.listdir(path)
+        except OSError:
+            return []
+        points = self.mounts()
+        return sorted(n for n in names if os.path.join(path, n) not in points)
+
+    def walk(self, top, skipped=None):
+        """Top-down walk like os.walk(top): yields (folder, dirs, files); dirs may be pruned in place.
+        Never enters a mount point, a folder on another device, a link or a folder with the own prefix;
+        they go to skipped as (path, reason) if a list is given. Links are listed in files."""
+        if not self.allowed(top):
+            if skipped is not None:
+                skipped.append((top, "on another mount than the home"))
+            return
+        try:
+            st = os.lstat(top)
+        except OSError:
+            return
+        if stat.S_ISLNK(st.st_mode):           # scandir would follow it
+            if skipped is not None:
+                skipped.append((top, "link"))
+            return
+        device = st.st_dev
+        self.begin()
+        stack = [top]
+        try:
+            while stack:
+                folder = stack.pop()
+                self.enter(folder)
+                try:
+                    with os.scandir(folder) as it:
+                        entries = list(it)
+                except OSError:
+                    continue
+                points = self.mounts()
+                dirs, files = [], []
+                for entry in entries:
+                    if entry.path in points:
+                        reason = "mount point"
+                    elif is_own(entry.name):
+                        reason = "own snapshot or archive (prefix)"
+                    else:
+                        try:
+                            if not entry.is_dir(follow_symlinks=False):
+                                files.append(entry.name)
+                                continue
+                            if entry.stat(follow_symlinks=False).st_dev == device:
+                                dirs.append(entry.name)
+                                continue
+                        except OSError:
+                            continue
+                        reason = "other file system"
+                    if skipped is not None:
+                        skipped.append((entry.path, reason))
+                yield folder, dirs, files
+                stack.extend(os.path.join(folder, d) for d in reversed(dirs))
+        finally:
+            self.leave()
+
+    def begin(self):
+        """Start of a walk; walks may nest (a size inside a walk), each ends with leave()."""
+        self.active.append(None)
+
+    def enter(self, folder):
+        """The walk starts reading folder: progress for the stall check."""
+        with self.lock:
+            now = time.monotonic()
+            if self.stalled is not None:
+                self._moved_on(now, folder)
+            self.active[-1] = folder
+            self.folder, self.since = folder, now
+        if self.thread is None:
+            self.thread = threading.Thread(target=self._watch, daemon=True)
+            self.thread.start()
+
+    def leave(self):
+        """End of a walk; an outer walk continues in its folder."""
+        with self.lock:
+            now = time.monotonic()
+            self.active.pop()
+            outer = self.active[-1] if self.active else None
+            if self.stalled is not None:
+                self._moved_on(now, outer)
+            self.folder, self.since = outer, now
+
+    def _moved_on(self, now, folder):
+        seconds = round(now - self.since)
+        self.stalls.append({"folder": self.stalled, "seconds": seconds})
+        where = f', now in "{folder}"' if folder else ", walk finished"
+        self._say(f'moved on after {seconds} s in "{self.stalled}"{where}')
+        self.stalled = None
+
+    def _watch(self):
+        while True:
+            time.sleep(self.stall_seconds)
+            with self.lock:
+                if self.folder is None:
+                    continue
+                seconds = time.monotonic() - self.since
+                if seconds < self.stall_seconds:
+                    continue
+                hint = "" if self.stalled else " (huge folder or unresponsive mount?)"
+                self.stalled = self.folder
+                self._say(f'still in "{self.folder}" after {round(seconds)} s, no progress{hint}')
+
+    def _say(self, text):
+        print(("\n" if self.newline else "") + f"{self.script}: {text}", file=sys.stderr, flush=True)
+
+
+WALK = Walker("delete.py")
 
 
 class Report:
@@ -94,7 +270,6 @@ class Guard:
 
     def __init__(self, home):
         self.home = home
-        self.mounts = mount_points()
         self.roots = [home] + WALKED_ROOTS
         self.devices = {}
         for root in self.roots:
@@ -117,6 +292,11 @@ class Guard:
             return "outside the analysed roots"
         if any(is_own(part) for part in path.split(os.sep) if part):
             return "own snapshot or archive (prefix)"
+        # by name before any system call: a stat on an unresponsive mount already blocks
+        if WALK.contains_mount(path):
+            return "is or contains a mount point"
+        if WALK.on_other_mount(path, root):
+            return "lies on a mount point"
         try:
             st = os.lstat(path)
         except FileNotFoundError:
@@ -125,8 +305,6 @@ class Guard:
             return f"not accessible: {exc.strerror}"
         if os.path.islink(path) and not allow_link:
             return "symbolic link"
-        if path in self.mounts or any(m.startswith(path + os.sep) for m in self.mounts):
-            return "is or contains a mount point"
         if os.path.dirname(path) == self.home and os.path.isdir(path):
             return "folder directly under home"
         if root in self.devices and st.st_dev != self.devices[root]:
@@ -146,13 +324,16 @@ class Deleter:
         if reason:
             self.report.skipped(path, reason)
             return False
-        if os.path.isdir(path) and not os.path.islink(path) and crosses_device(path):
-            self.report.skipped(path, "contains another file system")
+        size, inside = tree_info(path)
+        if inside:
+            self.report.skipped(path, f"contains {inside[0][1]}: {inside[0][0]}")
             return False
-        size = tree_size(path)
         if not self.dry_run:
+            if WALK.contains_mount(path, fresh=True):          # mounted since the check above
+                self.report.skipped(path, "is or contains a mount point")
+                return False
             try:
-                if os.path.isdir(path) and not os.path.islink(path):
+                if not os.path.islink(path) and os.path.isdir(path):
                     shutil.rmtree(path)
                 else:
                     os.unlink(path)
@@ -177,33 +358,28 @@ class Deleter:
         return done
 
 
-def crosses_device(path):
-    """True if a folder below path lies on another file system; rmtree would descend into it."""
-    device = os.lstat(path).st_dev
-    for folder, dirs, _ in os.walk(path):
-        for name in dirs:
-            try:
-                if os.lstat(os.path.join(folder, name)).st_dev != device:
-                    return True
-            except OSError:
-                pass
-    return False
-
-
-def tree_size(path):
+def tree_info(path):
+    """Size of a file or folder, and what a walk of the folder had to leave out (mount points, other file
+    systems, own folders) as [(path, reason)]; rmtree would not leave it out."""
+    if not WALK.allowed(path):
+        return 0, [(path, "on another mount than the home")]
     try:
-        if not os.path.isdir(path) or os.path.islink(path):
-            return os.lstat(path).st_size
+        if os.path.islink(path) or not os.path.isdir(path):
+            return os.lstat(path).st_size, []
     except OSError:
-        return 0
-    total = 0
-    for folder, _, files in os.walk(path):
+        return 0, []
+    total, left_out = 0, []
+    for folder, _, files in WALK.walk(path, left_out):
         for name in files:
             try:
                 total += os.lstat(os.path.join(folder, name)).st_size
             except OSError:
                 pass
-    return total
+    return total, left_out
+
+
+def tree_size(path):
+    return tree_info(path)[0]
 
 
 def age(path, now):
@@ -213,10 +389,7 @@ def age(path, now):
 
 
 def listdir(path):
-    try:
-        return sorted(os.listdir(path))
-    except OSError:
-        return []
+    return WALK.listdir(path)
 
 
 def running(program):
@@ -238,7 +411,7 @@ def old_entries(d, folder, now, group, pattern=None):
     """Delete entry files older than three days directly in folder; folders stay."""
     for name in listdir(folder):
         path = os.path.join(folder, name)
-        if os.path.isfile(path) and not os.path.islink(path) and (pattern is None or pattern.match(name)):
+        if not os.path.islink(path) and os.path.isfile(path) and (pattern is None or pattern.match(name)):
             if age(path, now) > CACHE_AGE:
                 d.remove(path, group)
 
@@ -247,7 +420,7 @@ def index_files(d, folder, names, program, group):
     """Index files and folders only while the program does not run."""
     for name in names:
         path = os.path.join(folder, name)
-        if os.path.lexists(path):
+        if WALK.allowed(path) and os.path.lexists(path):
             if running(program):
                 d.report.skipped(path, f"{program} is running")
             else:
@@ -277,13 +450,13 @@ def rule_firefox(d, home, params, now):
     for profile in listdir(profiles):
         for name in ("cache2", "startupCache"):
             path = os.path.join(profiles, profile, name)
-            if os.path.isdir(path) and newest_mtime(path) < now - STALE_PROFILE_AGE:
+            if WALK.allowed(path) and not os.path.islink(path) and os.path.isdir(path) and newest_mtime(path) < now - STALE_PROFILE_AGE:
                 d.remove(path, "profile remnants")
 
 
 def newest_mtime(path):
     newest = 0
-    for folder, _, files in os.walk(path):
+    for folder, _, files in WALK.walk(path):
         for name in files:
             try:
                 newest = max(newest, os.lstat(os.path.join(folder, name)).st_mtime)
@@ -298,7 +471,7 @@ def rule_chrome(d, home, params, now):
     for profile in listdir(cache):
         for parts in (("Cache", "Cache_Data"), ("Code Cache", "js")):
             folder = os.path.join(cache, profile, *parts)
-            if os.path.isdir(folder):
+            if WALK.allowed(folder) and not os.path.islink(folder) and os.path.isdir(folder):
                 old_entries(d, folder, now, "entries", ENTRY_NAME)
                 index_files(d, folder, ["index", "index-dir"], "chrome", "index")
 
@@ -319,12 +492,12 @@ def rule_vscode(d, home, params, now):
         cached = os.path.join(base, "CachedData")
         for name in listdir(cached):
             path = os.path.join(cached, name)
-            if name != commit and os.path.isdir(path) and newest_mtime(path) < now - CACHE_AGE:
+            if name != commit and not os.path.islink(path) and os.path.isdir(path) and newest_mtime(path) < now - CACHE_AGE:
                 d.remove(path, "CachedData")
     vsix = os.path.join(base, "CachedExtensionVSIXs")
     for name in listdir(vsix):
         path = os.path.join(vsix, name)
-        if name.startswith(".") and os.path.isfile(path) and age(path, now) > CACHE_AGE and not is_zip(path):
+        if name.startswith(".") and not os.path.islink(path) and os.path.isfile(path) and age(path, now) > CACHE_AGE and not is_zip(path):
             d.remove(path, "broken VSIX downloads")
 
 
@@ -348,7 +521,7 @@ def rule_logs(d, home, params, now):
     candidates = [(LOG_DIR, True)] + [(os.path.join(home, c), False)
                                          for c in (".config", ".local/share", ".cache", ".var")]
     for base, everything in candidates:
-        for folder, dirs, files in os.walk(base):
+        for folder, dirs, files in WALK.walk(base):
             dirs[:] = [x for x in dirs if os.path.join(folder, x) != JOURNAL_DIR]
             in_log_dir = everything or any(p in ("log", "logs") for p in folder.split(os.sep))
             for name in files:
@@ -365,6 +538,9 @@ def rule_logs(d, home, params, now):
 def rule_pip(d, home, params, now):
     """4.6: pip cache purge as the owner of the home; the amount is measured before and after."""
     cache = os.path.join(home, ".cache/pip")
+    if not WALK.allowed(cache):
+        d.report.skipped(cache, "on another mount than the home")
+        return
     before = tree_size(cache)
     user = owner(home)
     done = d.command(["python3", "-m", "pip", "cache", "purge"], user=user)
@@ -381,11 +557,10 @@ def owner(path):
 
 def rule_pycache(d, home, params, now):
     """4.12: every __pycache__ folder in the home, including the folder."""
-    for folder, dirs, _ in os.walk(home):
+    for folder, dirs, _ in WALK.walk(home):
         if "__pycache__" in dirs:
             d.remove(os.path.join(folder, "__pycache__"), "__pycache__")
             dirs.remove("__pycache__")
-        dirs[:] = [x for x in dirs if not os.path.islink(os.path.join(folder, x)) and not is_own(x)]
 
 
 def rule_docker(d, home, params, now):
@@ -416,14 +591,19 @@ def rule_trash(d, home, params, now):
     """4.14: entries longer than x days in the trash (DeletionDate); file and .trashinfo together."""
     days = int(params["days"])
     limit = now - days * DAY
-    trashes = [os.path.join(home, ".local/share/Trash")] + list(params.get("other_trashes", []))
-    for trash in trashes:
+    for trash in [os.path.join(home, ".local/share/Trash")]:      # trash on other file systems: never (4.14)
+        if not WALK.allowed(trash):
+            d.report.skipped(trash, "on another mount than the home")
+            continue
         info, files = os.path.join(trash, "info"), os.path.join(trash, "files")
         deleted = set()
         for name in listdir(info):
             if not name.endswith(".trashinfo"):
                 continue
             info_path = os.path.join(info, name)
+            if os.path.islink(info_path):
+                d.report.skipped(info_path, "symbolic link")
+                continue
             trashed = deletion_date(info_path)
             if trashed is None:
                 d.report.skipped(info_path, "no valid DeletionDate")
@@ -431,6 +611,9 @@ def rule_trash(d, home, params, now):
             if trashed >= limit:
                 continue
             item = os.path.join(files, name[:-len(".trashinfo")])
+            if not WALK.allowed(item):
+                d.report.skipped(item, "on another mount than the home")
+                continue
             if os.path.lexists(item) and not d.remove(item, "trash entries", allow_link=True):
                 continue          # the .trashinfo stays with its entry
             d.remove(info_path, "trashinfo")
@@ -462,6 +645,8 @@ def deletion_date(path):
 def prune_directorysizes(trash, deleted):
     """Drop the size-cache lines of deleted entries; temporary file plus rename, as the spec demands."""
     path = os.path.join(trash, "directorysizes")
+    if os.path.islink(path):
+        return
     try:
         with open(path, encoding="utf-8") as fh:
             lines = fh.readlines()
@@ -490,6 +675,7 @@ def main():
     parser.add_argument("--report")
     args = parser.parse_args()
     home = os.path.realpath(args.home)
+    WALK.home = home
     with open(args.order, encoding="utf-8") as fh:
         order = json.load(fh)
     area, kind = str(order.get("area")), order.get("kind")
@@ -504,6 +690,7 @@ def main():
     else:
         print(f"Unknown order: area {area}, kind {kind}", file=sys.stderr)
         return 2
+    report.data["stalls"] = WALK.stalls
     report.data["finished"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     target = args.report or f"/tmp/cleanup-report-{area}.json"
     tmp = target + ".part"

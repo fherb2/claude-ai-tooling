@@ -140,7 +140,7 @@ def main():
     check("invalid step name", not b.do_create(ns(step="Bad Name"))["ok"])
 
     # 5 verification notices damage
-    entries, skipped = b.walk_entries(b.validate(json.load(open(listing))["paths"], out)[0], b.mount_points())
+    entries, skipped = b.walk_entries(b.validate(json.load(open(listing))["paths"], out)[0])
     write(f"{data}/docs/b.txt", "BRAVO")
     check("tar: a changed file fails the comparison", not b.verify_tar(r1["archive"], entries, "full", False)["ok"])
     check("zip: a changed file fails the comparison", not b.verify_zip(r2["archive"], entries, "full", 2, "z")["ok"])

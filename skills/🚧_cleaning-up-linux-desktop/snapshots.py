@@ -3,7 +3,10 @@
 Commands: list, create, remove, restore. Only btrfs. Every snapshot this
 script creates is read-only and carries the name prefix of the skill; the
 script refuses to remove or restore from anything without that prefix.
-Restoring copies back only what is missing and overwrites nothing.
+Restoring copies back only what is missing and overwrites nothing; it copies each missing item
+on its own and never looks at a target that lies at or below a mount point other than the one
+restored (Grundsatz 8), because cp would descend into existing folders and a mount point inside
+the live tree may be unresponsive.
 With --dry-run nothing is changed; the report shows what would happen.
 The result is written as JSON, a short summary goes to stderr.
 
@@ -19,8 +22,11 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
+import threading
+import time
 from datetime import datetime
 
 PREFIX = "cleaning-up-linux-desktop-"
@@ -36,6 +42,205 @@ def run(cmd, timeout=TIMEOUT):
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
         return None, "", str(exc)
     return done.returncode, done.stdout, done.stderr
+
+
+def is_own(name):
+    """Names of the skill's own snapshots, archives and their container folders."""
+    return name.lstrip(".").startswith(PREFIX)
+
+
+STALL_SECONDS = 5
+MOUNT_REFRESH = 1.0
+
+
+def unescape_mount(field):
+    """Undo the octal escapes of /proc/self/mountinfo (space, tab, newline, backslash); UTF-8 stays as it is."""
+    return re.sub(r"\\([0-7]{3})", lambda m: chr(int(m.group(1), 8)), field)
+
+
+def mount_points():
+    """All mount points, bind mounts on the same file system included (/proc/self/mountinfo)."""
+    points = set()
+    try:
+        with open("/proc/self/mountinfo", encoding="utf-8", errors="surrogateescape") as fh:
+            for line in fh:
+                fields = line.split()
+                if len(fields) > 4:
+                    points.add(unescape_mount(fields[4]))
+    except OSError:
+        pass
+    return points
+
+
+class Walker:
+    """Folder walks that never touch a mount point and never follow a link (concept.md, Grundsatz 8),
+    with a line on stderr while a walk stays in one folder longer than STALL_SECONDS.
+
+    Mount points are recognised by name against /proc/self/mountinfo before any system call on them,
+    because already a stat of an unresponsive network mount blocks. In the home, nothing is touched that
+    lies on another mount than the home itself (set home); other start points are the caller's choice."""
+
+    def __init__(self, script, newline=False):
+        self.script, self.newline = script, newline
+        self.home = None
+        self.stall_seconds = STALL_SECONDS
+        self.points, self.read_at = set(), None
+        self.lock = threading.Lock()
+        self.thread = None
+        self.active = []                    # folder each running walk is reading, innermost last
+        self.folder = self.since = None
+        self.stalled = None                 # folder named in the last stall line
+        self.stalls = []                    # [{"folder", "seconds"}] for the report
+
+    def mounts(self, fresh=False):
+        """Mount points, read again when older than MOUNT_REFRESH seconds or when fresh is asked for."""
+        now = time.monotonic()
+        if fresh or self.read_at is None or now - self.read_at >= MOUNT_REFRESH:
+            self.points, self.read_at = mount_points(), now
+        return self.points
+
+    def on_other_mount(self, path, base, fresh=False):
+        """True if a mount point lies at path or between base and path: seen from base, path is mounted data."""
+        prefix = base.rstrip(os.sep) + os.sep
+        target = path.rstrip(os.sep) + os.sep
+        return any(m.startswith(prefix) and target.startswith(m.rstrip(os.sep) + os.sep)
+                   for m in self.mounts(fresh))
+
+    def mount_of(self, path):
+        """The mount point path lies on, by name: the longest mount point that is a prefix of path."""
+        target = path.rstrip(os.sep) + os.sep
+        return max((m for m in self.mounts() if target.startswith(m.rstrip(os.sep) + os.sep)), key=len, default="/")
+
+    def contains_mount(self, path, fresh=False):
+        """True if path is a mount point or one lies below it."""
+        prefix = path.rstrip(os.sep) + os.sep
+        return any(m == path or m.startswith(prefix) for m in self.mounts(fresh))
+
+    def allowed(self, path):
+        """False for a path in the home that is or lies below a mount point inside the home."""
+        return not (self.home and path.startswith(self.home + os.sep) and self.on_other_mount(path, self.home))
+
+    def listdir(self, path):
+        """Sorted names in path without mount points; empty if path itself is not allowed or unreadable."""
+        if not self.allowed(path):
+            return []
+        try:
+            names = os.listdir(path)
+        except OSError:
+            return []
+        points = self.mounts()
+        return sorted(n for n in names if os.path.join(path, n) not in points)
+
+    def walk(self, top, skipped=None):
+        """Top-down walk like os.walk(top): yields (folder, dirs, files); dirs may be pruned in place.
+        Never enters a mount point, a folder on another device, a link or a folder with the own prefix;
+        they go to skipped as (path, reason) if a list is given. Links are listed in files."""
+        if not self.allowed(top):
+            if skipped is not None:
+                skipped.append((top, "on another mount than the home"))
+            return
+        try:
+            st = os.lstat(top)
+        except OSError:
+            return
+        if stat.S_ISLNK(st.st_mode):           # scandir would follow it
+            if skipped is not None:
+                skipped.append((top, "link"))
+            return
+        device = st.st_dev
+        self.begin()
+        stack = [top]
+        try:
+            while stack:
+                folder = stack.pop()
+                self.enter(folder)
+                try:
+                    with os.scandir(folder) as it:
+                        entries = list(it)
+                except OSError:
+                    continue
+                points = self.mounts()
+                dirs, files = [], []
+                for entry in entries:
+                    if entry.path in points:
+                        reason = "mount point"
+                    elif is_own(entry.name):
+                        reason = "own snapshot or archive (prefix)"
+                    else:
+                        try:
+                            if not entry.is_dir(follow_symlinks=False):
+                                files.append(entry.name)
+                                continue
+                            if entry.stat(follow_symlinks=False).st_dev == device:
+                                dirs.append(entry.name)
+                                continue
+                        except OSError:
+                            continue
+                        reason = "other file system"
+                    if skipped is not None:
+                        skipped.append((entry.path, reason))
+                yield folder, dirs, files
+                stack.extend(os.path.join(folder, d) for d in reversed(dirs))
+        finally:
+            self.leave()
+
+    def begin(self):
+        """Start of a walk; walks may nest (a size inside a walk), each ends with leave()."""
+        self.active.append(None)
+
+    def enter(self, folder):
+        """The walk starts reading folder: progress for the stall check."""
+        with self.lock:
+            now = time.monotonic()
+            if self.stalled is not None:
+                self._moved_on(now, folder)
+            self.active[-1] = folder
+            self.folder, self.since = folder, now
+        if self.thread is None:
+            self.thread = threading.Thread(target=self._watch, daemon=True)
+            self.thread.start()
+
+    def leave(self):
+        """End of a walk; an outer walk continues in its folder."""
+        with self.lock:
+            now = time.monotonic()
+            self.active.pop()
+            outer = self.active[-1] if self.active else None
+            if self.stalled is not None:
+                self._moved_on(now, outer)
+            self.folder, self.since = outer, now
+
+    def _moved_on(self, now, folder):
+        seconds = round(now - self.since)
+        self.stalls.append({"folder": self.stalled, "seconds": seconds})
+        where = f', now in "{folder}"' if folder else ", walk finished"
+        self._say(f'moved on after {seconds} s in "{self.stalled}"{where}')
+        self.stalled = None
+
+    def _watch(self):
+        while True:
+            time.sleep(self.stall_seconds)
+            with self.lock:
+                if self.folder is None:
+                    continue
+                seconds = time.monotonic() - self.since
+                if seconds < self.stall_seconds:
+                    continue
+                hint = "" if self.stalled else " (huge folder or unresponsive mount?)"
+                self.stalled = self.folder
+                self._say(f'still in "{self.folder}" after {round(seconds)} s, no progress{hint}')
+
+    def _say(self, text):
+        print(("\n" if self.newline else "") + f"{self.script}: {text}", file=sys.stderr, flush=True)
+
+
+WALK = Walker("snapshots.py")
+
+
+def blocked(path, base):
+    """True if path is or lies below a mount point other than base, decided by name."""
+    return any(m != base and m.startswith(base.rstrip(os.sep) + os.sep)
+               and (path == m or path.startswith(m.rstrip(os.sep) + os.sep)) for m in WALK.mounts(fresh=True))
 
 
 def unescape(text):
@@ -230,36 +435,48 @@ def clean_relative(path):
     return norm
 
 
-def missing_items(src, dst):
-    """What of src is missing in dst: [(relative path, bytes)]; a missing folder counts as one item."""
+def missing_items(src, dst, base):
+    """What of src is missing in dst: ([(relative path, bytes)], [(relative path, reason)]). A missing folder
+    counts as one item. Targets at or below a mount point other than base are left out, by name, unseen."""
     def size_of(path):
         total = 0
-        for folder, _, files in os.walk(path):
+        for folder, _, files in WALK.walk(path):
             for f in files:
                 try:
                     total += os.lstat(os.path.join(folder, f)).st_size
                 except OSError:
                     pass
         return total
+    if blocked(dst, base):
+        return [], [(".", "target lies on another mount")]
     if not os.path.isdir(src) or os.path.islink(src):
-        return [(".", os.lstat(src).st_size)] if not os.path.lexists(dst) else []
-    items = []
-    for folder, dirs, files in os.walk(src):
+        return ([(".", os.lstat(src).st_size)] if not os.path.lexists(dst) else []), []
+    items, left_out = [], []
+    for folder, dirs, files in WALK.walk(src):
         rel = os.path.relpath(folder, src)
         target = dst if rel == "." else os.path.join(dst, rel)
+        if blocked(target, base):
+            left_out.append((rel, "target lies on another mount"))
+            dirs[:] = []
+            continue
         if not os.path.lexists(target):
             items.append((rel, size_of(folder)))
             dirs[:] = []
             continue
-        for d in list(dirs):
-            path = os.path.join(folder, d)
-            if os.path.islink(path):
-                dirs.remove(d)
-                files.append(d)
         for f in files:
-            if not os.path.lexists(os.path.join(target, f)):
-                items.append((os.path.normpath(os.path.join(rel, f)), os.lstat(os.path.join(folder, f)).st_size))
-    return items
+            name = os.path.normpath(os.path.join(rel, f))
+            if blocked(os.path.join(target, f), base):
+                left_out.append((name, "target lies on another mount"))
+            elif not os.path.lexists(os.path.join(target, f)):
+                items.append((name, os.lstat(os.path.join(folder, f)).st_size))
+        kept = []
+        for d in dirs:
+            if blocked(os.path.join(target, d), base):
+                left_out.append((os.path.normpath(os.path.join(rel, d)), "target lies on another mount"))
+            else:
+                kept.append(d)
+        dirs[:] = kept
+    return items, left_out
 
 
 def ensure_folder(src_root, dst_root, rel):
@@ -276,9 +493,11 @@ def ensure_folder(src_root, dst_root, rel):
         shutil.copystat(current_src, current_dst)
 
 
-def restore_plan(src, dst):
-    items = missing_items(src, dst)
-    return {"items": len(items), "bytes": sum(b for _, b in items), "examples": [r for r, _ in items[:10]]}
+def restore_plan(items, left_out):
+    plan = {"items": len(items), "bytes": sum(b for _, b in items), "examples": [r for r, _ in items[:10]]}
+    if left_out:
+        plan["not_restored"] = [{"path": p, "reason": why} for p, why in left_out[:50]]
+    return plan
 
 
 def do_restore(entry, rel, dry_run):
@@ -292,28 +511,32 @@ def do_restore(entry, rel, dry_run):
     dst = os.path.join(entry["mount"], clean)
     if not os.path.lexists(src) or not inside(os.path.realpath(os.path.dirname(src)), entry["path"]):
         return {"ok": False, "error": f"not in the snapshot: {clean}"}
-    plan = restore_plan(src, dst)
+    items, left_out = missing_items(src, dst, entry["mount"])
     result = {"ok": True, "dry_run": dry_run, "snapshot": entry["name"], "path": clean, "source": src, "target": dst,
-              "missing": plan}
-    if dry_run or plan["items"] == 0:
+              "missing": restore_plan(items, left_out)}
+    if dry_run or not items:
         return result
+    commands = []
     try:
-        if os.path.isdir(src) and not os.path.islink(src):
-            ensure_folder(entry["path"], entry["mount"], clean)
-            cmd = ["cp", "-a", "--update=none", "--", src + os.sep + ".", dst + os.sep]
-        else:
-            ensure_folder(entry["path"], entry["mount"], os.path.dirname(clean)) if os.path.dirname(clean) else None
-            cmd = ["cp", "-a", "--update=none", "--", src, dst]
+        for item, _ in items:           # each missing item on its own: cp never descends into an existing folder
+            item_src = src if item == "." else os.path.join(src, item)
+            item_dst = dst if item == "." else os.path.join(dst, item)
+            parent = os.path.dirname(os.path.join(clean, item) if item != "." else clean)
+            if parent:
+                ensure_folder(entry["path"], entry["mount"], parent)
+            cmd = ["cp", "-a", "--update=none", "--", item_src, item_dst]
+            code, out, err = run(cmd)
+            commands.append(" ".join(cmd))
+            if code != 0:
+                result.update({"ok": False, "error": f"cp failed: {err.strip()}", "command": commands[-1]})
+                return result
     except OSError as exc:
         return {"ok": False, "error": f"could not prepare the target: {exc.strerror}"}
-    code, out, err = run(cmd)
-    result["command"] = " ".join(cmd)
-    if code != 0:
-        result.update({"ok": False, "error": f"cp failed: {err.strip()}"})
-        return result
-    left = restore_plan(src, dst)
-    result["still_missing"] = left
-    result["ok"] = left["items"] == 0
+    result["command"] = commands[0] if len(commands) == 1 else f"{commands[0]} (and {len(commands) - 1} more)"
+    result["items_copied"] = len(commands)
+    left_items, left_blocked = missing_items(src, dst, entry["mount"])
+    result["still_missing"] = restore_plan(left_items, left_blocked)
+    result["ok"] = not left_items
     return result
 
 

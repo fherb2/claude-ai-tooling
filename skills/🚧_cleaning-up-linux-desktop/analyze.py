@@ -6,13 +6,19 @@ JSON result and builds the tables. Nothing is written except the result
 file, nothing is deleted. Progress goes to stderr.
 
 Deliveries: 15a fill level and table 3, 15b table 1, 15c software inventory (table 2),
-21 detection of snapshot mechanisms and tools (key "safeguards").
+21 detection of snapshot mechanisms and tools (key "safeguards"), 26 mount points never touched.
+
+Mount points and links are never followed (concept.md, Grundsatz 8): in the home, nothing on
+another mount than the home itself is touched; the fill level covers local file systems only.
+With --find-protocol the script only searches the home for protocol files of earlier runs
+(no root needed) and writes their paths to /tmp/cleanup-protocol-search.txt.
 
 Usage (paths resolved by the instance beforehand):
     sudo nice -n 19 ionice -c3 python3 -I analyze.py --home /home/<user> \
         --downloads <download dir> [--downloads <dir> ...] --media-dir <dir> [--media-dir <dir> ...] \
         --desktop "$XDG_CURRENT_DESKTOP" --threshold 150 [--archives] \
         [--output /tmp/cleanup-analysis.json]
+    python3 -I analyze.py --home "$HOME" --find-protocol
 """
 
 import argparse
@@ -21,8 +27,10 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
+import threading
 import time
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -38,6 +46,9 @@ PARTIAL = 1024**2
 CHUNK = 4 * 1024**2
 MiB = 1024**2
 PREFIX = "cleaning-up-linux-desktop-"      # name prefix of the skill's own snapshots and archives
+PROTOCOL_HEADING = "# cleaning-up-linux-desktop Protocol"
+PROTOCOL_SEARCH = "/tmp/cleanup-protocol-search.txt"
+EXCLUDED_FS = {"tmpfs", "devtmpfs", "squashfs", "overlay", "efivarfs"}    # as df -x before (delivery 21)
 TOOL_TIMEOUT = 30
 BASE_NAME = ".cleaning-up-linux-desktop-snapshots"
 
@@ -444,7 +455,7 @@ class LogSizes:
 
     def result(self):
         volatile = "/run/log/journal"
-        for folder, _, files in os.walk(volatile):
+        for folder, _, files in WALK.walk(volatile):
             for name in files:
                 try:
                     self.journal.add(os.lstat(os.path.join(folder, name)).st_size)
@@ -466,26 +477,11 @@ class TrashSizes:
 
     @staticmethod
     def entries(trash):
-        try:
-            return sum(1 for n in os.listdir(os.path.join(trash, "info")) if n.endswith(".trashinfo"))
-        except OSError:
-            return 0
+        return sum(1 for n in WALK.listdir(os.path.join(trash, "info")) if n.endswith(".trashinfo"))
 
-    def result(self, mounts, uid):
-        rows = [{"path": self.home_trash, "entries": self.entries(self.home_trash), "size": self.size}]
-        for mount in mounts:
-            for trash in (os.path.join(mount, ".Trash", str(uid)), os.path.join(mount, f".Trash-{uid}")):
-                if not os.path.isdir(trash) or trash == self.home_trash:
-                    continue
-                size = 0
-                for folder, _, files in os.walk(os.path.join(trash, "files")):
-                    for name in files:
-                        try:
-                            size += os.lstat(os.path.join(folder, name)).st_size
-                        except OSError:
-                            pass
-                rows.append({"path": trash, "entries": self.entries(trash), "size": size})
-        return rows
+    def result(self):
+        """Only the trash in the home: trash folders on other file systems are mounted data (4.14)."""
+        return [{"path": self.home_trash, "entries": self.entries(self.home_trash), "size": self.size}]
 
 
 class PipCache:
@@ -742,7 +738,7 @@ def desktop_entries(home, current_desktop):
     desktops = {d for d in current_desktop.split(":") if d}
     seen, included, excluded = set(), [], []
     for folder, origin in desktop_dirs(home):
-        for base, _, files in os.walk(folder):
+        for base, _, files in WALK.walk(folder):
             for fname in sorted(files):
                 if not fname.endswith(".desktop"):
                     continue
@@ -751,7 +747,12 @@ def desktop_entries(home, current_desktop):
                 if entry_id in seen:
                     continue          # an earlier location overrides this entry
                 seen.add(entry_id)
-                keys = read_desktop_entry(path)
+                real = resolve_checked(path, home) if os.path.islink(path) else path
+                if real is None:
+                    excluded.append({"id": entry_id, "name": None, "path": path, "origin": origin,
+                                     "reason": "link_not_followed"})
+                    continue
+                keys = read_desktop_entry(real)
                 if keys is None:
                     continue
                 reason = exclusion_reason(keys, desktops)
@@ -799,11 +800,8 @@ def other_installs(home):
         cols = line.split("\t")
         flatpaks.append({"id": cols[0], "name": cols[1] if len(cols) > 1 else None,
                          "version": cols[2] if len(cols) > 2 else None, "scope": "system"})
-    try:
-        for app in sorted(os.listdir(os.path.join(home, ".local/share/flatpak/app"))):
-            flatpaks.append({"id": app, "name": None, "version": None, "scope": "user"})
-    except OSError:
-        pass
+    for app in WALK.listdir(os.path.join(home, ".local/share/flatpak/app")):
+        flatpaks.append({"id": app, "name": None, "version": None, "scope": "user"})
     snaps = [{"name": cols[0], "version": cols[1] if len(cols) > 1 else None}
              for cols in (line.split() for line in (run(["snap", "list"]) or "").splitlines()[1:]) if cols]
     return {"flatpak": flatpaks, "snap": snaps}
@@ -893,18 +891,255 @@ def safe(func, *args):
         return {"error": repr(exc)}
 
 
+def is_own(name):
+    """Names of the skill's own snapshots, archives and their container folders."""
+    return name.lstrip(".").startswith(PREFIX)
+
+
+STALL_SECONDS = 5
+MOUNT_REFRESH = 1.0
+
+
+def unescape_mount(field):
+    """Undo the octal escapes of /proc/self/mountinfo (space, tab, newline, backslash); UTF-8 stays as it is."""
+    return re.sub(r"\\([0-7]{3})", lambda m: chr(int(m.group(1), 8)), field)
+
+
 def mount_points():
     """All mount points, bind mounts on the same file system included (/proc/self/mountinfo)."""
     points = set()
     try:
-        with open("/proc/self/mountinfo", encoding="utf-8") as fh:
+        with open("/proc/self/mountinfo", encoding="utf-8", errors="surrogateescape") as fh:
             for line in fh:
                 fields = line.split()
                 if len(fields) > 4:
-                    points.add(fields[4].encode().decode("unicode_escape"))
+                    points.add(unescape_mount(fields[4]))
     except OSError:
         pass
     return points
+
+
+class Walker:
+    """Folder walks that never touch a mount point and never follow a link (concept.md, Grundsatz 8),
+    with a line on stderr while a walk stays in one folder longer than STALL_SECONDS.
+
+    Mount points are recognised by name against /proc/self/mountinfo before any system call on them,
+    because already a stat of an unresponsive network mount blocks. In the home, nothing is touched that
+    lies on another mount than the home itself (set home); other start points are the caller's choice."""
+
+    def __init__(self, script, newline=False):
+        self.script, self.newline = script, newline
+        self.home = None
+        self.stall_seconds = STALL_SECONDS
+        self.points, self.read_at = set(), None
+        self.lock = threading.Lock()
+        self.thread = None
+        self.active = []                    # folder each running walk is reading, innermost last
+        self.folder = self.since = None
+        self.stalled = None                 # folder named in the last stall line
+        self.stalls = []                    # [{"folder", "seconds"}] for the report
+
+    def mounts(self, fresh=False):
+        """Mount points, read again when older than MOUNT_REFRESH seconds or when fresh is asked for."""
+        now = time.monotonic()
+        if fresh or self.read_at is None or now - self.read_at >= MOUNT_REFRESH:
+            self.points, self.read_at = mount_points(), now
+        return self.points
+
+    def on_other_mount(self, path, base, fresh=False):
+        """True if a mount point lies at path or between base and path: seen from base, path is mounted data."""
+        prefix = base.rstrip(os.sep) + os.sep
+        target = path.rstrip(os.sep) + os.sep
+        return any(m.startswith(prefix) and target.startswith(m.rstrip(os.sep) + os.sep)
+                   for m in self.mounts(fresh))
+
+    def mount_of(self, path):
+        """The mount point path lies on, by name: the longest mount point that is a prefix of path."""
+        target = path.rstrip(os.sep) + os.sep
+        return max((m for m in self.mounts() if target.startswith(m.rstrip(os.sep) + os.sep)), key=len, default="/")
+
+    def contains_mount(self, path, fresh=False):
+        """True if path is a mount point or one lies below it."""
+        prefix = path.rstrip(os.sep) + os.sep
+        return any(m == path or m.startswith(prefix) for m in self.mounts(fresh))
+
+    def allowed(self, path):
+        """False for a path in the home that is or lies below a mount point inside the home."""
+        return not (self.home and path.startswith(self.home + os.sep) and self.on_other_mount(path, self.home))
+
+    def listdir(self, path):
+        """Sorted names in path without mount points; empty if path itself is not allowed or unreadable."""
+        if not self.allowed(path):
+            return []
+        try:
+            names = os.listdir(path)
+        except OSError:
+            return []
+        points = self.mounts()
+        return sorted(n for n in names if os.path.join(path, n) not in points)
+
+    def walk(self, top, skipped=None):
+        """Top-down walk like os.walk(top): yields (folder, dirs, files); dirs may be pruned in place.
+        Never enters a mount point, a folder on another device, a link or a folder with the own prefix;
+        they go to skipped as (path, reason) if a list is given. Links are listed in files."""
+        if not self.allowed(top):
+            if skipped is not None:
+                skipped.append((top, "on another mount than the home"))
+            return
+        try:
+            st = os.lstat(top)
+        except OSError:
+            return
+        if stat.S_ISLNK(st.st_mode):           # scandir would follow it
+            if skipped is not None:
+                skipped.append((top, "link"))
+            return
+        device = st.st_dev
+        self.begin()
+        stack = [top]
+        try:
+            while stack:
+                folder = stack.pop()
+                self.enter(folder)
+                try:
+                    with os.scandir(folder) as it:
+                        entries = list(it)
+                except OSError:
+                    continue
+                points = self.mounts()
+                dirs, files = [], []
+                for entry in entries:
+                    if entry.path in points:
+                        reason = "mount point"
+                    elif is_own(entry.name):
+                        reason = "own snapshot or archive (prefix)"
+                    else:
+                        try:
+                            if not entry.is_dir(follow_symlinks=False):
+                                files.append(entry.name)
+                                continue
+                            if entry.stat(follow_symlinks=False).st_dev == device:
+                                dirs.append(entry.name)
+                                continue
+                        except OSError:
+                            continue
+                        reason = "other file system"
+                    if skipped is not None:
+                        skipped.append((entry.path, reason))
+                yield folder, dirs, files
+                stack.extend(os.path.join(folder, d) for d in reversed(dirs))
+        finally:
+            self.leave()
+
+    def begin(self):
+        """Start of a walk; walks may nest (a size inside a walk), each ends with leave()."""
+        self.active.append(None)
+
+    def enter(self, folder):
+        """The walk starts reading folder: progress for the stall check."""
+        with self.lock:
+            now = time.monotonic()
+            if self.stalled is not None:
+                self._moved_on(now, folder)
+            self.active[-1] = folder
+            self.folder, self.since = folder, now
+        if self.thread is None:
+            self.thread = threading.Thread(target=self._watch, daemon=True)
+            self.thread.start()
+
+    def leave(self):
+        """End of a walk; an outer walk continues in its folder."""
+        with self.lock:
+            now = time.monotonic()
+            self.active.pop()
+            outer = self.active[-1] if self.active else None
+            if self.stalled is not None:
+                self._moved_on(now, outer)
+            self.folder, self.since = outer, now
+
+    def _moved_on(self, now, folder):
+        seconds = round(now - self.since)
+        self.stalls.append({"folder": self.stalled, "seconds": seconds})
+        where = f', now in "{folder}"' if folder else ", walk finished"
+        self._say(f'moved on after {seconds} s in "{self.stalled}"{where}')
+        self.stalled = None
+
+    def _watch(self):
+        while True:
+            time.sleep(self.stall_seconds)
+            with self.lock:
+                if self.folder is None:
+                    continue
+                seconds = time.monotonic() - self.since
+                if seconds < self.stall_seconds:
+                    continue
+                hint = "" if self.stalled else " (huge folder or unresponsive mount?)"
+                self.stalled = self.folder
+                self._say(f'still in "{self.folder}" after {round(seconds)} s, no progress{hint}')
+
+    def _say(self, text):
+        print(("\n" if self.newline else "") + f"{self.script}: {text}", file=sys.stderr, flush=True)
+
+
+WALK = Walker("analyze.py", newline=True)
+
+
+def resolve_checked(path, home):
+    """Real path of path like os.path.realpath, but every component is checked by name before it is
+    touched: it must lie on the mount of /, of the home or of a named system root, and in the home not
+    on another mount than the home. None if a link leads elsewhere or the links loop."""
+    allowed = {WALK.mount_of(p) for p in ["/", home, "/usr"] + SYSTEM_ROOTS}
+    pending = list(reversed(os.path.abspath(path).split(os.sep)))
+    current, hops = "/", 0
+    while pending:
+        part = pending.pop()
+        if part in ("", "."):
+            continue
+        if part == "..":
+            current = os.path.dirname(current)
+            continue
+        candidate = os.path.join(current, part)
+        if WALK.mount_of(candidate) not in allowed or not WALK.allowed(candidate):
+            return None
+        try:
+            is_link = stat.S_ISLNK(os.lstat(candidate).st_mode)
+            target = os.readlink(candidate) if is_link else None
+        except OSError:
+            return None
+        if not is_link:
+            current = candidate
+            continue
+        hops += 1
+        if hops > 40:
+            return None
+        if target.startswith(os.sep):
+            current = "/"
+        pending.extend(reversed(target.split(os.sep)))
+    return current
+
+
+def find_protocol(home, output):
+    """Protocol files of earlier runs: Markdown files in the home whose heading line marks them."""
+    found = []
+    for folder, _, files in WALK.walk(home):
+        for name in files:
+            if not name.endswith(".md"):
+                continue
+            path = os.path.join(folder, name)
+            try:
+                if os.path.islink(path):
+                    continue
+                with open(path, encoding="utf-8", errors="replace") as fh:
+                    if any(line.startswith(PROTOCOL_HEADING) for line in fh):
+                        found.append(path)
+            except OSError:
+                pass
+    with open(output, "w", encoding="utf-8") as fh:
+        fh.writelines(p + "\n" for p in sorted(found))
+    for path in sorted(found):
+        print(path)
+    print(f"{len(found)} protocol file(s). Result: {output}", file=sys.stderr)
+    return 0
 
 
 def walk(root, home, areas, sinks, artifacts, stats, progress):
@@ -913,18 +1148,27 @@ def walk(root, home, areas, sinks, artifacts, stats, progress):
         device = os.stat(root).st_dev
     except OSError:
         return
-    mounts = mount_points()
+    WALK.begin()
+    try:
+        walk_stack(root, home, device, areas, sinks, artifacts, stats, progress)
+    finally:
+        WALK.leave()
+
+
+def walk_stack(root, home, device, areas, sinks, artifacts, stats, progress):
     stack = [(root, Ctx(root, (), root == home, False, areas.of_dir(root, ""), False, None, None))]
     while stack:
         current, ctx = stack.pop()
+        WALK.enter(current)
         try:
             with os.scandir(current) as it:
                 entries = list(it)
         except OSError:
             stats["read_errors"] += 1
             continue
+        mounts = WALK.mounts()
         names = {e.name for e in entries}
-        entries = [e for e in entries if not e.name.lstrip(".").startswith(PREFIX)]   # own safeguards
+        entries = [e for e in entries if not is_own(e.name)]   # own safeguards
         project = ctx.project
         if ctx.is_home and not ctx.dot_top and not ctx.area and not ctx.in_git and not ctx.artifact \
                 and current != home and names & PROJECT_MARKERS:
@@ -932,12 +1176,17 @@ def walk(root, home, areas, sinks, artifacts, stats, progress):
             artifacts.project(current, names)
         ctx.project = project
         for entry in entries:
+            if entry.path in mounts:
+                # by name before any system call on it; mounted data is analysed only at its real
+                # location, if that lies in a root
+                stats["other_filesystems"].append(entry.path)
+                continue
             try:
                 if entry.is_symlink():
                     continue
                 if entry.is_dir(follow_symlinks=False):
                     st = entry.stat(follow_symlinks=False)
-                    if st.st_dev != device or entry.path in mounts:
+                    if st.st_dev != device:
                         # mounted data is analysed only at its real location, if that lies in a root
                         stats["other_filesystems"].append(entry.path)
                         continue
@@ -947,7 +1196,7 @@ def walk(root, home, areas, sinks, artifacts, stats, progress):
                     if not artifact and not in_git and not area:
                         if project and entry.name in ARTIFACT_NAMES:
                             artifact = entry.path
-                        elif ctx.is_home and not ctx.dot_top and os.path.exists(os.path.join(entry.path, "pyvenv.cfg")):
+                        elif ctx.is_home and not ctx.dot_top and is_venv(entry.path, mounts):
                             artifact = entry.path
                             if not owner:
                                 # a Python environment outside a project counts on its own
@@ -966,6 +1215,11 @@ def walk(root, home, areas, sinks, artifacts, stats, progress):
             for sink in sinks:
                 sink.file(ctx, entry.path, entry.name, st, area)
         progress(current, stats["files"])
+
+
+def is_venv(folder, mounts):
+    cfg = os.path.join(folder, "pyvenv.cfg")
+    return cfg not in mounts and os.path.lexists(cfg)
 
 
 def file_hash(path, limit=None):
@@ -1014,20 +1268,41 @@ def run(cmd, timeout=TOOL_TIMEOUT):
     return done.stdout if done.returncode == 0 else None
 
 
+def local_filesystems():
+    """Local file systems from /proc/self/mountinfo: a block device or ZFS as source, without the types
+    df -x excluded before. One mount per file system, the shortest mount point, as df shows it.
+    Network, FUSE and memory file systems are never touched, not even by statfs."""
+    try:
+        with open("/proc/self/mountinfo", encoding="utf-8", errors="surrogateescape") as fh:
+            lines = fh.read().splitlines()
+    except OSError:
+        return []
+    chosen = {}
+    for line in lines:
+        left, sep, right = line.partition(" - ")
+        fields, rest = left.split(), right.split()
+        if not sep or len(fields) < 5 or len(rest) < 2:
+            continue
+        fstype, source = rest[0], unescape_mount(rest[1])
+        if fstype in EXCLUDED_FS or not (source.startswith("/dev/") or fstype == "zfs"):
+            continue
+        target = unescape_mount(fields[4])
+        known = chosen.get(fields[2])            # major:minor of the file system
+        if known is None or len(target) < len(known[2]):
+            chosen[fields[2]] = (source, fstype, target)
+    return sorted(chosen.values(), key=lambda row: row[2])
+
+
 def filesystems():
-    """Fill level per mounted file system and btrfs snapshots."""
-    out = run(["df", "-B1", "--output=source,fstype,size,used,target", "-x", "tmpfs", "-x", "devtmpfs",
-               "-x", "squashfs", "-x", "overlay", "-x", "efivarfs"]) or ""
+    """Fill level per local file system and btrfs snapshots."""
     mounts, btrfs = [], {}
-    for line in out.splitlines()[1:]:
-        source, fstype, size, used, target = line.split(None, 4)
+    for source, fstype, target in local_filesystems():
         try:
-            stat = os.statvfs(target)
-            avail = stat.f_bavail * stat.f_frsize
+            st = os.statvfs(target)
         except OSError:
-            avail = None
-        mounts.append({"mount": target, "source": source, "fstype": fstype, "size": int(size), "used": int(used),
-                       "avail": avail})
+            continue
+        mounts.append({"mount": target, "source": source, "fstype": fstype, "size": st.f_blocks * st.f_frsize,
+                       "used": (st.f_blocks - st.f_bfree) * st.f_frsize, "avail": st.f_bavail * st.f_frsize})
         if fstype == "btrfs":
             btrfs.setdefault(source, target)
     snapshots = []
@@ -1161,22 +1436,40 @@ def write_result(path, data):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--home", required=True)
-    parser.add_argument("--downloads", action="append", required=True,
-                        help="download folder (repeatable: XDG folder and browser download targets)")
+    parser.add_argument("--downloads", action="append", default=[],
+                        help="download folder (repeatable: XDG folder and browser download targets); required")
     parser.add_argument("--threshold", type=int, default=150, help="size threshold in MiB")
     parser.add_argument("--archives", action="store_true", help="section 4.8 covers general archives")
     parser.add_argument("--desktop", default="", help="value of XDG_CURRENT_DESKTOP (lost under sudo)")
     parser.add_argument("--media-dir", action="append", default=[],
                         help="user folder for videos, music, pictures or documents (repeatable)")
-    parser.add_argument("--output", default="/tmp/cleanup-analysis.json")
+    parser.add_argument("--find-protocol", action="store_true",
+                        help=f"only search the home for protocol files of earlier runs ({PROTOCOL_SEARCH})")
+    parser.add_argument("--output")
     args = parser.parse_args()
     home = os.path.realpath(args.home)
-    downloads = sorted({os.path.realpath(d) for d in args.downloads}, key=len, reverse=True)
-    media_dirs = [os.path.realpath(d) for d in args.media_dir]
-    for path in [home] + downloads + media_dirs:
+    WALK.home = home
+    if args.find_protocol:
+        return find_protocol(home, args.output or PROTOCOL_SEARCH)
+    if not args.downloads:
+        parser.error("--downloads is required")
+    output = args.output or "/tmp/cleanup-analysis.json"
+    if not os.path.isdir(home):
+        print(f"Not a directory: {home}", file=sys.stderr)
+        return 2
+    not_read = []
+    downloads, media_dirs = set(), []
+    for given, kind in [(d, "downloads") for d in args.downloads] + [(d, "media") for d in args.media_dir]:
+        path = resolve_checked(given, home)
+        if path is None:
+            not_read.append(given)      # on another mount than the home (or a link to one): never touched
+            print(f"Not analysed, lies on another mount: {given}", file=sys.stderr)
+            continue
         if not os.path.isdir(path):
-            print(f"Not a directory: {path}", file=sys.stderr)
+            print(f"Not a directory: {given}", file=sys.stderr)
             return 2
+        downloads.add(path) if kind == "downloads" else media_dirs.append(path)
+    downloads = sorted(downloads, key=len, reverse=True)
     if os.geteuid() != 0:
         print("Warning: not running as root; system directories will be incomplete.", file=sys.stderr)
 
@@ -1215,16 +1508,17 @@ def main():
     table1.update({"4.7_deb_files": files["deb_files"], "4.8_images_archives": files["images_archives"],
                    "4.9_downloads": files["downloads"], "4.10_stray_media": files["stray_media"],
                    "4.12_pycache": pycache.result(), "4.13_docker": safe(docker_state, compose.paths),
-                   "4.14_trash": trash.result([m["mount"] for m in fill["mounts"]], os.stat(home).st_uid)})
+                   "4.14_trash": trash.result()})
 
     data = {
-        "meta": {"tool": "analyze.py", "delivery": "21",
+        "meta": {"tool": "analyze.py", "delivery": "26",
                  "started": datetime.fromtimestamp(started, timezone.utc).isoformat(timespec="seconds"),
                  "duration_s": round(time.time() - started, 1), "files": stats["files"],
                  "read_errors": stats["read_errors"], "other_filesystems": sorted(stats["other_filesystems"]),
+                 "stalls": WALK.stalls,
                  "params": {"home": home, "downloads": downloads, "threshold_mib": args.threshold,
                             "archives": args.archives, "media_dirs": media_dirs,
-                            "desktop": args.desktop}},
+                            "not_read": not_read, "desktop": args.desktop}},
         "fill_level": fill,
         "safeguards": safe(safeguards, fill["mounts"]),
         "table1": table1,
@@ -1238,9 +1532,9 @@ def main():
             "dev_artifacts": artifacts.result(),
         },
     }
-    write_result(args.output, data)
+    write_result(output, data)
     print(f"Done: {stats['files']:,} files in {data['meta']['duration_s']} s, "
-          f"{stats['read_errors']} read errors. Result: {args.output}", file=sys.stderr)
+          f"{stats['read_errors']} read errors. Result: {output}", file=sys.stderr)
     return 0
 
 

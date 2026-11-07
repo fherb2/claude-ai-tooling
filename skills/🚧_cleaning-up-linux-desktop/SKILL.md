@@ -17,7 +17,7 @@ Dieser Skill läuft lange und in vielen Schritten; sein ganzer Regelteil steht d
 4. Installierte Software wird nie entfernt, auch nicht, wenn sie vermutlich nicht mehr gebraucht wird; solche Funde werden gemeldet.
 5. Was zu erhalten und was zu löschen ist, formuliert allein der Nutzer. Du übersetzt seine Angaben in einen Auftrag für das Skript und zeigst ihm die Übersetzung vor der Ausführung.
 6. Ordnernamen wie Downloads, Videos, Musik, Bilder, Dokumente setzt du nie selbst ein. Du ermittelst sie über die XDG-Benutzerverzeichnisse und übergibst die aufgelösten Pfade.
-7. Was eingehängt ist, wird nie gelöscht und nie durchlaufen; Links werden nie verfolgt. Die Skripte setzen das selbst durch.
+7. Was eingehängt ist (Netzfreigabe, anderer Datenträger, Bind-Mount), wird nie gelöscht, nie durchlaufen und nie angefasst, nicht einmal gelesen oder gezählt; Links werden nie verfolgt. Die Skripte setzen das selbst durch, nach dem Namen und vor jedem Zugriff, denn schon die Abfrage einer nicht antwortenden Netzfreigabe blockiert den Prozess. Eingehängte Daten erfasst nur, wer an ihrem echten Ort beginnt, und nur wenn der in der Analyse liegt. Einzige Ausnahme: der Zielort einer Archivsicherung, den der Nutzer wählt; er wird nur beschrieben.
 8. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie groß die entfernte Datenmenge war (nicht der frei gewordene Platz), was nur gemeldet wurde. Für Docker ohne Größe.
 9. Eigene Snapshots und Archive tragen den Namenspräfix `cleaning-up-linux-desktop-`. Die Skripte fassen nichts ohne diesen Präfix an und nehmen Dateien mit dem Präfix von allen Löschläufen aus. Davon weichst du nur auf ausdrücklichen Wunsch des Nutzers ab.
 
@@ -33,13 +33,25 @@ Auf ausdrücklichen Wunsch führst du Skripte ohne `sudo` selbst aus; das bietes
 
 Wurde der Skill nicht ausdrücklich mit `/cleaning-up-linux-desktop` aufgerufen — etwa weil er auf claude.ai von selbst geladen wurde —, frage zuerst, ob er jetzt angewendet werden soll. Bei Nein endest du.
 
-## Betriebsarten
+## Läuft ein Skript zu lange
 
-Der Skill kennt drei: das **Aufräumen** (der normale Lauf, beschrieben ab „Beginn“), das **Aufräumen der Sicherungen** eines früheren Laufs und die **Wiederaufnahme** nach einem abgebrochenen Lauf (beide am Ende dieser Datei). Suche zuerst das Protokoll (Abschnitt „Protokoll“): In Claude Code liest du `~/cleaning-up-linux-desktop-protocol.md`, auf claude.ai bittest du den Nutzer, es hochzuladen. Gibt es nichts, frage, ob es unter einem anderen Namen oder an anderer Stelle liegt, und biete diesen Suchbefehl an:
+Jedes Skript, das Ordner durchläuft, schreibt nach `stderr` eine Zeile, wenn es länger als 5 Sekunden in demselben Ordner steht: `<skript>: still in "<Ordner>" after <n> s, no progress`. Sie wiederholt sich, und beim Weitergehen kommt `moved on after <n> s in "<Ordner>"`. Sage dem Nutzer zu Beginn, dass er diese Zeilen im Terminal sieht und sie dir nennen soll. Die Stillstände stehen auch im Bericht (Liste `stalls`).
+
+Meldet der Nutzer, dass ein Lauf lange dauert, tust du das nie als „dauert halt“ ab. Frage zuerst nach diesen Zeilen; sie nennen den Ordner. Fehlen sie, gib den Block unten (liest nur; die Prozessnummer liefert `pgrep`). Zustand `D` bei kaum CPU und ohne Plattenzugriff heißt: Der Prozess wartet auf ein Gerät, meist eine Netzfreigabe. Ein solcher Prozess lässt sich auch mit `kill -KILL` nicht sofort beenden; rate dem Nutzer nicht zu Gewalt, sondern frage, was an dem genannten Ordner eingehängt ist (`findmnt -R <Ordner>`).
 
 ```bash
-grep -rl --include='*.md' '^# cleaning-up-linux-desktop Protocol' "$HOME" 2>/dev/null | tee /tmp/cleanup-protocol-search.txt
+{ for p in $(pgrep -f '^python3 -I .*cleaning-up-linux-desktop'); do ps -o pid,etime,stat,pcpu,cmd -p "$p"; echo "wchan: $(sudo cat /proc/$p/wchan)"; done; } 2>&1 | tee /tmp/cleanup-hang.txt
 ```
+
+## Betriebsarten
+
+Der Skill kennt drei: das **Aufräumen** (der normale Lauf, beschrieben ab „Beginn“), das **Aufräumen der Sicherungen** eines früheren Laufs und die **Wiederaufnahme** nach einem abgebrochenen Lauf (beide am Ende dieser Datei). Suche zuerst das Protokoll (Abschnitt „Protokoll“): In Claude Code liest du `~/cleaning-up-linux-desktop-protocol.md`, auf claude.ai bittest du den Nutzer, es hochzuladen. Gibt es nichts, frage, ob es unter einem anderen Namen oder an anderer Stelle liegt, und biete diesen Suchbefehl an. Er läuft ohne `sudo`, durchsucht nur das Home und fasst keinen Einhängepunkt an; liegt das Protokoll auf einem Einhängepunkt, nennt der Nutzer den Pfad:
+
+```bash
+python3 -I "${CLAUDE_SKILL_DIR}/analyze.py" --home "$HOME" --find-protocol
+```
+
+Er schreibt die gefundenen Pfade nach `/tmp/cleanup-protocol-search.txt`.
 
 Erst danach gilt: kein Protokoll. Schlage dann vor: kein Protokoll heißt Aufräumen; ein offener Schritt (begonnen ohne erledigt, oder Lauf nicht abgeschlossen) heißt Wiederaufnahme; ein abgeschlossener Lauf mit noch vorhandenen Sicherungen heißt Aufräumen der Sicherungen. Der Nutzer entscheidet. „Beginn“ gilt für alle drei Betriebsarten, Schritt 5 nur für das Aufräumen.
 
@@ -67,13 +79,13 @@ Download-Ziele, die in Firefox oder Chrome vom Standard abweichen (Zeilen `FIREF
 sudo nice -n 19 ionice -c3 python3 -I "${CLAUDE_SKILL_DIR}/analyze.py" --home "$HOME" --downloads "<Download-Ordner>" [--downloads "<Browser-Ziel>" …] --media-dir "<Videos>" --media-dir "<Musik>" --media-dir "<Bilder>" --media-dir "<Dokumente>" --desktop "$XDG_CURRENT_DESKTOP" --threshold <MiB> [--archives]
 ```
 
-Das Skript zeigt seinen Fortschritt und schreibt `/tmp/cleanup-analysis.json`: `fill_level`, `table1` (Bereiche 4.1 bis 4.14 außer 4.11), `software` (Starter-Einträge, Flatpak, Snap, Anwendungsordner mit Vorfilter), `table3`, `safeguards` (btrfs, ZFS, LVM, Timeshift, Snapper: was das System an Sicherungen hergibt). Es liest nur. Sag dem Nutzer vorher, dass du dabei auch prüfst, welche Software Cache- und Download-Ordner mitbringt, und dich im Internet über die Programme informierst.
+Das Skript zeigt seinen Fortschritt und schreibt `/tmp/cleanup-analysis.json`. Liegt ein übergebener Download- oder Medienordner auf einem Einhängepunkt, wird er nicht analysiert; das Skript meldet es, und `meta.params.not_read` nennt ihn. Sag dem Nutzer, dass er diesen Ordner an seinem echten Ort selbst aufräumen muss. `meta.other_filesystems` nennt die ausgelassenen Einhängepunkte unter dem Home. Der Inhalt: `fill_level`, `table1` (Bereiche 4.1 bis 4.14 außer 4.11), `software` (Starter-Einträge, Flatpak, Snap, Anwendungsordner mit Vorfilter), `table3`, `safeguards` (btrfs, ZFS, LVM, Timeshift, Snapper: was das System an Sicherungen hergibt). Es liest nur. Sag dem Nutzer vorher, dass du dabei auch prüfst, welche Software Cache- und Download-Ordner mitbringt, und dich im Internet über die Programme informierst.
 
 Danach recherchierst du die erfassten Programme (4.11), bevor du Tabellen zeigst. Am Ende der Analyse nennst du kurz die Software, zu der du bei der Bereinigung Vorschläge machen wirst; Firefox, Chrome und VS Code gehören dazu, wenn sie installiert sind.
 
 ## Darstellung
 
-Zuerst der **Füllstand** je Dateisystem (belegt, Gesamtgröße, Prozent); gibt es btrfs-Snapshots, ihre Zahl und, wenn bekannt, ihre Belegung; dazu, welche Sicherungsvarianten das System hergibt (`safeguards`). Der Füllstand zeigt, wo Aufräumen etwas bringt.
+Zuerst der **Füllstand** je lokalem Dateisystem (belegt, Gesamtgröße, Prozent); Netzfreigaben und andere nicht lokale Dateisysteme fehlen darin mit Absicht; gibt es btrfs-Snapshots, ihre Zahl und, wenn bekannt, ihre Belegung; dazu, welche Sicherungsvarianten das System hergibt (`safeguards`). Der Füllstand zeigt, wo Aufräumen etwas bringt.
 
 Dann drei Tabellen, **je Bereich eine Zeile**. Einzellisten, Histogramme und Auswahllisten kommen erst, wenn der Bereich bearbeitet wird — nie alles gleich nach der Analyse.
 
@@ -119,7 +131,7 @@ sudo python3 -I "${CLAUDE_SKILL_DIR}/backup.py" create --list <Liste oder Berich
 
 Der erste Bericht (`/tmp/cleanup-backup-create.json`) nennt den Lauf (`run`); gib ihn für alle weiteren Schritte desselben Laufs mit `--run` an. Jeder Schritt wird eine eigene Datei `NN-<schritt>.tar|.tar.gz|.zip`.
 
-**Zurückholen** geschieht selektiv: nur Fehlendes, nichts wird überschrieben. Aus einem Snapshot: `snapshots.py restore --snapshot <Name> --path <Ordner relativ zum Einhängepunkt> [--dry-run]`; aus einem Archiv: `backup.py restore --target <Ziel> --run <Lauf> --step <schritt> [--path <absoluter Originalpfad>] [--dry-run]`. Ein Zurückrollen eines ganzen Subvolumes machst du nur auf ausdrücklichen Wunsch und mit Warnung: Das Protokoll im Home würde auf den Stand des Snapshots zurückgesetzt. Aus einem zip erhalten neue Dateien den Besitzer ihres Elternordners.
+**Zurückholen** geschieht selektiv: nur Fehlendes, nichts wird überschrieben. Aus einem Snapshot: `snapshots.py restore --snapshot <Name> --path <Ordner relativ zum Einhängepunkt> [--dry-run]`; aus einem Archiv: `backup.py restore --target <Ziel> --run <Lauf> --step <schritt> [--path <absoluter Originalpfad>] [--dry-run]`. Ein Zurückrollen eines ganzen Subvolumes machst du nur auf ausdrücklichen Wunsch und mit Warnung: Das Protokoll im Home würde auf den Stand des Snapshots zurückgesetzt. Aus einem zip erhalten neue Dateien den Besitzer ihres Elternordners. Ziele an oder unter einem Einhängepunkt lassen beide Skripte aus und melden sie (`not_restored`); sag dem Nutzer, dass er solche Daten an ihrem Ort selbst zurückspielen muss.
 
 ## Protokoll
 
@@ -141,7 +153,7 @@ sudo python3 -I "${CLAUDE_SKILL_DIR}/delete.py" --home "$HOME" --order /tmp/clea
 sudo python3 -I "${CLAUDE_SKILL_DIR}/delete.py" --home "$HOME" --order /tmp/cleanup-orders/<Bereich>.json
 ```
 
-Jeder Lauf schreibt `/tmp/cleanup-report-<Bereich>.json` (entfernte Anzahl und Datenmenge, Gruppen, übersprungene Pfade mit Grund, ausgeführte Befehle). Übersprungenes zeigst du dem Nutzer mit Grund. Das Skript verweigert unabhängig vom Auftrag: `/`, das Home, Ordner direkt unter `/` oder dem Home, `/boot`, alles außerhalb von Home, `/var`, `/opt`, `/usr/local`, `/srv`, Einhängepunkte und alles, was einen enthält, Links (außer im Papierkorb).
+Jeder Lauf schreibt `/tmp/cleanup-report-<Bereich>.json` (entfernte Anzahl und Datenmenge, Gruppen, übersprungene Pfade mit Grund, ausgeführte Befehle). Übersprungenes zeigst du dem Nutzer mit Grund. Das Skript verweigert unabhängig vom Auftrag: `/`, das Home, Ordner direkt unter `/` oder dem Home, `/boot`, alles außerhalb von Home, `/var`, `/opt`, `/usr/local`, `/srv`, Einhängepunkte und alles, was einen enthält oder darunter liegt, Links (außer im Papierkorb).
 
 Auftragsformen: `{"area": "<Bereich>", "kind": "rule", "params": {...}}` für Regeln, `{"area": "<Bereich>", "kind": "list", "paths": [...]}` für ausgewählte Pfade (nur 4.7 bis 4.10).
 
@@ -184,7 +196,7 @@ Im Bericht keine Größe.
 
 **4.10 Vagabundierende Medien** — mit Auswahl. Das Skript liefert Mediendateien ab der Schwelle außerhalb der Medienordner, je Fundordner die Endungen der Nachbardateien und ob es ein Projekt oder `.git` ist. Du bewertest das Wesen jedes Ordners (Name, Projektordner, Nachbarendungen als Hinweis auf ein Bearbeitungsprojekt, bewusste Ablage) und zeigst nur, was vergessen abgelegt aussieht. Darstellung und Auswahl wie 4.8. Auftrag `list`.
 
-**4.14 Papierkorb** — zuletzt. Frage nach x Tagen (Vorgabe 14, 0 = alles). Auftrag `rule` mit `{"days": x}`, für Papierkörbe auf anderen Dateisystemen zusätzlich `"other_trashes": [...]` aus der Analyse. Maßgeblich ist das Datum des Verschiebens in den Papierkorb; Einträge ohne gültige `.trashinfo` werden nur gemeldet. Hinweis: endgültig weg, ein Backup hilft nur, wenn der Papierkorb gesichert wird.
+**4.14 Papierkorb** — zuletzt. Frage nach x Tagen (Vorgabe 14, 0 = alles). Auftrag `rule` mit `{"days": x}`. Nur der Papierkorb im Home wird bearbeitet; Papierkörbe auf anderen Datenträgern (`.Trash-<uid>` an einem Einhängepunkt) fasst der Skill nicht an, der Nutzer leert sie an ihrem Ort selbst — sag ihm das. Maßgeblich ist das Datum des Verschiebens in den Papierkorb; Einträge ohne gültige `.trashinfo` werden nur gemeldet. Hinweis: endgültig weg, ein Backup hilft nur, wenn der Papierkorb gesichert wird.
 
 ## Ergebnisbericht
 
