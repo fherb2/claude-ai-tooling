@@ -1,4 +1,4 @@
-# clean-up-linux-desktop — einen Linux-Desktop aufräumen, ohne Arbeitsdaten zu gefährden
+# cleaning-up-linux-desktop — einen Linux-Desktop aufräumen, ohne Arbeitsdaten zu gefährden
 
 *Stand: 2026-11-06*
 
@@ -10,11 +10,11 @@
 
 **Der Skill räumt einen Linux-Desktop oder -Laptop auf und löscht dabei nur, was nachweislich unnütz ist.** Er misst zuerst, was auf dem Rechner liegt, zeigt den Füllstand der Dateisysteme und drei Tabellen und arbeitet sie dann gemeinsam mit dem Nutzer ab: Caches von Firefox, Chrome und VS Code, der Paketcache von apt, Log-Files und Journal, der pip-Cache, Python-Bytecode, Docker-Reste, der Download-Ordner, liegengebliebene Installationsdateien, Images und Archive, vergessene Mediendateien und zuletzt der Papierkorb.
 
-Was ohne Rückfrage gelöscht wird, ist eng begrenzt: programmeigene Zwischendateien, die das Programm nicht mehr braucht oder jederzeit vollautomatisch neu erzeugt. Alles, was dem Nutzer gehört — Downloads, Installationsdateien, Medien, der Inhalt des Papierkorbs —, wird nur nach seiner Auswahl gelöscht. Vor jedem Löschen gibt es einen Probelauf, der zeigt, was tatsächlich weg wäre.
+Was ohne Rückfrage gelöscht wird, ist eng begrenzt: programmeigene Zwischendateien, die das Programm nicht mehr braucht oder jederzeit vollautomatisch neu erzeugt. Alles, was dem Nutzer gehört — Downloads, Installationsdateien, Medien, der Inhalt des Papierkorbs —, wird nur nach seiner Auswahl gelöscht. Wo sinnvoll, z. B. beim Downloads-Ordner, kann der Nutzer dabei neuste Daten erhalten lassen. Vor jedem Löschen gibt es einen Probelauf, der zeigt, was tatsächlich weg wäre.
 
 **Abgrenzung:** Der Skill entfernt keine installierte Software, auch keine, die vermutlich niemand mehr braucht; er meldet sie nur. Er ist für Desktops und Laptops gedacht (Ubuntu, Kubuntu und ähnliche), nicht für Server. Was eingehängt ist — ein anderes Dateisystem oder ein Bind-Mount —, wird nie durchlaufen und nie gelöscht.
 
-Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/clean-up-linux-desktop`. Er lädt sich nicht von selbst.
+Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/cleaning-up-linux-desktop`. Er lädt sich nicht von selbst.
 
 ## Ohne Gewähr
 
@@ -24,13 +24,13 @@ Der Skill wird nur auf ausdrücklichen Aufruf angewendet: `/clean-up-linux-deskt
 
 ### Claude Code
 
-1. **Paket herunterladen.** `downloads/clean-up-linux-desktop_de_local.zip`
+1. **Paket herunterladen.** `downloads/cleaning-up-linux-desktop_de_local.zip`
 
-2. **Entpacken.** Das Archiv enthält einen Ordner `clean-up-linux-desktop/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` im Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
+2. **Entpacken.** Das Archiv enthält einen Ordner `cleaning-up-linux-desktop/` mit allen Dateien. Entpacke ihn nach `~/.claude/skills/` — dann gilt der Skill für alle Projekte — oder nach `.claude/skills/` in einem Projekt, dann nur dort. Ein vorhandener Ordner gleichen Namens wird ersetzt; es bleibt nichts Altes liegen.
 
 ### claude.ai und Claude Desktop (Chat + Cowork)
 
-1. **Paket herunterladen.** `downloads/clean-up-linux-desktop_de_web.zip`
+1. **Paket herunterladen.** `downloads/cleaning-up-linux-desktop_de_web.zip`
 
 2. **Hochladen.** Im dafür vorgesehenen Verwaltungsfeld für Skills der Anwendung das Archiv hochladen. Der Skill gilt danach für Dein Konto — nicht für Deine Organisation, und nicht gleichzeitig in Claude Code.
 
@@ -66,11 +66,20 @@ Unabhängig vom Auftrag löscht `delete.py` nie: `/`, das Home selbst, einen Ord
 
 ### Was „Cache“ hier heißt
 
-Ein Ordner gilt nur dann als löschbarer Cache, wenn belegt ist, dass das Programm seine Daten jederzeit vollautomatisch wiederherstellt und ihr Fehlen bis auf Zeitverlust nichts ändert. Wie ein Ordner heißt, zählt nicht. Proxy-Dateien eines Videoschnittprogramms etwa sind kein Cache, auch wenn sie in einem Ordner dieses Namens liegen: Sie entstehen in einem eigenen Arbeitsschritt und kommen nicht von selbst zurück.
+Ein Ordner gilt nur dann als löschbarer Cache, wenn belegt ist, dass das Programm seine Daten jederzeit vollautomatisch wiederherstellt und ihr Fehlen bis auf Zeitverlust nichts ändert. Wie ein Ordner heißt, zählt nicht. Proxy-Dateien eines Videoschnittprogramms etwa sind kein Cache, auch wenn sie in einem Ordner dieses Namens liegen sollten: Sie entstehen in einem eigenen Arbeitsschritt und kommen nicht von selbst zurück.
 
 ### Belege und Herkunft der Regeln
 
-Die Festlegungen samt Begründungen und Messbefunden stehen in `plan/concept.md`; die Tests, auf denen die Regeln für Firefox, Chrome, VS Code und Docker beruhen, liegen unter `tests/`. Beides ist Entwicklungsmaterial und reist nicht mit ins Paket.
+Applikationsbezogene Regeln wurden bisher erarbeitet für:
+
+- Firefox
+- Chrome
+- VS Code
+- Docker
+
+Beachte, dass die Regeln auch veralten können und verfolge die Arbeit des Agenten aufmerksam.
+
+Die Festlegungen samt Begründungen und Messbefunden stehen in `plan/concept.md`; die Tests, auf denen die Regeln für die Applikationen beruhen, liegen unter `tests/`. Beides ist Entwicklungsmaterial, reist nicht mit ins Paket und verbleibt in der Entwicklungssprache des Autors.
 
 Das Alter einer Datei bestimmen die Skripte aus der späteren von Änderungs- und Statusänderungszeit; das Anlegedatum liefert Python unter Linux nicht. Eine Datei erscheint damit höchstens jünger, als sie ist, und wird im Zweifel nicht gelöscht.
 

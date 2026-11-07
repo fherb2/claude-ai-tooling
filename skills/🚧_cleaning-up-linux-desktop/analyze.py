@@ -1,4 +1,4 @@
-"""Read-only analysis for the clean-up-linux-desktop skill.
+"""Read-only analysis for the cleaning-up-linux-desktop skill.
 
 One walk over the home directory and the system directories collects the
 data for the fill level and the tables of the skill; the instance reads the

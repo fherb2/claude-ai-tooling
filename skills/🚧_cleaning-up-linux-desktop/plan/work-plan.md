@@ -1,4 +1,4 @@
-# Fahrplan: clean-up-linux-desktop
+# Fahrplan: cleaning-up-linux-desktop
 
 Die anstehenden Schritte dieses Vorhabens. Erledigte Schritte fliegen raus; die Nummern der übrigen werden dabei nicht neu vergeben, neue Schritte zählen hoch. Die Festlegungen stehen in `concept.md`.
 

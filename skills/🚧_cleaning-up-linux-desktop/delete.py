@@ -1,4 +1,4 @@
-"""Deletion for the clean-up-linux-desktop skill: one area per run, as ordered by the instance.
+"""Deletion for the cleaning-up-linux-desktop skill: one area per run, as ordered by the instance.
 
 An order is either a list (paths or containers the user selected) or a rule
 (the area with its parameters; the rule of concept.md section 4 is applied
