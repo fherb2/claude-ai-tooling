@@ -133,6 +133,20 @@ def main():
     check("remove dry run: nothing deleted", r["ok"] and delete not in fake.calls and os.path.isdir(one))
     r = s.do_remove(mnt, f"{P}a", [], False)
     check("remove: command and result", r["ok"] and r["removed"] and delete in fake.calls)
+    check("remove: container stays while others remain", r["container_removed"] is False and os.path.isdir(folder))
+
+    mount2 = os.path.join(base, "mnt2")
+    folder2 = os.path.join(mount2, s.BASE_NAME)
+    single = os.path.join(folder2, f"{P}only")
+    os.makedirs(single)
+    mnt2 = [{"mount": mount2, "device": "/dev/y", "subvolume": "/"}]
+    delete2 = ("btrfs", "subvolume", "delete", "--commit-after", single)
+    s.run = Fake({("btrfs", "subvolume", "show", single): (0, SHOW.format(id=9, flags="readonly"), ""),
+                  delete2: lambda: (shutil.rmtree(single), (0, "", ""))[1]})
+    r = s.do_remove(mnt2, f"{P}only", [], True)
+    check("remove dry run: announces the container removal", r["ok"] and r["container_removed"] is True and os.path.isdir(folder2))
+    r = s.do_remove(mnt2, f"{P}only", [], False)
+    check("remove: empty container folder goes with its last snapshot", r["ok"] and r["container_removed"] and not os.path.exists(folder2))
     fake = Fake({("btrfs", "subvolume", "show", two): (0, SHOW.format(id=302, flags="readonly"), ""),
                  ("btrfs", "subvolume", "delete", "--commit-after", two): (1, "", "permission denied")})
     s.run = fake

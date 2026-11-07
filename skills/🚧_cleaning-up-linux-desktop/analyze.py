@@ -39,6 +39,7 @@ CHUNK = 4 * 1024**2
 MiB = 1024**2
 PREFIX = "cleaning-up-linux-desktop-"      # name prefix of the skill's own snapshots and archives
 TOOL_TIMEOUT = 30
+BASE_NAME = ".cleaning-up-linux-desktop-snapshots"
 
 GROUPS = {
     "video": "mp4 mkv avi mov wmv flv webm m4v mpg mpeg ts mts m2ts 3gp vob",
@@ -923,6 +924,7 @@ def walk(root, home, areas, sinks, artifacts, stats, progress):
             stats["read_errors"] += 1
             continue
         names = {e.name for e in entries}
+        entries = [e for e in entries if not e.name.lstrip(".").startswith(PREFIX)]   # own safeguards
         project = ctx.project
         if ctx.is_home and not ctx.dot_top and not ctx.area and not ctx.in_git and not ctx.artifact \
                 and current != home and names & PROJECT_MARKERS:

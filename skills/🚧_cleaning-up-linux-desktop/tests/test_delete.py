@@ -131,6 +131,8 @@ def build(fx):
     fx.file("Downloads/old.iso", "gone")
     fx.file("Downloads/folder/a", "gone")
     fx.file("Downloads/keep.txt", "kept")
+    fx.file("Downloads/cleaning-up-linux-desktop-backup-x.tar", "kept")
+    fx.file(".cleaning-up-linux-desktop-snapshots/snap/proj/__pycache__/x.pyc", "kept")
     os.symlink(os.path.join(h, "Downloads/keep.txt"), os.path.join(h, "Downloads/link"))
     fx.expect[os.path.join(h, "Downloads/link")] = "kept"
     fx.file("Downloads/mounted/data", "kept")
@@ -177,7 +179,8 @@ def main():
     report = d.Report("4.9", False)
     deleter = d.Deleter(home, False, report)
     deleter.guard.mounts.add(os.path.join(home, "Downloads/mounted"))
-    for path in ["Downloads/old.iso", "Downloads/folder", "Downloads/link", "Downloads/mounted", "Dokumente", ""]:
+    for path in ["Downloads/old.iso", "Downloads/folder", "Downloads/link", "Downloads/mounted", "Dokumente", "",
+                 "Downloads/cleaning-up-linux-desktop-backup-x.tar"]:
         deleter.remove(os.path.join(home, path) if path else home)
     for path in ["/boot/vmlinuz", "/etc/passwd"]:
         deleter.remove(path)
@@ -201,6 +204,19 @@ def main():
         if cmd not in expected_commands:
             problems.append(f"unexpected command: {' '.join(cmd)}")
     reasons = {s["path"]: s["reason"] for s in results["4.9"]["skipped"]}
+    own = os.path.join(home, "Downloads/cleaning-up-linux-desktop-backup-x.tar")
+    if reasons.get(own) != "own snapshot or archive (prefix)":
+        problems.append(f"own archive not protected: {reasons.get(own)!r}")
+    os.makedirs(os.path.join(home, "probe/__pycache__"))
+    with open(os.path.join(home, "probe/__pycache__/a.pyc"), "w") as fh:
+        fh.write("x")
+    probe = d.Report("4.12", True, with_paths=True)
+    d.rule_pycache(d.Deleter(home, True, probe), home, {}, later)
+    wanted = {os.path.join(home, "probe/__pycache__")}
+    if not wanted <= set(probe.data["candidates"]) or any(".cleaning-up-linux-desktop-snapshots" in c for c in probe.data["candidates"]):
+        problems.append("with_paths: candidates missing or inside the own snapshot folder")
+    if "candidates" in d.Report("4.12", True).data:
+        problems.append("with_paths: candidates listed although not requested")
     for path, reason in [(os.path.join(home, "Downloads/link"), "symbolic link"),
                          (os.path.join(home, "Downloads/mounted"), "is or contains a mount point"),
                          (os.path.join(home, "Dokumente"), "folder directly under home"),
@@ -218,7 +234,7 @@ def main():
         for line in problems:
             print("  " + line)
         return 1
-    print(f"PASSED: {len(fx.expect)} paths, {len(expected_commands)} commands and 6 bans checked.")
+    print(f"PASSED: {len(fx.expect)} paths, {len(expected_commands)} commands, 6 bans, own-prefix protection and candidate paths checked.")
     for area, data in results.items():
         print(f"  {area:5} removed {data['removed_count']:3}  skipped {len(data['skipped'])}")
     return 0

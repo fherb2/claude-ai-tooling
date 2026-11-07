@@ -32,6 +32,8 @@ DAY = 86400
 CACHE_AGE = 3 * DAY
 STALE_PROFILE_AGE = 30 * DAY
 WALKED_ROOTS = ["/var", "/opt", "/usr/local", "/srv"]
+PREFIX = "cleaning-up-linux-desktop-"
+BASE_NAME = ".cleaning-up-linux-desktop-snapshots"
 APT_ARCHIVES = "/var/cache/apt/archives"
 LOG_DIR = "/var/log"
 JOURNAL_DIR = "/var/log/journal"
@@ -55,14 +57,24 @@ def mount_points():
     return points
 
 
+def is_own(name):
+    """Names of the skill's own snapshots, archives and their container folders."""
+    return name.lstrip(".").startswith(PREFIX)
+
+
 class Report:
-    def __init__(self, area, dry_run):
+    def __init__(self, area, dry_run, with_paths=False):
+        self.with_paths = with_paths
         self.data = {"area": area, "dry_run": dry_run, "removed_bytes": 0, "removed_count": 0,
                      "groups": {}, "removed": [], "skipped": [], "commands": []}
+        if with_paths:
+            self.data["candidates"] = []
 
     def removed(self, path, size, group=None):
         self.data["removed_bytes"] += size
         self.data["removed_count"] += 1
+        if self.with_paths:
+            self.data["candidates"].append(path)
         if group:
             g = self.data["groups"].setdefault(group, {"count": 0, "bytes": 0})
             g["count"] += 1
@@ -103,6 +115,8 @@ class Guard:
         root = next((r for r in self.roots if path.startswith(r + os.sep)), None)
         if root is None:
             return "outside the analysed roots"
+        if any(is_own(part) for part in path.split(os.sep) if part):
+            return "own snapshot or archive (prefix)"
         try:
             st = os.lstat(path)
         except FileNotFoundError:
@@ -371,7 +385,7 @@ def rule_pycache(d, home, params, now):
         if "__pycache__" in dirs:
             d.remove(os.path.join(folder, "__pycache__"), "__pycache__")
             dirs.remove("__pycache__")
-        dirs[:] = [x for x in dirs if not os.path.islink(os.path.join(folder, x))]
+        dirs[:] = [x for x in dirs if not os.path.islink(os.path.join(folder, x)) and not is_own(x)]
 
 
 def rule_docker(d, home, params, now):
@@ -471,13 +485,15 @@ def main():
     parser.add_argument("--home", required=True)
     parser.add_argument("--order", required=True)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--with-paths", action="store_true",
+                        help="the report names every candidate path (for a backup before deleting)")
     parser.add_argument("--report")
     args = parser.parse_args()
     home = os.path.realpath(args.home)
     with open(args.order, encoding="utf-8") as fh:
         order = json.load(fh)
     area, kind = str(order.get("area")), order.get("kind")
-    report = Report(area, args.dry_run)
+    report = Report(area, args.dry_run, args.with_paths)
     d = Deleter(home, args.dry_run, report)
     now = time.time()
     if kind == "list" and area in LIST_AREAS:

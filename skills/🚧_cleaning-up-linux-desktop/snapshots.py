@@ -198,15 +198,27 @@ def do_remove(mounts, arg, extra_dirs, dry_run):
     if error:
         return {"ok": False, "error": error}
     cmd = ["btrfs", "subvolume", "delete", "--commit-after", entry["path"]]
+    container = os.path.dirname(entry["path"])
+    own_container = os.path.basename(container) == BASE_NAME
     result = {"ok": True, "dry_run": dry_run, "name": entry["name"], "path": entry["path"],
               "mount": entry["mount"], "command": " ".join(cmd)}
     if dry_run:
+        if own_container:
+            result["container_removed"] = not [n for n in os.listdir(container) if n != entry["name"]]
         return result
     code, out, err = run(cmd)
     if code != 0:
         return {"ok": False, "error": f"btrfs failed: {err.strip()}", "command": result["command"]}
     result["removed"] = not os.path.lexists(entry["path"])
     result["ok"] = result["removed"]
+    # the container folder belongs to the skill: it goes with its last snapshot
+    result["container_removed"] = False
+    if result["removed"] and own_container:
+        try:
+            os.rmdir(container)
+            result["container_removed"] = True
+        except OSError:
+            pass
     return result
 
 
