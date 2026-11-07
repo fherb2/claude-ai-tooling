@@ -109,6 +109,8 @@ def main():
     check("tar: verified by comparison", r1["verify"]["mode"] == "full" and r1["verify"]["ok"])
     check("tar: private files and folder", stat.S_IMODE(os.stat(r1["archive"]).st_mode) == 0o600
           and stat.S_IMODE(os.stat(os.path.dirname(r1["archive"])).st_mode) == 0o700)
+    check("plan: overhead estimate added to the required space", r1["plan"]["overhead_estimate"] >= 2048 * 6
+          and r1["space"]["required"] == r1["plan"]["bytes"] + r1["plan"]["overhead_estimate"])
     check("tar: plan counted", r1["plan"]["files"] >= 6 and r1["plan"]["links"] == 1 and r1["plan"]["bytes"] > 50_000)
     run = r1["run"]
     r2 = b.do_create(ns(format="zip", step="z", run=run))

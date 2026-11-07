@@ -40,6 +40,7 @@ STORE_EXTENSIONS = set(
     "jpg jpeg png gif bmp tif tiff webp heic heif raw cr2 nef arw dng "
     "zip tar gz tgz xz bz2 7z rar zst lz4 img iso qcow2 vdi vmdk vhd vhdx deb".split())
 ZIP_LEVEL = 3
+ENTRY_OVERHEAD = 2048      # per file, folder or link: tar blocks and headers (measured: 1.8 KiB), zip headers
 TAR_GZIP = "gzip -1"
 MODE_FILE, MODE_DIR = 0o600, 0o700
 
@@ -289,8 +290,9 @@ def do_create(args):
     if unreadable:
         return {"ok": False, "error": "unreadable folders; nothing would be backed up there", "unreadable": unreadable[:20]}
     plan = summarize(entries, skipped)
+    plan["overhead_estimate"] = ENTRY_OVERHEAD * (plan["files"] + plan["dirs"] + plan["links"])
     size, avail = free_space(target)
-    space = space_check(size, avail, plan["bytes"], args.reserve_percent, args.reserve_gib)
+    space = space_check(size, avail, plan["bytes"] + plan["overhead_estimate"], args.reserve_percent, args.reserve_gib)
     run_name = args.run or f"{RUN_PREFIX}{datetime.now():%Y%m%d-%H%M%S}"
     if not run_name.startswith(RUN_PREFIX) or os.sep in run_name:
         return {"ok": False, "error": f"the run name must start with {RUN_PREFIX}"}
