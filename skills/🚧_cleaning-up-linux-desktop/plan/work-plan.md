@@ -9,25 +9,7 @@ Umgesetzt und getestet am 7. November 2026: der sichere Durchlauf und die Stills
 Offen:
 
 1. Ein echter Lauf mit einer `tmpfs`-Einhängung unter einem Testordner: darin ein `__pycache__` und ein Papierkorb, die nicht gefunden werden dürfen (`delete.py --dry-run`, `analyze.py`). Den `sudo mount`-Block führt der Entwickler aus; danach aushängen.
-2. Der unterbrochene Lauf aus der Sitzung `d2070323-e965-400e-80c5-878f5a08da4b` (Protokoll `~/cleaning-up-linux-desktop-protocol.md`, Snapshots `…-20261107-182302-vor-loeschen` auf `/` und `/home`): Mit dem neuen Paket in der Betriebsart Wiederaufnahme fortsetzen, ab 4.12. Das ist zugleich der erste Teil von Schritt 19.
-
-## 27 Download-Ordner: Altersregel statt Auswahl nach Größe (Plan, freigegeben am 7. November 2026)
-
-Anlass: Im Lauf vom 7. November 2026 wurden bei „ab 15 Tagen“ nur die sechs größten von 704 Einträgen gelöscht. Im Download-Ordner geht es aber um die Übersicht, nicht um die Größe.
-
-Regel (Entscheidungen des Entwicklers): Gelöscht wird alles direkt in `Downloads/`, dessen Alter größer als x Tage ist (Vorgabe 14), unabhängig von der Größe.
-
-- Dateien: eigenes Alter, das spätere von Änderungs- und Statusänderungszeit. Links werden nur gemeldet (Grundsatz 8).
-- Ordner: Alter des jüngsten Elements in beliebiger Tiefe; Elemente sind Dateien, Links und Unterordner. Ein einziges jüngeres Element schützt den ganzen Ordner mit allem darin.
-- Leerer Ordner (ohne Element): sein eigenes Datum zählt, gelöscht wird er ab x Tagen.
-- Unvollständige Downloads (`.crdownload`, `.part`): dieselbe Grenze, keine eigene Behandlung.
-- Ausnahmen nennt der Nutzer; die Instanz übersetzt sie in absolute Pfade direkt unter dem Download-Ordner (`exclude`).
-
-Umsetzung:
-
-- `delete.py`: neu `rule_downloads` (Auftrag `rule` mit `days`, `folders`, `exclude`), Alter zum Löschzeitpunkt aus dem Dateibaum; neue Hilfsfunktion für das jüngste Element; 4.9 verlässt `LIST_AREAS`.
-- `concept.md` und `SKILL.md`, 4.9: die drei Gruppen, die Sortierung nach Größe und die Nummernauswahl entfallen. Die Übersicht für den Nutzer baut die Instanz aus dem Probelauf von `delete.py` (die Analyse rechnet das Alter eines Ordners nur über Dateien und kann abweichen); `analyze.py` bleibt unverändert.
-- `tests/test_downloads.py` (neu) mit Leerproben; README, Datumszeilen, Paket.
+2. Der unterbrochene Lauf aus der Sitzung `d2070323-e965-400e-80c5-878f5a08da4b` (Protokoll `~/cleaning-up-linux-desktop-protocol.md`, Snapshots `…-20261107-182302-vor-loeschen` auf `/` und `/home`): Mit dem neuen Paket in der Betriebsart Wiederaufnahme fortsetzen. Erledigt sind laut den Sitzungsverläufen vom 7. November 4.1, 4.5, 4.6, 4.12 und 4.13 (das Protokoll selbst nicht nachgesehen); der Eintrag zu 4.9 steht auf „begonnen“ (Probelauf nach dem alten Verfahren mit Nummernauswahl) und wird mit der neuen Altersregel (Vorgabe 14 Tage, Auftrag `rule`) neu aufgegriffen. Das ist zugleich der erste Teil von Schritt 19.
 
 ## 19 Echter Lauf als Abschluss
 

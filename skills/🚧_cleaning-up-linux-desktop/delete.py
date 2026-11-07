@@ -11,7 +11,9 @@ Usage:
         [--report /tmp/cleanup-report-<area>.json]
 
 Order examples:
-    {"area": "4.9", "kind": "list", "paths": ["/home/u/Downloads/x.iso"]}
+    {"area": "4.8", "kind": "list", "paths": ["/home/u/Downloads/x.iso"]}
+    {"area": "4.9", "kind": "rule", "params": {"days": 14, "folders": ["/home/u/Downloads"],
+                                                 "exclude": ["/home/u/Downloads/keep.iso"]}}
     {"area": "4.14", "kind": "rule", "params": {"days": 14}}
     {"area": "4.13", "kind": "rule", "params": {"containers": ["old_one"], "keep_images": ["a:latest"],
                                                  "builder_until_hours": 48}}
@@ -563,6 +565,52 @@ def rule_pycache(d, home, params, now):
             dirs.remove("__pycache__")
 
 
+def newest_element(path):
+    """Time of the youngest element below a folder, at any depth: the later of modification and status
+    change of every file, link and subfolder. None if the folder holds no element."""
+    newest = None
+    for folder, dirs, files in WALK.walk(path):
+        for name in dirs + files:
+            try:
+                st = os.lstat(os.path.join(folder, name))
+            except OSError:
+                continue
+            stamp = max(st.st_mtime, st.st_ctime)
+            if newest is None or stamp > newest:
+                newest = stamp
+    return newest
+
+
+def rule_downloads(d, home, params, now):
+    """4.9: everything directly in the download folders that is older than x days, whatever its size.
+    A file counts by its own age; a folder by its youngest element at any depth (files, links and
+    subfolders), an empty folder by its own date. Links are only reported (Grundsatz 8)."""
+    limit = now - int(params["days"]) * DAY
+    exclude = {os.path.normpath(p) for p in params.get("exclude", [])}
+    for base in params["folders"]:
+        base = os.path.normpath(base)
+        if not base.startswith(home + os.sep):
+            d.report.skipped(base, "not below the home")
+            continue
+        if not WALK.allowed(base):
+            d.report.skipped(base, "on another mount than the home")
+            continue
+        for name in listdir(base):
+            path = os.path.join(base, name)
+            if path in exclude:
+                d.report.skipped(path, "excluded by the user")
+                continue
+            try:
+                st = os.lstat(path)
+            except OSError:
+                continue
+            stamp = newest_element(path) if stat.S_ISDIR(st.st_mode) else None
+            if stamp is None:
+                stamp = max(st.st_mtime, st.st_ctime)
+            if stamp < limit:
+                d.remove(path)
+
+
 def rule_docker(d, home, params, now):
     """4.13: selected stopped containers (with anonymous volumes), images without container
     except the keep list, build cache older than the limit. No sizes (concept.md 4.13)."""
@@ -661,8 +709,9 @@ def prune_directorysizes(trash, deleted):
 
 
 RULES = {"4.1": rule_apt, "4.2": rule_firefox, "4.3": rule_chrome, "4.4": rule_vscode, "4.5": rule_logs,
-         "4.6": rule_pip, "4.12": rule_pycache, "4.13": rule_docker, "4.14": rule_trash}
-LIST_AREAS = {"4.7", "4.8", "4.9", "4.10"}
+         "4.6": rule_pip, "4.9": rule_downloads, "4.12": rule_pycache, "4.13": rule_docker,
+         "4.14": rule_trash}
+LIST_AREAS = {"4.7", "4.8", "4.10"}
 
 
 def main():

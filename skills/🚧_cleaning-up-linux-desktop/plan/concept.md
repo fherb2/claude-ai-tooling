@@ -344,21 +344,30 @@ Dieser Schritt kommt im Ablauf vor 4.7, 4.8 und 4.10.
 
 **Analyse (im Analyseskript)**
 
-- Für Dateien direkt im Download-Ordner: Größe und Alter.
-- Für jeden Ordner direkt darunter: Größe des gesamten Inhalts über alle Ebenen, und das Alter der jüngsten geänderten oder erstellten Datei darin, ermittelt über den ganzen Dateibaum.
-- Das Alter einer Datei ist die Zeit seit dem späteren von Änderungs- und Anlegezeit, in vollen Tagen.
-- Die Ausgabe erfolgt getrennt in drei Gruppen nach Alter: unter 4 Tagen, 4 bis unter 15 Tagen, ab 15 Tagen.
-- Unvollständige Downloads (zum Beispiel `*.crdownload` bei Chrome, `*.part`) bilden eine eigene Gruppe, unabhängig von den drei Zeitgruppen. Messbefund: Im Download-Ordner liegen mehrere `*.crdownload` mit 230 bis 671 MiB.
-- In jeder Gruppe wird nummeriert und nach Größe absteigend sortiert.
+- Für Dateien direkt im Download-Ordner: Größe und Alter. Für jeden Ordner direkt darunter: Größe des gesamten Inhalts über alle Ebenen und das Alter der jüngsten Datei darin, ermittelt über den ganzen Dateibaum.
+- Das Alter einer Datei ist die Zeit seit dem späteren von Änderungs- und Statusänderungszeit, in vollen Tagen.
+- Diese Zahlen dienen dem ersten Überblick. Maßgeblich für das Löschen ist die Regel unten, die auch Unterordner als Elemente zählt und das Alter erst beim Löschen berechnet. Das Alter eines Ordners kann deshalb in der Analyse vom Löschergebnis abweichen; ein Ordner ohne Datei erscheint in der Analyse gar nicht.
+- Unvollständige Downloads (zum Beispiel `*.crdownload` bei Chrome, `*.part`) sind in der Analyse gekennzeichnet. Messbefund: Im Download-Ordner liegen mehrere `*.crdownload` mit 230 bis 671 MiB.
+
+**Regel (Festlegung des Entwicklers vom 7. November 2026)**
+
+Im Download-Ordner geht es um die Übersicht, nicht um die Größe. Ein früherer Entwurf legte die Einträge nach Altersgruppen und Größe sortiert vor und ließ den Nutzer Nummern wählen; im ersten Lauf des installierten Skills wurden so nur die sechs größten von 704 Einträgen gelöscht, der Rest blieb liegen. Deshalb gilt jetzt:
+
+- Der Skill fragt nach der Altersgrenze x in Tagen, Vorgabe 14. Gelöscht wird alles direkt im Download-Ordner, dessen Alter größer als x Tage ist, **unabhängig von der Größe**.
+- **Datei:** ihr eigenes Alter.
+- **Ordner:** das Alter seines jüngsten Elements in beliebiger Tiefe. Elemente sind Dateien, Links und Unterordner, bei jedem zählt das spätere von Änderungs- und Statusänderungszeit. Ein einziges jüngeres Element, auch ganz unten in der Hierarchie, schützt den ganzen Ordner mit allem darin. Das Alter des Ordners selbst zählt nicht.
+- **Leerer Ordner** (ohne Element): sein eigenes Datum zählt.
+- **Unvollständige Downloads:** dieselbe Grenze, keine eigene Behandlung; junge bleiben, denn sie können ein laufender Download sein.
+- **Links** direkt im Download-Ordner werden nur gemeldet (Grundsatz 8). Ein Link in einem Ordner, der gelöscht wird, geht mit dem Ordner, nie sein Ziel.
+- **Zeitpunkt der Berechnung:** Das Löschskript berechnet das Alter beim Lauf aus dem Dateibaum (Auftrag `rule` mit `days`, `folders`, `exclude`) und übernimmt es nicht aus der Analyse. Was seit der Analyse verändert wurde, ist dadurch geschützt, und der Probelauf zeigt genau, was weg wäre.
 
 **Auswahl durch den Nutzer**
 
-- Der Nutzer kann je Gruppe Nummern ein- oder ausschließen. Die Formulierung, was erhalten und was gelöscht wird, bleibt ihm vorbehalten.
-- Die Instanz überführt die Angaben in die Löschliste, die das Löschskript erhält (Grundsatz 6).
+- Der Nutzer nennt x und kann Ausnahmen nennen (Namen oder Muster). Die Instanz übersetzt sie anhand der Analyse in absolute Pfade direkt unter dem Download-Ordner (`exclude`, Grundsatz 6). Was erhalten bleibt, formuliert allein der Nutzer.
 
 **Vor dem Löschen**
 
-- Die Instanz zeigt die übersetzte Löschliste (Pfade, Gesamtgröße), und der Nutzer bestätigt sie.
+- Die Instanz führt zuerst den Probelauf aus und baut die Übersicht für den Nutzer aus dessen Bericht, nicht aus der Analyse: Zahl und Gesamtgröße, jeder Ordner einzeln, Dateien nach Typ gezählt, die größten wenigen, dazu was übersprungen wird und warum. Die vollständige Liste legt sie als Datei ab. Der Nutzer bestätigt, danach folgt der echte Lauf.
 - Der Skill weist darauf hin, dass gelöschte Dateien nur wiederherstellbar sind, wenn der Ordner gesichert wird.
 - Messbefund (Entwicklungsrechner): Dort ist der Download-Ordner vom Backup ausgeschlossen.
 
