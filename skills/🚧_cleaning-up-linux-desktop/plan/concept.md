@@ -53,7 +53,7 @@ Zum Alter einer Datei: Wo dieses Dokument die Anlegezeit nennt (4.2 bis 4.4, 4.9
 **Varianten.** Nach der Analyse bietet der Skill alle an, die das System hergibt, und der Nutzer entscheidet; die Wahl, der Zielort und die Namen kommen ins Protokoll:
 
 1. Eigene Sicherung: Der Nutzer bestätigt, dass eine aktuelle Sicherung vorliegt, die sich zurückspielen lässt. Der Skill sichert dann nichts selbst.
-2. Snapshot des Dateisystems, schreibgeschützt: btrfs (getestet), ZFS und LVM (Befehle recherchiert, nicht getestet; sie kommen später, `work-plan.md`, Schritt 25). Der Ubuntu-24.04-Desktop-Installer bietet ZFS und LVM an, btrfs nicht ([Ubuntu-Dokumentation](https://ubuntu.com/desktop/docs/en/24.04/reference/advanced-disk-setup-features/)); ext4 und xfs ohne LVM kennen keine Snapshots.
+2. Snapshot des Dateisystems, schreibgeschützt: btrfs (getestet). ZFS und LVM werden erkannt und gemeldet, sind aber ungeprüft: Es fehlt ein Testsystem, und der Skill enthält keinen eigenen Snapshot-Befehl dafür. Dort sichert der Nutzer selbst oder wählt das Archiv. Der Ubuntu-24.04-Desktop-Installer bietet ZFS und LVM an, btrfs nicht ([Ubuntu-Dokumentation](https://ubuntu.com/desktop/docs/en/24.04/reference/advanced-disk-setup-features/)); ext4 und xfs ohne LVM kennen keine Snapshots.
 3. Timeshift oder Snapper, wenn die Analyse sie erkennt: Der Skill gibt deren Befehle als Block, die Namen oder Kennungen kommen ins Protokoll. Das Skript `snapshots.py` fasst sie nicht an.
 4. Archiv der zu löschenden Dateien (unten).
 

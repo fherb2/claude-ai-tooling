@@ -14,12 +14,6 @@ Der vollständige Ablauf am Entwicklungsrechner mit echten Löschungen, als fina
 
 Erst wenn die deutsche Fassung samt README fertig ist: `SKILL.en.md`, Regeldateien und `README.en.md` als Übersetzung, die deutschen Dateien erhalten das Sprachkürzel (`skill-dev-doc.md`, Kapitel 5.1); danach die Download-Pakete (Kapitel 5.3).
 
-## 21 Erkennung von Snapshot-Fähigkeit und -Werkzeugen
-
-`analyze.py`: btrfs, ZFS und LVM erkennen, Timeshift und Snapper (installiert, eingerichtet), vorhandene Snapshots und freien Platz je Dateisystem ausgeben (`concept.md`, 3.2 und 3.3). Nur lesend.
-
-**Plan 21 (freigegeben, in Ausführung):** `filesystems()` liefert je Einhängepunkt zusätzlich den verfügbaren Platz (`statvfs`). Nach dem Durchlauf, geschützt über `safe()`, ein neuer Schlüssel `safeguards` neben `fill_level` mit `detect_btrfs()` (je Gerät: Einhängepunkte, Subvolume am Einhängepunkt über `btrfs subvolume show`, Snapshots über `btrfs subvolume list -s`: Zahl und Namen mit Präfix, fremde nur gezählt), `detect_zfs()` (`zfs list -H -t snapshot -o name`) und `detect_lvm()` (`lvs` mit den Feldern `lv_name`, `vg_name`, `lv_attr`, `origin`, `lv_size`, `vg_free`, `lv_path`) — ZFS und LVM mit `tested: false`, nur an nachgebauten Ausgaben geprüft — sowie `detect_tools()` (Timeshift und Snapper nur nach Installation und Konfiguration, ohne Aufruf der Werkzeuge, ihre Snapshots zählt `detect_btrfs()` mit). `run()` bekommt eine Zeitgrenze. Test `tests/test_safeguards.py` mit nachgebauten Ausgaben; Lauf am Entwicklungsrechner (zwei btrfs-Dateisysteme, keine Snapshots, Timeshift und Snapper nicht installiert). Für den Test von Timeshift und Snapper werden sie vorher installiert und danach wieder entfernt (beides in den Paketquellen vorhanden). In der README steht ein kurzer Hinweis, dass ZFS und LVM mangels Testsystem ungeprüft sind (Schritt 24).
-
 ## 22 Snapshot-Skript
 
 `snapshots.py` im Skill-Ordner: `list` (lesend), `create` und `remove`, je mit `--dry-run`. Zuerst btrfs. Namenspräfix `cleaning-up-linux-desktop-` mit Datum und Uhrzeit; Snapshots ohne Präfix lehnt das Skript ab. Schreibgeschützte Snapshots. Test: an einem Wegwerf-Subvolume am Entwicklungsrechner (`concept.md`, 3.2, 3.9, 3.10).
@@ -31,10 +25,6 @@ Erst wenn die deutsche Fassung samt README fertig ist: `SKILL.en.md`, Regeldatei
 ## 24 SKILL.md, README und Paket nachziehen
 
 Betriebsarten, Protokoll (3.8 bis 3.10), Sicherung (3.2) und die geänderte Haftungsempfehlung in `SKILL.md` und README; Paket neu bauen; Aktualitätsprüfer.
-
-## 25 ZFS und LVM
-
-Befehle für Snapshots anlegen, listen, entfernen und selektiv zurückholen aus der Dokumentation belegen und erproben; braucht eine Testumgebung mit ZFS beziehungsweise LVM.
 
 ## 14 Nachprobe Build-Cache (ab 8. November 2026)
 
