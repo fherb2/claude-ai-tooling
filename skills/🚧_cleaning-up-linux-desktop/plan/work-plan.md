@@ -16,7 +16,9 @@ Erst wenn die deutsche Fassung samt README fertig ist: `SKILL.en.md`, Regeldatei
 
 ## 23 Archiv-Skript
 
-`backup.py`: Pfadliste, Zielverzeichnis und Format (tar oder ZIP) entgegennehmen, Platzprüfung mit Reserve, Archiv schreiben und verifizieren; tar je Sicherungsschritt in einem Ordner je Lauf, ZIP als eine Datei je Lauf mit dateiweiser Entscheidung nach Endung; Links nie verfolgen. Dazu `delete.py --with-paths`: Der Probelauf nennt auf Wunsch die Kandidatenpfade. `analyze.py` und `delete.py` nehmen Dateien mit dem Präfix von allen Löschläufen aus. Test mit Simulation im Wegwerfbaum (`concept.md`, 3.2).
+`backup.py`: `create`, `list`, `restore`, `remove`. Pfadliste (oder der Bericht von `delete.py --with-paths`), Zielordner, Format (tar, tar.gz oder zip), Platzprüfung mit Reserve, Archiv schreiben und verifizieren (Vorgabe Vergleich mit den Dateien, auf Wunsch schnell). Ein Ordner je Lauf `cleaning-up-linux-desktop-backup-<Datum>-<Uhrzeit>/`, darin je Sicherungsschritt eine Datei `NN-<Schritt>.tar|.tar.gz|.zip` (auch beim ZIP: ein Abbruch beim Anhängen würde frühere Schritte unlesbar machen). ZIP dateiweise nach Endung (Medien nur ablegen, Rest Stufe 3); Links nie verfolgt; Eingehängtes nie betreten. (`concept.md`, 3.2, 3.9, 3.10)
+
+**Stand:** Skript und `tests/test_backup.py` (echtes tar, gzip und zip an einem Wegwerfbaum, Leerprobe schlägt an), `delete.py --with-paths` und der Ausschluss eigener Sicherungen in `analyze.py` und `delete.py` sind fertig und committet. **Offen:** der Test am Entwicklungsrechner mit einem Lauf als root (Besitzer des Ziels, große Pfadliste aus `delete.py`, tar, tar.gz und ZIP, `list`, `restore`, `remove`). Danach ist der Schritt erledigt.
 
 ## 24 SKILL.md, README und Paket nachziehen
 
