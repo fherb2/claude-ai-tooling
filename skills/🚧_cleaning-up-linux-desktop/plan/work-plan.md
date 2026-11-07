@@ -16,7 +16,9 @@ Erst wenn die deutsche Fassung samt README fertig ist: `SKILL.en.md`, Regeldatei
 
 ## 22 Snapshot-Skript
 
-`snapshots.py` im Skill-Ordner: `list` (lesend), `create` und `remove`, je mit `--dry-run`. Zuerst btrfs. Namenspräfix `cleaning-up-linux-desktop-` mit Datum und Uhrzeit; Snapshots ohne Präfix lehnt das Skript ab. Schreibgeschützte Snapshots. Test: an einem Wegwerf-Subvolume am Entwicklungsrechner (`concept.md`, 3.2, 3.9, 3.10).
+`snapshots.py` im Skill-Ordner: `list`, `create`, `remove`, `restore`, nur btrfs, je mit `--dry-run` (außer `list`). Namenspräfix `cleaning-up-linux-desktop-` mit Datum und Uhrzeit; Snapshots ohne Präfix lehnt das Skript ab; Snapshots sind schreibgeschützt. Ablage standardmäßig in `<Einhängepunkt>/.cleaning-up-linux-desktop-snapshots/`; der Skill fragt den Nutzer, ob das für ihn passt, er kann einen anderen Ort unterhalb des Einhängepunkts wählen (`--base-dir`). `restore` holt nur Fehlendes zurück und überschreibt nichts (`cp -a --update=none`). Entfernen mit `--commit-after`. (`concept.md`, 3.2, 3.9, 3.10)
+
+**Stand:** Skript und `tests/test_snapshots.py` (ohne btrfs, Leerprobe schlägt an) sind fertig. **Offen:** der Test an einer echten btrfs-Platte am Entwicklungsrechner: Snapshot von `/home` (oberstes Subvolume, ID 5) und von `/` (Subvolume `@`) anlegen, listen, einen gelöschten Testordner zurückholen, Snapshots entfernen. Erst danach ist der Schritt erledigt.
 
 ## 23 Archiv-Skript
 
