@@ -24,6 +24,7 @@ Usage (paths resolved by the instance beforehand):
 import argparse
 import hashlib
 import json
+import multiprocessing
 import os
 import re
 import shutil
@@ -1235,27 +1236,75 @@ def file_hash(path, limit=None):
     return digest.hexdigest()
 
 
+def physical_cores():
+    """Number of physical cores available to this process; logical CPUs if the topology is unreadable."""
+    cpus = os.sched_getaffinity(0)
+    cores = set()
+    for cpu in cpus:
+        try:
+            with open(f"/sys/devices/system/cpu/cpu{cpu}/topology/core_cpus_list", encoding="ascii") as fh:
+                cores.add(fh.read().strip())
+        except OSError:
+            return len(cpus)
+    return len(cores) or len(cpus)
+
+
+def hash_task(task):
+    """Pool task: (path, hash of the file, or of its first limit bytes); the hash is None if it cannot be read."""
+    path, limit = task
+    try:
+        return path, file_hash(path, limit)
+    except OSError:
+        return path, None
+
+
+def hash_files(pool, tasks, label, stats, progress, chunksize):
+    """{path: hash or None} of the tasks [(path, limit)], hashed by the pool; counts the read errors."""
+    digests = {}
+    for done, (path, digest) in enumerate(pool.imap_unordered(hash_task, tasks, chunksize), 1):
+        digests[path] = digest
+        if digest is None:
+            stats["read_errors"] += 1
+        progress(f"{label} {done}/{len(tasks)}", stats["files"])
+    return digests
+
+
 def find_duplicates(candidates, stats, progress):
-    """Groups of identical files: equal size, then equal first MiB, then equal content."""
+    """Groups of identical files: equal size, then equal first MiB, then equal content. A pool of workers,
+    half the physical cores rounded up (as in journal_stats.py), hashes one file per task; grouping and
+    order of the result stay in this process and equal those of a sequential run."""
+    sizes = []
+    for size, paths in sorted(candidates.by_size.items(), reverse=True):
+        paths = [p for p in paths if WALK.allowed(p)]      # by name: a mount point may have appeared since the walk
+        if len(paths) > 1:
+            sizes.append((size, paths))
+    tasks = [(p, PARTIAL) for _, paths in sizes for p in paths]
+    if not tasks:
+        return []
+    workers = max(1, min(-(-physical_cores() // 2), len(tasks)))
+    with multiprocessing.Pool(workers) as pool:
+        start = hash_files(pool, tasks, "hashing first MiB", stats, progress,
+                           max(1, min(64, len(tasks) // (workers * 8))))
+        same_start, full_tasks = [], []
+        for size, paths in sizes:
+            by_start = defaultdict(list)
+            for path in paths:
+                if start[path] is not None:
+                    by_start[start[path]].append(path)
+            kept = [g for g in by_start.values() if len(g) > 1]
+            same_start.append((size, kept))
+            if size > PARTIAL:           # up to one MiB the first MiB is the whole file
+                full_tasks += [(p, None) for g in kept for p in g]
+        full = hash_files(pool, full_tasks, "hashing content", stats, progress, 1) if full_tasks else {}
     groups = []
-    sizes = [(s, p) for s, p in candidates.by_size.items() if len(p) > 1]
-    for index, (size, paths) in enumerate(sorted(sizes, reverse=True)):
-        progress(f"comparing size group {index + 1}/{len(sizes)}", stats["files"])
-        by_start = defaultdict(list)
-        for path in paths:
-            try:
-                by_start[file_hash(path, PARTIAL)].append(path)
-            except OSError:
-                stats["read_errors"] += 1
-        for same_start in by_start.values():
-            if len(same_start) < 2:
-                continue
+    for size, kept in same_start:
+        for same in kept:
             by_content = defaultdict(list)
-            for path in same_start:
-                try:
-                    by_content[file_hash(path) if size > PARTIAL else ""].append(path)
-                except OSError:
-                    stats["read_errors"] += 1
+            for path in same:
+                if size <= PARTIAL:
+                    by_content[""].append(path)
+                elif full[path] is not None:
+                    by_content[full[path]].append(path)
             groups.extend({"size": size, "paths": sorted(g)} for g in by_content.values() if len(g) > 1)
     return sorted(groups, key=lambda g: g["size"] * (len(g["paths"]) - 1), reverse=True)
 
