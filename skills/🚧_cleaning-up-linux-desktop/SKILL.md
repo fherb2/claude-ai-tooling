@@ -1,6 +1,6 @@
 ---
 name: cleaning-up-linux-desktop
-description: Räumt einen Linux-Desktop oder -Laptop (Ubuntu, Kubuntu und ähnliche) auf, ohne Arbeitsdaten zu gefährden — Caches, Paket- und Log-Reste, Papierkorb, Docker-Reste, alte Downloads und Installationsdateien. Misst zuerst, zeigt Füllstand und drei Tabellen, löscht Caches nach festen Regeln und Nutzdaten nur nach Auswahl des Nutzers. Entfernt keine installierte Software. Wird ausschließlich auf ausdrücklichen Aufruf mit /cleaning-up-linux-desktop angewendet.
+description: Räumt einen Linux-Desktop oder -Laptop (Ubuntu, Kubuntu und ähnliche) auf, ohne Arbeitsdaten zu gefährden — Caches, Paket- und Log-Reste, Papierkorb, Docker-Reste, alte Downloads und Installationsdateien. Misst zuerst, zeigt Füllstand und drei Tabellen, löscht Caches nach festen Regeln und Nutzdaten nur nach Auswahl des Nutzers. Sichert vorher auf Wunsch (Snapshot oder Archiv) und führt ein knappes Protokoll, mit dem sich ein abgebrochener Lauf zurückholen und die Sicherung später aufräumen lässt. Entfernt keine installierte Software. Wird ausschließlich auf ausdrücklichen Aufruf mit /cleaning-up-linux-desktop angewendet.
 license: CC0-1.0
 disable-model-invocation: true
 ---
@@ -19,26 +19,37 @@ Dieser Skill läuft lange und in vielen Schritten; sein ganzer Regelteil steht d
 6. Ordnernamen wie Downloads, Videos, Musik, Bilder, Dokumente setzt du nie selbst ein. Du ermittelst sie über die XDG-Benutzerverzeichnisse und übergibst die aufgelösten Pfade.
 7. Was eingehängt ist, wird nie gelöscht und nie durchlaufen; Links werden nie verfolgt. Die Skripte setzen das selbst durch.
 8. Jeder Lauf endet mit einem Ergebnisbericht: was gelöscht wurde, wie groß die entfernte Datenmenge war (nicht der frei gewordene Platz), was nur gemeldet wurde. Für Docker ohne Größe.
+9. Eigene Snapshots und Archive tragen den Namenspräfix `cleaning-up-linux-desktop-`. Die Skripte fassen nichts ohne diesen Präfix an und nehmen Dateien mit dem Präfix von allen Löschläufen aus. Davon weichst du nur auf ausdrücklichen Wunsch des Nutzers ab.
 
 ## Wo du läufst und wie die Skripte ausgeführt werden
 
 Du startest grundsätzlich keine Skripte und Befehle auf dem System des Nutzers. Du gibst ihm Befehlsblöcke; er führt sie aus, auch alles mit `sudo`. Die Ergebnisse landen als Dateien in `/tmp`.
 
-**Claude Code:** Die Skripte liegen in `${CLAUDE_SKILL_DIR}`. Frage, ob die Sitzung auf dem Rechner läuft, der aufgeräumt werden soll; wenn nicht, beende den Skill mit diesem Hinweis. Die Ergebnisdateien liest du aus `/tmp`. In der Konsole kann der Nutzer mit `/add-dir /tmp` dafür sorgen, dass du sie ohne Einzelfreigabe liest. In der Erweiterung von VS Code gibt es `/add-dir` nicht; dort geht das Lesen im Berechtigungsmodus „auto“ ohne Rückfrage, sonst gibt der Nutzer jeden Zugriff einzeln frei — sag ihm das zu Beginn, damit die Rückfragen nicht überraschen. Aufträge für das Löschskript schreibst du selbst als Datei nach `/tmp/cleanup-orders/`.
+**Claude Code:** Die Skripte liegen in `${CLAUDE_SKILL_DIR}`. Frage, ob die Sitzung auf dem Rechner läuft, der aufgeräumt werden soll; wenn nicht, beende den Skill mit diesem Hinweis. Die Ergebnisdateien liest du aus `/tmp`. In der Konsole kann der Nutzer mit `/add-dir /tmp` dafür sorgen, dass du sie ohne Einzelfreigabe liest. In der Erweiterung von VS Code gibt es `/add-dir` nicht; dort geht das Lesen im Berechtigungsmodus „auto“ ohne Rückfrage, sonst gibt der Nutzer jeden Zugriff einzeln frei — sag ihm das zu Beginn, damit die Rückfragen nicht überraschen. Aufträge für das Löschskript und Pfadlisten für das Archivskript schreibst du selbst als Datei nach `/tmp/cleanup-orders/`.
 
 Auf ausdrücklichen Wunsch führst du Skripte ohne `sudo` selbst aus; das bietest du nur an, wenn die Sitzung in der Konsole läuft und der Nutzer sie vorher mit `/cd /tmp` dorthin verlegt hat. Alles mit `sudo` bleibt beim Nutzer.
 
-**claude.ai und Claude Desktop (Chat + Cowork):** Der Platzhalter für den Skill-Ordner wird hier nicht ersetzt. Suche den Ordner dieses Skills in deiner Ausführungsumgebung (`ls` unter `/mnt`), kopiere `analyze.py`, `delete.py` und `journal_stats.py` unverändert nach `/mnt/user-data/outputs` und biete sie als Download an — **nie als Artefakt**, denn ein Artefakt ist eine Abschrift durch dich und kann sich vom Original unterscheiden. Der Nutzer legt sie in einen Ordner seiner Wahl; in den Befehlen steht dieser Ordner statt `${CLAUDE_SKILL_DIR}`. Nach jedem Befehlsblock nennst du die Datei, die er dir hochladen soll. Aufträge für das Löschskript gibst du ebenfalls als Download.
+**claude.ai und Claude Desktop (Chat + Cowork):** Der Platzhalter für den Skill-Ordner wird hier nicht ersetzt. Suche den Ordner dieses Skills in deiner Ausführungsumgebung (`ls` unter `/mnt`), kopiere `analyze.py`, `delete.py`, `journal_stats.py`, `snapshots.py` und `backup.py` unverändert nach `/mnt/user-data/outputs` und biete sie als Download an — **nie als Artefakt**, denn ein Artefakt ist eine Abschrift durch dich und kann sich vom Original unterscheiden. Der Nutzer legt sie in einen Ordner seiner Wahl; in den Befehlen steht dieser Ordner statt `${CLAUDE_SKILL_DIR}`. Nach jedem Befehlsblock nennst du die Datei, die er dir hochladen soll. Aufträge, Pfadlisten und das Protokoll gibst du ebenfalls als Download.
 
 Wurde der Skill nicht ausdrücklich mit `/cleaning-up-linux-desktop` aufgerufen — etwa weil er auf claude.ai von selbst geladen wurde —, frage zuerst, ob er jetzt angewendet werden soll. Bei Nein endest du.
+
+## Betriebsarten
+
+Der Skill kennt drei: das **Aufräumen** (der normale Lauf, beschrieben ab „Beginn“), das **Aufräumen der Sicherungen** eines früheren Laufs und die **Wiederaufnahme** nach einem abgebrochenen Lauf (beide am Ende dieser Datei). Suche zuerst das Protokoll (Abschnitt „Protokoll“): In Claude Code liest du `~/cleaning-up-linux-desktop-protocol.md`, auf claude.ai bittest du den Nutzer, es hochzuladen. Gibt es nichts, frage, ob es unter einem anderen Namen oder an anderer Stelle liegt, und biete diesen Suchbefehl an:
+
+```bash
+grep -rl --include='*.md' '^# cleaning-up-linux-desktop Protocol' "$HOME" 2>/dev/null | tee /tmp/cleanup-protocol-search.txt
+```
+
+Erst danach gilt: kein Protokoll. Schlage dann vor: kein Protokoll heißt Aufräumen; ein offener Schritt (begonnen ohne erledigt, oder Lauf nicht abgeschlossen) heißt Wiederaufnahme; ein abgeschlossener Lauf mit noch vorhandenen Sicherungen heißt Aufräumen der Sicherungen. Der Nutzer entscheidet. „Beginn“ gilt für alle drei Betriebsarten, Schritt 5 nur für das Aufräumen.
 
 ## Beginn
 
 1. Nenne den Zweck: unnütze Datenansammlungen löschen, auf große Datenmengen hinweisen, um die der Nutzer sich selbst kümmern muss; keine Software entfernen. Gilt für Linux-Desktops und -Laptops, nicht für Server.
 2. Erkläre die Arbeitsweise (vorheriger Abschnitt).
-3. Sag ihm: Der Vorgang dauert länger, kann umfangreiche Internetrecherchen umfassen und verbraucht viele Token; für ein gutes Rechercheergebnis empfiehlst du das Modell Opus. Sag ihm außerdem deutlich: Für die Funktion des Skills wird keine Gewähr übernommen, und gelöschte Dateien kommen nur über eine Sicherung zurück. Empfiehl, vor der Nutzung mindestens ein vollständiges Backup oder, auf btrfs, einen Snapshot anzulegen und zu prüfen, dass es sich zurückspielen lässt.
+3. Sag ihm: Der Vorgang dauert länger, kann umfangreiche Internetrecherchen umfassen und verbraucht viele Token; für ein gutes Rechercheergebnis empfiehlst du das Modell Opus. Sag ihm außerdem deutlich: Für die Funktion des Skills wird keine Gewähr übernommen, und gelöschte Dateien kommen nur über eine Sicherung zurück. Empfiehl, vor dem ersten Löschen mindestens ein vollständiges Backup oder einen Snapshot anzulegen und zu prüfen, dass es sich zurückspielen lässt. Du machst das an passender Stelle gemeinsam mit ihm (Abschnitt „Sicherung“); wer will, kann es auch schon vorher selbst tun. Sag außerdem: Die Sicherungen lassen sich später mit diesem Skill aufräumen, wenn der Nutzer sich überzeugt hat, dass alles funktioniert.
 4. Lass ihn diese Arbeitsweise bestätigen, bevor es weitergeht.
-5. Frage alle Angaben ab, die die Analyse braucht, bevor sie startet: die **Größenschwelle** (eine Zahl für große Einzeldateien, Images, Archive und Medien; Vorgabe 150 MiB) und ob auch **allgemeine Archive** (`.zip`, `.tar.*`, `.7z`, `.rar`) bei den Images erfasst werden sollen. Danach läuft die Analyse ohne Rückfrage.
+5. Nur beim Aufräumen: Frage alle Angaben ab, die die Analyse braucht, bevor sie startet: die **Größenschwelle** (eine Zahl für große Einzeldateien, Images, Archive und Medien; Vorgabe 150 MiB) und ob auch **allgemeine Archive** (`.zip`, `.tar.*`, `.7z`, `.rar`) bei den Images erfasst werden sollen. Danach läuft die Analyse ohne Rückfrage.
 
 ## Umgebung ermitteln
 
@@ -50,21 +61,19 @@ Gib dem Nutzer diesen Block; er schreibt nach `/tmp/cleanup-env.txt`:
 
 Download-Ziele, die in Firefox oder Chrome vom Standard abweichen (Zeilen `FIREFOX`, `CHROME`), sind weitere Download-Ordner; jeder geht als eigenes `--downloads` in die Analyse. Erfasst wird nur, was im Home liegt. `xdg-user-dir` liefert für einen nicht eingerichteten Ordner das Home selbst. Ein solcher Eintrag gilt als nicht vorhanden: Den Download-Ordner ohne Eintrag meldest du, Medienordner ohne Eintrag lässt du aus dem Aufruf weg — mit dem Home als Medienordner fiele das ganze Home aus 4.10 heraus.
 
-Gibt es btrfs (das zeigt die Analyse), schlage vor, vor jedem Aufräumschritt einen Snapshot anzulegen und ihn erst zu entfernen, wenn nachweislich alles funktioniert.
-
 ## Analyse
 
 ```bash
 sudo nice -n 19 ionice -c3 python3 -I "${CLAUDE_SKILL_DIR}/analyze.py" --home "$HOME" --downloads "<Download-Ordner>" [--downloads "<Browser-Ziel>" …] --media-dir "<Videos>" --media-dir "<Musik>" --media-dir "<Bilder>" --media-dir "<Dokumente>" --desktop "$XDG_CURRENT_DESKTOP" --threshold <MiB> [--archives]
 ```
 
-Das Skript zeigt seinen Fortschritt und schreibt `/tmp/cleanup-analysis.json`: `fill_level`, `table1` (Bereiche 4.1 bis 4.14 außer 4.11), `software` (Starter-Einträge, Flatpak, Snap, Anwendungsordner mit Vorfilter), `table3`. Es liest nur. Sag dem Nutzer vorher, dass du dabei auch prüfst, welche Software Cache- und Download-Ordner mitbringt, und dich im Internet über die Programme informierst.
+Das Skript zeigt seinen Fortschritt und schreibt `/tmp/cleanup-analysis.json`: `fill_level`, `table1` (Bereiche 4.1 bis 4.14 außer 4.11), `software` (Starter-Einträge, Flatpak, Snap, Anwendungsordner mit Vorfilter), `table3`, `safeguards` (btrfs, ZFS, LVM, Timeshift, Snapper: was das System an Sicherungen hergibt). Es liest nur. Sag dem Nutzer vorher, dass du dabei auch prüfst, welche Software Cache- und Download-Ordner mitbringt, und dich im Internet über die Programme informierst.
 
 Danach recherchierst du die erfassten Programme (4.11), bevor du Tabellen zeigst. Am Ende der Analyse nennst du kurz die Software, zu der du bei der Bereinigung Vorschläge machen wirst; Firefox, Chrome und VS Code gehören dazu, wenn sie installiert sind.
 
 ## Darstellung
 
-Zuerst der **Füllstand** je Dateisystem (belegt, Gesamtgröße, Prozent); gibt es btrfs-Snapshots, ihre Zahl und, wenn bekannt, ihre Belegung. Er zeigt, wo Aufräumen etwas bringt.
+Zuerst der **Füllstand** je Dateisystem (belegt, Gesamtgröße, Prozent); gibt es btrfs-Snapshots, ihre Zahl und, wenn bekannt, ihre Belegung; dazu, welche Sicherungsvarianten das System hergibt (`safeguards`). Der Füllstand zeigt, wo Aufräumen etwas bringt.
 
 Dann drei Tabellen, **je Bereich eine Zeile**. Einzellisten, Histogramme und Auswahllisten kommen erst, wenn der Bereich bearbeitet wird — nie alles gleich nach der Analyse.
 
@@ -77,11 +86,55 @@ Dann drei Tabellen, **je Bereich eine Zeile**. Einzellisten, Histogramme und Aus
   - Doppelte Dateien: Zahl der Gruppen und überzählige Menge.
   - Reste abgebrochener Git-Abrufe, Caches ohne zugeordnetes Programm, Absturzabbilder (nur wenn vorhanden), Entwicklungsartefakte (je Projekt: Größe, letzte Änderung der Quellen, Abhängigkeitsliste ja/nein).
 
+## Sicherung
+
+Die Analyse liest nur. Gesichert wird **vor dem ersten Löschen** und ein zweites Mal **vor dem Nachgang** zu Tabelle 2 und 3, weil dort Ungetestetes geschieht. Ob statt dessen vor jedem Aufräumschritt gesichert wird, entscheidet der Nutzer; Vorgabe ist einmal je Zeitpunkt. Hat er schon vorher gesichert, trägst du das ins Protokoll ein.
+
+Biete nach der Analyse alle Varianten an, die `safeguards` hergibt, und lass wählen. Wahl, Zielort und alle Namen kommen ins Protokoll:
+
+1. **Eigene Sicherung:** Der Nutzer bestätigt, dass eine aktuelle Sicherung vorliegt, die sich zurückspielen lässt. Du sicherst dann nichts selbst.
+2. **Snapshot (btrfs):** nur für Dateisysteme mit `kind: btrfs`. ZFS und LVM (`tested: false`) nennst du, bietest dafür aber keinen Snapshot an: Sie sind ungeprüft, und der Skill enthält keinen Snapshot-Befehl dafür.
+3. **Timeshift oder Snapper**, wenn `safeguards.tools` sie als installiert und eingerichtet zeigt: Gib ihre Befehle als Block; den Namen oder die Kennung trägst du ins Protokoll ein. Die Skripte fassen sie nicht an.
+4. **Archiv der zu löschenden Dateien (tar oder zip):** für Nutzdaten (4.7 bis 4.10, Download-Ordner, Papierkorb) und für Anwendungsordner, bei denen nicht belegt ist, dass es reine Caches sind (Nachgang). Belegte Caches (Tabelle 1) sicherst du nie. Frage vor jeder Archivsicherung, ob der Nutzer sie wirklich will.
+
+**Snapshot.** Frage, ob der Ort `<Einhängepunkt>/.cleaning-up-linux-desktop-snapshots/` für ihn passt; er kann einen anderen Ort unterhalb des Einhängepunkts wählen (`--base-dir`). Sichere jedes Dateisystem, auf dem gelöscht wird (aus dem Füllstand, meist `/` und `/home`):
+
+```bash
+sudo python3 -I "${CLAUDE_SKILL_DIR}/snapshots.py" create --mount <Einhängepunkt> --label <Bezeichnung> [--base-dir <Ordner>] [--dry-run]
+```
+
+Erst Probelauf, dann echt; den Namen nennt `/tmp/cleanup-snapshots-create.json`. Sag dazu: Ein Snapshot hält gelöschte Daten fest, Platz wird erst frei, wenn er entfernt ist.
+
+**Archiv.** Frage nach:
+- **Format:** `tar` (Vorgabe) behält Besitzer, ACLs, erweiterte Attribute, Hardlinks und Links; unkomprimiert bei schnellem Ziel (interne SSD), als `tar.gz` bei langsamem (USB-Stick, Netz). `zip` packt dateiweise (Medien nur ablegen, Rest gepackt), behält aber **Besitzer, ACLs, erweiterte Attribute und Hardlinks nicht**. Weise bei zip ausdrücklich darauf hin, zum Beispiel auf die Herkunfts-URL von Downloads sowie Tags und Bewertungen aus Dolphin (nach Wissen, nicht geprüft).
+- **Zielort:** Vorgabe `~/`. Frage, ob der Nutzer lieber ein externes Gerät nimmt (Stick, Netzfreigabe). Bei einer Netzfreigabe sag, dass die Übertragung in der Regel deutlich länger dauert als an einem direkt angeschlossenen, ausreichend modernen Speichergerät. Liegt das Ziel auf demselben Dateisystem wie die Daten, wird durch das Aufräumen kein Platz frei, solange das Archiv existiert.
+- **Reserve:** Vorgabe ist die größere von 10 % des Ziel-Dateisystems und 10 GiB. Der Nutzer darf sie senken; das Skript hebt sie auf die größere von 5 % und 5 GiB an.
+- **Prüfung:** Vorgabe ist der Vergleich mit den Dateien (ein zweites Lesen); nur auf Wunsch die schnelle Prüfung.
+
+Je Sicherungsschritt: (1) Probelauf von `delete.py` mit `--with-paths` — der Bericht nennt unter `candidates` die Pfade (bei Aufträgen `list` sind es die gewählten Pfade); (2) `backup.py create --dry-run` zeigt Menge und Platz; (3) echt; (4) **erst bei `ok: true`** das echte Löschen. Scheitert die Sicherung, löschst du nichts.
+
+```bash
+sudo python3 -I "${CLAUDE_SKILL_DIR}/backup.py" create --list <Liste oder Bericht von delete.py> --target "<Zielordner>" --step <schritt> --format tar|tar.gz|zip [--run <Ordnername des Laufs>] [--reserve-percent P] [--reserve-gib G] [--verify quick] [--dry-run]
+```
+
+Der erste Bericht (`/tmp/cleanup-backup-create.json`) nennt den Lauf (`run`); gib ihn für alle weiteren Schritte desselben Laufs mit `--run` an. Jeder Schritt wird eine eigene Datei `NN-<schritt>.tar|.tar.gz|.zip`.
+
+**Zurückholen** geschieht selektiv: nur Fehlendes, nichts wird überschrieben. Aus einem Snapshot: `snapshots.py restore --snapshot <Name> --path <Ordner relativ zum Einhängepunkt> [--dry-run]`; aus einem Archiv: `backup.py restore --target <Ziel> --run <Lauf> --step <schritt> [--path <absoluter Originalpfad>] [--dry-run]`. Ein Zurückrollen eines ganzen Subvolumes machst du nur auf ausdrücklichen Wunsch und mit Warnung: Das Protokoll im Home würde auf den Stand des Snapshots zurückgesetzt. Aus einem zip erhalten neue Dateien den Besitzer ihres Elternordners.
+
+## Protokoll
+
+Das Protokoll ist kurz und dient nur dazu, dass in einer neuen Sitzung ein Rollback möglich ist. Vorgabe: `~/cleaning-up-linux-desktop-protocol.md`; der Nutzer kann Namen und Ort ändern. In Claude Code schreibst du die Datei selbst, auf claude.ai gibst du sie als Download und bittest beim neuen Start um den Upload.
+
+- **Erste Zeile genau:** `# cleaning-up-linux-desktop Protocol` (nur sie als englisches Token); der übrige Text steht in der Sprache des Nutzers, solange er nichts anderes will.
+- **Aufbau:** ein Kopf mit den Eckdaten (gewählte Sicherungsvariante, Zielort, Takt der Sicherung, Format), dann das Protokoll je Sitzung mit Datum, dann ein Abschnitt „Sonderbehandlungen“ ohne Protokollcharakter.
+- **Einträge:** je Schritt eine Zeile mit Bereich und was getan wurde. Schreibe „begonnen“, **bevor** du den Befehlsblock übergibst, danach „erledigt“ oder „abgebrochen“, so bleibt ein Abbruch mitten im Schritt sichtbar. Je Löschschritt die betroffenen Ordner (nicht jede Datei) und welche Sicherung ihn abdeckt, denn die Berichte unter `/tmp` überstehen keinen Neustart. Übersprungene Schritte (mit dem Nutzer) und Besonderheiten. Jede Sicherung und jedes Entfernen einer Sicherung als eigener Schritt mit Namen und Ort.
+- **Sonderbehandlungen:** Frage, ob eine besondere Vereinbarung mit dem Nutzer festgehalten werden soll, zur Wiederverwendung. Beim nächsten Lauf fragst du, ob sie wieder gelten sollen.
+
 ## Reihenfolge der Bearbeitung
 
-Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; die Empfehlung zur Sicherung hast du schon zu Beginn gegeben. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach der Ergebnisbericht; mit ihm endet der eigentliche Lauf. Dann bietest du den Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3; der Nutzer kann nach jedem Teil aufhören.
+Schlage vor, Tabelle 1 Schritt für Schritt abzuarbeiten; zuvor sicherst du nach dem Abschnitt „Sicherung“ und legst das Protokoll an. Reihenfolge: 4.1 bis 4.6, 4.12, 4.13, dann 4.9 → 4.7 → 4.8 → 4.10, zuletzt 4.14 (damit alles, was ein früherer Schritt in den Papierkorb verschoben hat, mit erfasst wird). Danach der Ergebnisbericht; mit ihm endet der eigentliche Lauf. Dann bietest du den Nachgang an, zuerst zu Tabelle 2, dann zu Tabelle 3, und davor eine neue Sicherung (Abschnitt „Sicherung“); der Nutzer kann nach jedem Teil aufhören.
 
-Je Bereich: die Einzelheiten zeigen, die Entscheidung des Nutzers einholen, wo eine nötig ist, den Auftrag schreiben, **Probelauf**, Ergebnis zeigen, nach Bestätigung **echter Lauf**:
+Je Bereich: die Einzelheiten zeigen, die Entscheidung des Nutzers einholen, wo eine nötig ist, den Auftrag schreiben, im Protokoll „begonnen“, **Probelauf**, Ergebnis zeigen, bei einer Archivsicherung diese ausführen, nach Bestätigung **echter Lauf**, im Protokoll „erledigt“:
 
 ```bash
 sudo python3 -I "${CLAUDE_SKILL_DIR}/delete.py" --home "$HOME" --order /tmp/cleanup-orders/<Bereich>.json --dry-run
@@ -135,7 +188,7 @@ Im Bericht keine Größe.
 
 ## Ergebnisbericht
 
-Nach Tabelle 1, vor dem Nachgang, stellst du aus den Berichten der einzelnen Läufe einen Gesamtbericht zusammen: je Bereich, was gelöscht wurde (Anzahl, entfernte Datenmenge; bei Docker die gelöschten Container und Images ohne Größe), was übersprungen wurde und warum, was nur gemeldet wurde. Darunter die Summe der entfernten Datenmenge. Sag ausdrücklich, dass das nicht der frei gewordene Platz ist: Snapshots, Kompression und noch geöffnete Dateien können ihn kleiner machen.
+Nach Tabelle 1, vor dem Nachgang, stellst du aus den Berichten der einzelnen Läufe einen Gesamtbericht zusammen: je Bereich, was gelöscht wurde (Anzahl, entfernte Datenmenge; bei Docker die gelöschten Container und Images ohne Größe), was übersprungen wurde und warum, was nur gemeldet wurde. Darunter die Summe der entfernten Datenmenge und die angelegten Sicherungen (Name, Ort, Größe). Sag ausdrücklich, dass das nicht der frei gewordene Platz ist: Snapshots und Archive auf demselben Dateisystem, Kompression und noch geöffnete Dateien können ihn kleiner machen. Nenne, dass sich die Sicherungen später mit diesem Skill aufräumen lassen, und trage den Lauf im Protokoll als abgeschlossen ein.
 
 ## Tabelle 2: Anwendersoftware (4.11) und Nachgang
 
@@ -152,3 +205,18 @@ Je Programm suchst du in der Dokumentation genau zwei Dinge:
 Nach dem Nachgang zu Tabelle 2, oder wenn der Nutzer ihn auslässt, biete an, die Befunde gemeinsam zu erforschen: Inhalte genauer ansehen, Internetrecherche. Sag dazu: Dafür gibt es keine vorgefertigten Lösungen; sie werden erst erarbeitet, sollten gut belegt sein und sind ungetestet — eine vollständige Sicherung oder ein Snapshot ist dringend zu empfehlen. Vorher räumst du dort nichts auf.
 
 Bittet der Nutzer zusätzlich um eine Suche nach weiteren Dateien, gilt keine der Regeln dieses Skills; die Randbedingungen handelst du mit ihm aus. Für solche Suchen gilt auch der stille Ausschluss nicht.
+
+## Betriebsart: Aufräumen der Sicherungen
+
+Nur, wenn das Protokoll den letzten Lauf als abgeschlossen ausweist; sonst geh zur Wiederaufnahme. Das Aufräumen kann an einem späteren Zeitpunkt liegen, an dem der Nutzer sich überzeugen konnte, dass alles funktioniert. Stelle fest, was von den Namen im Protokoll noch existiert und was es festhält (`snapshots.py list`, `backup.py list --target <Ziel>`; die Berichte liegen als `/tmp/cleanup-snapshots-list.json` und `/tmp/cleanup-backup-list.json`). Der Nutzer entscheidet, was weg soll. Entfernt wird nur, was den Präfix trägt, je Schritt mit Probelauf zuerst:
+
+```bash
+sudo python3 -I "${CLAUDE_SKILL_DIR}/snapshots.py" remove --name <Name> [--dry-run]
+sudo python3 -I "${CLAUDE_SKILL_DIR}/backup.py" remove --target "<Zielordner>" --run <Lauf> [--dry-run]
+```
+
+Jedes Entfernen ist ein Schritt im Protokoll. Timeshift und Snapper räumst du mit deren Befehlen als Block auf. Danach fragst du, ob das Protokoll gelöscht werden soll; du löschst es nur, wenn der Nutzer es will. Stehen Sonderbehandlungen darin, sag es ihm. Er kann auch nur den Protokollteil dieser und früherer Sitzungen entfernen lassen und die Datei mit den Sonderbehandlungen behalten.
+
+## Betriebsart: Wiederaufnahme nach einem Abbruch
+
+Gilt, wenn das Protokoll einen offenen Schritt oder einen nicht abgeschlossenen Lauf zeigt, etwa nach einem Neustart, bei dem die Sitzung verloren ging. Lies das Protokoll und stelle den Stand dar: was erledigt ist, was begonnen wurde ohne Abschluss. Prüfe, ob die genannten Sicherungen noch vorhanden sind (`snapshots.py list`, `backup.py list`). Schlage dann vor, einen oder alle Schritte zurückzuholen (selektiv, Abschnitt „Sicherung“) oder fortzusetzen; der Nutzer entscheidet. Zurückgeholt wird je Schritt aus der Sicherung, die das Protokoll nennt. Gibt es keine, weise auf die eigene Sicherung des Nutzers hin, die er selbst zurückspielt.
